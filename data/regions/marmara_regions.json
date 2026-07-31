@@ -1,1 +1,56 @@
-
+{
+  "project": "Nova-Forest AI",
+  "region": "Marmara-Trakya",
+  "areas": [
+    {
+      "city": "Edirne",
+      "districts": [
+        "Merkez",
+        "Keşan",
+        "İpsala",
+        "Enez",
+        "Uzunköprü",
+        "Lalapaşa"
+      ]
+    },
+    {
+      "city": "Kırklareli",
+      "districts": [
+        "Merkez",
+        "Demirköy",
+        "Vize",
+        "İğneada",
+        "Pınarhisar"
+      ]
+    },
+    {
+      "city": "Tekirdağ",
+      "districts": [
+        "Merkez",
+        "Şarköy",
+        "Saray",
+        "Malkara"
+      ]
+    },
+    {
+      "city": "Çanakkale",
+      "districts": [
+        "Merkez",
+        "Gelibolu",
+        "Ayvacık",
+        "Bayramiç",
+        "Biga"
+      ]
+    },
+    {
+      "city": "İstanbul Avrupa Yakası",
+      "districts": [
+        "Arnavutköy",
+        "Çatalca",
+        "Silivri",
+        "Sarıyer",
+        "Eyüpsultan"
+      ]
+    }
+  ]
+}
