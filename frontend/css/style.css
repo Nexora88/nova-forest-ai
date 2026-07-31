@@ -1,0 +1,51 @@
+/* Nova-Forest AI Interface */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #050505;
+    color: #00ff66;
+    font-family: "Courier New", monospace;
+}
+
+
+header {
+    text-align: center;
+    padding: 30px;
+    border-bottom: 1px solid #00ff66;
+}
+
+
+h1 {
+    font-size: 32px;
+}
+
+
+main {
+    padding: 20px;
+}
+
+
+#dashboard {
+    max-width: 900px;
+    margin: auto;
+}
+
+
+.risk-box {
+    background: #101010;
+    border: 1px solid #00ff66;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+}
+
+
+.risk-box h3 {
+    color: #ffb300;
+}
+
+
+p {
+    color: #ffffff;
+}
