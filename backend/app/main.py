@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api.routes import router
 from app.api.weather_routes import router as weather_router
+from app.api.satellite_routes import router as satellite_router
 
 app = FastAPI(
     title="Nova-Forest AI",
@@ -10,6 +11,7 @@ app = FastAPI(
 
 app.include_router(router)
 app.include_router(weather_router)
+app.include_router(satellite_router)
 
 
 @app.get("/health")
