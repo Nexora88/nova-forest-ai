@@ -1,6 +1,29 @@
 // Nova-Forest AI Dashboard Module
 
 
+function getRiskEmoji(level) {
+
+    if (level === "LOW") {
+        return "🟢";
+    }
+
+    if (level === "MEDIUM") {
+        return "🟡";
+    }
+
+    if (level === "HIGH") {
+        return "🟠";
+    }
+
+    if (level === "CRITICAL") {
+        return "🔴";
+    }
+
+    return "⚪";
+}
+
+
+
 function loadDashboard() {
 
 
@@ -13,14 +36,19 @@ function loadDashboard() {
         .then(data => {
 
 
-            console.log(
-                "Nova-Forest AI data loaded:",
-                data
-            );
-
-
             const dashboard =
                 document.getElementById("dashboard");
+
+
+            const container =
+                document.createElement("div");
+
+
+            container.id = "risk-container";
+
+
+            dashboard.appendChild(container);
+
 
 
             data.forEach(region => {
@@ -35,17 +63,25 @@ function loadDashboard() {
 
                 box.innerHTML = `
 
-                    <h3>${region.name}</h3>
+                <h3>
+                ${getRiskEmoji(region.risk)}
+                ${region.name}
+                </h3>
 
-                    <p>
-                    Risk Seviyesi:
-                    ${region.risk}
-                    </p>
+                <p>
+                Risk Seviyesi:
+                ${region.risk}
+                </p>
+
+                <p>
+                Sistem:
+                Aktif İzleme
+                </p>
 
                 `;
 
 
-                dashboard.appendChild(box);
+                container.appendChild(box);
 
 
             });
@@ -57,7 +93,7 @@ function loadDashboard() {
         .catch(error => {
 
             console.log(
-                "Dashboard connection error:",
+                "Dashboard error:",
                 error
             );
 
@@ -65,6 +101,7 @@ function loadDashboard() {
 
 
 }
+
 
 
 loadDashboard();
