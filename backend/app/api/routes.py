@@ -26,3 +26,33 @@ def risk_test():
         "district": "Keşan",
         "analysis": result
     }
+
+@router.get("/regions")
+def get_regions():
+
+    return [
+        {
+            "name": "Edirne",
+            "lat": 41.6771,
+            "lng": 26.5557,
+            "risk": "HIGH"
+        },
+        {
+            "name": "Kırklareli",
+            "lat": 41.7355,
+            "lng": 27.2252,
+            "risk": "MEDIUM"
+        },
+        {
+            "name": "Tekirdağ",
+            "lat": 40.9781,
+            "lng": 27.5110,
+            "risk": "LOW"
+        },
+        {
+            "name": "Çanakkale",
+            "lat": 40.1553,
+            "lng": 26.4142,
+            "risk": "CRITICAL"
+        }
+    ]
