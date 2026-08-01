@@ -83,3 +83,81 @@ fetch("http://localhost:8000/regions")
         );
 
     });
+
+// NASA FIRMS uydu sıcak nokta katmanı
+
+function loadSatelliteAlerts() {
+
+
+    fetch("http://localhost:8000/satellite-alerts")
+
+
+        .then(response => response.json())
+
+
+        .then(data => {
+
+
+            console.log(
+                "Satellite data:",
+                data
+            );
+
+
+            if (data.alerts.length === 0) {
+
+                console.log(
+                    "No satellite fire alerts"
+                );
+
+                return;
+
+            }
+
+
+            data.alerts.forEach(alert => {
+
+
+                L.circle(
+                    [
+                        alert.lat,
+                        alert.lng
+                    ],
+                    {
+                        color: "red",
+                        fillColor: "red",
+                        fillOpacity: 0.8,
+                        radius: 5000
+                    }
+                )
+
+                .addTo(map)
+
+                .bindPopup(
+                    `
+                    🔥 NASA FIRMS Alert<br>
+                    Bölge: ${alert.region}
+                    `
+                );
+
+
+            });
+
+
+        })
+
+
+        .catch(error => {
+
+            console.log(
+                "Satellite connection error:",
+                error
+            );
+
+        });
+
+}
+
+
+loadSatelliteAlerts();
+
