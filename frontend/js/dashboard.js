@@ -1,28 +1,68 @@
 // Nova-Forest AI Dashboard Module
 
 
-const projectName = "Nova-Forest AI";
-
-
 function loadDashboard() {
 
-    console.log(projectName + " dashboard loaded");
+
+    fetch("http://localhost:8000/regions")
 
 
-    const areas = [
-        "Edirne",
-        "Kırklareli",
-        "Tekirdağ",
-        "Çanakkale",
-        "İstanbul Avrupa Yakası"
-    ];
+        .then(response => response.json())
 
 
-    areas.forEach(area => {
+        .then(data => {
 
-        console.log("Monitoring area:", area);
 
-    });
+            console.log(
+                "Nova-Forest AI data loaded:",
+                data
+            );
+
+
+            const dashboard =
+                document.getElementById("dashboard");
+
+
+            data.forEach(region => {
+
+
+                const box =
+                    document.createElement("div");
+
+
+                box.className = "risk-box";
+
+
+                box.innerHTML = `
+
+                    <h3>${region.name}</h3>
+
+                    <p>
+                    Risk Seviyesi:
+                    ${region.risk}
+                    </p>
+
+                `;
+
+
+                dashboard.appendChild(box);
+
+
+            });
+
+
+        })
+
+
+        .catch(error => {
+
+            console.log(
+                "Dashboard connection error:",
+                error
+            );
+
+        });
+
 
 }
 
