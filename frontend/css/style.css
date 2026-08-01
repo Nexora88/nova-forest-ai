@@ -57,3 +57,35 @@ p {
     border-radius: 8px;
     margin-bottom: 20px;
 }
+
+/* Nova-Forest AI Risk Colors */
+
+
+.risk-box.low {
+    border-color: #00ff66;
+}
+
+
+.risk-box.medium {
+    border-color: #ffff00;
+}
+
+
+.risk-box.high {
+    border-color: #ff8800;
+}
+
+
+.risk-box.critical {
+    border-color: #ff0000;
+}
+
+
+.risk-box h3 {
+    font-size: 22px;
+}
+
+
+#risk-container {
+    margin-top: 20px;
+}
