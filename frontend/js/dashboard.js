@@ -58,7 +58,8 @@ function loadDashboard() {
                     document.createElement("div");
 
 
-                box.className = "risk-box";
+                box.className =
+                "risk-box " + region.risk.toLowerCase();
 
 
                 box.innerHTML = `
