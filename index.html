@@ -2,38 +2,270 @@
 <html lang="tr">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Nova-Forest AI</title>
+    <title>Nova-Forest AI | Uydu Tabanlı Yangın Risk Analizi</title>
+
 
     <link rel="stylesheet" href="css/style.css">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
 </head>
+
 
 <body>
 
-    <header>
-        <h1>🌲 Nova-Forest AI</h1>
-        <p>Uydu Tabanlı Orman Risk Analiz Sistemi</p>
-    </header>
+
+<header>
+
+    <div class="logo-area">
+
+        <h1>
+            🌲 NOVA-FOREST AI
+        </h1>
+
+        <p>
+            Uydu Tabanlı Erken Yangın Risk Tahmin Sistemi
+        </p>
+
+    </div>
 
 
-    <main>
+    <div class="system-status">
 
-        <section id="dashboard">
+        <span class="online-dot"></span>
 
-            <h2>Marmara - Trakya Risk Monitörü</h2>
-            <div id="map"></div>
+        SYSTEM ONLINE
 
-        </section>
+    </div>
 
-    </main>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/dashboard.js"></script>
+</header>
+
+
+
+<main>
+
+
+
+<section class="overview">
+
+
+<div class="info-card">
+
+<h3>🗺 İzlenen Bölge</h3>
+
+<p>
+Trakya & Marmara
+</p>
+
+</div>
+
+
+
+<div class="info-card">
+
+<h3>🌲 Takip Edilen Alan</h3>
+
+<p>
+Edirne<br>
+Kırklareli<br>
+Tekirdağ<br>
+Çanakkale<br>
+İstanbul Avrupa
+</p>
+
+</div>
+
+
+
+<div class="info-card">
+
+<h3>🛰 Veri Kaynakları</h3>
+
+<p>
+Sentinel-2<br>
+NASA FIRMS<br>
+Open-Meteo
+</p>
+
+</div>
+
+
+
+<div class="info-card">
+
+<h3>🔥 Sistem Modu</h3>
+
+<p>
+Erken Uyarı Aktif
+</p>
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section id="dashboard">
+
+
+<h2>
+🌲 Marmara - Trakya Risk Monitörü
+</h2>
+
+
+<div id="map"></div>
+
+
+
+<div id="risk-container">
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+<section class="analysis-panel">
+
+
+<h2>
+📊 Canlı Analiz
+</h2>
+
+
+
+<div class="analysis-grid">
+
+
+<div class="analysis-box">
+
+<h3>
+🌡 Hava Durumu
+</h3>
+
+<p>
+Sıcaklık: Bekleniyor
+</p>
+
+<p>
+Nem: Bekleniyor
+</p>
+
+<p>
+Rüzgar: Bekleniyor
+</p>
+
+
+</div>
+
+
+
+
+<div class="analysis-box">
+
+
+<h3>
+🛰 Uydu Analizi
+</h3>
+
+
+<p>
+NASA FIRMS:
+Hazırlanıyor
+</p>
+
+
+<p>
+Sentinel-2 NDVI:
+Hazırlanıyor
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="analysis-box">
+
+
+<h3>
+🧠 AI Risk Motoru
+</h3>
+
+
+<p>
+Risk Skoru:
+--
+</p>
+
+
+<p>
+Durum:
+Analiz Bekleniyor
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+</main>
+
+
+
+
+
+<footer>
+
+
+<p>
+Nova-Forest AI © 2026
+</p>
+
+
+<p>
+Sivil çevre izleme ve erken uyarı prototipi
+</p>
+
+
+</footer>
+
+
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script src="js/map.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+
 
 </body>
+
 
 </html>
