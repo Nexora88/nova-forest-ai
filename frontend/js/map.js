@@ -1,8 +1,11 @@
 // =====================================
 // NOVA-FOREST AI
-// Advanced Map System
+// Satellite Fire Risk Map System
 // =====================================
 
+
+
+// Harita başlangıcı
 
 const map = L.map("map").setView(
     [41.2, 27.0],
@@ -11,12 +14,14 @@ const map = L.map("map").setView(
 
 
 
-// Koyu harita görünümü
+
+// Koyu harita teması
 
 L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     {
-        attribution: "© OpenStreetMap © CARTO"
+        attribution:
+        "© OpenStreetMap © CARTO"
     }
 ).addTo(map);
 
@@ -26,29 +31,34 @@ L.tileLayer(
 
 // Risk renk sistemi
 
-function getRiskColor(level) {
+function getRiskColor(risk) {
 
 
-    switch(level) {
+    switch(risk) {
 
 
         case "LOW":
+
             return "#00ff66";
 
 
         case "MEDIUM":
+
             return "#ffff00";
 
 
         case "HIGH":
+
             return "#ff8800";
 
 
         case "CRITICAL":
+
             return "#ff0000";
 
 
         default:
+
             return "#ffffff";
 
     }
@@ -60,133 +70,110 @@ function getRiskColor(level) {
 
 
 
-// Risk bölgeleri
+// Backend'den bölge verisi çekme
 
-const regions = [
-
-
-    {
-        name:"Edirne",
-        lat:41.6771,
-        lng:26.5557,
-        risk:"HIGH",
-        ndvi:"0.32",
-        weather:"Kurak"
-    },
+fetch("http://localhost:8000/regions")
 
 
-    {
-        name:"Kırklareli",
-        lat:41.7355,
-        lng:27.2252,
-        risk:"MEDIUM",
-        ndvi:"0.48",
-        weather:"Normal"
-    },
+.then(response => response.json())
 
 
-    {
-        name:"Tekirdağ",
-        lat:40.9781,
-        lng:27.5110,
-        risk:"LOW",
-        ndvi:"0.65",
-        weather:"İyi"
-    },
+.then(data => {
 
 
-    {
-        name:"Çanakkale",
-        lat:40.1553,
-        lng:26.4142,
-        risk:"CRITICAL",
-        ndvi:"0.18",
-        weather:"Çok Kurak"
-    },
+
+    data.forEach(region => {
 
 
-    {
-        name:"İstanbul Avrupa Yakası",
-        lat:41.1500,
-        lng:28.6500,
-        risk:"HIGH",
-        ndvi:"0.29",
-        weather:"Rüzgarlı"
-    }
 
-
-];
+        const color =
+        getRiskColor(region.risk);
 
 
 
 
+        L.circle(
+
+            [
+                region.lat,
+                region.lng
+            ],
+
+            {
+
+                radius: 20000,
+
+                color: color,
+
+                fillColor: color,
+
+                fillOpacity: 0.35
+
+            }
+
+        )
+
+        .addTo(map)
 
 
 
-// Haritaya bölgeleri ekleme
-
-regions.forEach(region => {
+        .bindPopup(`
 
 
-
-    const color = getRiskColor(region.risk);
-
-
-
-    L.circle(
-        [
-            region.lat,
-            region.lng
-        ],
-        {
-
-            color: color,
-
-            fillColor: color,
-
-            fillOpacity:0.35,
-
-            radius:20000
-
-        }
-
-    )
-
-    .addTo(map)
+            <h3>
+            🌲 Nova-Forest AI
+            </h3>
 
 
-    .bindPopup(`
+            <b>Bölge:</b>
+            ${region.name}
 
-        <div>
 
-        <h3>🌲 Nova-Forest AI</h3>
+            <br><br>
 
-        <b>Bölge:</b>
-        ${region.name}
-        <br><br>
 
-        🔥 Risk:
-        ${region.risk}
+            🔥 Risk:
+            ${region.risk}
 
-        <br>
 
-        🌿 NDVI:
-        ${region.ndvi}
+            <br><br>
 
-        <br>
 
-        🌦 Durum:
-        ${region.weather}
+            🛰 Veri Kaynağı:
 
-        <br><br>
+            Backend Risk Engine
 
-        Son analiz:
-        2026
 
-        </div>
+            <br><br>
 
-    `);
 
+            📡 Sistem:
+
+            Aktif İzleme
+
+
+        `);
+
+
+
+    });
+
+
+
+})
+
+
+
+.catch(error => {
+
+
+    console.log(
+
+        "Nova-Forest AI bağlantı hatası:",
+
+        error
+
+    );
 
 
 });
@@ -196,12 +183,15 @@ regions.forEach(region => {
 
 
 
-
-// Uydu alarm katmanı hazırlığı
+// Uydu alarm katmanı
 
 const satelliteLayer =
-L.layerGroup()
-.addTo(map);
+L.layerGroup();
+
+
+satelliteLayer.addTo(map);
+
+
 
 
 
