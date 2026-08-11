@@ -1,224 +1,107 @@
-/* ===================================
+/* =====================================
    NOVA-FOREST AI
-   Satellite Risk Dashboard UI
-=================================== */
+   Environmental Intelligence UI
+===================================== */
 
 
 * {
-    box-sizing: border-box;
+
+    box-sizing:border-box;
+
 }
 
 
 
 body {
 
-    margin: 0;
+
+    margin:0;
+
 
     background:
-    radial-gradient(circle at top, #102010, #030303 60%);
 
-    color: #ffffff;
+    radial-gradient(
+    circle at top,
+    #10261a,
+    #020303 60%
+    );
+
+
+    color:#e8e8e8;
+
 
     font-family:
+
     "Courier New",
     monospace;
 
+
 }
+
+
+
 
 
 
 /* HEADER */
 
+
 header {
 
-    display: flex;
 
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding: 25px 40px;
-
-    border-bottom: 1px solid #00ff66;
-
-    background: rgba(0,0,0,0.6);
-
-}
+    display:flex;
 
 
-
-.logo-area h1 {
-
-    margin: 0;
-
-    color: #00ff66;
-
-    font-size: 32px;
-
-    letter-spacing: 3px;
-
-}
+    justify-content:space-between;
 
 
-
-.logo-area p {
-
-    color: #aaa;
-
-    margin-top: 10px;
-
-}
+    align-items:center;
 
 
-
-.system-status {
-
-    border: 1px solid #00ff66;
-
-    padding: 12px 20px;
-
-    border-radius: 20px;
-
-    color: #00ff66;
-
-}
+    padding:30px 50px;
 
 
+    border-bottom:
 
-.online-dot {
-
-    display: inline-block;
-
-    width: 10px;
-
-    height: 10px;
-
-    background: #00ff66;
-
-    border-radius: 50%;
-
-    margin-right: 8px;
-
-}
-
-
-
-/* ANA KARTLAR */
-
-
-main {
-
-    padding: 30px;
-
-}
-
-
-
-.overview {
-
-    display: grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
-
-    gap: 20px;
-
-    margin-bottom: 30px;
-
-}
-
-
-
-.info-card {
+    1px solid #163d25;
 
 
     background:
-    rgba(10,10,10,0.85);
 
-
-    border:
-
-    1px solid #154d28;
-
-
-    padding: 20px;
-
-
-    border-radius: 12px;
-
-
-    transition: .3s;
+    rgba(0,0,0,.65);
 
 
 }
 
 
 
-.info-card:hover {
-
-
-    border-color:#00ff66;
-
-    transform:translateY(-5px);
-
-}
-
-
-
-.info-card h3 {
-
-
-    color:#ffb300;
-
-}
-
-
-
-.info-card p {
-
-
-    color:#ddd;
-
-    line-height:1.6;
-
-}
-
-
-
-
-
-/* DASHBOARD */
-
-
-#dashboard {
-
-
-    background:
-
-    rgba(5,5,5,.9);
-
-
-    border:
-
-    1px solid #154d28;
-
-
-    padding:25px;
-
-
-    border-radius:15px;
-
-
-}
-
-
-
-h2 {
+.logo h1 {
 
 
     color:#00ff66;
 
-    letter-spacing:2px;
+
+    font-size:36px;
+
+
+    letter-spacing:4px;
+
+
+    margin:0;
+
+
+}
+
+
+
+.logo p {
+
+
+    color:#9ca39c;
+
+
+    font-size:15px;
+
 
 }
 
@@ -226,25 +109,46 @@ h2 {
 
 
 
-/* HARİTA */
+.status {
 
 
-#map {
+    border:
+
+    1px solid #00ff66;
 
 
-    height:550px;
+    padding:12px 25px;
 
 
-    width:100%;
+    border-radius:30px;
 
 
-    margin-top:20px;
+    color:#00ff66;
 
 
-    border-radius:12px;
+}
 
 
-    border:1px solid #00ff66;
+
+.status span {
+
+
+    display:inline-block;
+
+
+    width:10px;
+
+
+    height:10px;
+
+
+    background:#00ff66;
+
+
+    border-radius:50%;
+
+
+    margin-right:10px;
 
 
 }
@@ -254,10 +158,149 @@ h2 {
 
 
 
-/* RİSK KARTLARI */
 
 
-#risk-container {
+/* NAVIGATION */
+
+
+nav {
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    gap:30px;
+
+
+    padding:20px;
+
+
+    background:#050505;
+
+
+}
+
+
+
+nav a {
+
+
+    color:#aaa;
+
+
+    text-decoration:none;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+nav a:hover {
+
+
+    color:#00ff66;
+
+
+}
+
+
+
+
+
+
+
+
+/* MAIN */
+
+
+main {
+
+
+    padding:40px;
+
+
+}
+
+
+
+
+
+
+.hero {
+
+
+    padding:40px;
+
+
+    border:
+
+    1px solid #174d2a;
+
+
+    border-radius:20px;
+
+
+    background:
+
+    linear-gradient(
+
+    135deg,
+
+    rgba(0,255,102,.08),
+
+    rgba(0,0,0,.7)
+
+    );
+
+
+}
+
+
+
+.hero h2 {
+
+
+    color:#00ff66;
+
+
+    font-size:32px;
+
+
+}
+
+
+
+.hero p {
+
+
+    color:#bbb;
+
+
+    max-width:800px;
+
+
+    line-height:1.7;
+
+
+}
+
+
+
+
+
+
+
+
+/* CARDS */
+
+
+.cards {
 
 
     display:grid;
@@ -265,103 +308,33 @@ h2 {
 
     grid-template-columns:
 
-    repeat(auto-fit,minmax(250px,1fr));
+    repeat(auto-fit,minmax(230px,1fr));
 
 
-    gap:20px;
-
-
-    margin-top:25px;
-
-
-}
-
-
-
-.risk-box {
-
-
-    background:#0b0b0b;
-
-
-    border-left:5px solid #00ff66;
-
-
-    padding:20px;
-
-
-    border-radius:10px;
-
-
-}
-
-
-
-.risk-box h3 {
-
-
-    color:#ffb300;
-
-
-}
-
-
-
-/* RİSK RENKLERİ */
-
-
-.risk-box.low {
-
-    border-color:#00ff66;
-
-}
-
-
-
-.risk-box.medium {
-
-    border-color:#ffff00;
-
-}
-
-
-
-.risk-box.high {
-
-    border-color:#ff8800;
-
-}
-
-
-
-.risk-box.critical {
-
-    border-color:#ff0000;
-
-}
-
-
-
-
-
-/* ANALİZ PANELİ */
-
-
-.analysis-panel {
+    gap:25px;
 
 
     margin-top:35px;
 
 
-    background:#080808;
+}
 
 
-    padding:25px;
+
+.card {
+
+
+    background:
+
+    rgba(10,10,10,.85);
 
 
     border:
 
-    1px solid #154d28;
+    1px solid #174d2a;
+
+
+    padding:25px;
 
 
     border-radius:15px;
@@ -371,50 +344,136 @@ h2 {
 
 
 
-.analysis-grid {
+.card:hover {
 
 
-    display:grid;
-
-
-    grid-template-columns:
-
-    repeat(auto-fit,minmax(260px,1fr));
-
-
-    gap:20px;
+    border-color:#00ff66;
 
 
 }
 
 
 
-.analysis-box {
+.card h3 {
 
 
-    padding:20px;
-
-
-    background:#111;
-
-
-    border-radius:10px;
-
-
-    border:1px solid #222;
+    color:#ffb300;
 
 
 }
 
 
 
-.analysis-box h3 {
+.card strong {
+
+
+    display:block;
+
+
+    font-size:32px;
+
+
+    color:white;
+
+
+    margin:15px 0;
+
+
+}
+
+
+
+
+
+
+
+/* MAP */
+
+
+.map-section {
+
+
+    margin-top:40px;
+
+
+}
+
+
+
+#map {
+
+
+    height:600px;
+
+
+    margin-top:20px;
+
+
+    border-radius:20px;
+
+
+    border:
+
+    1px solid #00ff66;
+
+
+}
+
+
+
+
+
+
+
+/* SOURCES */
+
+
+.sources {
+
+
+    margin-top:40px;
+
+
+    padding:30px;
+
+
+    border-radius:20px;
+
+
+    border:
+
+    1px solid #174d2a;
+
+
+    background:#050505;
+
+
+}
+
+
+
+.sources h2 {
 
 
     color:#00ff66;
 
 
 }
+
+
+
+.sources div {
+
+
+    line-height:2;
+
+
+    color:#ccc;
+
+
+}
+
+
 
 
 
@@ -425,16 +484,18 @@ h2 {
 footer {
 
 
-    text-align:center;
+    margin-top:50px;
 
 
     padding:30px;
 
 
-    margin-top:40px;
+    text-align:center;
 
 
-    border-top:1px solid #154d28;
+    border-top:
+
+    1px solid #163d25;
 
 
     color:#777;
@@ -446,7 +507,7 @@ footer {
 
 
 
-/* MOBİL */
+/* MOBILE */
 
 
 @media(max-width:700px){
@@ -457,9 +518,21 @@ header {
 
     flex-direction:column;
 
+
     gap:20px;
 
+
     text-align:center;
+
+
+}
+
+
+
+nav {
+
+
+    flex-wrap:wrap;
 
 
 }
@@ -471,16 +544,19 @@ main {
 
     padding:15px;
 
+
 }
 
 
 
-.logo-area h1 {
+.hero h2 {
 
 
     font-size:24px;
 
+
 }
+
 
 
 #map {
@@ -488,7 +564,9 @@ main {
 
     height:400px;
 
+
 }
 
 
-  }
+
+}
