@@ -31,28 +31,60 @@ def risk_test():
 def get_regions():
 
     return [
+
         {
             "name": "Edirne",
             "lat": 41.6771,
             "lng": 26.5557,
-            "risk": "HIGH"
+            "risk": "HIGH",
+            "risk_score": 72,
+            "temperature": 36,
+            "humidity": 22,
+            "wind": 35,
+            "ndvi": 0.31,
+            "vegetation": "Kuruluk Riski"
         },
+
+
         {
             "name": "Kırklareli",
             "lat": 41.7355,
             "lng": 27.2252,
-            "risk": "MEDIUM"
+            "risk": "MEDIUM",
+            "risk_score": 48,
+            "temperature": 30,
+            "humidity": 40,
+            "wind": 20,
+            "ndvi": 0.52,
+            "vegetation": "Normal"
         },
+
+
         {
             "name": "Tekirdağ",
             "lat": 40.9781,
             "lng": 27.5110,
-            "risk": "LOW"
+            "risk": "LOW",
+            "risk_score": 25,
+            "temperature": 27,
+            "humidity": 55,
+            "wind": 15,
+            "ndvi": 0.70,
+            "vegetation": "Sağlıklı"
         },
+
+
         {
             "name": "Çanakkale",
             "lat": 40.1553,
             "lng": 26.4142,
-            "risk": "CRITICAL"
+            "risk": "CRITICAL",
+            "risk_score": 91,
+            "temperature": 39,
+            "humidity": 15,
+            "wind": 45,
+            "ndvi": 0.16,
+            "vegetation": "Kritik Kuruluk"
         }
+
     ]
