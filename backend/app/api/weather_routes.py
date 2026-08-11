@@ -1,43 +1,179 @@
-from fastapi import APIRouter
-from app.services.weather_service import get_weather
-from app.engine.risk_engine import calculate_risk
+# =====================================
+# NOVA-FOREST AI
+# Open-Meteo Weather Service
+# =====================================
+
+import requests
 
 
-router = APIRouter()
+
+OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 
-@router.get("/weather-risk")
-def weather_risk():
 
-    # Edirne örnek koordinatı
-
-    latitude = 41.6771
-    longitude = 26.5557
+def get_weather_data(latitude, longitude):
 
 
-    weather = get_weather(
-        latitude,
-        longitude
-    )
+    params = {
 
+        "latitude": latitude,
 
-    if "error" in weather:
-        return weather
+        "longitude": longitude,
 
+        "current": [
+            "temperature_2m",
+            "relative_humidity_2m",
+            "wind_speed_10m"
+        ],
 
-    risk = calculate_risk(
-        temperature=weather["temperature"],
-        humidity=weather["humidity"],
-        wind_speed=weather["wind_speed"]
-    )
-
-
-    return {
-
-        "region": "Edirne",
-
-        "weather": weather,
-
-        "risk_analysis": risk
+        "timezone": "Europe/Istanbul"
 
     }
+
+
+
+    try:
+
+
+        response = requests.get(
+            OPEN_METEO_URL,
+            params=params,
+            timeout=10
+        )
+
+
+        data = response.json()
+
+
+
+        current = data.get(
+            "current",
+            {}
+        )
+
+
+
+        return {
+
+
+            "temperature":
+            current.get(
+                "temperature_2m"
+            ),
+
+
+
+            "humidity":
+            current.get(
+                "relative_humidity_2m"
+            ),
+
+
+
+            "wind":
+            current.get(
+                "wind_speed_10m"
+            ),
+
+
+
+            "source":
+            "Open-Meteo"
+
+        }
+
+
+
+    except Exception as error:
+
+
+        return {
+
+
+            "error":
+            str(error),
+
+
+            "source":
+            "Open-Meteo"
+
+        }
+
+
+
+
+
+def get_region_weather():
+
+
+
+    regions = {
+
+
+        "Edirne": {
+
+            "lat":41.6771,
+
+            "lng":26.5557
+
+        },
+
+
+        "Kırklareli": {
+
+            "lat":41.7355,
+
+            "lng":27.2252
+
+        },
+
+
+        "Tekirdağ": {
+
+            "lat":40.9781,
+
+            "lng":27.5110
+
+        },
+
+
+        "Çanakkale": {
+
+            "lat":40.1553,
+
+            "lng":26.4142
+
+        },
+
+
+        "Istanbul Avrupa": {
+
+            "lat":41.1500,
+
+            "lng":28.6500
+
+        }
+
+
+    }
+
+
+
+    results = {}
+
+
+
+    for name, location in regions.items():
+
+
+        results[name] = get_weather_data(
+
+            location["lat"],
+
+            location["lng"]
+
+        )
+
+
+
+    return results
