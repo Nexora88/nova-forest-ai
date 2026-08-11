@@ -1,7 +1,35 @@
 # =====================================
 # NOVA-FOREST AI
-# Risk Analysis Service
+# Risk Analysis Service v0.2
 # =====================================
+
+
+
+def get_risk_level(score):
+
+
+    if score < 25:
+
+        return "LOW"
+
+
+    elif score < 50:
+
+        return "MEDIUM"
+
+
+    elif score < 75:
+
+        return "HIGH"
+
+
+    else:
+
+        return "CRITICAL"
+
+
+
+
 
 
 
@@ -18,7 +46,7 @@ def calculate_risk(
 
 
 
-    # Sıcaklık analizi
+    # Sıcaklık etkisi
 
     if temperature >= 40:
 
@@ -30,8 +58,7 @@ def calculate_risk(
 
 
 
-
-    # Nem analizi
+    # Nem etkisi
 
     if humidity <= 20:
 
@@ -43,9 +70,7 @@ def calculate_risk(
 
 
 
-
-
-    # Rüzgar analizi
+    # Rüzgar etkisi
 
     if wind >= 40:
 
@@ -57,9 +82,7 @@ def calculate_risk(
 
 
 
-
-
-    # Bitki kuruluk analizi
+    # Bitki kuruluğu
 
     if ndvi < 0.2:
 
@@ -71,8 +94,6 @@ def calculate_risk(
 
 
 
-
-
     # NASA FIRMS alarmı
 
     if fire_alert:
@@ -81,29 +102,19 @@ def calculate_risk(
 
 
 
-
-
-    # Maksimum 100
-
     if score > 100:
 
         score = 100
 
 
 
-
-
     return {
 
 
-        "risk_score":
-
-        score,
+        "risk_score": score,
 
 
-        "risk_level":
-
-        get_risk_level(score)
+        "risk_level": get_risk_level(score)
 
     }
 
@@ -112,27 +123,138 @@ def calculate_risk(
 
 
 
-def get_risk_level(score):
 
 
-    if score < 25:
-
-        return "LOW"
+def analyze_regions():
 
 
-
-    elif score < 50:
-
-        return "MEDIUM"
+    regions = [
 
 
-
-    elif score < 75:
-
-        return "HIGH"
+        {
 
 
+            "name": "Edirne",
 
-    else:
+            "temperature": 36,
 
-        return "CRITICAL"
+            "humidity": 25,
+
+            "wind": 30,
+
+            "ndvi": 0.31,
+
+            "fire_alert": False
+
+        },
+
+
+        {
+
+
+            "name": "Kırklareli",
+
+            "temperature": 31,
+
+            "humidity": 40,
+
+            "wind": 22,
+
+            "ndvi": 0.52,
+
+            "fire_alert": False
+
+        },
+
+
+        {
+
+
+            "name": "Tekirdağ",
+
+            "temperature": 28,
+
+            "humidity": 55,
+
+            "wind": 15,
+
+            "ndvi": 0.70,
+
+            "fire_alert": False
+
+        },
+
+
+        {
+
+
+            "name": "Çanakkale",
+
+            "temperature": 39,
+
+            "humidity": 18,
+
+            "wind": 45,
+
+            "ndvi": 0.16,
+
+            "fire_alert": True
+
+        }
+
+
+    ]
+
+
+
+    results = []
+
+
+
+    for region in regions:
+
+
+
+        analysis = calculate_risk(
+
+
+            region["temperature"],
+
+            region["humidity"],
+
+            region["wind"],
+
+            region["ndvi"],
+
+            region["fire_alert"]
+
+        )
+
+
+
+        results.append({
+
+
+            "name": region["name"],
+
+
+            "temperature": region["temperature"],
+
+
+            "humidity": region["humidity"],
+
+
+            "wind": region["wind"],
+
+
+            "ndvi": region["ndvi"],
+
+
+            **analysis
+
+
+        })
+
+
+
+    return results
