@@ -3,15 +3,21 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
 
-    <title>Nova-Forest AI | Uydu Tabanlı Yangın Risk Analizi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <link rel="stylesheet" href="css/style.css">
+<title>
+Nova-Forest AI | Orman Risk Analiz Sistemi
+</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<link rel="stylesheet" href="css/style.css">
+
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
 
 
 </head>
@@ -20,31 +26,70 @@
 <body>
 
 
+
 <header>
 
-    <div class="logo-area">
 
-        <h1>
-            🌲 NOVA-FOREST AI
-        </h1>
-
-        <p>
-            Uydu Tabanlı Erken Yangın Risk Tahmin Sistemi
-        </p>
-
-    </div>
+<div class="logo">
 
 
-    <div class="system-status">
+<h1>
+🌲 Nova-Forest AI
+</h1>
 
-        <span class="online-dot"></span>
 
-        SYSTEM ONLINE
+<p>
+Uydu Tabanlı Erken Uyarı ve Yangın Risk Tahmin Sistemi
+</p>
 
-    </div>
+
+</div>
+
+
+
+<div class="status">
+
+<span></span>
+
+Sistem Aktif
+
+</div>
+
 
 
 </header>
+
+
+
+
+
+<nav>
+
+
+<a href="index.html">
+Ana Panel
+</a>
+
+
+<a href="pages/map.html">
+Risk Haritası
+</a>
+
+
+<a href="pages/weather.html">
+Hava Analizi
+</a>
+
+
+<a href="pages/satellite.html">
+Uydu Verileri
+</a>
+
+
+</nav>
+
+
+
 
 
 
@@ -52,60 +97,23 @@
 
 
 
-<section class="overview">
+
+<section class="hero">
 
 
-<div class="info-card">
+<h2>
+Trakya Orman Risk Merkezi
+</h2>
 
-<h3>🗺 İzlenen Bölge</h3>
 
 <p>
-Trakya & Marmara
+
+Edirne, Kırklareli, Tekirdağ,
+Çanakkale ve İstanbul Avrupa Yakası
+için yapay zeka destekli risk analizi.
+
 </p>
 
-</div>
-
-
-
-<div class="info-card">
-
-<h3>🌲 Takip Edilen Alan</h3>
-
-<p>
-Edirne<br>
-Kırklareli<br>
-Tekirdağ<br>
-Çanakkale<br>
-İstanbul Avrupa
-</p>
-
-</div>
-
-
-
-<div class="info-card">
-
-<h3>🛰 Veri Kaynakları</h3>
-
-<p>
-Sentinel-2<br>
-NASA FIRMS<br>
-Open-Meteo
-</p>
-
-</div>
-
-
-
-<div class="info-card">
-
-<h3>🔥 Sistem Modu</h3>
-
-<p>
-Erken Uyarı Aktif
-</p>
-
-</div>
 
 
 </section>
@@ -114,121 +122,156 @@ Erken Uyarı Aktif
 
 
 
-<section id="dashboard">
+
+
+<section class="cards">
+
+
+
+<div class="card">
+
+<h3>
+🔥 Güncel Risk
+</h3>
+
+<strong>
+72/100
+</strong>
+
+<p>
+Yüksek Risk
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+🌲 İzlenen Bölge
+</h3>
+
+<strong>
+5
+</strong>
+
+<p>
+Trakya Bölgesi
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+🛰 Veri Kaynakları
+</h3>
+
+<strong>
+3
+</strong>
+
+<p>
+API Sistemi
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+🤖 AI Motoru
+</h3>
+
+<strong>
+ONLINE
+</strong>
+
+<p>
+Risk Analizi Aktif
+</p>
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="map-section">
 
 
 <h2>
-🌲 Marmara - Trakya Risk Monitörü
+Canlı Risk Haritası
 </h2>
 
 
 <div id="map"></div>
 
 
-
-<div id="risk-container">
-
-
-</div>
-
-
-
 </section>
 
 
 
 
 
-<section class="analysis-panel">
+
+
+<section class="sources">
 
 
 <h2>
-📊 Canlı Analiz
+Veri Kaynakları
 </h2>
 
 
+<div>
 
-<div class="analysis-grid">
+
+🌦 Open-Meteo
+
+<br>
 
 
-<div class="analysis-box">
+🛰 Sentinel-2
 
-<h3>
-🌡 Hava Durumu
-</h3>
+<br>
 
-<p>
-Sıcaklık: Bekleniyor
-</p>
 
-<p>
-Nem: Bekleniyor
-</p>
+🔥 NASA FIRMS
 
-<p>
-Rüzgar: Bekleniyor
-</p>
+<br>
+
+
+🌍 Açık Uydu Verileri
 
 
 </div>
-
-
-
-
-<div class="analysis-box">
-
-
-<h3>
-🛰 Uydu Analizi
-</h3>
-
-
-<p>
-NASA FIRMS:
-Hazırlanıyor
-</p>
-
-
-<p>
-Sentinel-2 NDVI:
-Hazırlanıyor
-</p>
-
-
-</div>
-
-
-
-
-
-<div class="analysis-box">
-
-
-<h3>
-🧠 AI Risk Motoru
-</h3>
-
-
-<p>
-Risk Skoru:
---
-</p>
-
-
-<p>
-Durum:
-Analiz Bekleniyor
-</p>
-
-
-</div>
-
-
-</div>
-
 
 
 </section>
+
+
+
+
 
 
 
@@ -238,16 +281,28 @@ Analiz Bekleniyor
 
 
 
+
+
 <footer>
 
 
 <p>
-Nova-Forest AI © 2026
-</p>
+
+Nova-Forest AI
+
+<br>
+
+Geliştirici:
+<strong>
+Ahmet Eymen
+</strong>
 
 
-<p>
-Sivil çevre izleme ve erken uyarı prototipi
+<br><br>
+
+
+Nexora88 © 2026
+
 </p>
 
 
@@ -257,9 +312,14 @@ Sivil çevre izleme ve erken uyarı prototipi
 
 
 
+
+
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+
 <script src="js/map.js"></script>
+
 
 <script src="js/dashboard.js"></script>
 
