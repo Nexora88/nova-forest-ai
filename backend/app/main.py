@@ -17,7 +17,7 @@ from app.api.satellite_routes import router as satellite_router
 
 from app.api.ndvi_routes import router as ndvi_router
 
-from app.api.advanced_risk_routes import router as risk_router
+from app.api.risk_routes import router as risk_router
 
 
 
