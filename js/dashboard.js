@@ -1,34 +1,129 @@
 // =====================================
 // NOVA-FOREST AI
-// Risk Dashboard System
+// Dashboard Controller
 // =====================================
 
+async function loadDashboard() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8000/risk-analysis"
+        );
+
+        if (!response.ok) {
+            throw new Error("Risk API bağlantısı başarısız.");
+        }
+
+        const data = await response.json();
+
+        console.log("Nova-Forest AI Risk Data:", data);
+
+        const regions = data.regions || [];
+
+        // Bölge sayısı
+        const regionCard = document.querySelectorAll(".card")[1];
+
+        if (regionCard) {
+
+            const value = regionCard.querySelector("strong");
+
+            if (value) {
+                value.textContent = regions.length;
+            }
+
+        }
 
 
-function getRiskEmoji(risk){
+        // Genel risk skorunu hesapla
+        const validRegions = regions.filter(
+            region =>
+                region.analysis &&
+                typeof region.analysis.risk_score === "number"
+        );
 
 
-    switch(risk){
+        if (validRegions.length > 0) {
+
+            const total = validRegions.reduce(
+                (sum, region) =>
+                    sum + region.analysis.risk_score,
+                0
+            );
+
+            const average =
+                Math.round(total / validRegions.length);
 
 
-        case "LOW":
-            return "🟢";
+            const riskCard =
+                document.querySelectorAll(".card")[0];
+
+            if (riskCard) {
+
+                const value =
+                    riskCard.querySelector("strong");
+
+                const description =
+                    riskCard.querySelector("p");
 
 
-        case "MEDIUM":
-            return "🟡";
+                if (value) {
+                    value.textContent =
+                        average + "/100";
+                }
 
 
-        case "HIGH":
-            return "🟠";
+                if (description) {
+
+                    description.textContent =
+                        getRiskLabel(average);
+
+                }
+
+            }
+
+        }
 
 
-        case "CRITICAL":
-            return "🔴";
+        // Veri kaynağı kartı
+        const sourceCard =
+            document.querySelectorAll(".card")[2];
+
+        if (sourceCard) {
+
+            const value =
+                sourceCard.querySelector("strong");
+
+            if (value) {
+                value.textContent = "LIVE";
+            }
+
+        }
 
 
-        default:
-            return "⚪";
+        // Konsola bölge analizlerini yaz
+        regions.forEach(region => {
+
+            if (region.analysis) {
+
+                console.log(
+                    region.region,
+                    region.analysis.risk_score,
+                    region.analysis.risk_level
+                );
+
+            }
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Nova-Forest AI Dashboard Error:",
+            error
+        );
 
     }
 
@@ -36,159 +131,23 @@ function getRiskEmoji(risk){
 
 
 
+function getRiskLabel(score) {
 
+    if (score < 25) {
+        return "Düşük Risk";
+    }
 
+    if (score < 50) {
+        return "Orta Risk";
+    }
 
-function loadDashboard(){
+    if (score < 75) {
+        return "Yüksek Risk";
+    }
 
-
-
-fetch("http://localhost:8000/regions")
-
-
-.then(response => response.json())
-
-
-.then(data => {
-
-
-
-    const container =
-    document.getElementById(
-        "risk-container"
-    );
-
-
-
-    container.innerHTML = "";
-
-
-
-
-    data.forEach(region => {
-
-
-
-        const card =
-        document.createElement("div");
-
-
-
-        card.className =
-        "risk-box " +
-        region.risk.toLowerCase();
-
-
-
-
-        card.innerHTML = `
-
-
-        <h3>
-
-        ${getRiskEmoji(region.risk)}
-
-        ${region.name}
-
-        </h3>
-
-
-
-        <p>
-
-        🔥 Risk:
-        ${region.risk}
-
-        </p>
-
-
-
-        <p>
-
-        📊 Risk Skoru:
-
-        ${region.risk_score ?? "--"}
-
-        /100
-
-        </p>
-
-
-
-        <p>
-
-        🌡 Sıcaklık:
-
-        ${region.temperature ?? "--"} °C
-
-        </p>
-
-
-
-        <p>
-
-        💧 Nem:
-
-        ${region.humidity ?? "--"} %
-
-        </p>
-
-
-
-        <p>
-
-        🌬 Rüzgar:
-
-        ${region.wind ?? "--"} km/s
-
-        </p>
-
-
-
-        <p>
-
-        🌿 NDVI:
-
-        ${region.ndvi ?? "--"}
-
-        </p>
-
-
-
-        `;
-
-
-
-
-        container.appendChild(card);
-
-
-
-    });
-
-
-
-})
-
-
-
-.catch(error => {
-
-
-console.log(
-
-"Dashboard veri hatası:",
-
-error
-
-);
-
-
-});
-
+    return "Kritik Risk";
 
 }
-
 
 
 
