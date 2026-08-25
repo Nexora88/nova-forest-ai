@@ -1,26 +1,157 @@
-# Nova-Forest AI
-# NASA FIRMS Satellite Service
+# =====================================
+# NOVA-FOREST AI
+# NASA FIRMS Service
+# Version 0.1
+# =====================================
+
+import os
+import csv
+import io
+import requests
 
 
-def get_fire_alerts(region):
+FIRMS_URL = (
+    "https://firms.modaps.eosdis.nasa.gov"
+    "/api/area/csv"
+)
 
+
+# Trakya ve çevresi için yaklaşık alan
+TRAKYA_BBOX = {
+    "west": 25.5,
+    "south": 39.5,
+    "east": 29.5,
+    "north": 42.2
+}
+
+
+def get_firms_alerts(
+    days: int = 1
+) -> dict:
     """
-    NASA FIRMS entegrasyon alanı.
+    NASA FIRMS alan verilerini kontrol eder.
 
-    İleride:
-    - VIIRS
-    - MODIS
-    - Thermal anomaly
-    verileri buraya bağlanacak.
+    Gerçek FIRMS API anahtarı .env üzerinden
+    FIRMS_MAP_KEY olarak sağlanır.
     """
 
+    api_key = os.getenv("FIRMS_MAP_KEY")
 
-    return {
+    if not api_key:
+        return {
+            "status": "not_configured",
+            "alert_count": 0,
+            "alerts": [],
+            "source": "NASA FIRMS"
+        }
 
-        "region": region,
 
-        "source": "NASA FIRMS",
+    area = (
+        f"{TRAKYA_BBOX['west']},"
+        f"{TRAKYA_BBOX['south']},"
+        f"{TRAKYA_BBOX['east']},"
+        f"{TRAKYA_BBOX['north']}"
+    )
 
-        "alerts": []
 
-    }
+    url = (
+        f"{FIRMS_URL}/"
+        f"{api_key}/"
+        f"VIIRS_SNPP_NRT/"
+        f"{area}/"
+        f"{days}"
+    )
+
+
+    try:
+
+        response = requests.get(
+            url,
+            timeout=20
+        )
+
+        response.raise_for_status()
+
+
+        reader = csv.DictReader(
+            io.StringIO(response.text)
+        )
+
+
+        alerts = []
+
+
+        for row in reader:
+
+            try:
+
+                latitude = float(
+                    row.get("latitude", 0)
+                )
+
+                longitude = float(
+                    row.get("longitude", 0)
+                )
+
+                confidence = row.get(
+                    "confidence"
+                )
+
+                frp = row.get(
+                    "frp"
+                )
+
+
+                alerts.append({
+
+                    "latitude": latitude,
+
+                    "longitude": longitude,
+
+                    "confidence": confidence,
+
+                    "frp": frp,
+
+                    "source":
+                    "NASA FIRMS"
+
+                })
+
+            except (TypeError, ValueError):
+
+                continue
+
+
+        return {
+
+            "status": "available",
+
+            "alert_count":
+            len(alerts),
+
+            "alerts":
+            alerts,
+
+            "source":
+            "NASA FIRMS"
+
+        }
+
+
+    except requests.RequestException as error:
+
+        return {
+
+            "status": "error",
+
+            "alert_count": 0,
+
+            "alerts": [],
+
+            "source":
+            "NASA FIRMS",
+
+            "error":
+            str(error)
+
+        }
