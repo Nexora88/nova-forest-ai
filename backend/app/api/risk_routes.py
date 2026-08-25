@@ -1,19 +1,16 @@
 # =====================================
 # NOVA-FOREST AI
 # Risk Analysis API
-# Version 0.3
+# Version 0.4
 # =====================================
 
 from fastapi import APIRouter
-import requests
 
 from app.services.risk_service import calculate_risk
+from app.services.weather_service import get_current_weather
 
 
 router = APIRouter()
-
-
-OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 
 REGIONS = {
@@ -46,34 +43,6 @@ REGIONS = {
 }
 
 
-def get_weather(latitude, longitude):
-
-    params = {
-
-        "latitude": latitude,
-        "longitude": longitude,
-
-        "current": (
-            "temperature_2m,"
-            "relative_humidity_2m,"
-            "wind_speed_10m"
-        ),
-
-        "timezone": "Europe/Istanbul"
-
-    }
-
-    response = requests.get(
-        OPEN_METEO_URL,
-        params=params,
-        timeout=10
-    )
-
-    response.raise_for_status()
-
-    return response.json()
-
-
 @router.get("/risk-analysis")
 def risk_analysis():
 
@@ -83,34 +52,23 @@ def risk_analysis():
 
         try:
 
-            weather = get_weather(
+            weather = get_current_weather(
                 location["latitude"],
                 location["longitude"]
             )
 
-            current = weather.get(
-                "current",
-                {}
-            )
+            temperature = weather["temperature"]
+            humidity = weather["humidity"]
+            wind = weather["wind"]
 
-            temperature = current.get(
-                "temperature_2m"
-            )
-
-            humidity = current.get(
-                "relative_humidity_2m"
-            )
-
-            wind = current.get(
-                "wind_speed_10m"
-            )
-
-            # Şimdilik NDVI gerçek uydu
-            # verisi bağlanana kadar
-            # nötr bir değer kullanıyoruz.
+            # Gerçek uydu NDVI verisi
+            # bağlanana kadar geçici nötr değer.
             ndvi = 0.50
 
+            # NASA FIRMS entegrasyonu
+            # tamamlanana kadar alarm kapalı.
             fire_alert = False
+
 
             analysis = calculate_risk(
 
@@ -126,6 +84,7 @@ def risk_analysis():
 
             )
 
+
             results.append({
 
                 "region": name,
@@ -140,25 +99,17 @@ def risk_analysis():
 
                 },
 
-                "weather": {
-
-                    "temperature":
-                    temperature,
-
-                    "humidity":
-                    humidity,
-
-                    "wind":
-                    wind
-
-                },
+                "weather": weather,
 
                 "analysis": analysis,
 
-                "data_source":
-                "Open-Meteo"
+                "data_source": [
+                    "Open-Meteo",
+                    "Nova-Forest Risk Engine"
+                ]
 
             })
+
 
         except Exception as error:
 
@@ -166,25 +117,24 @@ def risk_analysis():
 
                 "region": name,
 
-                "error":
-                str(error),
+                "status": "data_error",
 
-                "data_source":
-                "Open-Meteo"
+                "error": str(error)
 
             })
 
 
     return {
 
-        "system":
-        "Nova-Forest AI",
+        "system": "Nova-Forest AI",
 
-        "status":
-        "online",
+        "status": "online",
 
         "analysis_type":
         "Regional Environmental Risk",
+
+        "region_count":
+        len(REGIONS),
 
         "regions":
         results
