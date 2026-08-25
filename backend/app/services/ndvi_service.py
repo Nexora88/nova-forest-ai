@@ -1,50 +1,88 @@
-# Nova-Forest AI
-# Sentinel-2 NDVI Analysis Service
+# =====================================
+# NOVA-FOREST AI
+# NDVI Service
+# Version 0.1
+# =====================================
+
+from typing import Optional
+
+import requests
 
 
-def calculate_ndvi(red_band, nir_band):
+# Copernicus / Sentinel-2 entegrasyonu
+# için sonraki aşamada kullanılacak yapı.
+# Şimdilik servis katmanı hazır tutuluyor.
 
+
+def calculate_ndvi(
+    nir: Optional[float],
+    red: Optional[float]
+) -> Optional[float]:
     """
-    NDVI hesaplama:
+    NDVI hesaplar.
 
-    (NIR - RED) / (NIR + RED)
+    NDVI = (NIR - RED) / (NIR + RED)
 
-    Sentinel-2:
-    RED = B4
-    NIR = B8
+    nir:
+        Yakın kızılötesi yansıma
+
+    red:
+        Kırmızı bant yansıması
     """
 
+    if nir is None or red is None:
+        return None
 
-    if (nir_band + red_band) == 0:
-        return 0
+    denominator = nir + red
 
+    if denominator == 0:
+        return None
 
-    ndvi = (
-        nir_band - red_band
-    ) / (
-        nir_band + red_band
-    )
+    ndvi = (nir - red) / denominator
 
-
-    return round(ndvi, 3)
+    return round(ndvi, 4)
 
 
+def classify_ndvi(ndvi: Optional[float]) -> str:
+    """
+    NDVI değerini basit çevresel sınıflara ayırır.
+    """
 
-def get_vegetation_status(ndvi):
+    if ndvi is None:
+        return "NO_DATA"
 
+    if ndvi < 0.20:
+        return "VERY_LOW"
 
-    if ndvi > 0.6:
-        return "HEALTHY"
+    if ndvi < 0.40:
+        return "LOW"
 
-
-    elif ndvi > 0.3:
+    if ndvi < 0.60:
         return "MODERATE"
 
+    if ndvi < 0.80:
+        return "HEALTHY"
 
-    elif ndvi > 0:
-        return "DRY_RISK"
+    return "VERY_HEALTHY"
 
 
-    else:
-        return "CRITICAL"
-      
+def get_ndvi_status(
+    ndvi: Optional[float]
+) -> dict:
+    """
+    Frontend ve risk motoru için
+    standart NDVI çıktısı üretir.
+    """
+
+    classification = classify_ndvi(ndvi)
+
+    return {
+        "ndvi": ndvi,
+        "classification": classification,
+        "source": "Sentinel-2",
+        "status": (
+            "available"
+            if ndvi is not None
+            else "no_data"
+        )
+    }
