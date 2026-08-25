@@ -1,18 +1,23 @@
 # =====================================
 # NOVA-FOREST AI
 # Main Application
+# Version 0.5
 # =====================================
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.risk_routes import router as risk_router
+from app.api.satellite_routes import router as satellite_router
 
 
 app = FastAPI(
     title="Nova-Forest AI",
-    description="Uydu tabanlı çevresel risk analiz platformu",
-    version="0.4.0"
+    description=(
+        "Uydu tabanlı çevresel risk "
+        "analiz ve karar destek platformu."
+    ),
+    version="0.5.0"
 )
 
 
@@ -41,9 +46,13 @@ app.include_router(
     risk_router
 )
 
+app.include_router(
+    satellite_router
+)
+
 
 # =====================================
-# SYSTEM STATUS
+# ROOT
 # =====================================
 
 @app.get("/")
@@ -55,13 +64,25 @@ def root():
 
         "status": "online",
 
-        "version": "0.4.0",
+        "version": "0.5.0",
 
-        "message":
-        "Environmental Risk Analysis API"
+        "services": {
+
+            "risk_analysis": "online",
+
+            "weather_data": "online",
+
+            "satellite_monitor":
+                "online"
+
+        }
 
     }
 
+
+# =====================================
+# HEALTH
+# =====================================
 
 @app.get("/health")
 def health():
@@ -71,6 +92,6 @@ def health():
         "status": "healthy",
 
         "system":
-        "Nova-Forest AI"
+            "Nova-Forest AI"
 
     }
