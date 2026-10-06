@@ -1,9 +1,11 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 import os
 import requests
 from datetime import datetime, timedelta, timezone
 
 CDSE_STAC = "https://stac.dataspace.copernicus.eu/v1/search"
+SH_PROCESS = "https://sh.dataspace.copernicus.eu/statistics/v1"
+TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
 COLLECTION = "sentinel-2-l2a"
 
 REGIONS = {
@@ -57,6 +59,56 @@ def search_latest_scene(lat, lon, days=45, max_cloud=35):
         "catalog_url": f"https://browser.stac.dataspace.copernicus.eu/collections/{COLLECTION}/items/{item.get('id')}",
     }
 
+def _token():
+    client_id=os.getenv("CDSE_CLIENT_ID")
+    client_secret=os.getenv("CDSE_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        return None
+    r=requests.post(TOKEN_URL,data={"grant_type":"client_credentials","client_id":client_id,"client_secret":client_secret},timeout=20)
+    r.raise_for_status()
+    return r.json()["access_token"]
+
+def _stats_request(geometry, days=180, interval="P30D"):
+    now=datetime.now(timezone.utc)
+    start=now-timedelta(days=days)
+    evalscript="""//VERSION=3
+function setup() {
+  return {
+    input: [{ bands: ["B04","B08","SCL","dataMask"] }],
+    output: [
+      { id: "ndvi", bands: 1, sampleType: "FLOAT32" },
+      { id: "dataMask", bands: 1 }
+    ]
+  };
+}
+function evaluatePixel(s) {
+  var valid = s.dataMask && s.SCL !== 3 && s.SCL !== 8 && s.SCL !== 9 && s.SCL !== 10 && s.SCL !== 11;
+  var ndvi = valid ? (s.B08 - s.B04) / (s.B08 + s.B04) : 0;
+  return { ndvi:[ndvi], dataMask:[valid ? 1 : 0] };
+}"""
+    return {
+      "input":{"bounds":{"geometry":geometry,"properties":{"crs":"http://www.opengis.net/def/crs/OGC/1.3/CRS84"}},"data":[{"type":COLLECTION,"dataFilter":{"mosaickingOrder":"leastCC"}}]},
+      "aggregation":{"timeRange":{"from":start.isoformat().replace("+00:00","Z"),"to":now.isoformat().replace("+00:00","Z")},"aggregationInterval":{"of":interval},"evalscript":evalscript,"resx":10,"resy":10}
+    }
+
+def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"):
+    token=_token()
+    if not token:
+        return {"status":"not_configured","message":"Gerçek Sentinel-2 NDVI için CDSE_CLIENT_ID ve CDSE_CLIENT_SECRET backend ortam değişkenleri gerekli.","source":"Copernicus Sentinel-2 L2A","series":[]}
+    try:
+        r=requests.post(SH_PROCESS,headers={"Authorization":f"Bearer {token}","Content-Type":"application/json","Accept":"application/json"},json=_stats_request(geometry,days,interval),timeout=90)
+        r.raise_for_status()
+        raw=r.json()
+        series=[]
+        for item in raw.get("data",[]):
+            stats=item.get("outputs",{}).get("ndvi",{}).get("bands",{}).get("B0",{}).get("stats",{})
+            mean=stats.get("mean")
+            if mean is not None:
+                series.append({"from":item.get("interval",{}).get("from"),"to":item.get("interval",{}).get("to"),"ndvi":round(float(mean),4),"classification":classify_ndvi(float(mean)),"sample_count":stats.get("sampleCount",0)})
+        return {"status":"available","source":"Copernicus Sentinel-2 L2A / Statistical API","method":"B08-B04 NDVI; SCL cloud/shadow exclusion","series":series}
+    except requests.RequestException as exc:
+        return {"status":"error","source":"Copernicus Sentinel-2 L2A / Statistical API","error":str(exc),"series":[]}
+
 def get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
     scene = None
     error = None
@@ -66,35 +118,12 @@ def get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
             scene = search_latest_scene(lat, lon)
         except requests.RequestException as exc:
             error = str(exc)
-
-    return {
-        "ndvi": ndvi,
-        "classification": classify_ndvi(ndvi),
-        "source": "Copernicus Sentinel-2 Level-2A",
-        "status": "available" if ndvi is not None else ("scene_found" if scene else "no_ndvi_value"),
-        "latest_scene": scene,
-        "error": error,
-        "method": "NDVI = (B08 NIR - B04 RED) / (B08 NIR + B04 RED)",
-    }
+    return {"ndvi":ndvi,"classification":classify_ndvi(ndvi),"source":"Copernicus Sentinel-2 Level-2A","status":"available" if ndvi is not None else ("scene_found" if scene else "no_ndvi_value"),"latest_scene":scene,"error":error,"method":"NDVI = (B08 NIR - B04 RED) / (B08 NIR + B04 RED)"}
 
 def get_region_satellite_status(region: str):
     lat, lon = REGIONS[region]
     try:
         scene = search_latest_scene(lat, lon)
-        return {
-            "region": region,
-            "status": "available" if scene else "no_scene",
-            "source": "Copernicus Sentinel-2 Level-2A",
-            "scene": scene,
-            "ndvi": None,
-            "ndvi_status": "scene_discovered_but_pixel_processing_not_enabled",
-            "message": "Görüntü bulundu. NDVI piksel hesabı için işleme servisi/kimlik doğrulama gereklidir.",
-        }
+        return {"region":region,"status":"available" if scene else "no_scene","source":"Copernicus Sentinel-2 Level-2A","scene":scene,"ndvi":None,"ndvi_status":"scene_found_pixel_stats_require_cdse_credentials","message":"Sahne keşfi çalışır. Alan bazlı gerçek NDVI zaman serisi CDSE kimlik bilgileri tanımlandığında Statistical API üzerinden hesaplanır."}
     except requests.RequestException as exc:
-        return {
-            "region": region,
-            "status": "error",
-            "source": "Copernicus Sentinel-2 Level-2A",
-            "error": str(exc),
-            "ndvi": None,
-        }
+        return {"region":region,"status":"error","source":"Copernicus Sentinel-2 Level-2A","error":str(exc),"ndvi":None}
