@@ -1,156 +1,112 @@
-const REGION_DATA = {
-  "Edirne": { coords:[41.6771,26.5557], area:6145 },
-  "Kırklareli": { coords:[41.7355,27.2252], area:6459 },
-  "Tekirdağ": { coords:[40.9781,27.5110], area:6313 },
-  "Çanakkale": { coords:[40.1553,26.4142], area:9817 },
-  "İstanbul Avrupa": { coords:[41.1500,28.6500], area:5461 }
-};
+const API_BASE=(window.NOVA_API_BASE||"").replace(/\/$/,"");
+const geoPath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
+const map=L.map("map",{zoomControl:true}).setView([39.0,35.2],6);
+const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap katkıda bulunanlar"}).addTo(map);
+const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles &copy; Esri"});
+L.control.layers({"Temel Harita":base,"Uydu Görünümü":sat},null,{collapsed:false}).addTo(map);
+const layer=L.layerGroup().addTo(map);
+const historyKey="nova-forest-national-history-v2";
 
-const API_BASE = (window.NOVA_API_BASE || "").replace(/\/$/, "");
-const map = L.map("map", { zoomControl: true }).setView([41.25, 27.30], 8);
-
-const baseMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom:18, attribution:"&copy; OpenStreetMap katkıda bulunanlar"
-}).addTo(map);
-const satelliteTiles = L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {maxZoom:18, attribution:"Tiles &copy; Esri"}
-);
-L.control.layers({"Temel Harita":baseMap,"Uydu Görünümü":satelliteTiles},null,{collapsed:false,position:"topright"}).addTo(map);
-
-const riskLayer = L.layerGroup().addTo(map);
-const historyKey = "nova-forest-risk-history-v1";
-
-function riskColor(score) {
-  if (score < 25) return "#16c784";
-  if (score < 50) return "#f5c542";
-  if (score < 75) return "#ff7a18";
-  return "#ff3b30";
+function riskColor(s){return s<25?"#16c784":s<50?"#f5c542":s<75?"#ff7a18":"#ff3b30"}
+function riskLabel(s){return s<25?"DÜŞÜK":s<50?"ORTA":s<75?"YÜKSEK":"KRİTİK"}
+function riskScore(w){
+ let s=0,t=Number(w.temperature),h=Number(w.humidity),wind=Number(w.wind);
+ if(t>=40)s+=30;else if(t>=30)s+=15;else if(t>=25)s+=7;
+ if(h<=20)s+=25;else if(h<=40)s+=10;else if(h<=55)s+=4;
+ if(wind>=40)s+=25;else if(wind>=20)s+=10;else if(wind>=12)s+=4;
+ return Math.min(100,s);
 }
-function riskLabel(score) {
-  if (score < 25) return "DÜŞÜK";
-  if (score < 50) return "ORTA";
-  if (score < 75) return "YÜKSEK";
-  return "KRİTİK";
+function coordsOf(g){
+ const a=[];
+ function walk(x){if(typeof x[0]==="number")a.push(x);else x.forEach(walk)}
+ walk(g.coordinates);
+ if(!a.length)return null;
+ return [a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length];
 }
-function areaLabel(area) {
-  return area.toLocaleString("tr-TR") + " km²";
+function areaKm2(g){
+ let total=0;
+ function ringArea(r){
+   let a=0,lat=0;
+   r.forEach(p=>lat+=p[1]);lat/=r.length;
+   const k=111.32, c=Math.cos(lat*Math.PI/180);
+   for(let i=0,j=r.length-1;i<r.length;j=i++)a+=(r[j][0]*c)*(r[i][1])-(r[i][0]*c)*(r[j][1]);
+   return Math.abs(a)*k*k/2;
+ }
+ function walk(x){if(!Array.isArray(x)||!x.length)return;if(typeof x[0][0]==="number")total+=ringArea(x);else x.forEach(walk)}
+ walk(g.coordinates);return Math.round(total);
 }
-function calculateRisk(w) {
-  let score=0;
-  if(w.temperature>=40) score+=30; else if(w.temperature>=30) score+=15; else if(w.temperature>=25) score+=7;
-  if(w.humidity<=20) score+=25; else if(w.humidity<=40) score+=10; else if(w.humidity<=55) score+=4;
-  if(w.wind>=40) score+=25; else if(w.wind>=20) score+=10; else if(w.wind>=12) score+=4;
-  return Math.min(100,score);
+function warnings(w,s){
+ const a=[];
+ if(w.temperature>=35)a.push("Yüksek sıcaklık");
+ if(w.humidity<=30)a.push("Düşük nem");
+ if(w.wind>=25)a.push("Kuvvetli rüzgar");
+ if((s?.hotspots24||0)>0)a.push("Yakın sıcak nokta");
+ return a.length?a:["Olağandışı sinyal yok"];
 }
-function specialWarnings(weather, score, firms) {
-  const warnings=[];
-  if(weather.temperature>=35) warnings.push("Yüksek sıcaklık");
-  if(weather.humidity<=30) warnings.push("Düşük nem");
-  if(weather.wind>=25) warnings.push("Kuvvetli rüzgar");
-  if((firms?.nearby_hotspots_24h||0)>0) warnings.push("Yakın sıcak nokta");
-  if((firms?.nearby_hotspots_7d||0)>=3) warnings.push("7 günde tekrarlanan aktivite");
-  if(!warnings.length) warnings.push("Olağandışı sinyal yok");
-  return warnings;
+function saveHistory(rows){
+ const old=JSON.parse(localStorage.getItem(historyKey)||"[]"),now=new Date().toISOString();
+ rows.forEach(r=>old.push({time:now,province:r.name,score:r.score}));
+ localStorage.setItem(historyKey,JSON.stringify(old.slice(-810)));
 }
-function saveHistory(regions) {
-  const now=new Date().toISOString();
-  const old=JSON.parse(localStorage.getItem(historyKey)||"[]");
-  regions.forEach(r=>{
-    if(!r.analysis) return;
-    old.push({
-      time:now, region:r.region, score:Number(r.analysis.risk_score||0),
-      level:r.analysis.risk_level||riskLabel(Number(r.analysis.risk_score||0)),
-      hotspots7d:Number(r.satellite?.nasa_firms?.nearby_hotspots_7d||0)
-    });
+function historyFor(name){
+ const h=JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.province===name).slice(-8).reverse();
+ return h.length?h.map(x=>new Date(x.time).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.score+"/100").join("<br>"):"Bu cihazda henüz geçmiş gözlem yok.";
+}
+function popup(p,w,score,area,hotspots){
+ const ws=warnings(w,hotspots);
+ return '<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / İLSEL GÖZLEM</div><h3>'+p.name+'</h3>'+
+ '<div class="popup-area">'+area.toLocaleString("tr-TR")+' km² · '+riskLabel(score)+'</div>'+
+ '<div class="popup-score" style="color:'+riskColor(score)+'">'+score+'<small>/100</small></div>'+
+ '<div class="popup-grid"><span>Sıcaklık</span><b>'+w.temperature+' °C</b><span>Nem</span><b>'+w.humidity+' %</b><span>Rüzgar</span><b>'+w.wind+' km/s</b>'+
+ '<span>24s sıcak nokta</span><b>'+hotspots.hotspots24+'</b><span>Veri</span><b>Open-Meteo</b></div>'+
+ '<div class="popup-warning"><strong>Özel uyarılar</strong><br>'+ws.join(" · ")+'</div>'+
+ '<div class="popup-history"><strong>Son gözlemler</strong><br>'+historyFor(p.name)+'</div></div>';
+}
+function drawFeature(feature,weather,hotspots){
+ const p=feature.properties||{},name=p.il_adi||p.name||"İl",area=areaKm2(feature.geometry);
+ const score=riskScore(weather),color=riskColor(score),content=popup({name},weather,score,area,hotspots);
+ return L.geoJSON(feature,{style:{color:"#0b1510",weight:1.2,opacity:.95,fillColor:color,fillOpacity:.58},
+ onEachFeature:(f,l)=>{
+   l.bindPopup(content,{maxWidth:340});
+   l.on({mouseover:e=>e.target.setStyle({weight:2.5,fillOpacity:.78}),mouseout:e=>e.target.setStyle({weight:1.2,fillOpacity:.58})});
+ }}).addTo(layer);
+}
+async function nationalWeather(features){
+ const centers=features.map(f=>coordsOf(f.geometry));
+ const lat=centers.map(x=>x?x[0]:39).join(",");
+ const lon=centers.map(x=>x?x[1]:35).join(",");
+ const u=new URL("https://api.open-meteo.com/v1/forecast");
+ u.searchParams.set("latitude",lat);u.searchParams.set("longitude",lon);
+ u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m");
+ u.searchParams.set("timezone","Europe/Istanbul");
+ const r=await fetch(u.toString(),{cache:"no-store"});if(!r.ok)throw Error("Meteoroloji akışı alınamadı");
+ const j=await r.json();return Array.isArray(j)?j:[j];
+}
+async function firmsFromBackend(){
+ if(!API_BASE)return {};
+ try{const r=await fetch(API_BASE+"/risk-analysis",{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();
+  const out={};(j.regions||[]).forEach(x=>{out[x.region]={hotspots24:Number(x.satellite?.nasa_firms?.nearby_hotspots_24h||0),hotspots7:Number(x.satellite?.nasa_firms?.nearby_hotspots_7d||0)}});return out;
+ }catch(e){return {}}
+}
+async function loadNational(){
+ const status=document.querySelector("[data-map-status]");
+ try{
+  const gj=await fetch(new URL(geoPath,document.baseURI),{cache:"no-store"}).then(r=>r.json());
+  const features=gj.features||[];
+  const [weather,firmMap]=await Promise.all([nationalWeather(features),firmsFromBackend()]);
+  layer.clearLayers();
+  const rows=features.map((f,i)=>{
+   const p=f.properties||{},name=p.il_adi||p.name||"İl",c=weather[i]?.current||{};
+   const w={temperature:Number(c.temperature_2m??0),humidity:Number(c.relative_humidity_2m??0),wind:Number(c.wind_speed_10m??0)};
+   const h=firmMap[name]||{hotspots24:0,hotspots7:0},score=riskScore(w);
+   drawFeature(f,w,h);return{name,score,w,h};
   });
-  localStorage.setItem(historyKey,JSON.stringify(old.slice(-300)));
+  saveHistory(rows);
+  const avg=Math.round(rows.reduce((a,r)=>a+r.score,0)/rows.length);
+  const alerts=rows.reduce((a,r)=>a+warnings(r.w,r.h).filter(x=>x!=="Olağandışı sinyal yok").length,0);
+  if(status){status.textContent="CANLI • "+rows.length+" İL • ORTALAMA RİSK "+avg+"/100 • "+alerts+" UYARI";status.dataset.state="live"}
+  const notice=document.querySelector("[data-alert-summary]");if(notice)notice.textContent=alerts+" aktif özel uyarı. Renkli alanlara tıklayarak il detayını aç.";
+  const history=document.querySelector("[data-history-summary]");if(history)history.textContent="81 ilin son gözlemleri cihazda saklanıyor; il penceresinde geçmiş akışı görebilirsin.";
+ }catch(e){console.error(e);if(status){status.textContent="VERİ YÜKLENEMEDİ";status.dataset.state="error"}}
 }
-function getHistory(region) {
-  const old=JSON.parse(localStorage.getItem(historyKey)||"[]");
-  return old.filter(x=>x.region===region).slice(-8).reverse();
-}
-function historyText(region) {
-  const h=getHistory(region);
-  if(!h.length) return "Bu tarayıcıda henüz geçmiş gözlem kaydı yok.";
-  return h.map(x=>new Date(x.time).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.score+"/100 · "+x.level).join("<br>");
-}
-function popup(region, score, weather, satellite, source) {
-  const d=REGION_DATA[region], color=riskColor(score);
-  const ndvi=satellite?.sentinel_2?.ndvi ?? satellite?.ndvi ?? "Henüz hesaplanmadı";
-  const firms=satellite?.nasa_firms||{};
-  const warnings=specialWarnings(weather,score,firms);
-  return '<div class="risk-popup">'+
-    '<div class="popup-kicker">NOVA-FOREST / BÖLGESEL GÖZLEM</div>'+
-    '<h3>'+region+'</h3>'+
-    '<div class="popup-area">'+areaLabel(d.area)+'</div>'+
-    '<div class="popup-score" style="color:'+color+'">'+score+'<small>/100</small></div>'+
-    '<div class="popup-level" style="border-color:'+color+';color:'+color+'">'+riskLabel(score)+'</div>'+
-    '<div class="popup-grid">'+
-    '<span>Sıcaklık</span><b>'+weather.temperature+' °C</b>'+
-    '<span>Nem</span><b>'+weather.humidity+' %</b>'+
-    '<span>Rüzgar</span><b>'+weather.wind+' km/s</b>'+
-    '<span>24s sıcak nokta</span><b>'+Number(firms.nearby_hotspots_24h||0)+'</b>'+
-    '<span>7g geçmiş</span><b>'+Number(firms.nearby_hotspots_7d||0)+' olay</b>'+
-    '<span>Sentinel-2</span><b>'+(satellite?.sentinel_2?'Gözlem kaynağı':'Bekliyor')+'</b>'+
-    '<span>NDVI</span><b>'+ndvi+'</b></div>'+
-    '<div class="popup-warning"><strong>Özel uyarılar</strong><br>'+warnings.join(" · ")+'</div>'+
-    '<div class="popup-history"><strong>Son gözlemler</strong><br>'+historyText(region)+'</div>'+
-    '<div class="popup-source">Kaynak: '+source+'</div></div>';
-}
-function renderRegion(region,weather,score,satellite,source) {
-  const d=REGION_DATA[region]; if(!d)return;
-  const color=riskColor(score), areaRadius=7000+Math.sqrt(d.area)*430;
-  const content=popup(region,score,weather,satellite,source);
-  L.circle(d.coords,{radius:areaRadius,color:color,weight:2,opacity:.7,fillColor:color,fillOpacity:.18}).bindPopup(content,{maxWidth:330}).addTo(riskLayer);
-  L.circleMarker(d.coords,{radius:7+Math.min(score/15,5),color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(content,{maxWidth:330}).addTo(riskLayer);
-  L.marker(d.coords,{interactive:false,icon:L.divIcon({
-    className:"region-label",
-    html:'<span>'+region+'</span><strong>'+areaLabel(d.area)+'</strong>',
-    iconSize:[170,48],iconAnchor:[-8,24]
-  })}).addTo(riskLayer);
-}
-async function loadBackend(){
-  if(!API_BASE) throw new Error("API adresi tanımlı değil");
-  const r=await fetch(API_BASE+"/risk-analysis",{cache:"no-store"});
-  if(!r.ok)throw new Error("Risk API erişilemedi");
-  return r.json();
-}
-async function loadOpenMeteoFallback(){
-  const results=await Promise.all(Object.entries(REGION_DATA).map(async([region,d])=>{
-    const u=new URL("https://api.open-meteo.com/v1/forecast");
-    u.searchParams.set("latitude",d.coords[0]); u.searchParams.set("longitude",d.coords[1]);
-    u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m");
-    u.searchParams.set("timezone","Europe/Istanbul");
-    const r=await fetch(u.toString(),{cache:"no-store"}); if(!r.ok)throw new Error("Hava verisi alınamadı");
-    const c=(await r.json()).current||{};
-    const weather={temperature:Number(c.temperature_2m??0),humidity:Number(c.relative_humidity_2m??0),wind:Number(c.wind_speed_10m??0)};
-    const score=calculateRisk(weather);
-    return {region,weather,analysis:{risk_score:score,risk_level:riskLabel(score)},satellite:{nasa_firms:{nearby_hotspots_24h:0,nearby_hotspots_7d:0}},data_source:["Open-Meteo"]};
-  }));
-  return {regions:results,source:"Open-Meteo canlı yedek akış"};
-}
-async function loadRiskMap(){
-  const status=document.querySelector("[data-map-status]");
-  try{
-    let data,source;
-    try{data=await loadBackend();source="Nova-Forest API";}
-    catch(_){data=await loadOpenMeteoFallback();source="Open-Meteo canlı yedek akış";}
-    riskLayer.clearLayers();
-    (data.regions||[]).forEach(r=>{if(r.weather&&r.analysis)renderRegion(r.region,r.weather,Number(r.analysis.risk_score||0),r.satellite||{},source);});
-    const valid=(data.regions||[]).filter(r=>r.analysis);
-    saveHistory(valid);
-    const avg=valid.length?Math.round(valid.reduce((s,r)=>s+Number(r.analysis.risk_score||0),0)/valid.length):0;
-    const activeWarnings=valid.reduce((n,r)=>n+specialWarnings(r.weather,Number(r.analysis.risk_score||0),r.satellite?.nasa_firms).filter(x=>x!=="Olağandışı sinyal yok").length,0);
-    if(status){status.textContent="CANLI • "+valid.length+" BÖLGE • ORTALAMA RİSK "+avg+"/100 • "+activeWarnings+" ÖZEL UYARI";status.dataset.state="live";}
-    const notice=document.querySelector("[data-alert-summary]");
-    if(notice)notice.textContent=activeWarnings?activeWarnings+" özel uyarı aktif — riskli alanları açarak ayrıntıları inceleyin.":"Şu an olağandışı bir sinyal tespit edilmedi.";
-    const history=document.querySelector("[data-history-summary]");
-    if(history)history.textContent="Tarayıcıdaki son gözlemler otomatik kaydediliyor. Bu kayıtlar cihazına özeldir.";
-  }catch(e){
-    console.error("Nova-Forest harita:",e);
-    if(status){status.textContent="VERİ YÜKLENEMEDİ — YENİDEN DENENİYOR";status.dataset.state="error";}
-  }
-}
-loadRiskMap();
-setInterval(loadRiskMap,300000);
+loadNational();setInterval(loadNational,300000);
