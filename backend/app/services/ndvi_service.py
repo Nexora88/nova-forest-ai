@@ -74,17 +74,19 @@ def _stats_request(geometry, days=180, interval="P30D"):
     evalscript="""//VERSION=3
 function setup() {
   return {
-    input: [{ bands: ["B04","B08","SCL","dataMask"] }],
+    input: [{ bands: ["B04","B08","B11","SCL","dataMask"] }],
     output: [
       { id: "ndvi", bands: 1, sampleType: "FLOAT32" },
+      { id: "ndmi", bands: 1, sampleType: "FLOAT32" },
       { id: "dataMask", bands: 1 }
     ]
   };
 }
 function evaluatePixel(s) {
   var valid = s.dataMask && s.SCL !== 3 && s.SCL !== 8 && s.SCL !== 9 && s.SCL !== 10 && s.SCL !== 11;
-  var ndvi = valid ? (s.B08 - s.B04) / (s.B08 + s.B04) : 0;
-  return { ndvi:[ndvi], dataMask:[valid ? 1 : 0] };
+  var ndvi = valid && (s.B08 + s.B04) !== 0 ? (s.B08 - s.B04) / (s.B08 + s.B04) : 0;
+  var ndmi = valid && (s.B08 + s.B11) !== 0 ? (s.B08 - s.B11) / (s.B08 + s.B11) : 0;
+  return { ndvi:[ndvi], ndmi:[ndmi], dataMask:[valid ? 1 : 0] };
 }"""
     return {
       "input":{"bounds":{"geometry":geometry,"properties":{"crs":"http://www.opengis.net/def/crs/OGC/1.3/CRS84"}},"data":[{"type":COLLECTION,"dataFilter":{"mosaickingOrder":"leastCC"}}]},
@@ -101,11 +103,15 @@ def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"
         raw=r.json()
         series=[]
         for item in raw.get("data",[]):
-            stats=item.get("outputs",{}).get("ndvi",{}).get("bands",{}).get("B0",{}).get("stats",{})
-            mean=stats.get("mean")
-            if mean is not None:
-                series.append({"from":item.get("interval",{}).get("from"),"to":item.get("interval",{}).get("to"),"ndvi":round(float(mean),4),"classification":classify_ndvi(float(mean)),"sample_count":stats.get("sampleCount",0)})
-        return {"status":"available","source":"Copernicus Sentinel-2 L2A / Statistical API","method":"B08-B04 NDVI; SCL cloud/shadow exclusion","series":series}
+            ndvi_stats=item.get("outputs",{}).get("ndvi",{}).get("bands",{}).get("B0",{}).get("stats",{})
+            ndmi_stats=item.get("outputs",{}).get("ndmi",{}).get("bands",{}).get("B0",{}).get("stats",{})
+            ndvi=ndvi_stats.get("mean")
+            ndmi=ndmi_stats.get("mean")
+            if ndvi is not None:
+                series.append({"from":item.get("interval",{}).get("from"),"to":item.get("interval",{}).get("to"),"ndvi":round(float(ndvi),4),"ndmi":round(float(ndmi),4) if ndmi is not None else None,"classification":classify_ndvi(float(ndvi)),"sample_count":ndvi_stats.get("sampleCount",0)})
+        latest=series[-1] if series else None
+        previous=series[-2] if len(series)>1 else None
+        return {"status":"available","source":"Copernicus Sentinel-2 L2A / Statistical API","method":"NDVI B08-B04 + NDMI B08-B11; SCL cloud/shadow exclusion","series":series,"latest":latest,"delta":{"ndvi":round(latest["ndvi"]-previous["ndvi"],4) if latest and previous else None,"ndmi":round(latest["ndmi"]-previous["ndmi"],4) if latest and previous and latest.get("ndmi") is not None and previous.get("ndmi") is not None else None}}
     except requests.RequestException as exc:
         return {"status":"error","source":"Copernicus Sentinel-2 L2A / Statistical API","error":str(exc),"series":[]}
 
