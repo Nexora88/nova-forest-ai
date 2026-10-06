@@ -1,142 +1,74 @@
-# =====================================
-# NOVA-FOREST AI
-# Risk Analysis API
-# Version 0.4
-# =====================================
-
 from fastapi import APIRouter
-
 from app.services.risk_service import calculate_risk
-from app.services.weather_service import get_current_weather
-
+from app.services.weather_service import REGIONS, get_current_weather
+from app.services.firms_service import get_firms_alerts
 
 router = APIRouter()
 
-
-REGIONS = {
-
-    "Edirne": {
-        "latitude": 41.6771,
-        "longitude": 26.5557
-    },
-
-    "Kırklareli": {
-        "latitude": 41.7355,
-        "longitude": 27.2252
-    },
-
-    "Tekirdağ": {
-        "latitude": 40.9781,
-        "longitude": 27.5110
-    },
-
-    "Çanakkale": {
-        "latitude": 40.1553,
-        "longitude": 26.4142
-    },
-
-    "İstanbul Avrupa": {
-        "latitude": 41.1500,
-        "longitude": 28.6500
-    }
-
-}
-
+def _nearby_hotspot(region_lat, region_lon, alerts, radius_km=35):
+    import math
+    for alert in alerts:
+        try:
+            lat, lon = float(alert["latitude"]), float(alert["longitude"])
+            dlat = math.radians(lat - region_lat)
+            dlon = math.radians(lon - region_lon)
+            a = math.sin(dlat/2)**2 + math.cos(math.radians(region_lat))*math.cos(math.radians(lat))*math.sin(dlon/2)**2
+            distance = 6371 * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+            if distance <= radius_km:
+                return True
+        except (KeyError, TypeError, ValueError):
+            continue
+    return False
 
 @router.get("/risk-analysis")
 def risk_analysis():
-
+    firms = get_firms_alerts(days=1)
+    alerts = firms.get("alerts", [])
     results = []
 
-    for name, location in REGIONS.items():
-
+    for name, (lat, lon) in REGIONS.items():
         try:
-
-            weather = get_current_weather(
-                location["latitude"],
-                location["longitude"]
-            )
-
-            temperature = weather["temperature"]
-            humidity = weather["humidity"]
-            wind = weather["wind"]
-
-            # Gerçek uydu NDVI verisi
-            # bağlanana kadar geçici nötr değer.
-            ndvi = 0.50
-
-            # NASA FIRMS entegrasyonu
-            # tamamlanana kadar alarm kapalı.
-            fire_alert = False
-
-
+            weather = get_current_weather(lat, lon)
+            fire_alert = _nearby_hotspot(lat, lon, alerts)
             analysis = calculate_risk(
-
-                temperature=temperature,
-
-                humidity=humidity,
-
-                wind=wind,
-
-                ndvi=ndvi,
-
-                fire_alert=fire_alert
-
+                temperature=weather["temperature"],
+                humidity=weather["humidity"],
+                wind=weather["wind"],
+                ndvi=None,
+                fire_alert=fire_alert,
             )
-
-
             results.append({
-
                 "region": name,
-
-                "coordinates": {
-
-                    "latitude":
-                    location["latitude"],
-
-                    "longitude":
-                    location["longitude"]
-
-                },
-
+                "coordinates": {"latitude": lat, "longitude": lon},
                 "weather": weather,
-
                 "analysis": analysis,
-
-                "data_source": [
-                    "Open-Meteo",
-                    "Nova-Forest Risk Engine"
-                ]
-
+                "satellite": {
+                    "sentinel_2": {
+                        "status": "configured_as_observation_source",
+                        "ndvi": None,
+                        "ndvi_status": "no_live_ndvi",
+                        "bands": {"red": "B04", "nir": "B08"},
+                        "resolution_m": 10,
+                    },
+                    "nasa_firms": {
+                        "status": firms.get("status"),
+                        "nearby_hotspot": fire_alert,
+                        "alert_count_trakya": firms.get("alert_count", 0),
+                    },
+                },
+                "data_source": ["Open-Meteo", "Nova-Forest Risk Engine", "Sentinel-2 architecture", "NASA FIRMS"],
             })
-
-
         except Exception as error:
+            results.append({"region": name, "coordinates": {"latitude": lat, "longitude": lon}, "status": "data_error", "error": str(error)})
 
-            results.append({
-
-                "region": name,
-
-                "status": "data_error",
-
-                "error": str(error)
-
-            })
-
-
+    valid = [r for r in results if r.get("analysis")]
+    average = round(sum(r["analysis"]["risk_score"] for r in valid) / len(valid)) if valid else None
     return {
-
         "system": "Nova-Forest AI",
-
         "status": "online",
-
-        "analysis_type":
-        "Regional Environmental Risk",
-
-        "region_count":
-        len(REGIONS),
-
-        "regions":
-        results
-
+        "analysis_type": "Regional Environmental Risk",
+        "region_count": len(REGIONS),
+        "average_risk": average,
+        "satellite_status": firms.get("status"),
+        "regions": results,
     }
