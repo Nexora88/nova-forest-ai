@@ -1,7 +1,6 @@
 # =====================================
 # NOVA-FOREST AI
 # NASA FIRMS Service
-# Version 0.1
 # =====================================
 
 import os
@@ -9,14 +8,8 @@ import csv
 import io
 import requests
 
+FIRMS_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 
-FIRMS_URL = (
-    "https://firms.modaps.eosdis.nasa.gov"
-    "/api/area/csv"
-)
-
-
-# Trakya ve çevresi için yaklaşık alan
 TRAKYA_BBOX = {
     "west": 25.5,
     "south": 39.5,
@@ -25,16 +18,8 @@ TRAKYA_BBOX = {
 }
 
 
-def get_firms_alerts(
-    days: int = 1
-) -> dict:
-    """
-    NASA FIRMS alan verilerini kontrol eder.
-
-    Gerçek FIRMS API anahtarı .env üzerinden
-    FIRMS_MAP_KEY olarak sağlanır.
-    """
-
+def get_firms_alerts(days: int = 1) -> dict:
+    """NASA FIRMS VIIRS alan gözlemlerini getirir."""
     api_key = os.getenv("FIRMS_MAP_KEY")
 
     if not api_key:
@@ -45,113 +30,46 @@ def get_firms_alerts(
             "source": "NASA FIRMS"
         }
 
-
     area = (
-        f"{TRAKYA_BBOX['west']},"
-        f"{TRAKYA_BBOX['south']},"
-        f"{TRAKYA_BBOX['east']},"
-        f"{TRAKYA_BBOX['north']}"
+        f"{TRAKYA_BBOX['west']},{TRAKYA_BBOX['south']},"
+        f"{TRAKYA_BBOX['east']},{TRAKYA_BBOX['north']}"
     )
-
-
-    url = (
-        f"{FIRMS_URL}/"
-        f"{api_key}/"
-        f"VIIRS_SNPP_NRT/"
-        f"{area}/"
-        f"{days}"
-    )
-
+    url = f"{FIRMS_URL}/{api_key}/VIIRS_SNPP_NRT/{area}/{days}"
 
     try:
-
-        response = requests.get(
-            url,
-            timeout=20
-        )
-
+        response = requests.get(url, timeout=20)
         response.raise_for_status()
-
-
-        reader = csv.DictReader(
-            io.StringIO(response.text)
-        )
-
-
+        reader = csv.DictReader(io.StringIO(response.text))
         alerts = []
 
-
         for row in reader:
-
             try:
-
-                latitude = float(
-                    row.get("latitude", 0)
-                )
-
-                longitude = float(
-                    row.get("longitude", 0)
-                )
-
-                confidence = row.get(
-                    "confidence"
-                )
-
-                frp = row.get(
-                    "frp"
-                )
-
-
                 alerts.append({
-
-                    "latitude": latitude,
-
-                    "longitude": longitude,
-
-                    "confidence": confidence,
-
-                    "frp": frp,
-
-                    "source":
-                    "NASA FIRMS"
-
+                    "latitude": float(row.get("latitude", 0)),
+                    "longitude": float(row.get("longitude", 0)),
+                    "confidence": row.get("confidence"),
+                    "frp": row.get("frp"),
+                    "acq_date": row.get("acq_date"),
+                    "acq_time": row.get("acq_time"),
+                    "source": "NASA FIRMS"
                 })
-
             except (TypeError, ValueError):
-
                 continue
 
-
         return {
-
             "status": "available",
-
-            "alert_count":
-            len(alerts),
-
-            "alerts":
-            alerts,
-
-            "source":
-            "NASA FIRMS"
-
+            "alert_count": len(alerts),
+            "alerts": alerts,
+            "days": days,
+            "source": "NASA FIRMS"
         }
 
-
     except requests.RequestException as error:
-
         return {
-
             "status": "error",
-
             "alert_count": 0,
-
             "alerts": [],
-
-            "source":
-            "NASA FIRMS",
-
-            "error":
-            str(error)
-
+            "days": days,
+            "source": "NASA FIRMS",
+            "error": str(error)
         }

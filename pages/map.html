@@ -1,17 +1,18 @@
-[Reading 13 lines from start (total: 13 lines, 0 remaining)]
-
 <!DOCTYPE html>
 <html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Nova-Forest AI | Risk Haritası</title><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"></head>
 <body>
-<header><div class="logo"><h1>Nova-Forest AI</h1><p>Regional Environmental Risk Field</p></div><div class="status"><span></span> LIVE MAP</div></header>
+<header><div class="logo"><h1>Nova-Forest AI</h1><p>Bölgesel Çevresel İstihbarat</p></div><div class="status"><span></span> CANLI RİSK HARİTASI</div></header>
 <nav><a href="../index.html">Ana Panel</a><a href="map.html">Risk Haritası</a><a href="weather.html">Atmosfer</a><a href="satellite.html">Uydu Merkezi</a><a href="about.html">Proje</a></nav>
 <main>
-<section class="hero"><h2>Trakya / Marmara Risk Field</h2><p>Renkler canlı meteorolojik koşullardan hesaplanan 0–100 risk skorunu gösterir. Backend erişilemiyorsa harita Open-Meteo canlı akışına otomatik geçer.</p></section>
-<section class="map-section"><div class="map-toolbar"><span>LIVE ENVIRONMENTAL GRID</span><span data-map-status>VERİLER YÜKLENİYOR…</span></div><div id="map"></div></section>
-<section class="cards"><div class="card"><h3>🟢 Düşük</h3><p>0–24 · Normal izleme.</p></div><div class="card"><h3>🟡 Orta</h3><p>25–49 · Koşullar takip edilir.</p></div><div class="card"><h3>🟠 Yüksek</h3><p>50–74 · Yakın takip önerilir.</p></div><div class="card"><h3>🔴 Kritik</h3><p>75–100 · Acil değerlendirme alanı.</p></div></section>
-<section class="sources"><h2>Harita veri mantığı</h2><div>• Sıcaklık · Nem · Rüzgar → ana meteorolojik risk sinyalleri<br><br>• Sentinel-2 → multispektral gözlem / NDVI mimarisi<br><br>• NASA FIRMS → yapılandırılmışsa VIIRS sıcak nokta alarmı<br><br>• Risk Engine → açıklanabilir 0–100 öncelik skoru</div></section>
+<section class="hero"><h2>Trakya / Marmara Risk Field</h2><p>Artık şehir etiketlerinde yalnızca risk puanı yok: bölgenin yaklaşık yüzölçümü km² olarak gösterilir ve alanın rengi anlık çevresel risk seviyesine göre değişir. Bir bölgeye tıklayarak özel uyarıları ve bu tarayıcıda biriken geçmiş gözlemleri görebilirsin.</p></section>
+<section class="map-section"><div class="map-toolbar"><span>CANLI ÇEVRESEL IZGARA</span><span data-map-status>VERİLER YÜKLENİYOR…</span></div><div id="map"></div></section>
+<section class="cards">
+<div class="card"><h3>Özel Uyarılar</h3><p data-alert-summary>Uyarılar analiz ediliyor…</p></div>
+<div class="card"><h3>Geçmiş Gözlemler</h3><p data-history-summary>Geçmiş kayıt sistemi hazırlanıyor…</p></div>
+<div class="card"><h3>Renk Mantığı</h3><p>Yeşil düşük · Sarı orta · Turuncu yüksek · Kırmızı kritik. Dairenin büyüklüğü bölgenin yaklaşık yüzölçümünü temsil eder.</p></div>
+<div class="card"><h3>Veri Katmanları</h3><p>Hava koşulları + NASA FIRMS sıcak noktaları + Sentinel-2 gözlem mimarisi birlikte değerlendirilir.</p></div>
+</section>
+<section class="sources"><h2>Geçmiş ve uyarı mantığı</h2><div>• Özel uyarılar: yüksek sıcaklık, düşük nem, kuvvetli rüzgar ve yakın sıcak noktalar.<br><br>• 7 günlük geçmiş: NASA FIRMS yapılandırılmışsa son 7 gündeki yakın sıcak noktalar gösterilir.<br><br>• Yerel gözlem geçmişi: harita, her yenilemede son risk gözlemlerini tarayıcının yerel depolamasına kaydeder.<br><br>• Bu sistem bir yangın tahmini değildir; çevresel koşulları önceliklendiren açıklanabilir bir erken uyarı katmanıdır.</div></section>
 </main><footer><p>Nova-Forest AI · Ahmet Eymen Bakraç · Nexora88 © 2026</p></footer>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="../js/map.js"></script>
 </body></html>
-
-[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
