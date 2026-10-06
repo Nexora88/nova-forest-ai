@@ -1,4 +1,3 @@
-// NOVA-FOREST AI — Live Environmental Risk Map
 const REGION_COORDS = {
   "Edirne": [41.6771, 26.5557],
   "Kırklareli": [41.7355, 27.2252],
@@ -10,21 +9,19 @@ const REGION_COORDS = {
 const API_BASE = (window.NOVA_API_BASE || "").replace(/\/$/, "");
 const map = L.map("map", { zoomControl: true }).setView([41.25, 27.30], 8);
 
-const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 18,
-  attribution: "&copy; OpenStreetMap contributors"
+const baseMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 18, attribution: "&copy; OpenStreetMap katkıda bulunanlar"
 }).addTo(map);
-
 const satelliteTiles = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   { maxZoom: 18, attribution: "Tiles &copy; Esri" }
 );
-
-const overlays = { "Temel Harita": osm, "Uydu Görünümü": satelliteTiles };
-L.control.layers(null, overlays, { collapsed: false, position: "topright" }).addTo(map);
+L.control.layers(
+  {"Temel Harita": baseMap, "Uydu Görünümü": satelliteTiles},
+  null, {collapsed:false, position:"topright"}
+).addTo(map);
 
 const riskLayer = L.layerGroup().addTo(map);
-const alertLayer = L.layerGroup().addTo(map);
 
 function riskColor(score) {
   if (score < 25) return "#16c784";
@@ -32,14 +29,12 @@ function riskColor(score) {
   if (score < 75) return "#ff7a18";
   return "#ff3b30";
 }
-
 function riskLabel(score) {
   if (score < 25) return "DÜŞÜK";
   if (score < 50) return "ORTA";
   if (score < 75) return "YÜKSEK";
   return "KRİTİK";
 }
-
 function calculateRisk(w) {
   let score = 0;
   if (w.temperature >= 40) score += 30;
@@ -53,137 +48,104 @@ function calculateRisk(w) {
   else if (w.wind >= 12) score += 4;
   return Math.min(100, score);
 }
-
-function popup(region, score, weather, source = "Open-Meteo") {
+function popup(region, score, weather, satellite, source) {
   const color = riskColor(score);
-  return `
-    <div class="risk-popup">
-      <div class="popup-kicker">NOVA-FOREST // REGIONAL NODE</div>
-      <h3>${region}</h3>
-      <div class="popup-score" style="color:${color}">${score}<small>/100</small></div>
-      <div class="popup-level" style="border-color:${color};color:${color}">${riskLabel(score)}</div>
-      <div class="popup-grid">
-        <span>Sıcaklık</span><b>${weather.temperature} °C</b>
-        <span>Nem</span><b>${weather.humidity} %</b>
-        <span>Rüzgar</span><b>${weather.wind} km/h</b>
-      </div>
-      <div class="popup-source">Kaynak: ${source}</div>
-    </div>`;
+  const ndvi = satellite && satellite.ndvi != null ? satellite.ndvi : "Henüz hesaplanmadı";
+  const scene = satellite && satellite.scene ? "SAHNE BULUNDU" : "SAHNE ARANIYOR";
+  return '<div class="risk-popup">' +
+    '<div class="popup-kicker">NOVA-FOREST / BÖLGESEL GÖZLEM</div>' +
+    '<h3>' + region + '</h3>' +
+    '<div class="popup-score" style="color:' + color + '">' + score + '<small>/100</small></div>' +
+    '<div class="popup-level" style="border-color:' + color + ';color:' + color + '">' + riskLabel(score) + '</div>' +
+    '<div class="popup-grid">' +
+    '<span>Sıcaklık</span><b>' + weather.temperature + ' °C</b>' +
+    '<span>Nem</span><b>' + weather.humidity + ' %</b>' +
+    '<span>Rüzgar</span><b>' + weather.wind + ' km/s</b>' +
+    '<span>Sentinel-2</span><b>' + scene + '</b>' +
+    '<span>NDVI</span><b>' + ndvi + '</b></div>' +
+    '<div class="popup-source">Kaynak: ' + source + '</div></div>';
 }
-
-function renderRegion(region, weather, score, source) {
+function renderRegion(region, weather, score, satellite, source) {
   const coords = REGION_COORDS[region];
   if (!coords) return;
   const color = riskColor(score);
-  const radius = 9000 + score * 180;
-
+  const content = popup(region, score, weather, satellite, source);
   L.circle(coords, {
-    radius,
-    color,
-    weight: 1,
-    opacity: 0.35,
-    fillColor: color,
-    fillOpacity: 0.08
-  }).addTo(riskLayer);
-
+    radius: 9000 + score * 180, color: color, weight: 1, opacity: .45,
+    fillColor: color, fillOpacity: .10
+  }).bindPopup(content).addTo(riskLayer);
   L.circleMarker(coords, {
-    radius: 9 + Math.min(score / 12, 6),
-    color: "#ffffff",
-    weight: 2,
-    fillColor: color,
-    fillOpacity: 0.92
-  }).bindPopup(popup(region, score, weather, source)).addTo(riskLayer);
-
+    radius: 10 + Math.min(score / 12, 6), color: "#fff", weight: 2,
+    fillColor: color, fillOpacity: .95
+  }).bindPopup(content).addTo(riskLayer);
   L.marker(coords, {
     interactive: false,
     icon: L.divIcon({
       className: "region-label",
-      html: `<span>${region}</span><strong>${score}</strong>`,
-      iconSize: [140, 42],
-      iconAnchor: [-8, 21]
+      html: '<span>' + region + '</span><strong>' + score + '</strong>',
+      iconSize: [160, 42], iconAnchor: [-8, 21]
     })
   }).addTo(riskLayer);
 }
-
 async function loadBackend() {
-  if (!API_BASE) return null;
-  const response = await fetch(`${API_BASE}/risk-analysis`, { cache: "no-store" });
-  if (!response.ok) throw new Error("Backend risk API unavailable");
-  return response.json();
+  if (!API_BASE) throw new Error("API adresi tanımlı değil");
+  const r = await fetch(API_BASE + "/risk-analysis", {cache:"no-store"});
+  if (!r.ok) throw new Error("Risk API erişilemedi");
+  return r.json();
 }
-
 async function loadOpenMeteoFallback() {
-  const entries = Object.entries(REGION_COORDS);
-  const results = await Promise.all(entries.map(async ([region, [lat, lon]]) => {
-    const url = new URL("https://api.open-meteo.com/v1/forecast");
-    url.searchParams.set("latitude", lat);
-    url.searchParams.set("longitude", lon);
-    url.searchParams.set("current", "temperature_2m,relative_humidity_2m,wind_speed_10m");
-    url.searchParams.set("timezone", "Europe/Istanbul");
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Weather failed: ${region}`);
-    const data = await response.json();
-    const c = data.current || {};
+  const results = await Promise.all(Object.entries(REGION_COORDS).map(async ([region, coords]) => {
+    const lat = coords[0], lon = coords[1];
+    const u = new URL("https://api.open-meteo.com/v1/forecast");
+    u.searchParams.set("latitude", lat);
+    u.searchParams.set("longitude", lon);
+    u.searchParams.set("current", "temperature_2m,relative_humidity_2m,wind_speed_10m");
+    u.searchParams.set("timezone", "Europe/Istanbul");
+    const r = await fetch(u.toString(), {cache:"no-store"});
+    if (!r.ok) throw new Error("Hava verisi alınamadı: " + region);
+    const c = (await r.json()).current || {};
     const weather = {
       temperature: Number(c.temperature_2m ?? 0),
       humidity: Number(c.relative_humidity_2m ?? 0),
       wind: Number(c.wind_speed_10m ?? 0)
     };
+    const score = calculateRisk(weather);
     return {
-      region,
-      weather,
-      analysis: {
-        risk_score: calculateRisk(weather),
-        risk_level: riskLabel(calculateRisk(weather)),
-        engine: "Nova-Forest Weather Risk v1",
-        ndvi_status: "no_live_ndvi"
-      },
+      region: region, weather: weather,
+      analysis: {risk_score: score, risk_level: riskLabel(score)},
+      satellite: {status:"Yedek akış", ndvi:null},
       data_source: ["Open-Meteo"]
     };
   }));
-  return { regions: results, status: "online", source: "Open-Meteo direct fallback" };
+  return {regions: results, source:"Open-Meteo canlı yedek akış"};
 }
-
 async function loadRiskMap() {
   const status = document.querySelector("[data-map-status]");
   try {
-    let data;
-    let source;
-    try {
-      data = await loadBackend();
-      source = "Nova-Forest API";
-    } catch (_) {
-      data = await loadOpenMeteoFallback();
-      source = "Open-Meteo live fallback";
-    }
-
+    let data, source;
+    try { data = await loadBackend(); source = "Nova-Forest API"; }
+    catch (_) { data = await loadOpenMeteoFallback(); source = "Open-Meteo canlı yedek akış"; }
     riskLayer.clearLayers();
-    alertLayer.clearLayers();
-
-    const regions = data.regions || [];
-    regions.forEach(r => {
+    (data.regions || []).forEach(function(r) {
       if (r.weather && r.analysis) renderRegion(
-        r.region,
-        r.weather,
-        Number(r.analysis.risk_score || 0),
-        source
+        r.region, r.weather, Number(r.analysis.risk_score || 0), r.satellite || {}, source
       );
     });
-
-    const valid = regions.filter(r => r.analysis);
-    const avg = valid.length ? Math.round(valid.reduce((s, r) => s + Number(r.analysis.risk_score || 0), 0) / valid.length) : 0;
+    const valid = (data.regions || []).filter(function(r) { return r.analysis; });
+    const avg = valid.length ? Math.round(valid.reduce(function(s,r) {
+      return s + Number(r.analysis.risk_score || 0);
+    },0) / valid.length) : 0;
     if (status) {
-      status.textContent = `LIVE • ${valid.length} BÖLGE • ORTALAMA RİSK ${avg}/100`;
+      status.textContent = "CANLI • " + valid.length + " BÖLGE • ORTALAMA RİSK " + avg + "/100";
       status.dataset.state = "live";
     }
-  } catch (error) {
-    console.error("Nova-Forest map:", error);
+  } catch (e) {
+    console.error("Nova-Forest harita:", e);
     if (status) {
-      status.textContent = "VERİ BAĞLANTISI KESİLDİ";
+      status.textContent = "VERİ YÜKLENEMEDİ — YENİDEN DENENİYOR";
       status.dataset.state = "error";
     }
   }
 }
-
 loadRiskMap();
-setInterval(loadRiskMap, 5 * 60 * 1000);
+setInterval(loadRiskMap, 300000);

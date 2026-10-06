@@ -1,36 +1,11 @@
 from fastapi import APIRouter
-from app.services.ndvi_service import calculate_ndvi, get_vegetation_status
+from app.services.ndvi_service import get_region_satellite_status
 
+router = APIRouter(prefix="/ndvi", tags=["NDVI"])
 
-router = APIRouter()
-
-
-@router.get("/ndvi-test")
-def ndvi_test():
-
-    # Test Sentinel-2 değerleri
-
-    red_band = 0.20
-    nir_band = 0.65
-
-
-    ndvi = calculate_ndvi(
-        red_band,
-        nir_band
-    )
-
-
-    status = get_vegetation_status(
-        ndvi
-    )
-
-
-    return {
-
-        "source": "Sentinel-2",
-
-        "ndvi_value": ndvi,
-
-        "vegetation_status": status
-
-    }
+@router.get("/status/{region}")
+def ndvi_status(region: str):
+    supported = {"Edirne", "Kırklareli", "Tekirdağ", "Çanakkale", "İstanbul Avrupa"}
+    if region not in supported:
+        return {"status": "invalid_region", "message": "Desteklenmeyen bölge."}
+    return get_region_satellite_status(region)

@@ -1,356 +1,75 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-Nova-Forest AI | Uydu GÃ¶zlem Merkezi
-</title>
-
-
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Nova-Forest AI | Uydu Gözlem Merkezi</title>
 <link rel="stylesheet" href="../css/style.css">
-
-
 </head>
-
-
-
 <body>
-
-
-
 <header>
-
-
-<div class="logo">
-
-
-<h1>
-ğŸŒ² Nova-Forest AI
-</h1>
-
-
-<p>
-Uydu GÃ¶zlem ve Ã‡evresel Veri Merkezi
-</p>
-
-
-</div>
-
-
-
-<div class="status">
-
-<span></span>
-
-Satellite Monitor
-
-</div>
-
-
+  <div class="logo"><h1>Nova-Forest AI</h1><p>Uydu Gözlem ve Çevresel Veri Merkezi</p></div>
+  <div class="status"><span></span> SİSTEM ÇEVRİMİÇİ</div>
 </header>
-
-
-
-
-
-
 <nav>
-
-
-<a href="../index.html">
-Ana Panel
-</a>
-
-
-<a href="map.html">
-Risk HaritasÄ±
-</a>
-
-
-<a href="weather.html">
-Hava Analizi
-</a>
-
-
-<a href="satellite.html">
-Uydu Verileri
-</a>
-
-
+  <a href="../index.html">Ana Panel</a>
+  <a href="map.html">Risk Haritası</a>
+  <a href="weather.html">Atmosfer</a>
+  <a href="satellite.html" aria-current="page">Uydu Merkezi</a>
+  <a href="about.html">Proje</a>
 </nav>
-
-
-
-
-
-
-
 <main>
-
-
-
-
 <section class="hero">
-
-
-<h2>
-ğŸ›° Uydu Ä°stihbarat Merkezi
-</h2>
-
-
-<p>
-
-Sentinel-2 ve aÃ§Ä±k uydu veri kaynaklarÄ±ndan
-elde edilen Ã§evresel gÃ¶stergelerin analiz edildiÄŸi
-gÃ¶zlem paneli.
-
-</p>
-
-
+  <h2>Uydu Gözlem Merkezi</h2>
+  <p>Sentinel-2 verilerinin keşfi, bitki örtüsü analizi ve NASA FIRMS sıcak nokta gözlemlerinin tek merkezde takip edildiği bölüm.</p>
 </section>
-
-
-
-
-
-
-
-<section class="cards">
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-ğŸŒ¿ NDVI Analizi
-</h3>
-
-
-<strong>
-0.42
-</strong>
-
-
-<p>
-
-Bitki Ã¶rtÃ¼sÃ¼ saÄŸlÄ±k gÃ¶stergesi
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-ğŸ”¥ Termal GÃ¶zlem
-</h3>
-
-
-<strong>
-AKTÄ°F
-</strong>
-
-
-<p>
-
-NASA FIRMS veri entegrasyonu hazÄ±rlÄ±ÄŸÄ±
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-ğŸ›° Uydu KaynaÄŸÄ±
-</h3>
-
-
-<strong>
-Sentinel-2
-</strong>
-
-
-<p>
-
-Copernicus aÃ§Ä±k veri sistemi
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-ğŸ“¡ Son Tarama
-</h3>
-
-
-<strong>
-ONLINE
-</strong>
-
-
-<p>
-
-Ã‡evresel veri izleme aktif
-
-</p>
-
-
-</div>
-
-
-
-
+<section class="cards" id="satelliteCards">
+  <div class="card"><h3>Sentinel-2</h3><strong id="sceneStatus">BAĞLANIYOR</strong><p>Copernicus Sentinel-2 Level-2A en güncel uygun görüntü sahnesi.</p></div>
+  <div class="card"><h3>NDVI</h3><strong id="ndviValue">VERİ YOK</strong><p>B08 NIR ve B04 kırmızı bantlarından hesaplanır.</p></div>
+  <div class="card"><h3>Bulutluluk</h3><strong id="cloudValue">-- %</strong><p>Seçilen Sentinel-2 sahnesinin bulut oranı.</p></div>
+  <div class="card"><h3>NASA FIRMS</h3><strong id="firmsValue">KONTROL</strong><p>VIIRS sıcak nokta akışı yapılandırılmışsa gösterilir.</p></div>
 </section>
-
-
-
-
-
-
-
 <section class="sources">
-
-
-<h2>
-Uydu Veri Mimarisi
-</h2>
-
-
-<p>
-
-
-ğŸ›° Sentinel-2
-
-<br><br>
-
-
-ğŸ”¥ NASA FIRMS
-
-<br><br>
-
-
-ğŸŒ Copernicus Data Space
-
-<br><br>
-
-
-ğŸ¤– Nova-Forest AI Risk Engine
-
-
-</p>
-
-
+  <h2>Sentinel-2 Veri Akışı</h2>
+  <p id="sceneInfo">Bölge sahneleri taranıyor...</p>
+  <p><strong>İşlem:</strong> Copernicus Data Space STAC kataloğundan son 45 gün içinde, %35 veya daha düşük bulutluluğa sahip Sentinel-2 Level-2A sahnesi aranır. Bu, gerçek uydu ürününün bulunduğunu doğrular; piksel tabanlı NDVI hesabı için ayrıca uydu görüntüsü işleme erişimi gerekir.</p>
 </section>
-
-
-
-
-
-
-
-
-<section class="hero">
-
-
-<h2>
-Analiz YaklaÅŸÄ±mÄ±
-</h2>
-
-
-<p>
-
-Nova-Forest AI doÄŸrudan yangÄ±n tahmini yapmaz.
-Uydu gÃ¶rÃ¼ntÃ¼leri, meteorolojik koÅŸullar ve
-Ã§evresel gÃ¶stergeleri birleÅŸtirerek
-risk deÄŸerlendirmesi ve karar destek bilgisi Ã¼retir.
-
-</p>
-
-
+<section class="sources">
+  <h2>NDVI Nasıl Hesaplanıyor?</h2>
+  <p><strong>NDVI = (NIR − Kırmızı) / (NIR + Kırmızı)</strong></p>
+  <p>Sentinel-2'de NIR için B08, kırmızı bant için B04 kullanılır. Gerçek piksel yansımaları sisteme bağlandığında değer bölgesel bitki örtüsü katmanına aktarılacaktır. Veri yoksa sistem kesinlikle sahte NDVI üretmez.</p>
 </section>
-
-
-
-
-
-
-
 </main>
-
-
-
-
-
-
-
-
-<footer>
-
-
-<p>
-
-Nova-Forest AI
-
-<br>
-
-GeliÅŸtirici:
-<strong>
-Ahmet Eymen BakraÃ§
-</strong>
-
-
-<br><br>
-
-
-Nexora88 Â© 2026
-
-
-</p>
-
-
-</footer>
-
-
-
-
-
-
-
+<footer><p>Nova-Forest AI<br>Geliştirici: <strong>Ahmet Eymen Bakraç</strong><br><br>Nexora88 © 2026</p></footer>
+<script>
+const API_BASE=(window.NOVA_API_BASE||"").replace(//$/,"");
+const regions=["Edirne","Kırklareli","Tekirdağ","Çanakkale","İstanbul Avrupa"];
+async function getRegion(region){
+  if(!API_BASE) return {region,status:"backend_yok"};
+  const r=await fetch(API_BASE+"/ndvi/status/"+encodeURIComponent(region),{cache:"no-store"});
+  if(!r.ok) throw new Error(region);
+  return r.json();
+}
+async function loadSatellite(){
+  const results=await Promise.all(regions.map(r=>getRegion(r).catch(e=>({region:r,status:"error",error:e.message}))));
+  const found=results.find(x=>x.scene);
+  const first=found||results.find(x=>x.status==="available");
+  document.getElementById("sceneStatus").textContent=first?"SAHNE BULUNDU":"BEKLENİYOR";
+  document.getElementById("ndviValue").textContent=first&&first.ndvi!=null?first.ndvi:"VERİ YOK";
+  document.getElementById("cloudValue").textContent=first&&first.scene&&first.scene.cloud_cover!=null?first.scene.cloud_cover+" %":"-- %";
+  const info=document.getElementById("sceneInfo");
+  if(first&&first.scene){
+    const date=first.scene.datetime?new Date(first.scene.datetime).toLocaleString("tr-TR"):"Tarih yok";
+    info.innerHTML="<strong>En güncel sahne:</strong> "+first.scene.id+"<br><strong>Bölge:</strong> "+first.region+"<br><strong>Çekim zamanı:</strong> "+date+"<br><strong>Bulutluluk:</strong> "+(first.scene.cloud_cover??"--")+" %";
+  } else {
+    info.textContent="Şu anda uygun Sentinel-2 sahnesi bulunamadı veya backend bağlantısı kurulamadı.";
+  }
+  const sat=await fetch(API_BASE+"/satellite/status",{cache:"no-store"}).catch(()=>null);
+  if(sat&&sat.ok){
+    const d=await sat.json();
+    document.getElementById("firmsValue").textContent=d.sources&&d.sources.nasa_firms?String(d.sources.nasa_firms.alert_count||0)+" ALARM":"KONTROL";
+  } else document.getElementById("firmsValue").textContent="KONTROL";
+}
+loadSatellite();
+</script>
 </body>
-
-
 </html>
-
