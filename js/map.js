@@ -1,26 +1,91 @@
 const API_BASE=(window.NOVA_API_BASE||"").replace(/\/$/,"");
-const geoPath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
+const provincePath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
+const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/trakya_istanbul_districts.geojson":"data/admin/trakya_istanbul_districts.geojson";
 const TARGET=new Set(["Edirne","Kırklareli","Tekirdağ","İstanbul"]);
-const map=L.map("map",{zoomControl:true}).setView([41.15,27.1],8);
+const map=L.map("map",{zoomControl:true,doubleClickZoom:true}).setView([41.15,27.1],8);
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
 L.control.layers({"Temel Harita":base,"Uydu":sat},null,{collapsed:false}).addTo(map);
-const layer=L.layerGroup().addTo(map),historyKey="nova-forest-region-history-v4";
-let mode="risk",allRows=[],geoFeatures=[];
-const palette={risk:["#19a974","#e4c441","#ef8b24","#d9363e"],water:["#1f9ad6","#67c8d9","#e7c85a","#d95757"],crop:["#b7cf4a","#72a84a","#e09c35","#b94b43"],pollen:["#7bc96f","#e3c94b","#e78b3b","#c94a62"],forest:["#b8d45a","#68a84c","#d69b38","#a94442"]};
-function band(v,kind){if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?3:v<.20?2:v<.30?1:0;if(kind==="crop")return v<25?3:v<45?2:v<70?1:0;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?3:v<50?2:v<75?1:0}
-function color(v){return palette[mode][band(v,mode)]}
+
+const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
+const historyKey="nova-forest-region-history-v5", areaKey="nova-forest-my-areas-v1";
+const palette={risk:["#19a974","#e4c441","#ef8b24","#d9363e"],water:["#d95757","#e7c85a","#67c8d9","#1f9ad6"],crop:["#b94b43","#e09c35","#72a84a","#b7cf4a"],pollen:["#7bc96f","#e3c94b","#e78b3b","#c94a62"],forest:["#d95757","#e09c35","#72a84a","#b7cf4a"]};
+let mode="risk",provinceFeatures=[],districtFeatures=[],provinceRows=[],districtRows=[],selectedProvince=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
+
+function el(q){return document.querySelector(q)}
+function setStatus(t){const x=el("[data-map-status]");if(x)x.textContent=t}
+function band(v,kind){if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?0:v<50?1:v<75?2:3}
+function color(v){return palette[mode][band(Number(v)||0,mode)]}
 function label(v,kind){if(kind==="water")return v<.12?"KRİTİK KURU":v<.20?"STRES":v<.30?"NORMAL":"İYİ";if(kind==="crop")return v<25?"STRES":v<45?"DÜŞÜK":v<70?"İYİ":"ÇOK İYİ";if(kind==="pollen")return v<20?"DÜŞÜK":v<60?"ORTA":v<120?"YÜKSEK":"ÇOK YÜKSEK";return v<25?"DÜŞÜK":v<50?"ORTA":v<75?"YÜKSEK":"KRİTİK"}
-function riskScore(w,h){let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil<.18)s+=10;if(h.hotspots24>0)s+=10;return Math.min(100,s)}
+function riskScore(w,h=0){let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil<.18)s+=10;if(h>0)s+=10;return Math.min(100,s)}
+function cropScore(w){return Math.max(0,Math.min(100,100-(w.soil<.15?65:w.soil<.2?40:w.soil<.27?15:0)-(w.et0>5?20:w.et0>3?8:0)-(w.vpd>2?12:w.vpd>1.5?5:0)))}
+function forestScore(w){return Math.max(0,100-riskScore(w))}
+function beeScore(w,pollen=0){let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=35;else if(w.wind>15)s-=15;if(w.precip>1)s-=35;if(pollen>120)s-=5;return Math.max(0,Math.min(100,s))}
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
-function area(g){let n=0;const ring=r=>{let a=0,lat=r.reduce((s,p)=>s+p[1],0)/r.length,c=Math.cos(lat*Math.PI/180),k=111.32;for(let i=0,j=r.length-1;i<r.length;j=i++)a+=(r[j][0]*c*r[i][1]-r[i][0]*c*r[j][1]);return Math.abs(a)*k*k/2};const walk=x=>{if(!Array.isArray(x)||!x.length)return;if(typeof x[0][0]==="number")n+=ring(x);else x.forEach(walk)};walk(g.coordinates);return Math.round(n)}
-function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz yerel geçmiş yok."}
-function popup(r){return '<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / KARAR MERKEZİ</div><h3>'+r.name+'</h3><div class="popup-area">'+r.area.toLocaleString("tr-TR")+' km²</div><div class="popup-score" style="color:'+color(r.score)+'">'+r.score+'<small>/100</small></div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>24s sıcak nokta</span><b>'+r.h.hotspots24+'</b></div><div class="popup-warning"><strong>Aktif gösterge</strong><br>'+label(mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest,mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div></div>'}
-function draw(){layer.clearLayers();geoFeatures.forEach((f,i)=>{const r=allRows[i];L.geoJSON(f,{style:{color:"#102218",weight:1.3,fillColor:color(mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest),fillOpacity:.68},onEachFeature:(x,l)=>{l.bindPopup(popup(r),{maxWidth:350});l.on({mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.9}),mouseout:e=>e.target.setStyle({weight:1.3,fillOpacity:.68})})}}).addTo(layer)})}
-function controls(){let old=document.querySelector(".map-filters");if(old)old.remove();const box=document.createElement("div");box.className="map-filters";box.innerHTML='<strong>VERİ KATMANI</strong><button data-m="risk" class="on">🔥 Yangın / Çevre Riski</button><button data-m="forest">🌲 Orman Sağlığı</button><button data-m="water">💧 Su / Toprak Nemi</button><button data-m="crop">🌾 Tarım Koşulu</button><button data-m="pollen">🌼 Polen</button><div class="legend"><span style="background:#19a974"></span>İyi / düşük risk <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Renk, seçtiğin katmanın skoruna göre değişir.</small>';document.querySelector(".map-section").appendChild(box);box.onclick=e=>{if(!e.target.dataset.m)return;mode=e.target.dataset.m;box.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===e.target));draw()}}
-async function weatherFor(fs){const cs=fs.map(f=>coords(f.geometry)),lat=cs.map(x=>x[0]).join(","),lon=cs.map(x=>x[1]).join(","),u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",lat);u.searchParams.set("longitude",lon);u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,soil_moisture_0_to_7cm,vapour_pressure_deficit");u.searchParams.set("daily","et0_fao_evapotranspiration,precipitation_sum,temperature_2m_min,temperature_2m_max");u.searchParams.set("forecast_days","3");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());return Array.isArray(j)?j:[j]}
-async function pollenFor(fs){const cs=fs.map(f=>coords(f.geometry)),u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",cs.map(x=>x[0]).join(","));u.searchParams.set("longitude",cs.map(x=>x[1]).join(","));u.searchParams.set("current","european_aqi,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());return Array.isArray(j)?j:[j]}
-async function firms(){if(!API_BASE)return{};try{const j=await fetch(API_BASE+"/risk-analysis").then(x=>x.json()),o={};(j.regions||[]).forEach(x=>o[x.region]=Number(x.satellite?.nasa_firms?.nearby_hotspots_24h||0));return o}catch{return{}}}
-function insights(rows,ps){const r=rows[0],p=ps[0]?.current||{},pol=Math.max(...["alder_pollen","birch_pollen","grass_pollen","mugwort_pollen","olive_pollen","ragweed_pollen"].map(k=>Number(p[k]||0)));r.pollen=pol;r.forest=Math.max(0,100-r.score);r.crop=Math.max(0,Math.min(100,100-(r.w.soil<.15?65:r.w.soil<.2?40:0)-(r.w.et0>5?20:r.w.et0>3?8:0)));document.querySelector("[data-map-status]").textContent="CANLI • 4 BÖLGE • AKTİF KATMAN: "+mode.toUpperCase()+" • ORTALAMA "+Math.round(rows.reduce((a,x)=>a+x.score,0)/rows.length)+"/100"}
-async function load(){try{const gj=await fetch(geoPath).then(x=>x.json());geoFeatures=(gj.features||[]).filter(f=>TARGET.has((f.properties||{}).il_adi));const [ws,ps,fs]=await Promise.all([weatherFor(geoFeatures),pollenFor(geoFeatures),firms()]);allRows=geoFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{},w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0)};const h={hotspots24:fs[p.il_adi]||0},r={name:p.il_adi,area:area(f.geometry),w,h,score:riskScore(w,h),pollen:0,forest:0,crop:0};return r});insights(allRows,ps);const old=JSON.parse(localStorage.getItem(historyKey)||"[]");allRows.forEach(r=>old.push({t:new Date().toISOString(),name:r.name,r:r.score}));localStorage.setItem(historyKey,JSON.stringify(old.slice(-500)));draw();controls()}catch(e){console.error(e);document.querySelector("[data-map-status]").textContent="VERİ AKIŞI BEKLENİYOR"}}
-load();setInterval(load,300000);
+function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
+function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
+function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + Nova-Forest karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
+function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
+function area(g){return Number(g?.properties?.area_sqkm||0)}
+function styleFor(r){return {color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}}
+
+function controls(){
+ let old=el(".map-filters");if(old)old.remove();
+ const box=document.createElement("div");box.className="map-filters";
+ box.innerHTML='<strong>VERİ KATMANI</strong><div class="filter-buttons"><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small>';
+ el(".map-section").appendChild(box);
+ box.onclick=e=>{const m=e.target.dataset.m,a=e.target.dataset.action;if(m){mode=m;box.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x.dataset.m===mode));redraw();return}if(a==="back")goBack();if(a==="add")toggleDraw()};
+}
+function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
+
+function drawProvinces(){
+ provinceLayer.clearLayers();districtLayer.clearLayers();
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name));l.on({mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.9}),mouseout:e=>e.target.setStyle({weight:1.3,fillOpacity:.68})})}}).addTo(provinceLayer)});
+ breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
+}
+function drawDistricts(){
+ provinceLayer.clearLayers();districtLayer.clearLayers();
+ districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>focusDistrict(r))}}).addTo(districtLayer)});
+ breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
+}
+async function weatherFor(coordsList){
+ if(!coordsList.length)return[];
+ const u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",coordsList.map(x=>x[0]).join(","));u.searchParams.set("longitude",coordsList.map(x=>x[1]).join(","));u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,soil_moisture_0_to_7cm,vapour_pressure_deficit");u.searchParams.set("daily","et0_fao_evapotranspiration,precipitation_sum");u.searchParams.set("forecast_days","3");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());return Array.isArray(j)?j:[j]}
+async function pollenAt(lat,lon){try{const u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",lat);u.searchParams.set("longitude",lon);u.searchParams.set("current","alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());const p=j.current||{};return Math.max(...["alder_pollen","birch_pollen","grass_pollen","mugwort_pollen","olive_pollen","ragweed_pollen"].map(k=>Number(p[k]||0)))}catch{return 0}}
+function weatherRow(name,area,w,pollen=0){const h=0,risk=riskScore(w,h);return{name,area,w,score:risk,crop:cropScore(w),forest:forestScore(w),pollen,bee:beeScore(w,pollen)}}
+async function loadProvinceData(){
+ const gj=await fetch(provincePath).then(x=>x.json());provinceFeatures=(gj.features||[]).filter(f=>TARGET.has((f.properties||{}).il_adi));
+ const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
+ provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};return weatherRow(p.il_adi,area(f.geometry),w)});
+ drawProvinces();saveHistory(provinceRows);
+}
+async function openProvince(name){
+ selectedProvince=name;setStatus("İLÇELER YÜKLENİYOR…");
+ const gj=await fetch(districtPath).then(x=>x.json());districtFeatures=(gj.features||[]).filter(f=>(f.properties||{}).adm1_name1===name||(f.properties||{}).adm1_name===name);
+ const ws=await weatherFor(districtFeatures.map(f=>[Number(f.properties.center_lat),Number(f.properties.center_lon)]));
+ districtRows=districtFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};return weatherRow(p.adm2_name1,p.area_sqkm,w)});
+ drawDistricts();
+ const bounds=L.geoJSON({type:"FeatureCollection",features:districtFeatures}).getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.08));
+}
+async function focusDistrict(r){
+ const idx=districtRows.findIndex(x=>x.name===r.name);if(idx<0)return;
+ const f=districtFeatures[idx],b=L.geoJSON(f).getBounds();if(b.isValid())map.fitBounds(b.pad(.08));
+ const [lat,lon]=[r.w.lat||f.properties.center_lat,r.w.lon||f.properties.center_lon];r.pollen=await pollenAt(lat,lon);r.bee=beeScore(r.w,r.pollen);
+ const title=el("[data-map-status]");if(title)title.textContent=r.name+" • "+label(scoreFor(r),mode)+" • ALAN EKLE ile kendi parselini kaydedebilirsin";
+ L.geoJSON(f,{style:{color:"#00ff66",weight:3,fillOpacity:.12}}).bindPopup(popup(r,"ilçe")).addTo(districtLayer).openPopup();
+}
+function goBack(){if(selectedProvince){selectedProvince=null;drawProvinces();map.setView([41.15,27.1],8)}else map.setView([41.15,27.1],8)}
+function saveHistory(rows){const old=JSON.parse(localStorage.getItem(historyKey)||"[]");rows.forEach(r=>old.push({t:new Date().toISOString(),name:r.name,r:r.score}));localStorage.setItem(historyKey,JSON.stringify(old.slice(-600)))}
+
+function toggleDraw(){
+ drawMode=!drawMode;drawingPoints=[];if(drawingLine)map.removeLayer(drawingLine);if(drawingPolygon)map.removeLayer(drawingPolygon);
+ const b=el(".map-filters [data-action='add']");if(b)b.textContent=drawMode?"✓ Noktaları seç":"＋ Alan Ekle";
+ if(drawMode){map.doubleClickZoom.disable();setStatus("ALAN ÇİZİMİ • Haritada köşe noktalarına tıkla • son noktada çift tıkla");map.on("click",drawClick)}
+ else{map.doubleClickZoom.enable();map.off("click",drawClick)}
+}
+function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
+function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push({id:Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()});localStorage.setItem(areaKey,JSON.stringify(areas));toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • Alanlarım bölümünden canlı durumunu izle.");}
+function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.forEach(a=>{L.polygon(a.coordinates,{color:"#00ff66",weight:2,fillOpacity:.08}).bindTooltip(a.name+" · "+a.type).addTo(fieldLayer)})}
+map.on("dblclick",finishDraw);
+async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
+load();setInterval(loadProvinceData,300000);
