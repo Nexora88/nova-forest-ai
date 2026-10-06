@@ -1,29 +1,81 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Nova-Forest AI | Çevresel İstihbarat</title>
-<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="Nova-Forest AI — Trakya çevresel istihbarat, tarım, orman, polen ve arıcılık karar destek sistemi.">
+<title>Nova-Forest AI | Trakya Çevresel İstihbarat</title>
+<link rel="stylesheet" href="css/style.css?v=20261006">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
-<header><div class="logo"><h1>Nova-Forest AI</h1><p>Çevresel izleme • risk analizi • erken uyarı</p></div><div class="status"><span></span> SİSTEM ÇALIŞIYOR</div></header>
-<nav><a href="index.html">Ana Panel</a><a href="pages/map.html">Risk Haritası</a><a href="pages/weather.html">Atmosfer</a><a href="pages/satellite.html">Uydu Merkezi</a><a href="pages/about.html">Proje</a></nav>
+<header>
+  <div class="logo"><h1>Nova-Forest AI</h1><p>Trakya çevresel istihbarat • tarım • orman • ekosistem</p></div>
+  <div class="status"><span></span> SİSTEM ÇALIŞIYOR</div>
+</header>
+<nav>
+  <a href="index.html" class="active">Ana Panel</a>
+  <a href="pages/map.html">Risk Haritası</a>
+  <a href="pages/weather.html">Atmosfer</a>
+  <a href="pages/satellite.html">Uydu Merkezi</a>
+  <a href="pages/about.html">Sistem</a>
+</nav>
+
 <main>
-<section class="hero hero-command"><div><div class="eyebrow">NOVA-FOREST / ÇEVRESEL İSTİHBARAT PLATFORMU</div><h2>Türkiye'nin çevresini tek bir karar ekranında izle.</h2><p>Nova-Forest AI; meteoroloji, uydu gözlemleri, sıcak nokta verileri, geçmiş gözlemler ve açıklanabilir risk analizini aynı sistemde birleştiren ölçeklenebilir bir çevresel izleme altyapısıdır.</p><div class="hero-actions"><a href="pages/map.html" class="primary-action">Canlı risk haritasını aç →</a><a href="pages/satellite.html" class="secondary-action">Uydu merkezine git</a></div></div><div class="hero-terminal"><span>SİSTEM DURUMU</span><strong>ONLINE</strong><small>5 aktif bölge<br>5 dk gözlem döngüsü<br>çoklu veri katmanı</small></div></section>
-<section class="cards">
-<div class="card"><h3>Risk Motoru</h3><strong>0–100</strong><p>Sıcaklık, nem, rüzgar ve mevcut uydu/sıcak nokta sinyallerini açıklanabilir bir öncelik skoruna dönüştürür.</p></div>
-<div class="card"><h3>Alan Analizi</h3><strong>km²</strong><p>Harita artık yalnızca nokta göstermiyor; il sınırlarını gerçek geometrileriyle renkli risk alanlarına dönüştürüyor.</p></div>
-<div class="card"><h3>Geçmiş</h3><strong>7 GÜN</strong><p>Sıcak nokta geçmişi ve yerel risk gözlemleri zaman içinde karşılaştırılabilir.</p></div>
-<div class="card"><h3>Uyarılar</h3><strong>CANLI</strong><p>Yüksek sıcaklık, düşük nem, kuvvetli rüzgar ve yakın sıcak nokta gibi özel sinyaller ayrı uyarı katmanında izlenir.</p></div>
+<section class="hero hero-command">
+  <div>
+    <div class="eyebrow">NOVA-FOREST / TRAKYA ENVIRONMENTAL INTELLIGENCE</div>
+    <h2>Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle.</h2>
+    <p>Nova-Forest AI yalnızca yangın alarmı veren bir harita değil; orman sağlığı, tarımsal koşullar, toprak nemi, sulama ihtiyacı, polen, hava kalitesi, arıcılık uçuş koşulları ve çevresel riskleri aynı veri katmanında birleştiren bölgesel karar destek sistemidir.</p>
+    <div class="hero-actions">
+      <a href="pages/map.html" class="primary-action">Canlı çevre haritasını aç →</a>
+      <a href="pages/satellite.html" class="secondary-action">Uydu merkezine git</a>
+    </div>
+  </div>
+  <div class="hero-terminal"><span>SİSTEM KAPSAMI</span><strong>TRAKYA</strong><small>3 il / çoklu veri katmanı<br>hava + toprak + ekosistem<br>5 dk canlı gözlem döngüsü</small></div>
 </section>
-<section class="map-section"><h2>Türkiye Çevresel Risk Alanı</h2><div class="map-toolbar"><span>81 İL SINIRI / CANLI RENKLENDİRME</span><span data-map-status>VERİLER YÜKLENİYOR…</span></div><div id="map"></div></section>
+
+<section class="command-strip">
+  <div><span>ORMAN</span><strong>Sağlık + yangın</strong></div>
+  <div><span>TARIM</span><strong>Nem + sulama</strong></div>
+  <div><span>ARICILIK</span><strong>Nova-Bee</strong></div>
+  <div><span>İNSAN</span><strong>Polen + hava</strong></div>
+</section>
+
+<section class="cards">
+  <div class="card intelligence-card"><div class="card-icon">01</div><h3>Orman Durumu</h3><strong>HEALTH</strong><p>Bitki stresi, kuraklık sinyali, sıcaklık ve yangın koşullarını tek göstergede birleştirir.</p><span class="card-link">Orman katmanı →</span></div>
+  <div class="card intelligence-card"><div class="card-icon">02</div><h3>Tarım İstihbaratı</h3><strong>FIELD</strong><p>Toprak nemi, ET₀, yağış ve sıcaklık üzerinden sulama ve tarla çalışması için erken sinyaller üretir.</p><span class="card-link">Tarım katmanı →</span></div>
+  <div class="card intelligence-card"><div class="card-icon">03</div><h3>Nova-Bee</h3><strong>BEE</strong><p>Arıcılık için sıcaklık, rüzgar, yağış ve polen koşullarını yorumlayan bölgesel uçuş koşulu göstergesi.</p><span class="card-link">Arıcılık katmanı →</span></div>
+  <div class="card intelligence-card"><div class="card-icon">04</div><h3>Polen & Hava</h3><strong>AIR</strong><p>Avrupa CAMS hava kalitesi modeli üzerinden polen ve hava kalitesi sinyallerini izler.</p><span class="card-link">Atmosfer katmanı →</span></div>
+</section>
+
+<section class="map-section">
+  <div class="section-heading"><div><div class="eyebrow">01 / OPERASYON MERKEZİ</div><h2>Trakya Çevresel Risk Alanı</h2><p>İl sınırları gerçek geometrileriyle; hava, tarım ve ekosistem göstergeleriyle birlikte.</p></div></div>
+  <div class="map-toolbar"><span>EDİRNE • KIRKLARELİ • TEKİRDAĞ</span><span data-map-status>VERİLER YÜKLENİYOR…</span></div>
+  <div id="map"></div>
+</section>
+
+<section class="insight-grid">
+  <article class="insight-panel"><div class="eyebrow">TARIM / SULAMA</div><h3 data-farm-title>Hesaplanıyor…</h3><p data-farm-summary>Toprak nemi ve ET₀ verileri hazırlanıyor.</p><div class="metric-row"><span>Toprak nemi</span><b data-soil>—</b></div><div class="metric-row"><span>ET₀</span><b data-et0>—</b></div></article>
+  <article class="insight-panel"><div class="eyebrow">NOVA-BEE / ARICILIK</div><h3 data-bee-title>Uçuş koşulu hazırlanıyor</h3><p data-bee-summary>Sıcaklık, rüzgar ve yağış birlikte değerlendiriliyor.</p><div class="metric-row"><span>Uçuş skoru</span><b data-bee-score>—</b></div><div class="metric-row"><span>Polen sinyali</span><b data-pollen>—</b></div></article>
+  <article class="insight-panel"><div class="eyebrow">ORMAN / EKOSİSTEM</div><h3 data-forest-title>Çevresel durum hesaplanıyor</h3><p data-forest-summary>Yangın, sıcaklık, nem ve bitki stresi sinyalleri birleştiriliyor.</p><div class="metric-row"><span>Risk</span><b data-forest-risk>—</b></div><div class="metric-row"><span>Uyarı</span><b data-forest-alert>—</b></div></article>
+</section>
+
 <section class="system-grid">
-<div class="system-item"><div class="eyebrow">01 / METEOROLOJİ</div><strong>Hava Koşulları</strong><p>Sıcaklık, bağıl nem ve rüzgar ile anlık çevresel koşul takibi.</p></div>
-<div class="system-item"><div class="eyebrow">02 / UYDU</div><strong>Sentinel-2</strong><p>Multispektral gözlem ve NDVI tabanlı bitki/kuraklık sinyalleri için altyapı.</p></div>
-<div class="system-item"><div class="eyebrow">03 / SICAK NOKTA</div><strong>NASA FIRMS</strong><p>Yapılandırıldığında VIIRS sıcak nokta gözlemleri ve 7 günlük yakınlık geçmişi.</p></div>
-<div class="system-item"><div class="eyebrow">04 / KARAR MOTORU</div><strong>Nova Risk Engine</strong><p>Ham verileri açıklanabilir risk seviyelerine ve özel uyarılara dönüştürür.</p></div>
+  <div class="system-item"><div class="eyebrow">01 / ORMAN</div><strong>Orman Sağlığı</strong><p>Sentinel-2 sahne altyapısı, bitki stresi ve risk sinyalleri. Gerçek NDVI pixel hesabı ayrıca yapılandırılacak.</p></div>
+  <div class="system-item"><div class="eyebrow">02 / TARIM</div><strong>Toprak & Su</strong><p>Toprak nemi, yağış, ET₀ ve VPD ile sulama ve su stresi için karar destek göstergeleri.</p></div>
+  <div class="system-item"><div class="eyebrow">03 / ARICILIK</div><strong>Nova-Bee</strong><p>Arı uçuş koşulları, polen aktivitesi ve hava koşullarını tek ekranda yorumlayan yardımcı modül.</p></div>
+  <div class="system-item"><div class="eyebrow">04 / İNSAN</div><strong>Polen & Hava</strong><p>CAMS tabanlı polen ve hava kalitesi göstergeleriyle günlük çevre farkındalığı.</p></div>
+  <div class="system-item"><div class="eyebrow">05 / SICAK NOKTA</div><strong>NASA FIRMS</strong><p>Yapılandırıldığında VIIRS sıcak nokta gözlemlerini risk motoruna ekler.</p></div>
+  <div class="system-item"><div class="eyebrow">06 / GEÇMİŞ</div><strong>Zaman Serisi</strong><p>Yerel gözlem geçmişi şimdilik tarayıcıda tutulur; kalıcı sunucu geçmişi sonraki veri katmanıdır.</p></div>
+</section>
+
+<section class="notice-panel">
+  <div><div class="eyebrow">SİSTEM MANTIĞI</div><h2>Tek uygulama, farklı kullanıcılar.</h2></div>
+  <p>Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir. Nova-Forest'ın amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.</p>
 </section>
 </main>
 <footer><p>Nova-Forest AI · Geliştirici: <strong>Ahmet Eymen Bakraç</strong> · Nexora88 © 2026</p></footer>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="js/map.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="js/map.js?v=20261006"></script>
 </body></html>
