@@ -1,12 +1,14 @@
 {
-  "name":"Nova-Forest AI",
+  "name":"Nova-Forest AI EDGE",
   "short_name":"Nova-Forest",
-  "description":"Trakya ve İstanbul çevresel istihbarat ve karar destek sistemi.",
+  "description":"Trakya ve Istanbul cevresel istihbarat ve offline karar destek sistemi.",
   "start_url":"./index.html",
   "scope":"./",
   "display":"standalone",
+  "orientation":"any",
   "background_color":"#020303",
   "theme_color":"#020303",
   "lang":"tr",
-  "icons":[]
+  "categories":["utilities","productivity","weather"],
+  "prefer_related_applications":false
 }

@@ -107,7 +107,9 @@ async function loadSettlements(district,lat,lon){
     u.searchParams.set("addressdetails","1");u.searchParams.set("accept-language","tr");
     let rows=await fetch(u,{headers:{"Accept":"application/json"}}).then(x=>x.json());
     rows=rows.filter(x=>["village","hamlet","suburb","neighbourhood","quarter"].includes(x.type)||["village","hamlet","suburb","neighbourhood","quarter"].includes(x.addresstype));
-    settlementRows=rows;const pollenValues=mode==="pollen"?await pollenFor(rows.map(x=>[Number(x.lat),Number(x.lon)])):[];
+    settlementRows=rows;
+    try{await window.NovaStore.put("settlements",{id:"settlements:"+norm(selectedProvince||"")+"::"+norm(district),province:selectedProvince||"",district,rows,updatedAt:Date.now()})}catch{}
+    const pollenValues=mode==="pollen"?await pollenFor(rows.map(x=>[Number(x.lat),Number(x.lon)])):[];
     rows.forEach((x,i)=>{
       const score=mode==="pollen"?Number(pollenValues[i]||0):0;
       const markerColor=mode==="pollen"?palette.pollen[band(score,"pollen")]:"#00ff66";
@@ -118,7 +120,23 @@ async function loadSettlements(district,lat,lon){
     });
     breadcrumb(selectedProvince+" → "+district+" → KÖY / MAHALLE");
     setStatus("CANLI • "+rows.length+" KÖY / MAHALLE • "+district+" • "+mode.toUpperCase());
-  }catch(e){settlementRows=[];setStatus(district+" • YERLEŞİM VERİSİ ALINAMADI");}
+  }catch(e){
+    try{
+      const cached=await window.NovaStore.get("settlements","settlements:"+norm(selectedProvince||"")+"::"+norm(district));
+      if(cached?.rows?.length){
+        settlementRows=cached.rows;
+        cached.rows.forEach(x=>{
+          const m=L.circleMarker([Number(x.lat),Number(x.lon)],{radius:6,color:"#00ff66",weight:1,fillColor:"#00ff66",fillOpacity:.9});
+          m.bindTooltip(x.display_name.split(",")[0],{direction:"top"});
+          m.addTo(settlementLayer);
+        });
+        breadcrumb(selectedProvince+" → "+district+" → KÖY / MAHALLE");
+        setStatus("ÇEVRİMDIŞI • "+cached.rows.length+" KÖY / MAHALLE • SON YEREL VERİ");
+        return;
+      }
+    }catch{}
+    settlementRows=[];setStatus(district+" • ÇEVRİMDIŞI • YEREL YERLEŞİM VERİSİ YOK");
+  }
 }
 async function refreshView(){
   setStatus("VERİLER YENİLENİYOR…");
@@ -130,7 +148,7 @@ async function refreshView(){
   await loadProvinceData();
 }
 function goBack(){if(selectedDistrict){selectedDistrict=null;settlementLayer.clearLayers();drawDistricts();return}if(selectedProvince){selectedProvince=null;drawProvinces();map.setView([41.15,27.1],8)}else map.setView([41.15,27.1],8)}
-function saveHistory(rows){const old=JSON.parse(localStorage.getItem(historyKey)||"[]");rows.forEach(r=>old.push({t:new Date().toISOString(),name:r.name,r:r.score}));localStorage.setItem(historyKey,JSON.stringify(old.slice(-600)))}
+function saveHistory(rows){const old=JSON.parse(localStorage.getItem(historyKey)||"[]");rows.forEach(r=>{const item={t:new Date().toISOString(),name:r.name,r:r.score};old.push(item);try{window.NovaStore.put("timeseries",{id:"risk:"+r.name+":"+Date.now(),...item,updatedAt:Date.now()})}catch{}});localStorage.setItem(historyKey,JSON.stringify(old.slice(-600)))}
 
 function toggleDraw(){
  drawMode=!drawMode;drawingPoints=[];if(drawingLine)map.removeLayer(drawingLine);if(drawingPolygon)map.removeLayer(drawingPolygon);
@@ -139,7 +157,7 @@ function toggleDraw(){
  else{map.doubleClickZoom.enable();map.off("click",drawClick)}
 }
 function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
-function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push({id:Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()});localStorage.setItem(areaKey,JSON.stringify(areas));toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • Alanlarım bölümünden canlı durumunu izle.");}
+async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • IndexedDB + yerel yedek aktif.");}
 function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.forEach(a=>{L.polygon(a.coordinates,{color:"#00ff66",weight:2,fillOpacity:.08}).bindTooltip(a.name+" · "+a.type).addTo(fieldLayer)})}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
