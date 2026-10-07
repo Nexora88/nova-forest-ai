@@ -23,7 +23,7 @@ async function requestNovaBrowserPermission() {
 
 function showNovaBrowserAlert(alert) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  new Notification("NexoraWildfire", {
+  new Notification("NexoraWildfire AI", {
     body: alert.area + ": risk " + alert.risk + "/100",
     tag: "nova-" + alert.area + "-" + alert.risk
   });
@@ -59,4 +59,3 @@ window.NovaAlert = {
   browser: showNovaBrowserAlert,
   requestPermission: requestNovaBrowserPermission
 };
-

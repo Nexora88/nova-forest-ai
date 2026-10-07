@@ -9,11 +9,11 @@
   }
   function evaluate(w,previous){
     const r=risk(w), alerts=[];
-    if(Number(w.soil)<.15)alerts.push({level:"critical",title:"SU STRESÄ°",message:"Yerel veride toprak nemi kritik eÅŸikte."});
-    else if(Number(w.soil)<.20)alerts.push({level:"warning",title:"NEM DÃœÅÃœYOR",message:"Yerel veride toprak nemi dÃ¼ÅŸÃ¼k."});
-    if(Number(w.vpd)>2)alerts.push({level:"warning",title:"VPD YÃœKSEK",message:"Hava koÅŸullarÄ± su kaybÄ± baskÄ±sÄ±nÄ± artÄ±rÄ±yor."});
-    if(Number(w.wind)>25)alerts.push({level:"warning",title:"RÃœZGAR",message:"Yerel veride yÃ¼ksek rÃ¼zgar gÃ¶rÃ¼lÃ¼yor."});
-    if(previous && r-previous.risk>=15)alerts.push({level:"warning",title:"RÄ°SK ARTIÅI",message:"Son kayÄ±tla karÅŸÄ±laÅŸtÄ±rÄ±ldÄ±ÄŸÄ±nda risk belirgin arttÄ±."});
+    if(Number(w.soil)<.15)alerts.push({level:"critical",title:"SU STRESİ",message:"Yerel veride toprak nemi kritik eşikte."});
+    else if(Number(w.soil)<.20)alerts.push({level:"warning",title:"NEM DÜŞÜYOR",message:"Yerel veride toprak nemi düşük."});
+    if(Number(w.vpd)>2)alerts.push({level:"warning",title:"VPD YÜKSEK",message:"Hava koşulları su kaybı baskısını artırıyor."});
+    if(Number(w.wind)>25)alerts.push({level:"warning",title:"RÜZGAR",message:"Yerel veride yüksek rüzgar görülüyor."});
+    if(previous && r-previous.risk>=15)alerts.push({level:"warning",title:"RİSK ARTIŞI",message:"Son kayıtla karşılaştırıldığında risk belirgin arttı."});
     return {risk:r,alerts,calculatedAt:Date.now(),mode:"offline-decision-support"};
   }
   window.NovaOfflineEngine={risk,evaluate};

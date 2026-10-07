@@ -18,7 +18,7 @@ async function loadWeatherData() {
         const data = await response.json();
 
         console.log(
-            "NexoraWildfire Weather Data:",
+            "NexoraWildfire AI Weather Data:",
             data
         );
 
@@ -104,7 +104,7 @@ async function loadWeatherData() {
     catch (error) {
 
         console.error(
-            "NexoraWildfire Weather Error:",
+            "NexoraWildfire AI Weather Error:",
             error
         );
 
@@ -114,4 +114,3 @@ async function loadWeatherData() {
 
 
 loadWeatherData();
-

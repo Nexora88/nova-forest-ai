@@ -9,10 +9,10 @@
       document.body.appendChild(host);
     }
     host.innerHTML='<div class="edge-status"><span class="edge-dot"></span><div><b>NEXORAWILDFIRE EDGE</b><small>Yerel veri + offline karar motoru</small></div></div><button class="edge-install" data-install>↥ CİHAZA YÜKLE</button><button class="edge-update" data-update hidden>↻ YENİ SÜRÜM HAZIR</button>';
-    const installs=document.querySelectorAll("[data-install]");
-    installs.forEach(install=>{install.onclick=async()=>{const ok=await window.NovaInstall?.();if(!ok)install.textContent="Tarayıcı menüsünden yükle";}});
+    const install=host.querySelector("[data-install]");
+    install.onclick=async()=>{const ok=await window.NovaInstall?.();if(!ok)install.textContent="Tarayıcı menüsünden yükle";};
     host.querySelector("[data-update]").onclick=()=>window.NovaApplyUpdate?.();
-    document.addEventListener("nova:install-ready",()=>installs.forEach(x=>x.removeAttribute("disabled")));
+    document.addEventListener("nova:install-ready",()=>install.removeAttribute("disabled"));
     document.addEventListener("nova:update-ready",()=>{host.querySelector("[data-update]").hidden=false});
   }
   document.addEventListener("DOMContentLoaded",boot);

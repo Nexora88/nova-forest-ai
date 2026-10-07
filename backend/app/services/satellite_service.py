@@ -1,4 +1,4 @@
-# NexoraWildfire Satellite Service
+# NexoraWildfire AI Satellite Service
 # İlk sürüm uydu veri altyapısı
 
 

@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v1";
-const DATA_CACHE = "nexorawildfire-data-v1";
+const CACHE_NAME = "nexorawildfire-shell-v4";
+const DATA_CACHE = "nexorawildfire-data-v4";
 
 const APP_SHELL = [
   "./",
@@ -29,6 +29,7 @@ const APP_SHELL = [
   "./assets/nexora-logo.png",
   "./favicon.png",
   "./manifest.webmanifest",
+  "./data/admin/trakya_istanbul_districts.geojson",
   "./data/admin/tur_admin2.geojson",
   "./data/edirne_settlements.geojson",
   "https://unpkg.com/leaflet/dist/leaflet.css",

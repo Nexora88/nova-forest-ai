@@ -1,4 +1,4 @@
-# NexoraWildfire — Explainable Environmental Risk Engine
+# NexoraWildfire AI — Explainable Environmental Risk Engine
 
 def get_level(score):
     if score < 25:

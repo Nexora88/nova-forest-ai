@@ -99,7 +99,7 @@ def risk_analysis():
     average = round(sum(r["analysis"]["risk_score"] for r in valid) / len(valid)) if valid else None
 
     return {
-        "system": "NexoraWildfire",
+        "system": "NexoraWildfire AI",
         "status": "online",
         "analysis_type": "Regional Environmental Risk",
         "region_count": len(REGIONS),

@@ -1,5 +1,5 @@
 # =====================================
-# NEXORAWILDFIRE
+# NEXORAWILDFIRE AI
 # NASA FIRMS Service
 # =====================================
 

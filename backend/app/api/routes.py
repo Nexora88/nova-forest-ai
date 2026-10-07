@@ -7,7 +7,7 @@ router = APIRouter()
 @router.get("/")
 def home():
     return {
-        "project": "NexoraWildfire",
+        "project": "NexoraWildfire AI",
         "message": "Forest risk analysis system is running"
     }
 
