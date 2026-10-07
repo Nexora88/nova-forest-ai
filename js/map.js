@@ -33,7 +33,7 @@ function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
-function styleFor(r){return {color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}}
+function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
 
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
@@ -46,12 +46,12 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>ACTIVE_PROVINCES.has(norm(r.name))?openProvince(r.name):window.NexoraFeedback?.comingSoon(r.name));l.on({mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.9}),mouseout:e=>e.target.setStyle({weight:1.3,fillOpacity:.68})})}}).addTo(provinceLayer)});
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name+(ACTIVE_PROVINCES.has(norm(r.name))?"":" - YAKINDA"),{permanent:true,direction:"center",className:"region-label "+(ACTIVE_PROVINCES.has(norm(r.name))?"":"region-disabled")});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>ACTIVE_PROVINCES.has(norm(r.name))?openProvince(r.name):window.NexoraFeedback?.comingSoon(r.name));l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
 }
 function drawDistricts(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
+ districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r,true),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
  breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
 }
 function chooseDistrict(r){
