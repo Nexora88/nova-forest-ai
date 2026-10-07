@@ -3,8 +3,8 @@ const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
 function brand(){
  document.documentElement.dataset.brand='nexora';
- if(!document.querySelector('link[rel="icon"]')){const l=document.createElement('link');l.rel='icon';l.type='image/svg+xml';l.href=(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-mark.svg';document.head.appendChild(l)}
- const logo=$('.logo');if(logo&&!logo.dataset.nexora){logo.dataset.nexora='1';logo.innerHTML='<div class="brand-lockup"><img src="'+(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-mark.svg" alt="Nexora"><div><div class="brand-parent">NEXORA</div><h1>Nova-Forest AI</h1><p>Çevresel istihbarat · karar destek · EDGE</p></div></div>'}
+ if(!document.querySelector('link[rel="icon"]')){const l=document.createElement('link');l.rel='icon';l.type='image/png';l.href=(location.pathname.includes('/pages/')?'../':'')+'favicon.png';document.head.appendChild(l)}
+ const logo=$('.logo');if(logo&&!logo.dataset.nexora){logo.dataset.nexora='1';logo.innerHTML='<div class="brand-lockup"><img src="'+(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-logo.png" alt="Nexora"><div><div class="brand-parent">NEXORA</div><h1>Nova-Forest AI</h1><p>Çevresel istihbarat · karar destek · EDGE</p></div></div>'}
  const nav=document.querySelector('nav');if(nav&&!nav.querySelector('.nav-brand')){const b=document.createElement('span');b.className='nav-brand';b.textContent='NEXORA / ENVIRONMENTAL INTELLIGENCE';nav.prepend(b)}
 }
 function toast(title,msg,type='info'){
@@ -13,7 +13,7 @@ function toast(title,msg,type='info'){
 }
 async function notify(title,msg,type='info'){
  toast(title,msg,type);
- try{if('Notification' in window){if(Notification.permission==='default')await Notification.requestPermission();if(Notification.permission==='granted')new Notification(title,{body:msg,icon:(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-mark.svg',tag:'nova-'+title})}}catch{}
+ try{if('Notification' in window){if(Notification.permission==='default')await Notification.requestPermission();if(Notification.permission==='granted')new Notification(title,{body:msg,icon:(location.pathname.includes('/pages/')?'../':'')+'favicon.png',tag:'nova-'+title})}}catch{}
  try{await window.NovaStore?.put('alerts',{id:'ui:'+Date.now(),title,message:msg,severity:type,source:'Nova-Alert',createdAt:Date.now(),read:false})}catch{}
 }
 window.NovaNotify=notify;

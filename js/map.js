@@ -1,17 +1,19 @@
 const API_BASE=(window.NOVA_API_BASE||"").replace(/\/$/,"");
 const provincePath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
-const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/trakya_istanbul_districts.geojson":"data/admin/trakya_istanbul_districts.geojson";
+const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/tur_admin2.geojson":"data/admin/tur_admin2.geojson";
 const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../data/edirne_settlements.geojson":"data/edirne_settlements.geojson";
-const TARGET=new Set(["edirne","kirklareli","tekirdag","istanbul"]);
+const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
 const map=L.map("map",{zoomControl:true,doubleClickZoom:true}).setView([41.15,27.1],8);
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
 L.control.layers({"Temel Harita":base,"Uydu":sat},null,{collapsed:false}).addTo(map);
+const scan=document.createElement("div");scan.className="nova-satellite-scan";scan.innerHTML="<span>UYDU ANALİZİ • VECTOR OVERLAY • OFFLINE SINIRLAR</span><i></i>";document.querySelector(".map-section")?.appendChild(scan);
+map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
 
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
 const historyKey="nova-forest-region-history-v5", areaKey="nova-forest-my-areas-v1";
-const palette={risk:["#19a974","#e4c441","#ef8b24","#d9363e"],water:["#d95757","#e7c85a","#67c8d9","#1f9ad6"],crop:["#b94b43","#e09c35","#72a84a","#b7cf4a"],pollen:["#7bc96f","#e3c94b","#e78b3b","#c94a62"],forest:["#d95757","#e09c35","#72a84a","#b7cf4a"]};
+const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
 let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
 
 function el(q){return document.querySelector(q)}
@@ -28,7 +30,8 @@ function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").fi
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
 function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + Nova-Forest karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
-function area(g){return Number(g?.properties?.area_sqkm||0)}
+function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
+function area(g){return num(g?.properties?.area_sqkm)}
 function styleFor(r){return {color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}}
 
 function controls(){
@@ -47,7 +50,7 @@ function drawProvinces(){
 }
 function drawDistricts(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-risk-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
+ districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
  breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
 }
 function chooseDistrict(r){
@@ -68,7 +71,7 @@ async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(row
 async function loadProvinceData(){
  try{
   const gj=await fetch(provincePath).then(x=>x.json());
-  provinceFeatures=(gj.features||[]).filter(f=>TARGET.has(norm((f.properties||{}).il_adi)));
+  provinceFeatures=(gj.features||[]);
   const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
   provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
   await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
