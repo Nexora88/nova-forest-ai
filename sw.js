@@ -1,6 +1,4 @@
-[Reading 103 lines from start (total: 103 lines, 0 remaining)]
 
-[Reading 98 lines from start (total: 98 lines, 0 remaining)]
 
 const CACHE_NAME = "nova-forest-shell-v1";
 const DATA_CACHE = "nova-forest-data-v1";
@@ -103,7 +101,3 @@ self.addEventListener("fetch", event => {
 self.addEventListener("message", event => {
   if (event.data === "SKIP_WAITING") self.skipWaiting();
 });
-
-[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
-
-[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
