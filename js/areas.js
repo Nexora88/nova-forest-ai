@@ -11,4 +11,26 @@ function alerts(a,d,sat){const out=[];if(d.w.soil<.15)out.push(["SU STRESİ","To
 function satelliteBox(sat){if(sat.status==="available"&&sat.series?.length){const last=sat.series[sat.series.length-1],prev=sat.series.length>1?sat.series[sat.series.length-2]:null;const delta=prev?(last.ndvi-prev.ndvi):null;const ndmi=last.ndmi;const ndmiDelta=prev&&ndmi!=null&&prev.ndmi!=null?(ndmi-prev.ndmi):null;return '<div class="sat-mini"><div><span>UYDU ZAMAN SERİSİ</span><b>'+last.ndvi.toFixed(2)+' NDVI · '+(ndmi==null?"—":ndmi.toFixed(2)+" NDMI")+"</b></div><small>"+last.classification+(delta===null?"":" · NDVI "+(delta>=0?"+":"")+delta.toFixed(2))+(ndmiDelta===null?"":" · NDMI "+(ndmiDelta>=0?"+":"")+ndmiDelta.toFixed(2))+'</small></div>'}if(sat.status==="not_configured")return '<div class="sat-mini muted"><span>UYDU</span><b>CDSE bağlantısı bekleniyor</b><small>Backend’e Sentinel Hub OAuth bilgileri tanımlanınca gerçek NDVI zaman serisi çalışır.</small></div>';return '<div class="sat-mini muted"><span>UYDU</span><b>Sahne/işleme bekleniyor</b><small>Alan bazlı Sentinel-2 istatistiği hazırlanıyor.</small></div>'}
 async function card(a){const [lat,lon]=center(a.coordinates);const [d,sat]=await Promise.all([live(lat,lon),satellite(a)]);const alertsHtml=alerts(a,d,sat).map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3>'+a.name+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-live"><span>CANLI DURUM</span><strong>'+d.risk+'/100 risk</strong><small>Güncelleme: '+new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Otomatik olaylar</h4>'+alertsHtml+'</div><div class="area-footer">Koordinat merkezi: '+lat.toFixed(4)+', '+lon.toFixed(4)+' · Hava/toprak modeli canlıdır. Uydu zaman serisi Sentinel-2 sahneleri geldikçe güncellenir.</div></article>'}
 async function render(){const areas=getAreas();countEl.textContent=areas.length+" alan";if(!areas.length){areasEl.innerHTML="";emptyEl.style.display="grid";return}emptyEl.style.display="none";areasEl.innerHTML='<div class="loading-area">Alanların canlı durumu hesaplanıyor…</div>';const html=await Promise.all(areas.map(card));areasEl.innerHTML=html.join("");areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{localStorage.setItem(KEY,JSON.stringify(getAreas().filter(a=>a.id!==b.dataset.delete)));render()})}
-render();setInterval(render,300000);
+async function checkNativeAlerts(){
+  const base=(window.NOVA_API_BASE||"").replace(/\/$/,"");
+  const settings=window.NovaAlert?.settings?.()||{enabled:true,threshold:70};
+  if(!base||settings.enabled===false||!window.NovaAlert)return;
+  const areas=getAreas();
+  for(const a of areas){
+    try{
+      const [lat,lon]=center(a.coordinates);
+      const u=new URL(base+"/notifications/evaluate");
+      u.searchParams;
+      const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat,lon,area_name:a.name,threshold:Number(settings.threshold||70)})});
+      const result=await r.json();
+      if(result.alert){
+        const alert={area:a.name,risk:result.risk,level:result.level,message:result.message,title:result.title};
+        const before=JSON.parse(localStorage.getItem("nova-forest-alerts-v1")||"[]");
+        const existed=before.some(x=>x.fingerprint===[alert.area,alert.risk,alert.level,alert.message].join("|")&&Date.now()-x.createdAt<6*60*60*1000);
+        window.NovaAlert.save(alert);
+        if(!existed)window.NovaAlert.browser(alert);
+      }
+    }catch{}
+  }
+}
+render();checkNativeAlerts();setInterval(()=>{render();checkNativeAlerts()},300000);
