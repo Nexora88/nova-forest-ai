@@ -1,7 +1,7 @@
 {
-  "name":"Nova-Forest AI EDGE",
+  "name":"Nova-Forest AI EDGE — Nexora",
   "short_name":"Nova-Forest",
-  "description":"Trakya ve Istanbul cevresel istihbarat ve offline karar destek sistemi.",
+  "description":"Nexora çatısı altında Trakya ve İstanbul çevresel istihbarat ve offline karar destek ürünü.",
   "start_url":"./index.html",
   "scope":"./",
   "display":"standalone",
@@ -10,5 +10,8 @@
   "theme_color":"#020303",
   "lang":"tr",
   "categories":["utilities","productivity","weather"],
-  "prefer_related_applications":false
+  "prefer_related_applications":false,
+  "icons":[
+    {"src":"assets/nexora-mark.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }

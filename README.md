@@ -1,34 +1,79 @@
-﻿# ğŸŒ² Nova-Forest AI
+# 🌲 Nova-Forest AI
 
-Satellite-Based Forest Fire Risk Analysis System
+**Nexora çatısı altında çevresel istihbarat ve karar destek ürünü.**
 
-## Overview
+Nova-Forest AI; tarım, orman, arıcılık, su-toprak, polen ve çevresel riskleri tek bir saha ekranında birleştiren **PWA + offline-first** bir çevresel istihbarat platformudur.
 
-Nova-Forest AI analyzes environmental conditions using open satellite and weather data to estimate forest fire risk levels.
+## Ürün yaklaşımı
 
-## Coverage Area
+Nova-Forest'ın temel hiyerarşisi:
 
-- Edirne
-- KÄ±rklareli
-- TekirdaÄŸ
-- Ã‡anakkale
-- Istanbul European Side
+**İl → İlçe → Köy/Mahalle → Alan → Uydu zaman serisi → Bitki stresi → Su/Sulama → Ürün/bitki sınıfı**
 
-## Risk Levels
+İlk ürünleşme sahası **Edirne**'dir. İlçe seviyesinden köy/mahalle seviyesine inilir. Yerleşim noktaları gerçek OpenStreetMap/Nominatim verilerinden alınır ve seçilen çevresel katmana göre renklendirilir.
 
-ğŸŸ¢ Low\r\nğŸŸ¡ Medium\r\nğŸŸ  High\r\nğŸ”´ Critical# nova-forest-ai
-Satellite-based early warning and forest fire risk analysis system using open data sources.
+Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** olarak kaydedebilir. Kişisel alanlar çevresel katmanlardan ayrı, mor neon ile gösterilir.
 
-## Current data architecture
-- **Open-Meteo:** live temperature, relative humidity and 10 m wind.
-- **Sentinel-2:** multispectral observation architecture; B04/B08 are reserved for NDVI.
-- **NASA FIRMS / VIIRS:** hotspot observations when `FIRMS_MAP_KEY` is configured.
-- **Risk Engine:** explainable 0â€“100 score. Missing satellite data is never replaced with fabricated values.
-- **Frontend fallback:** the live map can query Open-Meteo directly when the FastAPI backend is unavailable, so GitHub Pages still shows live weather-based risk colors.
+## Nexora / Nova-Forest EDGE
+
+- PWA olarak cihaza kurulabilir.
+- IndexedDB yerel veri deposu kullanır.
+- Servis çalışanı ile uygulama kabuğu çevrimdışı açılabilir.
+- Son geçerli gözlemlerle yerel karar destek motoru çalışabilir.
+- Yerel Nova-Alert merkezi tarayıcı bildirimi ve uygulama içi bildirim üretir.
+- Güncelleme hazır olduğunda uygulama içinden yeni sürüm alınabilir.
+- Mobil ekranlara uyumludur.
+
+> Çevrimdışı mod yeni internet verisi ürettiğini iddia etmez. Son geçerli veriyi kullanır ve açıkça **karar destek** olarak etiketler.
+
+## Veri kaynakları
+
+- **Open-Meteo:** sıcaklık, nem, rüzgar, yağış, toprak nemi, ET₀ ve VPD.
+- **OpenStreetMap / Nominatim:** ilçe altındaki köy/mahalle yerleşim noktaları.
+- **Copernicus Sentinel-2:** gerçek NDVI/NDMI zaman serisi altyapısı; CDSE kimlik bilgileri yapılandırıldığında kullanılır.
+- **NASA FIRMS / VIIRS:** yapılandırılmış API anahtarı olduğunda sıcak nokta gözlemleri.
+
+Üretilmemiş uydu veya yangın verisi sahte değerlerle doldurulmaz.
+
+## Harita katmanları
+
+- 🔥 Çevre / yangın riski
+- 🌲 Orman sağlığı
+- 💧 Su / toprak nemi
+- 🌾 Tarım koşulu
+- 🌼 Polen
+
+Harita renkleri seçilen katmana göre değişir. Polen rengi bitki sağlığı anlamına gelmez. Köy/mahalle noktaları parsel veya mülkiyet sınırı değildir.
+
+## Bildirim sistemi
+
+**Nova-Alert** yerel uyarı merkezidir. Alanlardaki canlı veya çevrimdışı karar destek sinyalleri IndexedDB'ye kaydedilir. Tarayıcı izin verdiğinde sistem bildirim gönderebilir; ayrıca uygulama içi bildirim kartı gösterilir.
 
 ## Backend
-Run from `backend/`:
-`python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`
 
-Health: `/health`\r\nRisk: `/risk-analysis`\r\nSatellite: `/satellite/status`\r\nWeather: `/weather`
+`backend/` altında FastAPI servisi bulunur.
 
+```bash
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Önemli uçlar:
+
+- `/health`
+- `/risk-analysis`
+- `/satellite/status`
+- `/weather`
+- `/forecast-risk`
+- `/ndvi/status/{region}`
+- `/ndvi/area-timeseries`
+- `/notifications/status`
+
+## Ürün vizyonu
+
+Nova-Forest AI, yalnızca bir web sitesi değil; sahada kullanılabilecek dayanıklı bir çevresel karar destek ürünüdür. Sonraki fazlarda seçili bölgeler için gerçek offline vector map paketleri ve cihazlar arası veri senkronizasyonu planlanmaktadır.
+
+## Geliştirici
+
+**Ahmet Eymen Bakraç**
+**Nexora / Nexora88**
+2026

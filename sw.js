@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nova-forest-shell-v2";
-const DATA_CACHE = "nova-forest-data-v2";
+const CACHE_NAME = "nova-forest-shell-v3";
+const DATA_CACHE = "nova-forest-data-v3";
 
 const APP_SHELL = [
   "./",
@@ -23,7 +23,12 @@ const APP_SHELL = [
   "./js/nova-offline-engine.js",
   "./js/install-update.js",
   "./js/edge-ui.js",
+  "./js/nexora-product.js",
+  "./css/product-ui.css",
+  "./assets/nexora-mark.svg",
+  "./manifest.webmanifest",
   "./data/admin/trakya_istanbul_districts.geojson",
+  "./data/edirne_settlements.geojson",
   "https://unpkg.com/leaflet/dist/leaflet.css",
   "https://unpkg.com/leaflet/dist/leaflet.js"
 ];
