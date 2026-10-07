@@ -1,5 +1,5 @@
 // =====================================
-// NOVA-FOREST AI
+// NEXORAWILDFIRE AI
 // Risk Dashboard System
 // =====================================
 
@@ -193,7 +193,7 @@ error
 
 
 loadDashboard();// =====================================
-// NOVA-FOREST AI
+// NEXORAWILDFIRE AI
 // Risk Dashboard System
 // =====================================
 
@@ -387,3 +387,4 @@ error
 
 
 loadDashboard();
+

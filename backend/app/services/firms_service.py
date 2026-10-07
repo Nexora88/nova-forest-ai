@@ -1,5 +1,5 @@
 # =====================================
-# NOVA-FOREST AI
+# NEXORAWILDFIRE
 # NASA FIRMS Service
 # =====================================
 

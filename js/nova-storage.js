@@ -1,6 +1,6 @@
-/* Nova-Forest local data layer: IndexedDB with localStorage migration fallback. */
+/* NexoraWildfire local data layer: IndexedDB with localStorage migration fallback. */
 (function(){
-  const DB_NAME="nova-forest-edge";
+  const DB_NAME="nexorawildfire-edge";
   const DB_VERSION=1;
   const STORES=["areas","observations","timeseries","alerts","settlements","meta"];
   let dbPromise=null;
@@ -19,10 +19,10 @@
   async function clear(store){const db=await open();return new Promise((res,rej)=>{const tx=db.transaction(store,"readwrite");tx.objectStore(store).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
   async function migrate(){
     try{
-      const raw=JSON.parse(localStorage.getItem("nova-forest-my-areas-v1")||"[]");
+      const raw=JSON.parse(localStorage.getItem("nexorawildfire-my-areas-v1")||"[]");
       for(const a of raw) await put("areas",{...a,id:String(a.id),updatedAt:Date.now()});
-      if(raw.length)localStorage.setItem("nova-forest-idb-migrated","1");
-      const alerts=JSON.parse(localStorage.getItem("nova-forest-alerts-v1")||"[]");
+      if(raw.length)localStorage.setItem("nexorawildfire-idb-migrated","1");
+      const alerts=JSON.parse(localStorage.getItem("nexorawildfire-alerts-v1")||"[]");
       for(const a of alerts) await put("alerts",{...a,id:a.id||crypto.randomUUID(),updatedAt:a.createdAt||Date.now()});
       window.dispatchEvent(new CustomEvent("nova:idb-ready"));
     }catch(e){console.warn("Nova Edge storage",e)}

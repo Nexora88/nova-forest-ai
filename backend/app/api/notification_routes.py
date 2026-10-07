@@ -33,7 +33,7 @@ def notification_status():
         "system": "Nova-Alert",
         "external_providers": False,
         "channels": ["in_app", "browser"],
-        "note": "Uyarılar Nova-Forest içinde üretilir. Harici SMS, e-posta veya bot sağlayıcısı kullanılmaz."
+        "note": "Uyarılar NexoraWildfire içinde üretilir. Harici SMS, e-posta veya bot sağlayıcısı kullanılmaz."
     }
 
 @router.post("/evaluate")

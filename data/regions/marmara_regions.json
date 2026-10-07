@@ -1,56 +1,57 @@
 {
-  "project": "Nova-Forest AI",
-  "region": "Marmara-Trakya",
+  "project": "NexoraWildfire",
+  "region": "Marmara-Türkiye",
   "areas": [
     {
       "city": "Edirne",
       "districts": [
         "Merkez",
-        "Keşan",
-        "İpsala",
+        "KeÅŸan",
+        "Ä°psala",
         "Enez",
-        "Uzunköprü",
-        "Lalapaşa"
+        "UzunkÃ¶prÃ¼",
+        "LalapaÅŸa"
       ]
     },
     {
-      "city": "Kırklareli",
+      "city": "KÄ±rklareli",
       "districts": [
         "Merkez",
-        "Demirköy",
+        "DemirkÃ¶y",
         "Vize",
-        "İğneada",
-        "Pınarhisar"
+        "Ä°ÄŸneada",
+        "PÄ±narhisar"
       ]
     },
     {
-      "city": "Tekirdağ",
+      "city": "TekirdaÄŸ",
       "districts": [
         "Merkez",
-        "Şarköy",
+        "ÅarkÃ¶y",
         "Saray",
         "Malkara"
       ]
     },
     {
-      "city": "Çanakkale",
+      "city": "Ã‡anakkale",
       "districts": [
         "Merkez",
         "Gelibolu",
-        "Ayvacık",
-        "Bayramiç",
+        "AyvacÄ±k",
+        "BayramiÃ§",
         "Biga"
       ]
     },
     {
-      "city": "İstanbul Avrupa Yakası",
+      "city": "Ä°stanbul Avrupa YakasÄ±",
       "districts": [
-        "Arnavutköy",
-        "Çatalca",
+        "ArnavutkÃ¶y",
+        "Ã‡atalca",
         "Silivri",
-        "Sarıyer",
-        "Eyüpsultan"
+        "SarÄ±yer",
+        "EyÃ¼psultan"
       ]
     }
   ]
 }
+

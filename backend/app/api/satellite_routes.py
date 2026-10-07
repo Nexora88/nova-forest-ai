@@ -9,7 +9,7 @@ def satellite_status():
     ndvi = get_ndvi_status(None)
     firms = get_firms_alerts(days=1)
     return {
-        "system": "Nova-Forest AI",
+        "system": "NexoraWildfire",
         "status": "online",
         "sources": {
             "sentinel_2": {

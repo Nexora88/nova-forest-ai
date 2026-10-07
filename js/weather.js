@@ -1,5 +1,5 @@
 // =====================================
-// NOVA-FOREST AI
+// NEXORAWILDFIRE AI
 // Weather Data Controller
 // =====================================
 
@@ -18,7 +18,7 @@ async function loadWeatherData() {
         const data = await response.json();
 
         console.log(
-            "Nova-Forest AI Weather Data:",
+            "NexoraWildfire Weather Data:",
             data
         );
 
@@ -104,7 +104,7 @@ async function loadWeatherData() {
     catch (error) {
 
         console.error(
-            "Nova-Forest AI Weather Error:",
+            "NexoraWildfire Weather Error:",
             error
         );
 
@@ -114,3 +114,4 @@ async function loadWeatherData() {
 
 
 loadWeatherData();
+

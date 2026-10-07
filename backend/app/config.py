@@ -1,6 +1,6 @@
-# Nova-Forest AI Configuration
+# NexoraWildfire Configuration
 
-PROJECT_NAME = "Nova-Forest AI"
+PROJECT_NAME = "NexoraWildfire"
 
 VERSION = "0.1.0"
 

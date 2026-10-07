@@ -2,7 +2,7 @@
 
 
 /* =====================================
-   NOVA-FOREST AI
+   NEXORAWILDFIRE AI
    Environmental Intelligence UI
 ===================================== */
 
@@ -574,7 +574,7 @@ main {
 
 }
 
-/* ===== NOVA-FOREST MAP INTELLIGENCE UI ===== */
+/* ===== NEXORAWILDFIRE MAP INTELLIGENCE UI ===== */
 .map-toolbar {
   display:flex; align-items:center; justify-content:space-between; gap:16px;
   margin:18px 0 0; padding:12px 16px; border:1px solid #183b26;
@@ -618,7 +618,7 @@ main {
 .system-item strong { display:block; margin-top:7px; color:#f0f4f0; font-size:16px; }
 .system-item p { margin:7px 0 0; color:#8f9991; font-size:12px; line-height:1.5; }
 
-/* ===== NOVA-FOREST FIELD INTELLIGENCE ===== */
+/* ===== NEXORAWILDFIRE FIELD INTELLIGENCE ===== */
 .popup-area{font-size:11px;color:#687269;margin:2px 0 7px;letter-spacing:.3px}.popup-warning{margin-top:12px;padding:9px;background:#fff8df;border-left:3px solid #f5c542;font-size:11px;line-height:1.55}.popup-history{margin-top:10px;padding-top:9px;border-top:1px solid #e1e5e1;font-size:10px;line-height:1.7}.region-label strong{display:block;width:max-content;margin-top:3px;padding:3px 7px;border-radius:5px;background:#050805;color:#fff;font-size:10px;border:1px solid rgba(255,255,255,.15)}
 
 /* ===== 2026 TRAKYA INTELLIGENCE CONSOLE ===== */
@@ -651,8 +651,9 @@ html[data-network="offline"] .status span{background:#d99a35}
 .region-risk-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.region-risk-card{padding:13px;border:1px solid #173d25;border-radius:10px;background:#050806}.region-risk-card strong{display:block;color:#e8f0ea}.region-risk-card span{display:block;margin:7px 0;font-size:11px;font-weight:800}.region-risk-card small{letter-spacing:0}
 .science-box{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:14px;padding:18px;border-top:1px solid #173d25}.science-box h3{margin:7px 0;color:#edf4ee}.science-box p,.science-box small{color:#7f8b82;font-size:11px;line-height:1.55}.breakdown-row{display:flex;justify-content:space-between;margin:5px 0;color:#aab6ad;font-size:11px}.breakdown-track{height:7px;border-radius:99px;background:#18231b;overflow:hidden;margin-bottom:12px}.breakdown-track i{display:block;height:100%;background:#00ff66}
 @media(max-width:700px){.dashboard-grid,.science-box{grid-template-columns:1fr}.region-risk-list{grid-template-columns:1fr 1fr}.dashboard-head{align-items:start;flex-direction:column}}
-/* ===== NOVA-FOREST EDGE / FIELD-READY PWA ===== */
+/* ===== NEXORAWILDFIRE EDGE / FIELD-READY PWA ===== */
 .edge-dock{position:fixed;right:18px;bottom:18px;z-index:11000;display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #285a38;border-radius:14px;background:rgba(3,8,5,.94);backdrop-filter:blur(14px);box-shadow:0 18px 50px rgba(0,0,0,.45)}
 .edge-status{display:flex;align-items:center;gap:8px}.edge-status b{display:block;color:#e8f1ea;font-size:10px;letter-spacing:1px}.edge-status small{display:block;color:#748278;font-size:9px;margin-top:3px}.edge-dot{width:8px;height:8px;border-radius:50%;background:#00ff66;box-shadow:0 0 12px rgba(0,255,102,.65)}html[data-network="offline"] .edge-dot{background:#ffb300;box-shadow:0 0 12px rgba(255,179,0,.45)}
 .edge-install,.edge-update{border:1px solid #31563b;background:#07120b;color:#cfe2d3;padding:8px 10px;border-radius:9px;font:700 9px "Courier New",monospace;cursor:pointer}.edge-install:hover,.edge-update:hover{border-color:#00ff66;color:#00ff66}.edge-update{color:#ffcf72;border-color:#6c5325}
 @media(max-width:700px){.edge-dock{left:10px;right:10px;bottom:10px;justify-content:space-between;padding:9px}.edge-status small{display:none}.edge-install,.edge-update{font-size:8px;padding:8px}.edge-status b{font-size:9px}}
+

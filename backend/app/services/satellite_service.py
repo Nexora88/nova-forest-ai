@@ -1,4 +1,4 @@
-# Nova-Forest AI Satellite Service
+# NexoraWildfire Satellite Service
 # İlk sürüm uydu veri altyapısı
 
 

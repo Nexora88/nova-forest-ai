@@ -1,5 +1,5 @@
-const NOVA_ALERT_SETTINGS_KEY = "nova-forest-alert-settings-v2";
-const NOVA_ALERTS_KEY = "nova-forest-alerts-v1";
+const NOVA_ALERT_SETTINGS_KEY = "nexorawildfire-alert-settings-v2";
+const NOVA_ALERTS_KEY = "nexorawildfire-alerts-v1";
 
 function getNovaAlertSettings() {
   return JSON.parse(localStorage.getItem(NOVA_ALERT_SETTINGS_KEY) || '{"enabled":true,"threshold":70}');
@@ -23,7 +23,7 @@ async function requestNovaBrowserPermission() {
 
 function showNovaBrowserAlert(alert) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  new Notification("Nova-Forest AI", {
+  new Notification("NexoraWildfire", {
     body: alert.area + ": risk " + alert.risk + "/100",
     tag: "nova-" + alert.area + "-" + alert.risk
   });
@@ -59,3 +59,4 @@ window.NovaAlert = {
   browser: showNovaBrowserAlert,
   requestPermission: requestNovaBrowserPermission
 };
+

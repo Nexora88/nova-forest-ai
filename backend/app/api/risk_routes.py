@@ -36,7 +36,7 @@ def _nearby_hotspots(region_lat, region_lon, alerts, radius_km=35):
 def specialized(lat: float, lon: float, pollen: float | None = None, ndvi: float | None = None, ndmi: float | None = None, fire_hotspots: int = 0):
     weather = get_current_weather(lat, lon)
     common = {"temperature":weather["temperature"],"humidity":weather["humidity"],"wind":weather["wind"],"precipitation":weather.get("precipitation",0)}
-    return {"status":"available","coordinates":{"latitude":lat,"longitude":lon},"apiary":apiary_risk(**common,pollen=pollen),"forest":forest_risk(**common,ndvi=ndvi,ndmi=ndmi,fire_hotspots=fire_hotspots),"sources":["Open-Meteo","Nova-Forest specialist risk engine"],"note":"Skorlar karar destek sinyalidir; ölçüm veya saha gözleminin yerine geçmez."}
+    return {"status":"available","coordinates":{"latitude":lat,"longitude":lon},"apiary":apiary_risk(**common,pollen=pollen),"forest":forest_risk(**common,ndvi=ndvi,ndmi=ndmi,fire_hotspots=fire_hotspots),"sources":["Open-Meteo","NexoraWildfire specialist risk engine"],"note":"Skorlar karar destek sinyalidir; ölçüm veya saha gözleminin yerine geçmez."}
 
 
 @router.get("/risk-analysis")
@@ -85,7 +85,7 @@ def risk_analysis():
                         "history": nearby_history[:12],
                     },
                 },
-                "data_source": ["Open-Meteo", "Nova-Forest Risk Engine", "Sentinel-2 architecture", "NASA FIRMS"],
+                "data_source": ["Open-Meteo", "NexoraWildfire Risk Engine", "Sentinel-2 architecture", "NASA FIRMS"],
             })
         except Exception as error:
             results.append({
@@ -99,7 +99,7 @@ def risk_analysis():
     average = round(sum(r["analysis"]["risk_score"] for r in valid) / len(valid)) if valid else None
 
     return {
-        "system": "Nova-Forest AI",
+        "system": "NexoraWildfire",
         "status": "online",
         "analysis_type": "Regional Environmental Risk",
         "region_count": len(REGIONS),

@@ -1,7 +1,7 @@
 {
-  "name":"Nova-Forest AI EDGE — Nexora",
-  "short_name":"Nova-Forest",
-  "description":"Nexora çatısı altında Trakya ve İstanbul çevresel istihbarat ve offline karar destek ürünü.",
+  "name":"NexoraWildfire EDGE — Nexora",
+  "short_name":"NexoraWildfire",
+  "description":"NexoraWildfire; Turkiye genelinde orman, yangin, tarim, su-toprak ve cevresel risk karar destek uygulamasi.",
   "start_url":"./index.html",
   "scope":"./",
   "display":"standalone",

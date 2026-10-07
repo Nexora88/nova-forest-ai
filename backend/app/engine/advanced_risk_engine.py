@@ -1,4 +1,4 @@
-# Nova-Forest AI — Explainable Environmental Risk Engine
+# NexoraWildfire — Explainable Environmental Risk Engine
 
 def get_level(score):
     if score < 25:
@@ -50,5 +50,5 @@ def calculate_advanced_risk(temperature, humidity, wind_speed, ndvi=None, fire_a
         "factors": factors,
         "ndvi_used": ndvi is not None,
         "fire_alert_used": bool(fire_alert),
-        "engine": "Nova-Forest Explainable Risk Engine v1"
+        "engine": "NexoraWildfire Explainable Risk Engine v1"
     }

@@ -1,79 +1,41 @@
-# 🌲 Nova-Forest AI
+# NexoraWildfire
 
-**Nexora çatısı altında çevresel istihbarat ve karar destek ürünü.**
+NexoraWildfire, Nexora catisi altinda gelistirilen Turkiye geneli cevresel risk ve yangin karar destek uygulamasidir.
 
-Nova-Forest AI; tarım, orman, arıcılık, su-toprak, polen ve çevresel riskleri tek bir saha ekranında birleştiren **PWA + offline-first** bir çevresel istihbarat platformudur.
+## Kapsam
 
-## Ürün yaklaşımı
+- 81 il ve 973 ilce icin offline vector idari sinir altyapisi
+- Orman, yangin, tarim, su/toprak ve polen katmanlari
+- Uydu gorunumu ve analiz tarama arayuzu
+- Il -> ilce -> koy/mahalle -> alan hiyerarsisi
+- Kisisel tarla, arilik ve orman alanlarini kaydetme
+- PWA olarak bilgisayar ve telefona kurulabilme
+- Offline-first servis worker + IndexedDB yerel veri deposu
+- Open-Meteo, OpenStreetMap/Nominatim, Copernicus Sentinel-2 ve yapilandirildiginda NASA FIRMS veri altyapisi
 
-Nova-Forest'ın temel hiyerarşisi:
+## Uygulamayi yukleme
 
-**İl → İlçe → Köy/Mahalle → Alan → Uydu zaman serisi → Bitki stresi → Su/Sulama → Ürün/bitki sınıfı**
+Uygulama PWA olarak calisir. Desteklenen tarayicilarda ana ekrandaki Cihaza yukle butonu kullanilabilir. Tarayici bu secenegi gostermiyorsa tarayicinin uygulama/yukleme menusunden NexoraWildfire kurulabilir.
 
-İlk ürünleşme sahası **Edirne**'dir. İlçe seviyesinden köy/mahalle seviyesine inilir. Yerleşim noktaları gerçek OpenStreetMap/Nominatim verilerinden alınır ve seçilen çevresel katmana göre renklendirilir.
+## Harita
 
-Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** olarak kaydedebilir. Kişisel alanlar çevresel katmanlardan ayrı, mor neon ile gösterilir.
+Harita renkleri secilen veri katmanina gore degisir. Uydu katmaninda vector sinirlar ve analiz tarama efekti birlikte goruntulenir. Ilce sinirlari yerel data/admin/tur_admin2.geojson dosyasindan yuklenir; temel idari harita internet olmadan da acilabilir.
 
-## Nexora / Nova-Forest EDGE
+## Veri ve karar destegi
 
-- PWA olarak cihaza kurulabilir.
-- IndexedDB yerel veri deposu kullanır.
-- Servis çalışanı ile uygulama kabuğu çevrimdışı açılabilir.
-- Son geçerli gözlemlerle yerel karar destek motoru çalışabilir.
-- Yerel Nova-Alert merkezi tarayıcı bildirimi ve uygulama içi bildirim üretir.
-- Güncelleme hazır olduğunda uygulama içinden yeni sürüm alınabilir.
-- Mobil ekranlara uyumludur.
+NexoraWildfire kesin yangin tahmini veya resmi afet uyarisi iddiasinda bulunmaz. Sistem mevcut verileri birlestirerek risk ve cevresel karar destek sinyalleri uretir. Canli veri yoksa son gecerli yerel veri acikca cevrimdisi olarak gosterilir.
 
-> Çevrimdışı mod yeni internet verisi ürettiğini iddia etmez. Son geçerli veriyi kullanır ve açıkça **karar destek** olarak etiketler.
+## Teknoloji
 
-## Veri kaynakları
+- PWA
+- Leaflet
+- IndexedDB
+- Service Worker
+- GeoJSON
+- FastAPI backend
 
-- **Open-Meteo:** sıcaklık, nem, rüzgar, yağış, toprak nemi, ET₀ ve VPD.
-- **OpenStreetMap / Nominatim:** ilçe altındaki köy/mahalle yerleşim noktaları.
-- **Copernicus Sentinel-2:** gerçek NDVI/NDMI zaman serisi altyapısı; CDSE kimlik bilgileri yapılandırıldığında kullanılır.
-- **NASA FIRMS / VIIRS:** yapılandırılmış API anahtarı olduğunda sıcak nokta gözlemleri.
+## Gelistirici
 
-Üretilmemiş uydu veya yangın verisi sahte değerlerle doldurulmaz.
-
-## Harita katmanları
-
-- 🔥 Çevre / yangın riski
-- 🌲 Orman sağlığı
-- 💧 Su / toprak nemi
-- 🌾 Tarım koşulu
-- 🌼 Polen
-
-Harita renkleri seçilen katmana göre değişir. Polen rengi bitki sağlığı anlamına gelmez. Köy/mahalle noktaları parsel veya mülkiyet sınırı değildir.
-
-## Bildirim sistemi
-
-**Nova-Alert** yerel uyarı merkezidir. Alanlardaki canlı veya çevrimdışı karar destek sinyalleri IndexedDB'ye kaydedilir. Tarayıcı izin verdiğinde sistem bildirim gönderebilir; ayrıca uygulama içi bildirim kartı gösterilir.
-
-## Backend
-
-`backend/` altında FastAPI servisi bulunur.
-
-```bash
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-Önemli uçlar:
-
-- `/health`
-- `/risk-analysis`
-- `/satellite/status`
-- `/weather`
-- `/forecast-risk`
-- `/ndvi/status/{region}`
-- `/ndvi/area-timeseries`
-- `/notifications/status`
-
-## Ürün vizyonu
-
-Nova-Forest AI, yalnızca bir web sitesi değil; sahada kullanılabilecek dayanıklı bir çevresel karar destek ürünüdür. Sonraki fazlarda seçili bölgeler için gerçek offline vector map paketleri ve cihazlar arası veri senkronizasyonu planlanmaktadır.
-
-## Geliştirici
-
-**Ahmet Eymen Bakraç**
-**Nexora / Nexora88**
+Ahmet Eymen Bakrac
+Nexora / Nexora88
 2026

@@ -3,6 +3,7 @@ const provincePath=document.location.pathname.includes("/pages/")?"../data/turki
 const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/tur_admin2.geojson":"data/admin/tur_admin2.geojson";
 const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../data/edirne_settlements.geojson":"data/edirne_settlements.geojson";
 const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
+const ACTIVE_PROVINCES=new Set(["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"].map(x=>norm(x)));
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
 const map=L.map("map",{zoomControl:true,doubleClickZoom:true}).setView([41.15,27.1],8);
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
@@ -12,7 +13,7 @@ const scan=document.createElement("div");scan.className="nova-satellite-scan";sc
 map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
 
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
-const historyKey="nova-forest-region-history-v5", areaKey="nova-forest-my-areas-v1";
+const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
 const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
 let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
 
@@ -28,7 +29,7 @@ function beeScore(w,pollen=0){let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
-function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + Nova-Forest karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
+function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
@@ -45,7 +46,7 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name));l.on({mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.9}),mouseout:e=>e.target.setStyle({weight:1.3,fillOpacity:.68})})}}).addTo(provinceLayer)});
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>ACTIVE_PROVINCES.has(norm(r.name))?openProvince(r.name):window.NexoraFeedback?.comingSoon(r.name));l.on({mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.9}),mouseout:e=>e.target.setStyle({weight:1.3,fillOpacity:.68})})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
 }
 function drawDistricts(){
@@ -75,11 +76,11 @@ async function loadProvinceData(){
   const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
   provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
   await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
-  localStorage.setItem("nova-forest-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));
+  localStorage.setItem("nexorawildfire-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));
   setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
  }catch(e){
   try{
-   const cached=JSON.parse(localStorage.getItem("nova-forest-map-cache-v1")||"null");
+   const cached=JSON.parse(localStorage.getItem("nexorawildfire-map-cache-v1")||"null");
    if(cached?.rows?.length){provinceRows=cached.rows;drawProvinces();setStatus("ÇEVRİMDIŞI • SON GEÇERLİ VERİ • "+new Date(cached.savedAt).toLocaleString("tr-TR"))}
    else setStatus("ÇEVRİMDIŞI • HENÜZ YEREL VERİ YOK");
   }catch{setStatus("ÇEVRİMDIŞI • YEREL VERİ OKUNAMADI")}
@@ -131,7 +132,7 @@ async function loadSettlements(district,lat,lon){
       const markerColor=palette[mode][band(score,mode)];
       const m=L.circleMarker([Number(x.lat),Number(x.lon)],{radius:6,color:markerColor,weight:1,fillColor:markerColor,fillOpacity:.92});
       m.bindTooltip(x.display_name.split(",")[0]+' · '+x.envLabel,{direction:"top"});
-      m.bindPopup('<div class="risk-popup"><div class="popup-kicker">NOVA-FOREST / YERLEŞİM</div><h3>'+x.display_name.split(",")[0]+'</h3><div class="popup-warning">Köy / mahalle yerleşim noktası.<br>Çevresel katmanları bu noktaya göre okumak için seçili veri katmanını kullan.</div><div class="popup-source">Kaynak: '+(x._source||"OpenStreetMap")+'. Yerleşim noktası idari mülkiyet veya parsel sınırı değildir.</div></div>');
+      m.bindPopup('<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / YERLEŞİM</div><h3>'+x.display_name.split(",")[0]+'</h3><div class="popup-warning">Köy / mahalle yerleşim noktası.<br>Çevresel katmanları bu noktaya göre okumak için seçili veri katmanını kullan.</div><div class="popup-source">Kaynak: '+(x._source||"OpenStreetMap")+'. Yerleşim noktası idari mülkiyet veya parsel sınırı değildir.</div></div>');
       m.addTo(settlementLayer);
     });
     breadcrumb(selectedProvince+" → "+district+" → KÖY / MAHALLE");
@@ -173,7 +174,7 @@ function toggleDraw(){
  else{map.doubleClickZoom.enable();map.off("click",drawClick)}
 }
 function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
-async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • IndexedDB + yerel yedek aktif.");}
+async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Türkiye / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • IndexedDB + yerel yedek aktif.");}
 function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.forEach(a=>{L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+a.name+" · "+a.type,{className:"saved-field-label"}).addTo(fieldLayer)})}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
