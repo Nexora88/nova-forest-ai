@@ -1,0 +1,12 @@
+{
+  "name":"Nova-Forest AI",
+  "short_name":"Nova-Forest",
+  "description":"Trakya ve İstanbul çevresel istihbarat ve karar destek sistemi.",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#020303",
+  "theme_color":"#020303",
+  "lang":"tr",
+  "icons":[]
+}

@@ -65,10 +65,21 @@ async function pollenAt(lat,lon){try{const u=new URL("https://air-quality-api.op
 function weatherRow(name,area,w,pollen=0,lat=null,lon=null){const risk=riskScore(w,0);return{name,area,w,score:risk,crop:cropScore(w),forest:forestScore(w),pollen,bee:beeScore(w,pollen),lat,lon}}
 async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(rows.map(async r=>{if(r.lat!=null&&r.lon!=null)r.pollen=await pollenAt(r.lat,r.lon);r.bee=beeScore(r.w,r.pollen)}))}
 async function loadProvinceData(){
- const gj=await fetch(provincePath).then(x=>x.json());provinceFeatures=(gj.features||[]).filter(f=>TARGET.has(norm((f.properties||{}).il_adi)));
- const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
- provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
- await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
+ try{
+  const gj=await fetch(provincePath).then(x=>x.json());
+  provinceFeatures=(gj.features||[]).filter(f=>TARGET.has(norm((f.properties||{}).il_adi)));
+  const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
+  provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
+  await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
+  localStorage.setItem("nova-forest-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));
+  setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
+ }catch(e){
+  try{
+   const cached=JSON.parse(localStorage.getItem("nova-forest-map-cache-v1")||"null");
+   if(cached?.rows?.length){provinceRows=cached.rows;drawProvinces();setStatus("ÇEVRİMDIŞI • SON GEÇERLİ VERİ • "+new Date(cached.savedAt).toLocaleString("tr-TR"))}
+   else setStatus("ÇEVRİMDIŞI • HENÜZ YEREL VERİ YOK");
+  }catch{setStatus("ÇEVRİMDIŞI • YEREL VERİ OKUNAMADI")}
+ }
 }
 async function openProvince(name){
  selectedProvince=name;selectedDistrict=null;setStatus("İLÇELER YÜKLENİYOR…");

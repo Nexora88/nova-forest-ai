@@ -1,3 +1,9 @@
+[Reading 656 lines from start (total: 656 lines, 0 remaining)]
+
+[Reading 645 lines from start (total: 645 lines, 0 remaining)]
+
+[Reading 634 lines from start (total: 634 lines, 0 remaining)]
+
 /* =====================================
    NOVA-FOREST AI
    Environmental Intelligence UI
@@ -632,3 +638,23 @@ main {
 .insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:22px}.insight-panel{border:1px solid #193e28;border-radius:14px;background:linear-gradient(160deg,rgba(8,17,11,.95),rgba(3,5,4,.9));padding:20px}.insight-panel h3{margin:8px 0;color:#e9f0ea;font-size:19px}.insight-panel p{color:#87948a;min-height:42px;font-size:12px;line-height:1.55}.metric-row{display:flex;justify-content:space-between;border-top:1px solid #172a1d;padding-top:9px;margin-top:9px;font-size:11px;color:#738178}.metric-row b{color:#00ff66}
 .notice-panel{display:grid;grid-template-columns:1fr 1.4fr;gap:30px;margin-top:25px;padding:25px;border:1px solid #285a38;border-radius:16px;background:radial-gradient(circle at 15% 10%,rgba(0,255,102,.07),transparent 45%),#050806}.notice-panel h2{margin:7px 0 0;color:#edf4ee}.notice-panel p{color:#909c93;line-height:1.7;font-size:13px;margin:0}
 @media(max-width:800px){.hero-command,.notice-panel{grid-template-columns:1fr}.insight-grid{grid-template-columns:1fr}.command-strip{grid-template-columns:1fr 1fr}.hero-command h2{font-size:28px}.hero-terminal{min-height:150px}}
+
+[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
+
+.nova-offline-bar{position:sticky;top:0;z-index:10000;display:block;padding:8px 14px;text-align:center;background:#141b16;border-bottom:1px solid #31563b;color:#b7c5ba;font:700 10px "Courier New",monospace;letter-spacing:1px}
+html[data-network="offline"] .nova-offline-bar{background:#3a2410;border-color:#8a5b20;color:#ffd79a}
+html[data-network="online"] .nova-offline-bar{background:#07160d;color:#78e69a}
+html[data-network="offline"] .status{border-color:#d99a35;color:#ffd79a}
+html[data-network="offline"] .status span{background:#d99a35}
+@media(max-width:700px){.nova-offline-bar{font-size:9px;padding:7px 8px}}
+
+[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
+
+.nova-dashboard{margin-top:25px;padding:22px;border:1px solid #193e28;border-radius:16px;background:linear-gradient(150deg,rgba(7,16,10,.96),rgba(2,4,3,.96))}
+.dashboard-head{display:flex;justify-content:space-between;gap:20px;align-items:end}.dashboard-head h2{margin:7px 0;color:#edf4ee}.dashboard-head>span{font-size:10px;color:#00ff66;letter-spacing:1px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}.dashboard-grid article{padding:18px;border:1px solid #173d25;border-radius:12px;background:#050806}.dashboard-grid small,.region-risk-card small{display:block;color:#718075;font-size:9px;letter-spacing:1px}.dashboard-grid h3{margin:8px 0;color:#f0f5f1}.dashboard-grid p{color:#7f8b82;font-size:11px;line-height:1.5}
+.region-risk-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.region-risk-card{padding:13px;border:1px solid #173d25;border-radius:10px;background:#050806}.region-risk-card strong{display:block;color:#e8f0ea}.region-risk-card span{display:block;margin:7px 0;font-size:11px;font-weight:800}.region-risk-card small{letter-spacing:0}
+.science-box{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:14px;padding:18px;border-top:1px solid #173d25}.science-box h3{margin:7px 0;color:#edf4ee}.science-box p,.science-box small{color:#7f8b82;font-size:11px;line-height:1.55}.breakdown-row{display:flex;justify-content:space-between;margin:5px 0;color:#aab6ad;font-size:11px}.breakdown-track{height:7px;border-radius:99px;background:#18231b;overflow:hidden;margin-bottom:12px}.breakdown-track i{display:block;height:100%;background:#00ff66}
+@media(max-width:700px){.dashboard-grid,.science-box{grid-template-columns:1fr}.region-risk-list{grid-template-columns:1fr 1fr}.dashboard-head{align-items:start;flex-direction:column}}
+
+[executed on device: LAPTOP-4AV7HMO0 (d17a76b8-f486-4b62-a349-b0d78189c6d2)]
