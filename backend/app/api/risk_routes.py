@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.services.risk_service import calculate_risk
 from app.services.weather_service import REGIONS, get_current_weather
 from app.services.firms_service import get_firms_alerts
+from app.engine.specialized_risk_engine import apiary_risk, forest_risk
 
 router = APIRouter()
 
@@ -29,6 +30,13 @@ def _nearby_hotspots(region_lat, region_lon, alerts, radius_km=35):
         except (KeyError, TypeError, ValueError):
             continue
     return nearby
+
+
+@router.get("/specialized")
+def specialized(lat: float, lon: float, pollen: float | None = None, ndvi: float | None = None, ndmi: float | None = None, fire_hotspots: int = 0):
+    weather = get_current_weather(lat, lon)
+    common = {"temperature":weather["temperature"],"humidity":weather["humidity"],"wind":weather["wind"],"precipitation":weather.get("precipitation",0)}
+    return {"status":"available","coordinates":{"latitude":lat,"longitude":lon},"apiary":apiary_risk(**common,pollen=pollen),"forest":forest_risk(**common,ndvi=ndvi,ndmi=ndmi,fire_hotspots=fire_hotspots),"sources":["Open-Meteo","Nova-Forest specialist risk engine"],"note":"Skorlar karar destek sinyalidir; ölçüm veya saha gözleminin yerine geçmez."}
 
 
 @router.get("/risk-analysis")

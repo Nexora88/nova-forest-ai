@@ -1,7 +1,8 @@
 const API_BASE=(window.NOVA_API_BASE||"").replace(/\/$/,"");
 const provincePath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
 const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/trakya_istanbul_districts.geojson":"data/admin/trakya_istanbul_districts.geojson";
-const TARGET=new Set(["Edirne","Kırklareli","Tekirdağ","İstanbul"]);
+const TARGET=new Set(["edirne","kirklareli","tekirdag","istanbul"]);
+function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
 const map=L.map("map",{zoomControl:true,doubleClickZoom:true}).setView([41.15,27.1],8);
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
@@ -45,8 +46,17 @@ function drawProvinces(){
 }
 function drawDistricts(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>focusDistrict(r))}}).addTo(districtLayer)});
+ districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-risk-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
  breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
+}
+function chooseDistrict(r){
+ selectedDistrict=null;
+ let old=el(".district-picker");if(old)old.remove();
+ const box=document.createElement("div");box.className="district-picker";
+ box.innerHTML='<div><strong>İLÇE SEÇ</strong><button data-close>×</button></div><h3>'+r.name+'</h3><p>Bu ilçeyi açmak ve köy/mahalle seviyesine inmek için seç.</p><button class="district-open">İlçeyi aç →</button>';
+ el(".map-section").appendChild(box);
+ box.querySelector("[data-close]").onclick=()=>box.remove();
+ box.querySelector(".district-open").onclick=()=>{box.remove();selectedDistrict=r.name;focusDistrict(r)};
 }
 async function weatherFor(coordsList){
  if(!coordsList.length)return[];
@@ -55,14 +65,14 @@ async function pollenAt(lat,lon){try{const u=new URL("https://air-quality-api.op
 function weatherRow(name,area,w,pollen=0,lat=null,lon=null){const risk=riskScore(w,0);return{name,area,w,score:risk,crop:cropScore(w),forest:forestScore(w),pollen,bee:beeScore(w,pollen),lat,lon}}
 async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(rows.map(async r=>{if(r.lat!=null&&r.lon!=null)r.pollen=await pollenAt(r.lat,r.lon);r.bee=beeScore(r.w,r.pollen)}))}
 async function loadProvinceData(){
- const gj=await fetch(provincePath).then(x=>x.json());provinceFeatures=(gj.features||[]).filter(f=>TARGET.has((f.properties||{}).il_adi));
+ const gj=await fetch(provincePath).then(x=>x.json());provinceFeatures=(gj.features||[]).filter(f=>TARGET.has(norm((f.properties||{}).il_adi)));
  const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
  provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
  await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
 }
 async function openProvince(name){
  selectedProvince=name;selectedDistrict=null;setStatus("İLÇELER YÜKLENİYOR…");
- const gj=await fetch(districtPath).then(x=>x.json());districtFeatures=(gj.features||[]).filter(f=>(f.properties||{}).adm1_name1===name||(f.properties||{}).adm1_name===name);
+ const gj=await fetch(districtPath).then(x=>x.json());districtFeatures=(gj.features||[]).filter(f=>norm((f.properties||{}).adm1_name1)===norm(name)||norm((f.properties||{}).adm1_name)===norm(name));
  const ws=await weatherFor(districtFeatures.map(f=>[Number(f.properties.center_lat),Number(f.properties.center_lon)]));
  districtRows=districtFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};return weatherRow(p.adm2_name1,p.area_sqkm,w,0,Number(p.center_lat),Number(p.center_lon))});
  await applyPollen(districtRows);drawDistricts();
