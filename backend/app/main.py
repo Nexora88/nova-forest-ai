@@ -7,6 +7,7 @@ from app.api.advanced_risk_routes import router as advanced_router
 from app.api.ndvi_routes import router as ndvi_router
 from app.api.forecast_routes import router as forecast_router
 from app.api.notification_routes import router as notification_router
+from app.api.environment_routes import router as environment_router
 
 app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.2.0")
 
@@ -26,6 +27,7 @@ app.include_router(advanced_router)
 app.include_router(ndvi_router)
 app.include_router(forecast_router)
 app.include_router(notification_router)
+app.include_router(environment_router)
 
 @app.middleware("http")
 async def vercel_api_prefix(request, call_next):
