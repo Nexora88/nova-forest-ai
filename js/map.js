@@ -15,7 +15,7 @@ map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
 const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
 const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
-let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
+let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
 
 function el(q){return document.querySelector(q)}
 function setStatus(t){const x=el("[data-map-status]");if(x)x.textContent=t}
@@ -46,7 +46,7 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.bindTooltip(r.name+' · Yakında',{permanent:true,direction:"center",className:"region-label region-label-muted"});l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
 }
 function drawDistricts(){
@@ -124,7 +124,7 @@ async function loadSettlements(district,lat,lon){
     const coordsList=rows.map(x=>[Number(x.lat),Number(x.lon)]);
     const ws=mode!=="pollen"?await weatherFor(coordsList):[];
     const pollenValues=mode==="pollen"?await pollenFor(coordsList):[];
-    rows=rows.map((x,i)=>{const c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const pollen=Number(pollenValues[i]||0);const env=weatherRow(x.display_name.split(",")[0],0,w,pollen,Number(x.lat),Number(x.lon));return {...x,envScore:mode==="pollen"?pollen:scoreFor(env),envLabel:label(mode==="pollen"?pollen:scoreFor(env),mode),_source:norm(selectedProvince)==="edirne"?"OpenStreetMap / Overpass":"OpenStreetMap / Nominatim"} });
+    rows=rows.map((x,i)=>{const c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const pollen=Number(pollenValues[i]||0);const env=weatherRow(x.display_name.split(",")[0],0,w,pollen,Number(x.lat),Number(x.lon));return {...x,envScore:mode==="pollen"?pollen:scoreFor(env),envLabel:label(mode==="pollen"?pollen:scoreFor(env),mode),envWeather:w,_source:norm(selectedProvince)==="edirne"?"OpenStreetMap / Overpass":"OpenStreetMap / Nominatim"} });
     settlementRows=rows;
     try{await window.NovaStore.put("settlements",{id:"settlements:"+norm(selectedProvince||"")+"::"+norm(district),province:selectedProvince||"",district,rows,updatedAt:Date.now()})}catch{}
     rows.forEach((x,i)=>{
@@ -132,7 +132,8 @@ async function loadSettlements(district,lat,lon){
       const markerColor=palette[mode][band(score,mode)];
       const m=L.circleMarker([Number(x.lat),Number(x.lon)],{radius:6,color:markerColor,weight:1,fillColor:markerColor,fillOpacity:.92});
       m.bindTooltip(x.display_name.split(",")[0]+' · '+x.envLabel,{direction:"top"});
-      m.bindPopup('<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / YERLEŞİM</div><h3>'+x.display_name.split(",")[0]+'</h3><div class="popup-warning">Köy / mahalle yerleşim noktası.<br>Çevresel katmanları bu noktaya göre okumak için seçili veri katmanını kullan.</div><div class="popup-source">Kaynak: '+(x._source||"OpenStreetMap")+'. Yerleşim noktası idari mülkiyet veya parsel sınırı değildir.</div></div>');
+      m.bindPopup('<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / YERLEŞİM</div><h3>'+x.display_name.split(",")[0]+'</h3><div class="popup-warning">Köy / mahalle yerleşim noktası.<br>Bu konumu <strong>seçili saha</strong> seviyesinde açarak çevresel sinyalleri incele.</div><button class="field-select-button" data-field-select>Seçili saha olarak aç →</button><div class="popup-source">Kaynak: '+(x._source||"OpenStreetMap")+'. Yerleşim noktası idari mülkiyet veya parsel sınırı değildir.</div></div>');
+      m.on("popupopen",()=>{const b=document.querySelector("[data-field-select]");if(b)b.onclick=()=>selectSettlement(x)});
       m.addTo(settlementLayer);
     });
     breadcrumb(selectedProvince+" → "+district+" → KÖY / MAHALLE");
@@ -155,6 +156,20 @@ async function loadSettlements(district,lat,lon){
     settlementRows=[];setStatus(district+" • ÇEVRİMDIŞI • YEREL YERLEŞİM VERİSİ YOK");
   }
 }
+function selectSettlement(x){
+ selectedField=x;
+ const lat=Number(x.lat),lon=Number(x.lon);
+ map.setView([lat,lon],Math.max(map.getZoom(),13));
+ document.querySelector(".selected-field-panel")?.remove();
+ const p=document.createElement("aside");p.className="selected-field-panel";
+ const w=x.envWeather||{};
+ p.innerHTML='<div class="selected-field-kicker">NEXORAWILDFIRE / SEÇİLİ SAHA</div><button class="selected-field-close" aria-label="Kapat">×</button><h3>'+x.display_name.split(",")[0]+'</h3><p class="field-path">'+selectedProvince+' → '+selectedDistrict+' → '+x.display_name.split(",")[0]+'</p><div class="field-score"><strong>'+Math.round(Number(x.envScore||0))+'</strong><span>/100 · '+x.envLabel+'</span></div><div class="field-metrics"><span>Sıcaklık <b>'+w.t+' °C</b></span><span>Nem <b>'+w.h+' %</b></span><span>Rüzgar <b>'+w.wind+' km/s</b></span><span>Toprak nemi <b>'+Math.round((w.soil||0)*100)+' %</b></span><span>ET₀ <b>'+Number(w.et0||0).toFixed(1)+' mm</b></span><span>VPD <b>'+Number(w.vpd||0).toFixed(2)+'</b></span></div><p class="field-note">Bu seviye seçili bir coğrafi gözlem noktasıdır; resmî parsel veya mülkiyet sınırı değildir. Kendi saha poligonunu kaydetmek için Alan Ekle kullanılabilir.</p><small>Kaynak: '+(x._source||"OpenStreetMap")+'</small>';
+ document.querySelector(".map-section")?.appendChild(p);
+ p.querySelector(".selected-field-close").onclick=()=>{selectedField=null;p.remove();breadcrumb(selectedProvince+" → "+selectedDistrict+" → KÖY / MAHALLE")};
+ breadcrumb(selectedProvince+" → "+selectedDistrict+" → "+x.display_name.split(",")[0]+" → SEÇİLİ SAHA");
+ setStatus("SEÇİLİ SAHA • "+x.display_name.split(",")[0]+" • "+x.envLabel);
+}
+window.NexoraMap={selectSettlement};
 async function refreshView(){
   setStatus("VERİLER YENİLENİYOR…");
   if(selectedDistrict){
@@ -164,7 +179,7 @@ async function refreshView(){
   if(selectedProvince){await openProvince(selectedProvince);return;}
   await loadProvinceData();
 }
-function goBack(){if(selectedDistrict){selectedDistrict=null;settlementLayer.clearLayers();drawDistricts();return}if(selectedProvince){selectedProvince=null;drawProvinces();map.setView([41.15,27.1],8)}else map.setView([41.15,27.1],8)}
+function goBack(){if(selectedField){selectedField=null;document.querySelector(".selected-field-panel")?.remove();breadcrumb(selectedProvince+" → "+selectedDistrict+" → KÖY / MAHALLE");return}if(selectedDistrict){selectedDistrict=null;settlementLayer.clearLayers();drawDistricts();return}if(selectedProvince){selectedProvince=null;drawProvinces();map.setView([41.15,27.1],8)}else map.setView([41.15,27.1],8)}
 function saveHistory(rows){const old=JSON.parse(localStorage.getItem(historyKey)||"[]");rows.forEach(r=>{const item={t:new Date().toISOString(),name:r.name,r:r.score};old.push(item);try{window.NovaStore.put("timeseries",{id:"risk:"+r.name+":"+Date.now(),...item,updatedAt:Date.now()})}catch{}});localStorage.setItem(historyKey,JSON.stringify(old.slice(-600)))}
 
 function toggleDraw(){
