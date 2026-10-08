@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.risk_routes import router as risk_router
@@ -6,7 +7,7 @@ from app.api.weather_routes import router as weather_router
 from app.api.advanced_risk_routes import router as advanced_router
 from app.api.ndvi_routes import router as ndvi_router
 from app.api.forecast_routes import router as forecast_router
-from app.api.notification_routes import router as notification_router
+from app.api.notification_routes import router as notification_router, background_push_loop
 
 app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.2.0")
 
@@ -25,6 +26,15 @@ app.include_router(advanced_router)
 app.include_router(ndvi_router)
 app.include_router(forecast_router)
 app.include_router(notification_router)
+
+@app.on_event("startup")
+async def start_background_push():
+    app.state.push_task = asyncio.create_task(background_push_loop())
+
+@app.on_event("shutdown")
+async def stop_background_push():
+    task = getattr(app.state, "push_task", None)
+    if task: task.cancel()
 
 @app.get("/")
 def root():

@@ -22,7 +22,17 @@ function systemCenter(){
  const main=document.querySelector('main');if(!main||$('.product-center'))return;
  const sec=document.createElement('section');sec.className='product-center';sec.innerHTML='<div class="eyebrow">NEXORA / PRODUCT</div><h2>Biz kimiz?</h2><p>Nexora çatısı altında geliştirilen NexoraWildfire AI; Trakya ve İstanbul çevresini il → ilçe → köy/mahalle → alan seviyesinde izleyen, gerçek veri kaynaklarını anlaşılır karar destek sinyallerine dönüştüren çevresel istihbarat ürünüdür.</p><div class="product-grid"><article><span>ÜRÜN</span><strong>NexoraWildfire AI</strong><p>Tarım, orman, arıcılık, su-toprak, polen ve çevresel riskleri tek operasyon ekranında birleştirir.</p></article><article><span>ALTYAPI</span><strong>NexoraWildfire EDGE</strong><p>PWA + IndexedDB + servis çalışanı sayesinde son geçerli veriler ve yerel karar motoru bağlantı kesilse bile çalışmaya devam eder.</p></article><article><span>VERİ</span><strong>Gerçek kaynaklar</strong><p>Open-Meteo, OpenStreetMap/Nominatim, Copernicus Sentinel-2 ve yapılandırıldığında NASA FIRMS. Üretilmeyen veri üretilmiş gibi gösterilmez.</p></article><article><span>İLK SAHA</span><strong>Edirne</strong><p>İlk ürünleşme fazında Edirne&#39;nin ilçe ve köy/mahalle hiyerarşisi ayrıntılı biçimde ele alınır; daha sonra bölgesel kapsam genişletilir.</p></article></div><div class="product-actions"><button class="primary-action" data-enable-notifications>Bildirimleri etkinleştir</button><button class="secondary-action" data-test-notification>Nova-Alert test bildirimi</button></div><div class="alert-center"><div class="alert-center-head"><div><div class="eyebrow">NOVA-ALERT</div><h3>Yerel bildirim merkezi</h3></div><button data-refresh-alerts>Yenile</button></div><div data-alert-list>Yerel kayıtlar okunuyor…</div></div>';
  main.appendChild(sec);
- $('[data-enable-notifications]',sec)?.addEventListener('click',async()=>{try{const p=await Notification.requestPermission();toast('Nova-Alert',p==='granted'?'Bildirimler etkinleştirildi.':'Bildirim izni verilmedi.',p==='granted'?'success':'warning')}catch{toast('Nova-Alert','Tarayıcı bildirim API kullanılabilir değil.','warning')}});
+ $('[data-enable-notifications]',sec)?.addEventListener('click',async()=>{
+  try{
+    const areas=JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]');
+    const area=areas[0];
+    if(!area?.coordinates?.length){toast('Nova-Alert','Önce Alanlarım bölümüne en az bir alan ekle.','warning');return}
+    const lat=area.coordinates.reduce((s,p)=>s+p[0],0)/area.coordinates.length;
+    const lon=area.coordinates.reduce((s,p)=>s+p[1],0)/area.coordinates.length;
+    const result=await window.NovaAlert?.enablePush?.({name:area.name,lat,lon});
+    toast('Nova-Alert',result?.ok?'Web Push aktif. Site kapalıyken de bu alan için cihaz bildirimi alınacak.':'Bildirim kurulamadı: '+(result?.reason||'bilinmeyen hata'),result?.ok?'success':'warning');
+  }catch{toast('Nova-Alert','Web Push kurulumu başarısız.','warning')}
+});
  $('[data-test-notification]',sec)?.addEventListener('click',()=>notify('NexoraWildfire AI','Yerel Nova-Alert merkezi aktif.','success'));
  $('[data-refresh-alerts]',sec)?.addEventListener('click',()=>renderAlerts(sec));renderAlerts(sec);
 }

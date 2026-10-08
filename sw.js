@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v6";
-const DATA_CACHE = "nexorawildfire-data-v6";
+const CACHE_NAME = "nexorawildfire-shell-v7";
+const DATA_CACHE = "nexorawildfire-data-v7";
 
 const APP_SHELL = [
   "./",
@@ -107,6 +107,34 @@ self.addEventListener("fetch", event => {
         return response;
       }).catch(() => cached)
     )
+  );
+});
+
+self.addEventListener("push", event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch {}
+  const title = data.title || "NexoraWildfire AI";
+  const options = {
+    body: data.message || "Yeni çevresel uyarı var.",
+    icon: data.icon || "/favicon.png",
+    badge: data.icon || "/favicon.png",
+    tag: data.tag || "nexorawildfire-alert",
+    renotify: true,
+    data: { url: data.url || "./" }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "./", self.location.origin).href;
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
+      for (const client of list) {
+        if ("focus" in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(target);
+    })
   );
 });
 

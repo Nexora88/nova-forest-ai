@@ -3,3 +3,4 @@ uvicorn
 requests
 python-dotenv
 pydantic
+pywebpush==2.5.0
