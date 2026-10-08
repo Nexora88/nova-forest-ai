@@ -1,13 +1,10 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
+from app.services.ndvi_service import get_region_satellite_status, get_area_ndvi_timeseries, get_satellite_risk_raster
 from pydantic import BaseModel, Field
-from typing import Any, Dict, Optional
-from app.services.ndvi_service import get_region_satellite_status, get_area_ndvi_timeseries
+from typing import Any, Dict
 
 router = APIRouter(prefix="/ndvi", tags=["NDVI"])
-
-class AreaGeometry(BaseModel):
-    type: str = Field(pattern="^Polygon$")
-    coordinates: list
 
 class AreaNDVIRequest(BaseModel):
     geometry: Dict[str, Any]
@@ -27,3 +24,16 @@ def area_timeseries(request: AreaNDVIRequest):
     if geometry.get("type") != "Polygon" or not geometry.get("coordinates"):
         raise HTTPException(status_code=400, detail="Geçerli bir Polygon geometrisi gerekli.")
     return get_area_ndvi_timeseries(geometry, request.days, request.interval)
+
+@router.get("/risk-raster")
+def risk_raster(west: float, south: float, east: float, north: float, width: int = 640, height: int = 480):
+    if not (west < east and south < north):
+        raise HTTPException(status_code=400, detail="Geçerli bbox gerekli.")
+    width=max(128,min(1024,width)); height=max(128,min(1024,height))
+    try:
+        image=get_satellite_risk_raster([west,south,east,north],width,height)
+        return Response(content=image,media_type="image/png",headers={"Cache-Control":"public, max-age=900"})
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503,detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=502,detail=f"Sentinel-2 raster alınamadı: {exc}")

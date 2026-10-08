@@ -115,7 +115,36 @@ def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"
     except requests.RequestException as exc:
         return {"status":"error","source":"Copernicus Sentinel-2 L2A / Statistical API","error":str(exc),"series":[]}
 
-def get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
+
+
+def get_satellite_risk_raster(bbox, width=640, height=480):
+    """Fetch a real Sentinel-2 L2A raster and colorize NDVI/NDMI dryness.
+    This is an observation layer, not a trained fire-probability model.
+    """
+    token=_token()
+    if not token:
+        raise RuntimeError("Gerçek Sentinel-2 rasterı için CDSE_CLIENT_ID ve CDSE_CLIENT_SECRET gerekli.")
+    process_url="https://sh.dataspace.copernicus.eu/api/v1/process"
+    evalscript="""//VERSION=3
+function setup(){return {input:[{bands:[\"B04\",\"B08\",\"B11\",\"SCL\",\"dataMask\"]}],output:{bands:4,sampleType:\"AUTO\"}}}
+function evaluatePixel(s){
+  var valid=s.dataMask && s.SCL!==3 && s.SCL!==8 && s.SCL!==9 && s.SCL!==10 && s.SCL!==11;
+  if(!valid) return [0,0,0,0];
+  var ndvi=(s.B08-s.B04)/(s.B08+s.B04);
+  var ndmi=(s.B08-s.B11)/(s.B08+s.B11);
+  var vegStress=Math.max(0,Math.min(1,(0.72-ndvi)/0.72));
+  var dryness=Math.max(0,Math.min(1,(0.35-ndmi)/0.70));
+  var risk=Math.max(0,Math.min(1,0.45*vegStress+0.55*dryness));
+  var r=Math.min(1,risk*2.1);
+  var g=Math.max(0,1-Math.abs(risk-0.55)*2.4);
+  var b=Math.max(0,1-risk*2.2);
+  return [r,g,b,Math.min(0.88,0.18+risk*0.70)];
+}"""
+    payload={"input":{"bounds":{"bbox":bbox,"properties":{"crs":"http://www.opengis.net/def/crs/OGC/1.3/CRS84"}},"data":[{"type":COLLECTION,"dataFilter":{"mosaickingOrder":"leastCC","maxCloudCoverage":40}}]},"output":{"width":width,"height":height,"responses":[{"identifier":"default","format":{"type":"image/png"}}]},"evalscript":evalscript}
+    r=requests.post(process_url,headers={"Authorization":f"Bearer {token}","Content-Type":"application/json"},json=payload,timeout=90)
+    r.raise_for_status()
+    return r.content
+\n\ndef get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
     scene = None
     error = None
     if region in REGIONS:
