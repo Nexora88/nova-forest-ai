@@ -658,3 +658,8 @@ html[data-network="offline"] .status span{background:#d99a35}
 @media(max-width:700px){.edge-dock{left:10px;right:10px;bottom:10px;justify-content:space-between;padding:9px}.edge-status small{display:none}.edge-install,.edge-update{font-size:8px;padding:8px}.edge-status b{font-size:9px}}
 
 #nexora-install{position:fixed;right:20px;bottom:20px;z-index:9999;display:flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid rgba(70,255,160,.35);border-radius:12px;background:rgba(7,12,10,.94);color:#fff;font:600 13px/1 system-ui;box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);cursor:pointer}#nexora-install img{width:24px;height:24px;border-radius:7px;object-fit:cover}
+
+/* NexoraWildfire brand lockup */
+.brand-lockup{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;min-width:0}.brand-lockup>img{width:54px;height:54px;object-fit:contain;display:block;filter:drop-shadow(0 0 14px rgba(0,255,170,.18));border-radius:12px}.brand-lockup .logo{min-width:0}.brand-lockup .logo h1{margin:0}.brand-lockup .logo p{margin:.2rem 0 0}.brand-lockup:hover>img{filter:drop-shadow(0 0 18px rgba(0,255,170,.32))}
+@media(max-width:700px){.brand-lockup>img{width:44px;height:44px}.brand-lockup{gap:10px}}
+
