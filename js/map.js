@@ -5,7 +5,7 @@ const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../da
 const ACTIVE_PROVINCES=new Set(["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"].map(x=>norm(x)));
 const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
-const map=L.map("map",{zoomControl:true,doubleClickZoom:true}).setView([41.15,27.1],8);
+const isMobile=matchMedia("(max-width: 700px)").matches; const map=L.map("map",{zoomControl:true,doubleClickZoom:true,dragging:!isMobile,scrollWheelZoom:!isMobile,touchZoom:true,tap:true}).setView([41.15,27.1],8); if(isMobile){map.dragging.disable();map.touchZoom.enable();map.doubleClickZoom.disable();}
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
 L.control.layers({"Temel Harita":base,"Uydu":sat},null,{collapsed:false}).addTo(map);
@@ -35,6 +35,18 @@ function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFi
 function area(g){return num(g?.properties?.area_sqkm)}
 function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
 
+function enableMobileMapGesture(){
+ if(!isMobile)return;
+ let n=0,active=false;
+ const blocker=document.createElement("div");blocker.className="mobile-map-gesture";blocker.innerHTML="<b>HARİTAYI HAREKET ETTİRMEK İÇİN İKİ PARMAK</b><span>Sayfayı tek parmakla kaydırabilirsin.</span>";
+ document.querySelector(".map-section")?.appendChild(blocker);
+ map.getContainer().addEventListener("touchstart",e=>{
+   n=e.touches.length;
+   if(n>=2){active=true;map.dragging.enable();blocker.classList.remove("show")}
+   else if(!active){map.dragging.disable();blocker.classList.add("show");clearTimeout(window.__nmgt);window.__nmgt=setTimeout(()=>blocker.classList.remove("show"),1400)}
+ },{passive:true});
+ map.getContainer().addEventListener("touchend",e=>{if(e.touches.length<2){active=false;map.dragging.disable()}},{passive:true});
+}
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
  const box=document.createElement("div");box.className="map-filters";
@@ -193,4 +205,4 @@ async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En 
 function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.forEach(a=>{L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+a.name+" · "+a.type,{className:"saved-field-label"}).addTo(fieldLayer)})}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
-load();setInterval(loadProvinceData,300000);
+load();enableMobileMapGesture();setInterval(loadProvinceData,300000);

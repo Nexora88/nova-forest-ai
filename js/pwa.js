@@ -1,4 +1,16 @@
 (function(){
+  window.NovaEnablePush=async function(){
+    try{
+      if(!("Notification" in window)||!("serviceWorker" in navigator)||!("PushManager" in window))return {ok:false,reason:"unsupported"};
+      const permission=Notification.permission==="granted"? "granted":await Notification.requestPermission();
+      if(permission!=="granted")return {ok:false,reason:"permission"};
+      if(window.NovaAlert?.enablePush){
+        const area=JSON.parse(localStorage.getItem("nexorawildfire-push-area-v1")||"null")||{name:"Genel Nova-Alert",lat:41.0082,lon:28.9784};
+        return await window.NovaAlert.enablePush(area);
+      }
+      return {ok:true};
+    }catch(e){return {ok:false,reason:"error"}}
+  };
   const script=document.currentScript;
   const root=new URL('../',script?.src||location.href);
   if('serviceWorker' in navigator){

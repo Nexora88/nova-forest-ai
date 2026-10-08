@@ -8,7 +8,12 @@ const DAYS=[
  {m:8,d:30,k:'national',title:'30 Ağustos Zafer Bayramı',text:'Cumhuriyetimizin temelindeki bağımsızlık ve ortak gelecek anlayışını yaşatıyoruz.',tone:'red',icon:'🇹🇷'},
  {m:10,d:29,k:'national',title:'29 Ekim Cumhuriyet Bayramı',text:'Cumhuriyetimizin ışığında, vatan topraklarını ve ormanlarımızı koruyoruz.',tone:'red',icon:'🇹🇷'},
  {m:11,d:10,k:'memorial',title:'10 Kasım Atatürk\'ü Anma Günü',text:'Açtığın yolda, bilimsel ve çağdaş çevre anlayışının izindeyiz.',tone:'black',icon:'◼',image:'assets/ataturk-1925.jpg'},
- {m:3,d:21,k:'forest',title:'21 Mart Dünya Ormancılık Günü / Orman Haftası',text:'Ormanları yalnızca yangından değil; kuraklık, su stresi ve iklim baskısından da izlemek için çalışıyoruz.',tone:'forest',icon:'🌲'}
+ {m:3,d:21,k:'forest',title:'21 Mart Dünya Ormancılık Günü / Orman Haftası',text:'Ormanları yalnızca yangından değil; kuraklık, su stresi ve iklim baskısından da izlemek için çalışıyoruz.',tone:'forest',icon:'🌲'},
+ {m:3,d:20,k:'bee',title:'Dünya Arıcılık Günü',text:'Arıcının emeği; orman, tarım ve biyoçeşitlilik arasındaki görünmez bağı taşır. Daha sağlıklı ekosistemler için birlikte izliyoruz.',tone:'earth',icon:'🐝'},
+ {m:3,d:22,k:'water',title:'Dünya Su Günü',text:'Su; ormanın, tarlanın ve arılığın ortak yaşam kaynağıdır. Veriyi suyu korumak için kullanıyoruz.',tone:'green',icon:'💧'},
+ {m:10,d:16,k:'food',title:'Dünya Gıda Günü',text:'Topraktan sofraya uzanan emeğin; güvenli, sürdürülebilir ve verimli bir geleceğe ulaşmasına katkı sunuyoruz.',tone:'earth',icon:'🌾'},
+ {m:12,d:5,k:'soil',title:'Dünya Toprak Günü',text:'Sağlıklı toprak, sağlıklı tarım ve güçlü ekosistemlerin temelidir. Toprağı veriden başlayarak daha iyi anlamaya çalışıyoruz.',tone:'earth',icon:'🌱'},
+ {m:12,d:11,k:'mountain',title:'Uluslararası Dağlar Günü',text:'Dağ ekosistemlerinin su, orman ve biyoçeşitlilik için taşıdığı değeri izliyoruz.',tone:'forest',icon:'⛰️'}
 ];
 const root=location.pathname.includes('/pages/')?'../':'';
 const esc=s=>String(s).replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
