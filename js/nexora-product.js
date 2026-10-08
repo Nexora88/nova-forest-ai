@@ -4,7 +4,7 @@ const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'
 function brand(){
  document.documentElement.dataset.brand='nexora';
  if(!document.querySelector('link[rel="icon"]')){const l=document.createElement('link');l.rel='icon';l.type='image/png';l.href=(location.pathname.includes('/pages/')?'../':'')+'favicon.png';document.head.appendChild(l)}
- const logo=$('.logo');if(logo&&!logo.dataset.nexora){logo.dataset.nexora='1';logo.innerHTML='<div class="brand-lockup"><img src="'+(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-logo.png" alt="Nexora"><div><div class="brand-parent">NEXORA</div><h1>NexoraWildfire AI</h1><p>Çevresel istihbarat · karar destek · EDGE</p></div></div>'}
+ const logo=$('.logo');if(logo&&!logo.dataset.nexora){logo.dataset.nexora='1';logo.innerHTML='<div class="brand-lockup"><img src="'+(location.pathname.includes('/pages/')?'../':'')+'assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI"><div><div class="brand-parent">NEXORA</div><h1>NexoraWildfire AI</h1><p>Çevresel istihbarat · karar destek · EDGE</p></div></div>'}
  const nav=document.querySelector('nav');if(nav&&!nav.querySelector('.nav-brand')){const b=document.createElement('span');b.className='nav-brand';b.textContent='NEXORA / ENVIRONMENTAL INTELLIGENCE';nav.prepend(b)}
 }
 function toast(title,msg,type='info'){
