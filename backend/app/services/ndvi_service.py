@@ -144,7 +144,8 @@ function evaluatePixel(s){
     r=requests.post(process_url,headers={"Authorization":f"Bearer {token}","Content-Type":"application/json"},json=payload,timeout=90)
     r.raise_for_status()
     return r.content
-\n\ndef get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
+
+def get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
     scene = None
     error = None
     if region in REGIONS:
