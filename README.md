@@ -1,41 +1,54 @@
 # 🌲 NexoraWildfire AI
 
-**Nexora çatısı altında çevresel istihbarat ve karar destek ürünü.**
+**Nexora çatısı altında geliştirilen çevresel istihbarat ve karar destek sistemi.**
 
-NexoraWildfire AI; tarım, orman, arıcılık, su-toprak, polen ve çevresel riskleri tek bir saha ekranında birleştiren **PWA + offline-first** bir çevresel istihbarat platformudur.
+NexoraWildfire AI; orman, tarım, su-toprak, arıcılık, polen ve çevresel risk göstergelerini aynı operasyon ekranında birleştiren **PWA + offline-first** bir saha ürünüdür. Amaç yalnızca bir risk haritası göstermek değil, gerçek veri kaynaklarını anlaşılır sinyallere dönüştürmektir.
 
-## Ürün yaklaşımı
+## Sistem ne yapıyor?
 
-NexoraWildfire'ın temel hiyerarşisi:
+NexoraWildfire AI mevcut verileri kullanıcı kararlarına yaklaşan bir hiyerarşide işler:
 
-**İl → İlçe → Köy/Mahalle → Alan → Uydu zaman serisi → Bitki stresi → Su/Sulama → Ürün/bitki sınıfı**
+**İl → İlçe → Köy/Mahalle → Alan → çevresel gözlem → risk/sinyal → karar desteği**
 
-İlk ürünleşme sahası **Edirne**'dir. İlçe seviyesinden köy/mahalle seviyesine inilir. Yerleşim noktaları gerçek OpenStreetMap/Nominatim verilerinden alınır ve seçilen çevresel katmana göre renklendirilir.
+Ana panelde Trakya odaklı çevresel durum görünür. Harita katmanları ve mevcut analiz panelleri üzerinden kullanıcı; yangın/çevre riski, orman sağlığı, tarım koşulları, toprak nemi, sulama ihtiyacı, polen ve arıcılık uçuş koşullarını inceleyebilir.
 
-Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** olarak kaydedebilir. Kişisel alanlar çevresel katmanlardan ayrı, mor neon ile gösterilir.
+İlk ürünleşme sahası **Edirne**'dir. İlçe ve köy/mahalle seviyesine inilerek gerçek yerleşim verileriyle saha görünümü oluşturulur. Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** bölümünde kaydedebilir.
 
-## Nexora / NexoraWildfire EDGE
+## Karar destek mantığı
 
-- PWA olarak cihaza kurulabilir.
-- IndexedDB yerel veri deposu kullanır.
-- Servis çalışanı ile uygulama kabuğu çevrimdışı açılabilir.
-- Son geçerli gözlemlerle yerel karar destek motoru çalışabilir.
-- Yerel Nova-Alert merkezi tarayıcı bildirimi ve uygulama içi bildirim üretir.
-- Güncelleme hazır olduğunda uygulama içinden yeni sürüm alınabilir.
-- Mobil ekranlara uyumludur.
+Sistem tek bir “AI skoru” üretip sonucu kesin gerçek gibi sunmaz. Farklı çevresel göstergeler birlikte değerlendirilir ve kullanıcıya **risk, durum, uyarı ve koşul** sinyalleri gösterilir.
 
-> Çevrimdışı mod yeni internet verisi ürettiğini iddia etmez. Son geçerli veriyi kullanır ve açıkça **karar destek** olarak etiketler.
+Önemli girdiler:
 
-## Veri kaynakları
+- Sıcaklık, bağıl nem ve rüzgar
+- Yağış ve toprak nemi
+- ET₀ ve VPD gibi su/atmosfer göstergeleri
+- Bitki stresi için NDVI/NDMI altyapısı
+- Uydu gözlemleri
+- Polen ve hava kalitesi sinyalleri
+- Yapılandırıldığında NASA FIRMS / VIIRS sıcak nokta gözlemleri
 
-- **Open-Meteo:** sıcaklık, nem, rüzgar, yağış, toprak nemi, ET₀ ve VPD.
-- **OpenStreetMap / Nominatim:** ilçe altındaki köy/mahalle yerleşim noktaları.
-- **Copernicus Sentinel-2:** gerçek NDVI/NDMI zaman serisi altyapısı; CDSE kimlik bilgileri yapılandırıldığında kullanılır.
-- **NASA FIRMS / VIIRS:** yapılandırılmış API anahtarı olduğunda sıcak nokta gözlemleri.
+Üretilmemiş uydu, yangın veya model başarım verisi sahte değerlerle doldurulmaz. Sistem mevcut veri durumunu açıkça belirtir.
 
-Üretilmemiş uydu veya yangın verisi sahte değerlerle doldurulmaz.
+## Mevcut ana modüller
 
-## Harita katmanları
+### 🌲 Orman / yangın
+Sıcaklık, nem, rüzgar, bitki stresi ve çevresel koşullar üzerinden risk değerlendirmesi yapılır. Sentinel-2 ve FIRMS entegrasyonları gerçek veri erişimi yapılandırıldığında genişletilebilir.
+
+### 🌾 Tarım istihbaratı
+Toprak nemi, yağış, ET₀, sıcaklık ve VPD göstergeleri sulama ve tarla çalışması için erken karar destek sinyallerine dönüştürülür.
+
+### 🐝 Nova-Bee
+Sıcaklık, rüzgar, yağış ve polen koşullarını birlikte değerlendirerek arıcılık için bölgesel uçuş koşulu göstergesi sağlar.
+
+### 🌼 Polen & hava
+CAMS tabanlı atmosfer/polen sinyalleri çevresel farkındalık için izlenir. Polen göstergesi bitki sağlığının kesin ölçümü olarak yorumlanmaz.
+
+## Harita
+
+Leaflet tabanlı operasyon haritası Türkiye ve Trakya odaklı katmanları gösterir. İl ve ilçe geometrileri yerel GeoJSON ile çalışabildiği için temel harita yapısı bağlantı kesildiğinde de açılabilir.
+
+Harita katmanları:
 
 - 🔥 Çevre / yangın riski
 - 🌲 Orman sağlığı
@@ -43,11 +56,32 @@ Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** olarak kay
 - 🌾 Tarım koşulu
 - 🌼 Polen
 
-Harita renkleri seçilen katmana göre değişir. Polen rengi bitki sağlığı anlamına gelmez. Köy/mahalle noktaları parsel veya mülkiyet sınırı değildir.
+Köy/mahalle noktaları parsel veya mülkiyet sınırı değildir; yalnızca çevresel analiz için referans yerleşim noktalarıdır.
 
-## Bildirim sistemi
+## NexoraWildfire EDGE
 
-**Nova-Alert** yerel uyarı merkezidir. Alanlardaki canlı veya çevrimdışı karar destek sinyalleri IndexedDB'ye kaydedilir. Tarayıcı izin verdiğinde sistem bildirim gönderebilir; ayrıca uygulama içi bildirim kartı gösterilir.
+- PWA olarak kurulabilir.
+- IndexedDB yerel veri deposu kullanır.
+- Servis çalışanı uygulama kabuğunu çevrimdışı açabilir.
+- Son geçerli gözlemlerle yerel karar destek motoru çalışabilir.
+- Nova-Alert yerel bildirim merkezi olarak görev yapar.
+- Güncelleme hazır olduğunda uygulama içinden yeni sürüm alınabilir.
+- Mobil ekranlara uyumludur.
+
+> Çevrimdışı mod yeni internet verisi ürettiğini iddia etmez. Son geçerli veriyi kullanır ve açıkça karar destek olarak etiketler.
+
+## Veri kaynakları
+
+- **Open-Meteo:** sıcaklık, nem, rüzgar, yağış, toprak nemi, ET₀ ve VPD.
+- **OpenStreetMap / Nominatim:** ilçe altındaki köy/mahalle yerleşim noktaları.
+- **Copernicus Sentinel-2:** gerçek NDVI/NDMI zaman serisi altyapısı; CDSE erişimi yapılandırıldığında kullanılır.
+- **NASA FIRMS / VIIRS:** API erişimi yapılandırıldığında sıcak nokta gözlemleri.
+
+## Sistem hakkında
+
+NexoraWildfire AI'nin sistem sayfasında ürünün teknik yaklaşımının yanında çevre, üretim ve kırsal yaşam odağı da açıkça anlatılır. Atatürk'ün “Köylü milletin efendisidir.” sözü, projenin orman yangınlarının tarım alanları ve üreticinin emeği üzerindeki etkisini de dikkate alan toplumsal misyonunu anlatmak için kullanılır.
+
+Bu ifade tarihsel bir alıntıdır; sistem herhangi bir siyasi amaç taşımaz. Projenin amacı çevresel verileri anlaşılır karar desteğine dönüştürmektir.
 
 ## Backend
 
@@ -68,12 +102,14 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 - `/ndvi/area-timeseries`
 - `/notifications/status`
 
-## Ürün vizyonu
+## Ürün hedefi
 
-NexoraWildfire AI, yalnızca bir web sitesi değil; sahada kullanılabilecek dayanıklı bir çevresel karar destek ürünüdür. Sonraki fazlarda seçili bölgeler için gerçek offline vector map paketleri ve cihazlar arası veri senkronizasyonu planlanmaktadır.
+NexoraWildfire AI'yi özellik listesi şişen bir demo yerine, mevcut modülleri daha doğru veri, daha iyi açıklama ve daha güvenilir karar desteğiyle geliştirmek temel yaklaşımdır. Yeni bir özellik ancak mevcut sistemi anlamlı biçimde güçlendiriyorsa eklenir.
+
+Sonraki geliştirmelerde öncelik; gerçek veri erişimlerinin sağlamlaştırılması, mevcut tahmin/risk mantığının açıklanabilirliğinin artırılması, harita katmanlarının doğruluğunun yükseltilmesi ve saha kullanımının iyileştirilmesidir.
 
 ## Geliştirici
 
-**Ahmet Eymen Bakraç**
-**Nexora / Nexora88**
+**Ahmet Eymen Bakraç**  
+**Nexora / Nexora88**  
 2026
