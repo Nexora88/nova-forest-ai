@@ -16,6 +16,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Nexora-Risk-Type","X-Nexora-Weather-Risk","X-Nexora-Weather-Time"],
 )
 
 app.include_router(risk_router)

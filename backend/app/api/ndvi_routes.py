@@ -31,8 +31,14 @@ def risk_raster(west: float, south: float, east: float, north: float, width: int
         raise HTTPException(status_code=400, detail="Geçerli bbox gerekli.")
     width=max(128,min(1024,width)); height=max(128,min(1024,height))
     try:
-        image=get_satellite_risk_raster([west,south,east,north],width,height)
-        return Response(content=image,media_type="image/png",headers={"Cache-Control":"public, max-age=900"})
+        image, weather, weather_risk = get_satellite_risk_raster([west,south,east,north],width,height)
+        headers={
+            "Cache-Control":"public, max-age=900",
+            "X-Nexora-Risk-Type":"Sentinel-2 NDVI/NDMI + Open-Meteo meteorological composite",
+            "X-Nexora-Weather-Risk":f"{weather_risk:.3f}",
+            "X-Nexora-Weather-Time":str(weather.get("observed_at") or ""),
+        }
+        return Response(content=image,media_type="image/png",headers=headers)
     except RuntimeError as exc:
         raise HTTPException(status_code=503,detail=str(exc))
     except Exception as exc:

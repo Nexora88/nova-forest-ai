@@ -117,33 +117,111 @@ def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"
 
 
 
+def _raster_weather(bbox):
+    """Get live meteorological inputs for the raster center from Open-Meteo."""
+    west, south, east, north = bbox
+    lat = (south + north) / 2
+    lon = (west + east) / 2
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,vapour_pressure_deficit",
+        "daily": "et0_fao_evapotranspiration,precipitation_sum",
+        "forecast_days": 1,
+        "timezone": "Europe/Istanbul",
+    }
+    r = requests.get("https://api.open-meteo.com/v1/forecast", params=params, timeout=15)
+    r.raise_for_status()
+    data = r.json()
+    current = data.get("current", {})
+    daily = data.get("daily", {})
+    return {
+        "temperature": float(current.get("temperature_2m") or 0),
+        "humidity": float(current.get("relative_humidity_2m") or 0),
+        "wind": float(current.get("wind_speed_10m") or 0),
+        "precipitation": float(current.get("precipitation") or 0),
+        "vpd": float(current.get("vapour_pressure_deficit") or 0),
+        "et0": float((daily.get("et0_fao_evapotranspiration") or [0])[0] or 0),
+        "observed_at": current.get("time"),
+    }
+
+
+def _weather_risk_score(weather):
+    """Transparent 0..1 meteorological fire-weather signal."""
+    t = weather["temperature"]
+    h = weather["humidity"]
+    wind = weather["wind"]
+    precip = weather["precipitation"]
+    vpd = weather["vpd"]
+    et0 = weather["et0"]
+    temp = max(0.0, min(1.0, (t - 18.0) / 24.0))
+    dry = max(0.0, min(1.0, (65.0 - h) / 50.0))
+    wind_score = max(0.0, min(1.0, wind / 55.0))
+    vpd_score = max(0.0, min(1.0, vpd / 4.0))
+    et0_score = max(0.0, min(1.0, et0 / 7.0))
+    rain_penalty = max(0.0, min(0.35, precip / 8.0))
+    return max(0.0, min(1.0, 0.24 * temp + 0.27 * dry + 0.24 * wind_score + 0.15 * vpd_score + 0.10 * et0_score - rain_penalty))
+
+
 def get_satellite_risk_raster(bbox, width=640, height=480):
-    """Fetch a real Sentinel-2 L2A raster and colorize NDVI/NDMI dryness.
-    This is an observation layer, not a trained fire-probability model.
+    """Generate a real decision-support fire-risk raster.
+
+    Sentinel-2 supplies spatial NDVI/NDMI vegetation stress/dryness.
+    Open-Meteo supplies live weather stress for the requested area's center.
+    The result is a transparent composite signal, not a trained fire-probability model.
     """
-    token=_token()
+    token = _token()
     if not token:
         raise RuntimeError("Gerçek Sentinel-2 rasterı için CDSE_CLIENT_ID ve CDSE_CLIENT_SECRET gerekli.")
-    process_url="https://sh.dataspace.copernicus.eu/api/v1/process"
-    evalscript="""//VERSION=3
-function setup(){return {input:[{bands:[\"B04\",\"B08\",\"B11\",\"SCL\",\"dataMask\"]}],output:{bands:4,sampleType:\"AUTO\"}}}
-function evaluatePixel(s){
+
+    weather = _raster_weather(bbox)
+    weather_risk = _weather_risk_score(weather)
+    process_url = "https://sh.dataspace.copernicus.eu/api/v1/process"
+
+    # Weather is constant over this image tile because Open-Meteo is a point
+    # forecast source here; Sentinel-2 supplies the spatial variation.
+    evalscript = f"""//VERSION=3
+function setup(){{
+  return {{input:[{{bands:["B04","B08","B11","SCL","dataMask"]}}],
+    output:{{bands:4,sampleType:"AUTO"}}}};
+}}
+function evaluatePixel(s){{
   var valid=s.dataMask && s.SCL!==3 && s.SCL!==8 && s.SCL!==9 && s.SCL!==10 && s.SCL!==11;
   if(!valid) return [0,0,0,0];
   var ndvi=(s.B08-s.B04)/(s.B08+s.B04);
   var ndmi=(s.B08-s.B11)/(s.B08+s.B11);
   var vegStress=Math.max(0,Math.min(1,(0.72-ndvi)/0.72));
   var dryness=Math.max(0,Math.min(1,(0.35-ndmi)/0.70));
-  var risk=Math.max(0,Math.min(1,0.45*vegStress+0.55*dryness));
-  var r=Math.min(1,risk*2.1);
-  var g=Math.max(0,1-Math.abs(risk-0.55)*2.4);
-  var b=Math.max(0,1-risk*2.2);
-  return [r,g,b,Math.min(0.88,0.18+risk*0.70)];
-}"""
-    payload={"input":{"bounds":{"bbox":bbox,"properties":{"crs":"http://www.opengis.net/def/crs/OGC/1.3/CRS84"}},"data":[{"type":COLLECTION,"dataFilter":{"mosaickingOrder":"leastCC","maxCloudCoverage":40}}]},"output":{"width":width,"height":height,"responses":[{"identifier":"default","format":{"type":"image/png"}}]},"evalscript":evalscript}
-    r=requests.post(process_url,headers={"Authorization":f"Bearer {token}","Content-Type":"application/json"},json=payload,timeout=90)
+  var satelliteRisk=Math.max(0,Math.min(1,0.45*vegStress+0.55*dryness));
+  var weatherRisk=__WEATHER_RISK__;
+  var finalRisk=Math.max(0,Math.min(1,0.65*satelliteRisk+0.35*weatherRisk));
+  var r=Math.min(1,finalRisk*2.05);
+  var g=Math.max(0,1-Math.abs(finalRisk-0.55)*2.5);
+  var b=Math.max(0,1-finalRisk*2.15);
+  return [r,g,b,Math.min(0.88,0.20+finalRisk*0.68)];
+}}"""
+    evalscript = evalscript.replace("__WEATHER_RISK__", f"{weather_risk:.6f}")
+    payload = {
+        "input": {
+            "bounds": {"bbox": bbox, "properties": {"crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"}},
+            "data": [{"type": COLLECTION, "dataFilter": {"mosaickingOrder": "leastCC", "maxCloudCoverage": 40}}],
+        },
+        "output": {
+            "width": width,
+            "height": height,
+            "responses": [{"identifier": "default", "format": {"type": "image/png"}}],
+        },
+        "evalscript": evalscript,
+    }
+    r = requests.post(
+        process_url,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        json=payload,
+        timeout=90,
+    )
     r.raise_for_status()
-    return r.content
+    return r.content, weather, weather_risk
+
 
 def get_ndvi_status(ndvi: Optional[float], region: Optional[str] = None):
     scene = None
