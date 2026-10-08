@@ -46,7 +46,7 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{l.bindTooltip(r.name+(ACTIVE_PROVINCES.has(norm(r.name))?"":" - YAKINDA"),{permanent:true,direction:"center",className:"region-label "+(ACTIVE_PROVINCES.has(norm(r.name))?"":"region-disabled")});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>ACTIVE_PROVINCES.has(norm(r.name))?openProvince(r.name):window.NexoraFeedback?.comingSoon(r.name));l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
 }
 function drawDistricts(){
@@ -73,7 +73,7 @@ async function loadProvinceData(){
  try{
   const gj=await fetch(provincePath).then(x=>x.json());
   provinceFeatures=(gj.features||[]);
-  const ws=await weatherFor(provinceFeatures.map(f=>coords(f.geometry)));
+  const activeNames=provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>norm((f.properties||{}).il_adi));const ws=await weatherFor(provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>coords(f.geometry)));
   provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
   await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
   localStorage.setItem("nexorawildfire-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));

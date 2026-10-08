@@ -13,6 +13,6 @@
   "prefer_related_applications":false,
   "icons":[
     {"src":"favicon.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},
-    {"src":"assets/nexora-mark.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+    {"src":"assets/nexora-wildfire-logo.png","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
 }
