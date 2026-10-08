@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v4";
-const DATA_CACHE = "nexorawildfire-data-v4";
+const CACHE_NAME = "nexorawildfire-shell-v5";
+const DATA_CACHE = "nexorawildfire-data-v5";
 
 const APP_SHELL = [
   "./",
@@ -21,12 +21,12 @@ const APP_SHELL = [
   "./js/dashboard.js",
   "./js/nova-storage.js",
   "./js/nova-offline-engine.js",
-  "./js/install-update.js",
+  "./js/install-update.js",`n  "./js/pwa.js",
   "./js/edge-ui.js",
   "./js/nexora-product.js",
   "./css/product-ui.css",
   "./assets/nexora-mark.svg",
-  "./assets/nexora-logo.png",
+  "./assets/nexora-logo.png",`n  "./assets/nexora-wildfire-logo.png",
   "./favicon.png",
   "./manifest.webmanifest",
   "./data/admin/trakya_istanbul_districts.geojson",
