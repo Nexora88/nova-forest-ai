@@ -9,7 +9,7 @@
     e.preventDefault(); deferred=e;
     const old=document.getElementById('nexora-install'); if(old) old.remove();
     const b=document.createElement('button'); b.id='nexora-install'; b.type='button';
-    b.innerHTML='<img src="'+new URL('favicon.png',root).href+'" alt=""><span>Uygulamayı yükle</span>';
+    b.innerHTML='<img src="'+new URL('assets/nexora-wildfire-logo.png',root).href+'" alt=""><span>Uygulamayı yükle</span>';
     b.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;b.remove()};
     document.body.appendChild(b);
   });

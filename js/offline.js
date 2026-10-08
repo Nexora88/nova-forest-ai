@@ -5,7 +5,7 @@
     root.dataset.network=online?"online":"offline";
     let bar=document.querySelector(".nova-offline-bar");
     if(!bar){bar=document.createElement("div");bar.className="nova-offline-bar";document.body.prepend(bar)}
-    bar.textContent=online?"BAĞLANTI VAR • CANLI VERİ + YEREL DEPO AKTİF":"ÇEVRİMDIŞI MOD • YEREL KARAR MOTORU + SON VERİLER AKTİF";
+    bar.innerHTML=online?"<strong>● İNTERNET VAR</strong> <span>• Canlı veri ve yerel depo aktif</span>":"<strong>● İNTERNET YOK</strong> <span>• Yerel karar motoru ve son veriler aktif</span>";
   }
   window.addEventListener("online",setNetwork);window.addEventListener("offline",setNetwork);
   document.addEventListener("DOMContentLoaded",setNetwork);

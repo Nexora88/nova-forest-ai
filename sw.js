@@ -117,8 +117,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || "/favicon.png",
-    badge: data.icon || "/favicon.png",
+    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
