@@ -8,7 +8,7 @@ async function loadAreas(){
   for(const a of areaCache){try{await window.NovaStore.put("areas",{...a,id:String(a.id),updatedAt:Date.now()})}catch{}}
   return areaCache;
 }
-async function removeArea(id){areaCache=areaCache.filter(a=>a.id!==id);localStorage.setItem(KEY,JSON.stringify(areaCache));try{await window.NovaStore.remove("areas",String(id))}catch{}}
+async function removeArea(id){if(window.NovaAuth?.isLoggedIn()){try{await window.NovaAuth.deleteArea(String(id))}catch(e){console.warn("Cloud area delete",e)}}areaCache=areaCache.filter(a=>String(a.id)!==String(id));localStorage.setItem(KEY,JSON.stringify(areaCache));try{await window.NovaStore.remove("areas",String(id))}catch{}}
 
 function center(points){let lat=0,lon=0;points.forEach(p=>{lat+=p[0];lon+=p[1]});return[lat/points.length,lon/points.length]}
 function scoreRisk(w){let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil<.18)s+=10;return Math.min(100,s)}
@@ -73,4 +73,4 @@ async function checkNativeAlerts(){
     }catch{}
   }
 }
-render();checkNativeAlerts();setInterval(()=>{render();checkNativeAlerts()},300000);
+render();document.addEventListener("nova:auth-ready",()=>render());document.addEventListener("nova:areas-synced",()=>render());checkNativeAlerts();setInterval(()=>{render();checkNativeAlerts()},300000);
