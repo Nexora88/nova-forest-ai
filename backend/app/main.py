@@ -11,12 +11,17 @@ from app.api.environment_routes import router as environment_router
 
 app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.2.0")
 
+import os
+from app.security import security_middleware
+
+ALLOWED_ORIGINS=[x.strip() for x in os.getenv("ALLOWED_ORIGINS","https://nexora88.github.io").split(",") if x.strip()]
+app.add_middleware(security_middleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET","POST","OPTIONS"],
+    allow_headers=["Authorization","Content-Type","Accept"],
     expose_headers=["X-Nexora-Risk-Type","X-Nexora-Weather-Risk","X-Nexora-Weather-Time"],
 )
 
