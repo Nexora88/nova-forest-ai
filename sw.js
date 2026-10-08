@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v7";
-const DATA_CACHE = "nexorawildfire-data-v7";
+const CACHE_NAME = "nexorawildfire-shell-v8";
+const DATA_CACHE = "nexorawildfire-data-v8";
 
 const APP_SHELL = [
   "./",
@@ -27,6 +27,7 @@ const APP_SHELL = [
   "./js/nexora-product.js",
   "./css/product-ui.css",
   "./assets/nexora-wildfire-logo.png",
+  "./assets/ataturk-1925.jpg",
   "./favicon.png",
   "./manifest.webmanifest",
   "./data/admin/trakya_istanbul_districts.geojson",

@@ -113,3 +113,21 @@ Sonraki geliştirmelerde öncelik; gerçek veri erişimlerinin sağlamlaştırı
 **Ahmet Eymen Bakraç**  
 **Nexora / Nexora88**  
 2026
+
+
+## Vercel üretim mimarisi
+
+Bu depo statik arayüz + FastAPI backend'i aynı Vercel projesinde tutacak şekilde yapılandırılmıştır. Vercel ayarlarında Root Directory repository root (./) kullanılmalıdır. Services erişimi açıksa Framework Preset: Services seçilir; Build Command ve Output Directory elle değiştirilmez. Depodaki vercel.json web servisini kökte, FastAPI servisini backend/ altında tanımlar ve /api/* isteklerini backend'e yönlendirir.
+
+### Nova-Alert bildirim mimarisi
+
+Bildirimler GitHub Pages'a bağlı değildir. Vercel sürümünde tarayıcı bildirimi ve Web Push aboneliği aynı NexoraWildfire alan adı üzerindeki /api/notifications/* backend uçlarına gider. VAPID özel anahtarı, Supabase admin anahtarı ve diğer gizli değerler yalnızca Vercel backend ortam değişkenlerinde tutulmalıdır; frontend'e yazılmamalıdır.
+
+Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki sonsuz asyncio worker döngüsü kaldırıldı. Abonelik ve test bildirimi istek-temelli çalışır; periyodik risk taraması için kalıcı bir scheduler gerektiğinde Vercel Cron (plan sınırları dahilinde) veya Supabase pg_cron + pg_net kullanılmalıdır. Böylece bildirim motoru GitHub Actions gibi frontend barındırma katmanına bağımlı kalmaz.
+
+### Üretim doğrulama ilkeleri
+
+- Gerçek model değerlendirmesi olmadan doğruluk/F1 gibi metrikler uydurulmaz.
+- Canlı veri ile simülasyon açıkça ayrılır.
+- PWA servis worker önbelleği sürümlenir; kritik yeni görseller shell'e dahil edilir.
+- Tek resmi NexoraWildfire logosu kullanılır; dinamik marka enjeksiyonu mevcut brand-lockup varsa ikinci logo üretmez.
