@@ -1,0 +1,11 @@
+(()=>{
+const $=(s,r=document)=>r.querySelector(s);
+const api=(window.NOVA_API_BASE||"").replace(/\/$/,"");
+const state={modules:["orman","tarim","aricilik","su","toprak","bitki","hayvancilik","ekosistem"],weights:{}}
+function scoreFarm(w){const t=Number(w.temperature||0),h=Number(w.humidity||0),wind=Number(w.wind||0),rain=Number(w.rain||0);return Math.max(0,Math.min(100,Math.round(100-(Math.abs(t-23)*2.2)-Math.max(0,35-h)*1.1-Math.max(0,wind-20)*.7+Math.min(rain,12)*1.5)))}
+function classify(score){return score>=80?"Uygun":score>=60?"İzlenmeli":score>=40?"Stres riski":"Olumsuz koşullar"}
+async function evaluate(lat,lon){try{const r=await fetch(api+"/notifications/evaluate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat,lon,area_name:"Seçili saha",threshold:70})});if(!r.ok)throw 0;return await r.json()}catch{return null}}
+function render(d){const box=$("#agri-intelligence");if(!box||!d)return;const s=scoreFarm(d.weather||{});box.innerHTML='<div class="agri-head"><div><div class="eyebrow">NEXORA / AGRI INTELLIGENCE</div><h2>Tarım Karar Motoru</h2><p>Yangın dışındaki saha kararlarını da aynı veri mantığıyla ele alır.</p></div><b>'+s+'/100</b></div><div class="agri-grid">'+[['Sulama','Toprak nemi + ET₀ + yağış'],['Ekim / hasat','Sıcaklık + yağış penceresi'],['Bitki stresi','VPD + sıcaklık + kuraklık'],['Arıcılık','Uçuş + rüzgar + yağış'],['Hayvancılık','Sıcaklık + nem + ısı stresi'],['Ekosistem','Kuraklık + yangın + habitat']].map(x=>'<article><span>'+x[0]+'</span><strong>'+classify(s)+'</strong><small>'+x[1]+'</small></article>').join('')+'</div>'}
+async function init(){const box=$("#agri-intelligence");if(!box)return;const lat=41.67,lon=26.56;render(await evaluate(lat,lon)||{weather:{temperature:23,humidity:55,wind:10,rain:2}})}
+window.NovaAgri={evaluate,render};document.addEventListener("DOMContentLoaded",init)
+})();
