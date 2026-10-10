@@ -56,7 +56,7 @@ class MobileUiSmokeTests(unittest.TestCase):
 
     def new_page(self, width=390, height=844):
         context = self.browser.new_context(viewport={"width": width, "height": height}, locale="en-US")
-        context.add_init_script("localStorage.removeItem('nexorawildfire-installed-v1')")
+        context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
         # Third-party API/CDN failures must not stop local UI controls from being tested.
         page.route("https://**/*", lambda route: route.abort())
@@ -73,7 +73,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     self.assertTrue(page.locator("#nexora-install").is_visible(), f"install control missing on {path}")
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
                     if page.locator("nav").count():
-                        page.wait_for_selector("nav.nx-nav-toggle", timeout=5000)
+                        page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
                 finally:
                     context.close()
 
@@ -81,7 +81,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
-            menu = page.locator("nav.nx-nav-toggle")
+            menu = page.locator("nav .nx-nav-toggle")
             self.assertTrue(menu.is_visible())
             self.assertEqual(page.locator("nav.nx-nav > a:visible").count(), 0)
             menu.click()
