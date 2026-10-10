@@ -95,3 +95,8 @@ Contributions are welcome. Please read .github/CONTRIBUTING.md, avoid fabricated
 ## Important limitation
 
 NexoraWildfire AI is a developing research and decision-support project. It is not an official warning system, does not guarantee wildfire prediction, and must not replace local authorities, professional judgement, or emergency procedures.
+
+
+## Research ML prototype
+
+A reproducible Random Forest research artifact is trained from the UCI Algerian Forest Fires dataset. The geographic holdout metrics and limitations are documented in [the model card](docs/ML_MODEL_CARD.md). This small 2012 Algerian dataset is **not validated for Thrace/Türkiye** and is not an operational fire forecast. The separate nine-feature, seven-day model remains fail-closed until matching labelled historical data is collected.
