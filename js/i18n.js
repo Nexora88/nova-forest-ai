@@ -1,7 +1,7 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
-    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Özel Mesajlar","Private Messages"],["Sistem","About the System"],
+    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Özel Mesajlar","Feedback"],["Feedback","Feedback"],["Sistem","About the System"],
     ["Çevresel Harita","Environmental Map"],["Çevresel İstihbarat","Environmental Intelligence"],["Çevresel istihbarat ve karar destek sistemi","Environmental intelligence and decision-support system"],
     ["CANLI KARAR MERKEZİ","LIVE DECISION CENTER"],["SİSTEM ÇEVRİMİÇİ","SYSTEM ONLINE"],["YETKİLİ ÇALIŞMA ALANI","AUTHORIZED WORKSPACE"],
     ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle","Monitor Thrace's forests, fields, and ecosystems in one decision workspace"],
@@ -99,7 +99,7 @@
     ["Open-Meteo meteorolojik verileri kullanılarak bölgesel sıcaklık, nem ve rüzgar koşulları analiz edilir.","Regional temperature, humidity, and wind conditions are analysed using Open-Meteo weather data."],
     ["Bitki kuruluğu için analiz edilir","Analysed as an indicator of plant dryness"],["Yangın yayılım risk faktörü","A factor in wildfire spread risk"],
     ["Meteorolojik risk işleme aktif","Meteorological risk processing is active"],["Veri Akışı","Data Stream"],["Bölgesel koordinat analizi","Regional coordinate analysis"],
-    ["Sahadaki insanlarla doğrudan iletişim.","Communicate directly with people in the field."],
+    ["Sahadaki insanlarla doğrudan iletişim.","Communicate directly with people in the field."],["Bilim, üretim ve toplumsal fayda","Science, production, and public benefit"],["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
     ["Özel mesajlar yalnızca konuşmaya katılan hesaplar tarafından okunabilir. E-posta ve telefon numarası herkese açık gösterilmez.","Private messages are readable only by conversation participants. Email addresses and phone numbers are not publicly displayed."],
     ["Mesajlaşmak için hesabına giriş yap","Sign in to send messages"],["Risk haritası ve acil durum bilgileri herkese açık kalır. Özel mesajlar için güvenli hesap gerekir.","The risk map and emergency information remain public. Private messages require an account."],
     ["Herkese açık kullanıcı adı","Public username"],["Kullanıcı adı","Username"],["Görünen ad","Display name"],["Kimliğimi kaydet","Save my identity"],
