@@ -15,7 +15,7 @@ Bu deney, Edirne, Kırklareli ve Tekirdağ'ı kapsayan sabit bir Trakya pilotu i
 - Saat dilimi: Europe/Istanbul.
 - Kaydedilen birimler: sıcaklık °C, bağıl nem %, rüzgâr km/h, yağış mm, ET₀ mm, VPD kPa.
 
-NASA FIRMS için ücretsiz MAP_KEY gerekir. Anahtar yalnızca ortam değişkeninde tutulmalı; GitHub'a, CSV'ye veya loglara eklenmemelidir.
+NASA FIRMS için ücretsiz MAP_KEY gerekir. Anahtar yalnızca ortam değişkeninde tutulmalı; GitHub'a, CSV'ye veya loglara eklenmemelidir. Otomatik veri üretimi için GitHub deposunda Settings → Secrets and variables → Actions bölümüne FIRMS_MAP_KEY adlı repository secret ekle; anahtarı sohbete veya koda yapıştırma. Ardından Actions → Build and evaluate Thrace hotspot dataset → Run workflow ile tarih aralığını seçerek çalıştır. Workflow dataset ve model değerlendirmesini 30 günlük artifact olarak yükler. Depo herkese açıksa artifact'ların da depo okuyucularına açık olabileceğini unutma; yalnızca paylaşılması uygun veriler için çalıştır.
 
 ## Veri üretimi
 
