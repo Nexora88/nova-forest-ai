@@ -9,29 +9,53 @@ SUPABASE_URL=os.getenv("SUPABASE_URL","").rstrip("/")
 SUPABASE_ADMIN_KEY=os.getenv("SUPABASE_ADMIN_KEY","")
 VAPID_PRIVATE_KEY_B64=os.getenv("VAPID_PRIVATE_KEY_B64","")
 VAPID_SUBJECT=os.getenv("VAPID_SUBJECT","mailto:hello@nexora88.com")
-VAPID_PUBLIC_KEY="BA9PgktSWf1VAcGa7bvOB_HkqfGcztBQ7azhGaAXofjHkJgQI0Zjs9tbsCa8-hm8FkFWZH9N8jOVlMGtEcpu-L4"
+VAPID_PUBLIC_KEY=os.getenv("VAPID_PUBLIC_KEY") or "BA9PgktSWf1VAcGa7bvOB_HkqfGcztBQ7azhGaAXofjHkJgQI0Zjs9tbsCa8-hm8FkFWZH9N8jOVlMGtEcpu-L4"
 
-def configured(): return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PRIVATE_KEY_B64)
-def _headers(): return {"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {SUPABASE_ADMIN_KEY}","Content-Type":"application/json"}
-def _url(): return f"{SUPABASE_URL}/rest/v1/nexorawildfire_push_subscriptions"
+def configured():
+    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PRIVATE_KEY_B64)
 
-def upsert_subscription(sub:dict,lat:float,lon:float,area_name:str,threshold:int):
+def verify_supabase_user(access_token: str) -> str:
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        raise RuntimeError("supabase_auth_not_configured")
+    response=requests.get(
+        f"{SUPABASE_URL}/auth/v1/user",
+        headers={"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {access_token}"},
+        timeout=8,
+    )
+    if response.status_code != 200:
+        raise ValueError("invalid_access_token")
+    user=response.json()
+    if not user.get("id"):
+        raise ValueError("invalid_access_token")
+    return str(user["id"])
+
+def _headers():
+    return {"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {SUPABASE_ADMIN_KEY}","Content-Type":"application/json"}
+
+def _url():
+    return f"{SUPABASE_URL}/rest/v1/nexorawildfire_push_subscriptions"
+
+def upsert_subscription(sub:dict,lat:float,lon:float,area_name:str,threshold:int,user_id:str):
     if not configured(): return
-    payload={"endpoint":sub["endpoint"],"p256dh":sub["keys"]["p256dh"],"auth":sub["keys"]["auth"],"lat":lat,"lon":lon,"area_name":area_name,"threshold":threshold}
-    r=requests.post(_url(),headers={**_headers(),"Prefer":"resolution=merge-duplicates,return=minimal"},params={"on_conflict":"endpoint,area_name"},json=payload,timeout=12)
+    payload={"user_id":user_id,"endpoint":sub["endpoint"],"p256dh":sub["keys"]["p256dh"],"auth":sub["keys"]["auth"],"lat":lat,"lon":lon,"area_name":area_name,"threshold":threshold}
+    # The database has a unique constraint on endpoint, so conflict resolution must target that key.
+    r=requests.post(_url(),headers={**_headers(),"Prefer":"resolution=merge-duplicates,return=minimal"},params={"on_conflict":"endpoint"},json=payload,timeout=12)
     r.raise_for_status()
 
-def delete_subscription(endpoint:str,area_name=None):
+def delete_subscription(endpoint:str,area_name=None,user_id=None):
     if not configured(): return
     params={"endpoint":f"eq.{endpoint}"}
     if area_name: params["area_name"]=f"eq.{area_name}"
+    if user_id: params["user_id"]=f"eq.{user_id}"
     r=requests.delete(_url(),headers=_headers(),params=params,timeout=12)
     r.raise_for_status()
+
 def list_subscriptions():
     if not configured(): return []
     r=requests.get(_url(),headers=_headers(),params={"select":"*","limit":"500"},timeout=12)
     r.raise_for_status()
     return r.json()
+
 def update_alert_state(row_id,risk,alerted):
     if not configured(): return
     payload={"last_risk":risk}
@@ -43,13 +67,13 @@ def send_push(sub,title,message,url="./"):
     if not VAPID_PRIVATE_KEY_B64: return False
     pem=base64.urlsafe_b64decode(VAPID_PRIVATE_KEY_B64).decode()
     info={"endpoint":sub["endpoint"],"keys":{"p256dh":sub["p256dh"],"auth":sub["auth"]}}
-    data=json.dumps({"title":title,"message":message,"url":url,"icon":"/favicon.png","tag":"nexorawildfire-alert"})
+    data=json.dumps({"title":title,"message":message,"url":url,"icon":"/assets/nexora-wildfire-logo.png","tag":"nexorawildfire-alert"})
     try:
         webpush(subscription_info=info,data=data,vapid_private_key=pem,vapid_claims={"sub":VAPID_SUBJECT},ttl=300)
         return True
     except WebPushException as exc:
         if getattr(getattr(exc,"response",None),"status_code",None) in (404,410):
-            try: delete_subscription(sub["endpoint"],sub.get("area_name"))
+            try: delete_subscription(sub["endpoint"],sub.get("area_name"),sub.get("user_id"))
             except Exception: pass
         return False
     except Exception:
