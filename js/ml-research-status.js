@@ -12,7 +12,7 @@
     else main.prepend(panel);
     const state = panel.querySelector("[data-ml-state]");
     const details = panel.querySelector("[data-ml-details]");
-    const apiBase = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai-backend.vercel.app" : "/api")).replace(/\/$/,"");
+    const apiBase = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai.vercel.app/api" : "/api")).replace(/\/$/,"");
     try {
       const response = await fetch(apiBase + "/ml/research-status", {headers:{Accept:"application/json"}});
       if (!response.ok) throw new Error("HTTP " + response.status);
