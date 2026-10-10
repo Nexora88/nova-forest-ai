@@ -11,6 +11,7 @@ Bu deney, Edirne, Kırklareli ve Tekirdağ'ı kapsayan sabit bir Trakya pilotu i
 - NASA FIRMS Area API: https://firms.modaps.eosdis.nasa.gov/api/area/
 - Open-Meteo Historical Weather API: https://open-meteo.com/en/docs/historical-weather-api
 - Hava modeli: ERA5-Land reanalysis. Bu, yerel meteoroloji istasyonu ölçümü değil, yeniden analiz verisidir.
+- NASA FIRMS acquisition date/time fields are retained as acquisition_date_utc and acquisition_time_utc (UTC as provided by FIRMS). Weather values are daily values for the Europe/Istanbul local calendar day, not event-hour observations; this interval is explicitly recorded.
 - Saat dilimi: Europe/Istanbul.
 - Kaydedilen birimler: sıcaklık °C, bağıl nem %, rüzgâr km/h, yağış mm, ET₀ mm, VPD kPa.
 
