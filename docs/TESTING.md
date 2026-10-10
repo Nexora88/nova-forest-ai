@@ -26,3 +26,10 @@ These checks validate syntax and selected safety properties; they do not prove l
 ## Production release gate
 
 Do not call the release complete until the GitHub Actions checks pass, the Vercel build succeeds, the production API health endpoint responds, provider-dependent flows are tested with configured credentials, and the map/language toggle have been checked in a real browser. The Vercel build-rate-limit failure is a hosting quota issue and must be resolved independently.
+
+
+## Automated browser and provider checks
+
+- The `browser-smoke` GitHub Actions job launches Chromium and checks the language/install controls on every HTML page, mobile menu collapse/expand, desktop More menu, language switching, and the install control disappearing after the `appinstalled` event.
+- After backend deployment, request `GET /satellite/providers/status?probe=true`. `nasa_firms.status=authorized` verifies the configured NASA key; `copernicus_sentinel_hub.status=authorized` verifies the configured OAuth credentials. `not_configured` means the corresponding environment variables are missing; `validation_failed` means the provider probe did not succeed.
+- A provider credential probe is not an end-to-end imagery test. Verify the global Napa demo, real FIRMS observations (if any), and a completed Copernicus NDVI time-series job separately.
