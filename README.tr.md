@@ -36,7 +36,7 @@ Kural tabanlı çevresel gösterge, makine öğrenmesi tahmini değildir. Sistem
 
 ## Veri kaynakları
 
-Yapılandırmaya ve servis erişimine bağlı olarak Open-Meteo, OpenStreetMap/Nominatim, Copernicus Sentinel-2/CDSE ve geçerli backend MAP_KEY ayarlandığında NASA FIRMS/VIIRS kullanılabilir. Eksik anahtar veya başarısız istek sıfır risk anlamına gelmez. NASA GIBS altlık görüntüsü, işlenmiş Sentinel-2 NDVI ürünüyle aynı şey değildir.
+Yapılandırmaya ve servis erişimine bağlı olarak Open-Meteo, OpenStreetMap/Nominatim, Copernicus Sentinel-2/CDSE ve geçerli backend FIRMS_MAP_KEY ayarlandığında NASA FIRMS/VIIRS kullanılabilir. Eksik anahtar veya başarısız istek sıfır risk anlamına gelmez. NASA GIBS altlık görüntüsü, işlenmiş Sentinel-2 NDVI ürünüyle aynı şey değildir.
 
 ## Backend'i yerel çalıştırma
 
