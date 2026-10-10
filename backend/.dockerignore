@@ -6,4 +6,4 @@ __pycache__
 .env.*
 models/*.joblib
 models/*metadata.json
- data/*.csv
+data/*.csv
