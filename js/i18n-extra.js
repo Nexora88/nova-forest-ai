@@ -57,13 +57,14 @@
  ];
  const toEn=new Map(pairs), toTr=new Map(pairs.map(([a,b])=>[b,a]));
  const originals=new WeakMap();
+ const attributeOriginals=new WeakMap();
  function lang(){return document.documentElement.dataset.language || (localStorage.getItem("nexorawildfire-language-v1")||"en")}
  function translate(root=document.body){
    const en=lang()==="en", dict=en?toEn:toTr;
    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
    for(const n of nodes){if(!originals.has(n)) originals.set(n,n.nodeValue);const raw=originals.get(n).trim();if(!raw)continue;const replacement=dict.get(raw);if(replacement){const lead=originals.get(n).match(/^\s*/)?.[0]||"",tail=originals.get(n).match(/\s*$/)?.[0]||"";n.nodeValue=lead+replacement+tail}}
-   root.querySelectorAll?.("[placeholder],[title],[aria-label]").forEach(el=>["placeholder","title","aria-label"].forEach(attr=>{if(el.hasAttribute(attr)){const k=attr+":"+el.tagName+":"+el.getAttribute("data-i18n-extra-key");if(!el.dataset.i18nExtraKey)el.dataset.i18nExtraKey=String(Math.random()).slice(2);const key=attr+":"+el.dataset.i18nExtraKey;if(!el.dataset["orig"+attr])el.dataset["orig"+attr]=el.getAttribute(attr);const orig=el.dataset["orig"+attr];if(dict.has(orig))el.setAttribute(attr,dict.get(orig));}}));
+   root.querySelectorAll?.("[placeholder],[title],[aria-label]").forEach(el=>{let saved=attributeOriginals.get(el);if(!saved){saved={};attributeOriginals.set(el,saved)}for(const attr of ["placeholder","title","aria-label"]){if(!el.hasAttribute(attr))continue;if(!(attr in saved))saved[attr]=el.getAttribute(attr);const orig=saved[attr];if(dict.has(orig))el.setAttribute(attr,dict.get(orig));}});
  }
  document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))requestAnimationFrame(()=>translate());},true);
  const observer=new MutationObserver(records=>{if(lang()!=="en")return;records.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===Node.ELEMENT_NODE)translate(n);else if(n.nodeType===Node.TEXT_NODE)translate(n.parentElement||document.body)}))});
