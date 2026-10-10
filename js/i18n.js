@@ -1,7 +1,7 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
-    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Özel Mesajlar","Feedback"],["Feedback","Feedback"],["Sistem","About the System"],
+    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Feedback","Feedback"],["Sistem","About the System"],
     ["Çevresel Harita","Environmental Map"],["Çevresel İstihbarat","Environmental Intelligence"],["Çevresel istihbarat ve karar destek sistemi","Environmental intelligence and decision-support system"],
     ["CANLI KARAR MERKEZİ","LIVE DECISION CENTER"],["SİSTEM ÇEVRİMİÇİ","SYSTEM ONLINE"],["YETKİLİ ÇALIŞMA ALANI","AUTHORIZED WORKSPACE"],
     ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle","Monitor Thrace's forests, fields, and ecosystems in one decision workspace"],
@@ -99,14 +99,14 @@
     ["Open-Meteo meteorolojik verileri kullanılarak bölgesel sıcaklık, nem ve rüzgar koşulları analiz edilir.","Regional temperature, humidity, and wind conditions are analysed using Open-Meteo weather data."],
     ["Bitki kuruluğu için analiz edilir","Analysed as an indicator of plant dryness"],["Yangın yayılım risk faktörü","A factor in wildfire spread risk"],
     ["Meteorolojik risk işleme aktif","Meteorological risk processing is active"],["Veri Akışı","Data Stream"],["Bölgesel koordinat analizi","Regional coordinate analysis"],
-    ["Sahadaki insanlarla doğrudan iletişim.","Communicate directly with people in the field."],["Bilim, üretim ve toplumsal fayda","Science, production, and public benefit"],["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
-    ["Özel mesajlar yalnızca konuşmaya katılan hesaplar tarafından okunabilir. E-posta ve telefon numarası herkese açık gösterilmez.","Private messages are readable only by conversation participants. Email addresses and phone numbers are not publicly displayed."],
-    ["Mesajlaşmak için hesabına giriş yap","Sign in to send messages"],["Risk haritası ve acil durum bilgileri herkese açık kalır. Özel mesajlar için güvenli hesap gerekir.","The risk map and emergency information remain public. Private messages require an account."],
+    ["Bilim, üretim ve toplumsal fayda","Science, production, and public benefit"],["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
+    
+    
     ["Herkese açık kullanıcı adı","Public username"],["Kullanıcı adı","Username"],["Görünen ad","Display name"],["Kimliğimi kaydet","Save my identity"],
-    ["Kişi bul","Find a person"],["Kullanıcı adına göre","By username"],["Ara","Search"],["GELEN KUTUSU","INBOX"],["Konuşmalar yükleniyor…","Loading conversations…"],
-    ["Bir konuşma seç","Select a conversation"],["Bir saha kullanıcısı ara veya sol taraftaki konuşmalarından birini aç.","Search for a field user or open one of your conversations on the left."],
+    ["Ara","Search"],
+    
     ["Saygılı ve saha odaklı iletişim kur. Kişisel bilgileri paylaşırken dikkatli ol.","Communicate respectfully and stay focused on field work. Be careful when sharing personal information."],
-    ["Bu mesajlar uçtan uca şifrelenmiş değildir. Hassas konum, kişisel veri veya acil durum bilgilerini özel mesajlarda paylaşma.","These messages are not end-to-end encrypted. Do not share sensitive locations, personal data, or emergency information in private messages."],
+    
     ["Acil durumlarda 112 ve yetkili kurumların talimatları önceliklidir.","In emergencies, call 112 and follow instructions from the relevant authorities."],
     ["Kurumsal varlık güzergâhı ve risk raporu","Enterprise asset mapping and risk reporting"],
     ["Bu ayrı çalışma alanı; enerji hatları, trafo merkezleri ve rüzgâr türbinleri için coğrafi varlık geometrisi hazırlamak ve çevresel risk raporu istemek üzere tasarlanmıştır. Ana paneldeki harita deneyimini bölmez.","This dedicated workspace lets users prepare geographic asset geometries and request environmental risk reports for power lines, substations, and wind turbines without cluttering the main map."],
@@ -130,7 +130,7 @@
     ["KATMANLAR","LAYERS"],["VERİ KATMANI","DATA LAYER"],["UYDU","SATELLITE"],["ORMAN","FOREST"],["TARIM","AGRICULTURE"],
     ["POLEN","POLLEN"],["SU / TOPRAK","WATER / SOIL"],["KARANLIK","DARK"],["AÇIK","LIGHT"],["TOPOĞRAFYA","TOPOGRAPHY"],
     ["İNSANİ HARİTA","HUMANITARIAN MAP"],["STANDART","STANDARD"],["CANLI","LIVE"],["SİSTEM ÇALIŞIYOR","SYSTEM OPERATIONAL"],
-    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],["Saha ağı · güvenli özel mesajlar","Field network · private messaging"],
+    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],
     ["SİSTEM KAPSAMI","SYSTEM COVERAGE"],["OPERASYON MERKEZİ","OPERATIONS CENTER"],["TARIM / SULAMA","AGRICULTURE / IRRIGATION"],
     ["Sıcaklık Analizi","Temperature Analysis"],["Nem Seviyesi","Humidity Level"],["Rüzgar Hızı","Wind Speed"],["AI Değerlendirme","AI Assessment"],
     ["Uydu katmanı","Satellite layer"],["Orman katmanı","Forest layer"],["Tarım katmanı","Agriculture layer"],["Arıcılık katmanı","Beekeeping layer"],["Atmosfer katmanı","Atmosphere layer"],
