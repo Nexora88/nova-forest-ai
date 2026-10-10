@@ -1,0 +1,31 @@
+/* Free, keyless public-data overlays. Availability and source timestamps are shown honestly. */
+(function(){
+ if(!window.L||!document.getElementById("map"))return;
+ const m=map, overlays={},places=[
+  {name:"Edirne",lat:41.6771,lon:26.5557},{name:"Kırklareli",lat:41.7351,lon:27.2252},
+  {name:"Tekirdağ",lat:40.9781,lon:27.5110},{name:"Çanakkale",lat:40.1553,lon:26.4142},
+  {name:"İstanbul Avrupa",lat:41.0082,lon:28.9784}
+ ];
+ const weatherLayer=L.layerGroup(),airLayer=L.layerGroup(),quakeLayer=L.geoJSON(null,{
+  pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:Math.max(5,Math.min(13,Number(f.properties?.mag||0)*2)),color:"#ff765e",weight:1.5,fillColor:"#ff392b",fillOpacity:.75}),
+  onEachFeature:(f,l)=>{const p=f.properties||{};l.bindPopup('<div class="risk-popup"><div class="popup-kicker">USGS / SON 7 GÜN</div><h3>'+safe(p.place||"Deprem gözlemi")+'</h3><b>'+Number(p.mag||0).toFixed(1)+' Mw</b><p>'+new Date(p.time||Date.now()).toLocaleString("tr-TR")+'</p><p>Derinlik: '+(f.geometry?.coordinates?.[2]??"—")+' km</p><a target="_blank" rel="noopener" href="'+safe(p.url||"https://earthquake.usgs.gov/earthquakes/map/")+'">USGS kaydını aç ↗</a><small>Kaynak: USGS Earthquake Hazards Program</small></div>')}
+ });
+ function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+ function setStatus(text){const el=document.querySelector("[data-map-status]");if(el)el.textContent=text}
+ function popup(place,kind,values,source,time){return '<div class="risk-popup"><div class="popup-kicker">'+safe(source)+'</div><h3>'+safe(place.name)+'</h3>'+values.map(v=>'<div class="metric-row"><span>'+safe(v[0])+'</span><b>'+safe(v[1])+'</b></div>').join("")+'<small>Güncelleme: '+safe(time||"kaynak zaman bilgisi yok")+'</small></div>'}
+ places.forEach(p=>{const mk=L.circleMarker([p.lat,p.lon],{radius:7,color:"#00ff66",weight:2,fillColor:"#00ff66",fillOpacity:.6});mk.bindTooltip(p.name+" · Open-Meteo");weatherLayer.addLayer(mk)});
+ overlays["Open-Meteo · Hava istasyonları"]=weatherLayer;
+ places.forEach(p=>{const mk=L.circleMarker([p.lat,p.lon],{radius:7,color:"#f2c14e",weight:2,fillColor:"#f59e0b",fillOpacity:.65});mk.bindTooltip(p.name+" · Hava kalitesi / polen");airLayer.addLayer(mk)});
+ overlays["CAMS · Hava kalitesi + polen"]=airLayer;
+ overlays["USGS · Son 7 gün depremler"]=quakeLayer;
+ overlays["NASA GIBS · MODIS uydu görüntüsü"]=L.tileLayer.wms("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi",{
+  layers:"MODIS_Terra_CorrectedReflectance_TrueColor",format:"image/jpeg",transparent:false,version:"1.1.1",time:new Date().toISOString().slice(0,10),attribution:"NASA Global Imagery Browse Services (GIBS)",tileSize:256
+ });
+ L.control.layers(null,overlays,{collapsed:true,position:"topright"}).addTo(m);
+ let weatherLoaded=false,airLoaded=false,quakesLoaded=false;
+ async function loadWeather(){if(weatherLoaded)return;weatherLoaded=true;try{const u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",places.map(p=>p.lat).join(","));u.searchParams.set("longitude",places.map(p=>p.lon).join(","));u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation");u.searchParams.set("timezone","Europe/Istanbul");const r=await fetch(u);if(!r.ok)throw Error("Open-Meteo HTTP "+r.status);const raw=await r.json(),arr=Array.isArray(raw)?raw:[raw];weatherLayer.clearLayers();arr.forEach((j,i)=>{const c=j.current||{},p=places[i];if(!p)return;const wind=Number(c.wind_speed_10m||0),color=wind>=35?"#ff4d4d":wind>=20?"#ffb020":"#00ff66";const mk=L.circleMarker([p.lat,p.lon],{radius:8,color,weight:2,fillColor:color,fillOpacity:.7});mk.bindPopup(popup(p.name,"weather",[["Sıcaklık",c.temperature_2m+" °C"],["Bağıl nem",c.relative_humidity_2m+" %"],["Rüzgar",wind+" km/s"],["Yağış",c.precipitation+" mm"]],"Open-Meteo Forecast",c.time));weatherLayer.addLayer(mk)})}catch(e){weatherLoaded=false;setStatus("HAVA KATMANI • kaynak yanıt vermiyor; yeniden denenebilir")}}
+ async function loadAir(){if(airLoaded)return;airLoaded=true;try{const u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",places.map(p=>p.lat).join(","));u.searchParams.set("longitude",places.map(p=>p.lon).join(","));u.searchParams.set("current","pm10,pm2_5,ozone,uv_index,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const r=await fetch(u);if(!r.ok)throw Error("CAMS HTTP "+r.status);const raw=await r.json(),arr=Array.isArray(raw)?raw:[raw];airLayer.clearLayers();arr.forEach((j,i)=>{const c=j.current||{},p=places[i];if(!p)return;const pm=Number(c.pm2_5||0),color=pm>=25?"#ff4d4d":pm>=10?"#ffb020":"#f2c14e";const mk=L.circleMarker([p.lat,p.lon],{radius:8,color,weight:2,fillColor:color,fillOpacity:.72});mk.bindPopup(popup(p.name,"air",[["PM2.5",c.pm2_5+" µg/m³"],["PM10",c.pm10+" µg/m³"],["Ozon",c.ozone+" µg/m³"],["UV",c.uv_index],["Çimen poleni",c.grass_pollen??"veri yok"]],"Open-Meteo Air Quality / CAMS",c.time));airLayer.addLayer(mk)})}catch(e){airLoaded=false;setStatus("HAVA KALİTESİ KATMANI • kaynak yanıt vermiyor; yeniden denenebilir")}}
+ async function loadQuakes(){if(quakesLoaded)return;quakesLoaded=true;try{const r=await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson",{cache:"no-store"});if(!r.ok)throw Error("USGS HTTP "+r.status);const j=await r.json();quakeLayer.addData(j);const n=(j.features||[]).length;quakeLayer.bindTooltip("USGS · "+n+" deprem kaydı (küresel, son 7 gün)");}catch(e){quakesLoaded=false;setStatus("USGS deprem katmanı yüklenemedi; diğer katmanlar çalışabilir")}}
+ m.on("overlayadd",e=>{if(e.layer===weatherLayer)loadWeather();if(e.layer===airLayer)loadAir();if(e.layer===quakeLayer)loadQuakes()});
+ m.whenReady(()=>{const label=document.createElement("div");label.className="free-layer-note";label.innerHTML='<b>ÜCRETSİZ VERİ KATMANLARI</b><span>OSM · Open-Meteo · CAMS · NASA GIBS · USGS</span><small>Katmanlar sağ üstteki üst üste kare simgesinden açılır. Veriler bölgesel gösterimdir; resmî alarm yerine geçmez.</small>';document.querySelector(".map-section")?.append(label)});
+})();
