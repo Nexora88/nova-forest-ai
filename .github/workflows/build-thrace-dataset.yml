@@ -1,0 +1,74 @@
+name: Build and evaluate Thrace hotspot dataset
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Start date (YYYY-MM-DD)"
+        required: true
+        default: "2018-01-01"
+        type: string
+      end_date:
+        description: "End date (YYYY-MM-DD)"
+        required: true
+        default: "2025-12-31"
+        type: string
+      max_positive:
+        description: "Maximum sampled positive hotspot cells"
+        required: true
+        default: "500"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      FIRMS_MAP_KEY: \${{ secrets.FIRMS_MAP_KEY }}
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Validate required secret
+        run: |
+          if [ -z "$FIRMS_MAP_KEY" ]; then
+            echo "::error::Add FIRMS_MAP_KEY in GitHub repository Actions secrets before running this workflow."
+            exit 1
+          fi
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build dataset from NASA FIRMS and Open-Meteo
+        run: |
+          python scripts/build_thrace_dataset.py \
+            --start-date "\${{ inputs.start_date }}" \
+            --end-date "\${{ inputs.end_date }}" \
+            --max-positive "\${{ inputs.max_positive }}" \
+            --output data/thrace_fire_dataset.csv
+      - name: Train and evaluate with chronological holdout
+        run: |
+          python scripts/train_fire_model.py \
+            --input data/thrace_fire_dataset.csv \
+            --model-output models/fire_risk.joblib \
+            --metadata-output models/fire_risk_metadata.json
+      - name: Publish dataset and evaluation as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thrace-hotspot-research-\${{ github.run_number }}
+          path: |
+            backend/data/thrace_fire_dataset.csv
+            backend/models/fire_risk.joblib
+            backend/models/fire_risk_metadata.json
+          if-no-files-found: error
+          retention-days: 30
