@@ -116,6 +116,15 @@
     ["Çizgi: elektrik hattı · Çokgen: RES/trafo etki alanı · Nokta: tek türbin","Line: power line · Polygon: wind-farm/substation impact area · Point: individual turbine"],
     ["NexoraWildfire AI · Uydu Tabanlı Çevresel Risk Analiz Platformu","NexoraWildfire AI · Satellite-Based Environmental Risk Analysis Platform"],
     ["Sistem şu anda bir pilot bölgede","The system is currently being tested in a pilot region"],
+    ["Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Hava durumu ve NASA FIRMS durumu isteniyor…","GeoJSON rendered at Napa Valley, California. Requesting weather and NASA FIRMS status…"],
+    ["Open-Meteo: kullanılamıyor","Open-Meteo: unavailable"],["Hava değerleri uydurulmadı.","No weather values were fabricated."],
+    ["NASA FIRMS: KULLANILABİLİR","NASA FIRMS: AVAILABLE"],["NASA FIRMS: YAPILANDIRILMAMIŞ","NASA FIRMS: NOT CONFIGURED"],
+    ["NASA FIRMS: backend uç noktası kullanılamıyor","NASA FIRMS: backend endpoint unavailable"],
+    ["FIRMS_MAP_KEY anahtarını backend ortam değişkenlerinde tanımlayarak gerçek sıcak nokta sorgularını etkinleştir.","set FIRMS_MAP_KEY in the backend environment to enable real hotspot queries."],
+    ["Son bir gün için","for the last day"],["Sıfır gözlem, yangın riskinin sıfır olduğunu kanıtlamaz.","Zero observations do not prove zero fire risk."],
+    ["Bu demo yalnızca harita geometrisini, güncel hava durumunu ve sağlayıcı yanıtını kontrol eder; eğitilmiş bir Kaliforniya yangın-risk modeli veya resmî uyarı değildir.","This demo checks map geometry, current weather, and the provider response only; it is not a trained California fire-risk model or an official alert."],
+    ["NASA FIRMS:","NASA FIRMS:"],["hotspot observations","sıcak nokta gözlemi"],["humidity","nem"],["wind","rüzgâr"],
+    ["Satellite and trained-ML status remain unverified.","Uydu ve eğitilmiş ML durumu doğrulanmadı."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
