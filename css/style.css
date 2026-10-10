@@ -885,3 +885,19 @@ main{padding-bottom:76px}
 .nx-planning-tools{animation:nxPanelEnter .32s ease-out both}
 @keyframes nxPanelEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.nx-safe-zone-outline,.nx-animated-route,.nx-planning-tools{animation:none!important;filter:none!important}}
+
+/* Publicly mapped emergency points and motion-aware map cues. */
+.nx-safety-points{margin:16px 0 22px;padding:clamp(14px,2.5vw,22px);border:1px solid #275438;border-radius:16px;background:linear-gradient(135deg,rgba(0,255,102,.055),rgba(4,10,7,.96));box-shadow:0 12px 36px #0003}
+.nx-safety-head{display:flex;align-items:center;gap:12px}.nx-safety-head strong{display:block;color:#eaffef;font:750 13px/1.5 Inter,system-ui,sans-serif;letter-spacing:.04em}.nx-safety-head small,.nx-safety-source{display:block;color:#82978a;font-size:11px;line-height:1.6}
+.nx-safety-pulse{width:11px;height:11px;flex:none;border-radius:50%;background:#00ff88;box-shadow:0 0 0 0 #00ff8855;animation:nxSafetyPulse 2s infinite}
+.nx-safety-warning{margin:12px 0;color:#d7c99e;font:450 12px/1.7 Inter,system-ui,sans-serif}
+.nx-safety-controls{display:flex;align-items:end;gap:9px;flex-wrap:wrap}.nx-safety-controls label{display:grid;gap:5px;color:#91a397;font:600 11px Inter,system-ui,sans-serif}
+.nx-safety-controls select,.nx-safety-controls button,.nx-safety-result button{min-height:42px;padding:9px 12px;border:1px solid #285a38;border-radius:9px;background:#06110a;color:#eaffef;font:650 12px Inter,system-ui,sans-serif}
+.nx-safety-controls button{cursor:pointer}.nx-safety-controls button:first-of-type{border-color:#00a94d}.nx-safety-controls button:disabled{opacity:.55;cursor:wait}
+.nx-safety-status{margin:12px 0;color:#b5c6ba;font:450 12px/1.6 Inter,system-ui,sans-serif}
+.nx-safety-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px}
+.nx-safety-result{display:grid;gap:5px;padding:12px;border:1px solid #1d3927;border-radius:11px;background:#050a07}.nx-safety-result strong{color:#eaffef;font-size:12px}.nx-safety-result small{color:#82978a;font-size:10px}.nx-safety-result button{justify-self:start;min-height:34px;padding:6px 9px;cursor:pointer}
+.nx-safety-marker-wrap{border:0;background:transparent}.nx-safety-marker{display:block;width:14px;height:14px;border:2px solid #eaffef;border-radius:50%;background:#00ff88;box-shadow:0 0 0 5px #00ff8830,0 0 18px #00ff88;animation:nxSafetyPulse 1.8s infinite}.nx-safety-marker.is-station{background:#48baff;box-shadow:0 0 0 5px #48baff30,0 0 18px #48baff}
+@keyframes nxSafetyPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,.3)}50%{box-shadow:0 0 0 8px rgba(0,255,136,0)}}
+@media(prefers-reduced-motion:reduce){.nx-safety-pulse,.nx-safety-marker{animation:none!important}}
+@media(max-width:600px){.nx-safety-controls>*{flex:1 1 42%}.nx-safety-controls button{min-width:0}.nx-safety-result{grid-template-columns:1fr}}
