@@ -35,7 +35,8 @@
  ["Ağ bağlantısı yok","No network connection"],["Son kayıtlı veri","Last saved data"],["Veri sağlayıcısına bağlanılamadı","Could not connect to the data provider"],
  ["Resmî acil durum yönlendirmesi değildir.","This is not official emergency guidance."],["Planlama alanı","Planning area"],["Hat çiz","Draw a line"],["Alan çiz","Draw an area"],
  ["Koordinatlar","Coordinates"],["Yer adı","Place name"],["Enlem","Latitude"],["Boylam","Longitude"],["Konuma git ve analiz et","Go to location and analyze"],
- ["Yer adı veya koordinat gir","Enter a place name or coordinates"],["Yer bulunamadı","Place not found"],["Hava durumu","Weather"],["NASA FIRMS durumu","NASA FIRMS status"],\n ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
+ ["Yer adı veya koordinat gir","Enter a place name or coordinates"],["Yer bulunamadı","Place not found"],["Hava durumu","Weather"],["NASA FIRMS durumu","NASA FIRMS status"],
+ ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
  ];
  const toEn=new Map(pairs), toTr=new Map(pairs.map(([a,b])=>[b,a]));
  const originals=new WeakMap();
