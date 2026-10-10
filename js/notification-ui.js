@@ -10,6 +10,7 @@ function showNovaBrowserAlert(alert){if(!("Notification"in window)||Notification
 function urlBase64ToUint8Array(base64String){const padding="=".repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(base64);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)))}
 async function registerWebPush(area){
   if(!("serviceWorker"in navigator)||!("PushManager"in window))return{ok:false,reason:"unsupported"};
+  const session=window.NovaAuth?.session();if(!session?.access_token)return{ok:false,reason:"login_required"};
   const permission=await requestNovaBrowserPermission();
   if(permission!=="granted")return{ok:false,reason:"permission"};
   const reg=await navigator.serviceWorker.ready;
@@ -20,7 +21,7 @@ async function registerWebPush(area){
   if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(cfg.publicKey)});
   const settings=getNovaAlertSettings();
   const payload={subscription:sub.toJSON(),lat:Number(area.lat),lon:Number(area.lon),area_name:area.name,threshold:Number(settings.threshold||70)};
-  const r=await fetch(PUSH_API+"/notifications/push/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const r=await fetch(PUSH_API+"/notifications/push/subscribe",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(payload)});
   if(!r.ok)throw new Error("push subscribe failed");
   localStorage.setItem(PUSH_AREA_KEY,JSON.stringify(area));
   return{ok:true};
