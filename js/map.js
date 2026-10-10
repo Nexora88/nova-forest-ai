@@ -1,4 +1,4 @@
-const API_BASE=(window.NOVA_API_BASE||"https://nova-forest-ai-backend.vercel.app").replace(/\/$/,"");
+const API_BASE=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai-backend.vercel.app":"/api")).replace(/\/$/,"");
 const provincePath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
 const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/tur_admin2.geojson":"data/admin/tur_admin2.geojson";
 const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../data/edirne_settlements.geojson":"data/edirne_settlements.geojson";
