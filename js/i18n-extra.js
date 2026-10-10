@@ -22,7 +22,20 @@
  ["Çevresel Harita","Environmental Map"],["Uydu Merkezi","Satellite Hub"],["Geri Bildirim","Feedback"],["Cumhuriyet Vizyonu","Republic Vision"],
  ["Açık veri","Open data"],["Veri kaynağı","Data source"],["Son güncelleme","Last updated"],["Hata oluştu","An error occurred"],["Yeniden dene","Try again"],
  ["Gözlem bulunamadı","No observations found"],["Veri sağlayıcısı kullanılamıyor","Data provider unavailable"],["Tahmini değer","Estimated value"],["Gerçek ölçüm","Observed measurement"],
- ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
+ ["🔥 Risk","🔥 Risk"],["🌲 Orman","🌲 Forest"],["💧 Su / Nem","💧 Water / Moisture"],["🌾 Tarım","🌾 Agriculture"],["🌼 Polen","🌼 Pollen"],
+ ["Alanlarım →","My Areas →"],["Alan Ekle","Add Area"],["İLÇELER","DISTRICTS"],["KÖY / MAHALLELER YÜKLENİYOR…","LOADING VILLAGES / NEIGHBOURHOODS…"],
+ ["CANLI","LIVE"],["YAKINDA","COMING SOON"],["İL SEVİYESİ","PROVINCE LEVEL"],["İLÇE SEÇ","SELECT DISTRICT"],["İlçeyi aç →","Open district →"],
+ ["Bu ilçeyi açmak ve köy/mahalle seviyesine inmek için seç.","Select to open this district and explore villages/neighbourhoods."],
+ ["İlçeler yükleniyor…","Loading districts…"],["Konum aranıyor…","Searching for location…"],["Veri alınamadı","Could not load data"],
+ ["Sıcaklık","Temperature"],["Nem","Humidity"],["Rüzgar","Wind"],["Toprak nemi","Soil moisture"],["Geçmiş","History"],["Kaynak","Source"],
+ ["Düşük / iyi","Low / good"],["Orta","Moderate"],["Yüksek","High"],["Kritik","Critical"],
+ ["Kendi alanını çiz","Draw your own area"],["Çizimi başlat","Start drawing"],["Çizimi kaydet","Save drawing"],["Çizimi iptal et","Cancel drawing"],
+ ["Seçili alan haritada gösteriliyor","Selected area is shown on the map"],["Harita katmanları","Map layers"],["Standart","Standard"],["Uydu","Satellite"],
+ ["Karanlık","Dark"],["Açık","Light"],["Topoğrafya","Topography"],["İnsani harita","Humanitarian map"],
+ ["Ağ bağlantısı yok","No network connection"],["Son kayıtlı veri","Last saved data"],["Veri sağlayıcısına bağlanılamadı","Could not connect to the data provider"],
+ ["Resmî acil durum yönlendirmesi değildir.","This is not official emergency guidance."],["Planlama alanı","Planning area"],["Hat çiz","Draw a line"],["Alan çiz","Draw an area"],
+ ["Koordinatlar","Coordinates"],["Yer adı","Place name"],["Enlem","Latitude"],["Boylam","Longitude"],["Konuma git ve analiz et","Go to location and analyze"],
+ ["Yer adı veya koordinat gir","Enter a place name or coordinates"],["Yer bulunamadı","Place not found"],["Hava durumu","Weather"],["NASA FIRMS durumu","NASA FIRMS status"],\n ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
  ];
  const toEn=new Map(pairs), toTr=new Map(pairs.map(([a,b])=>[b,a]));
  const originals=new WeakMap();
