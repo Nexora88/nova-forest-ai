@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import Any
+from datetime import datetime, timezone
 import requests
 from pywebpush import webpush, WebPushException
 
@@ -59,7 +59,7 @@ def list_subscriptions():
 def update_alert_state(row_id,risk,alerted):
     if not configured(): return
     payload={"last_risk":risk}
-    if alerted: payload["last_alert_at"]="now()"
+    if alerted: payload["last_alert_at"]=datetime.now(timezone.utc).isoformat()
     r=requests.patch(_url(),headers={**_headers(),"Prefer":"return=minimal"},params={"id":f"eq.{row_id}"},json=payload,timeout=12)
     r.raise_for_status()
 
