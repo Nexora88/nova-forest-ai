@@ -1,2 +1,70 @@
-<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020303"><title>NexoraWildfire AI | Saha Hesabı</title><link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../assets/nexora-wildfire-logo.png"><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/auth.css"></head><body><header><a class="brand-lockup" href="../index.html"><img class="brand-logo" src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI"><div class="logo"><h1>NexoraWildfire AI</h1><p>Saha kimliği · tarım · arıcılık · orman</p></div></a><div class="status"><span></span> GÜVENLİ HESAP</div></header><main class="auth-shell"><section class="auth-card"><div class="eyebrow">NEXORA / SAHA HESABI</div><h2>Verini cihazda değil, kendi hesabında taşı.</h2><p>Alanlarım, kullanım rolün ve Nova-Alert tercihlerin hesabına bağlanır. Bu bir sosyal medya profili değil; saha operasyon merkezindir.</p><form id="phone-form" class="auth-form"><input name="phone" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" required><button type="submit">SMS kodu gönder →</button><input name="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="6 haneli SMS kodu" maxlength="6" hidden><button name="verify" type="button" class="auth-secondary" hidden>Kodu doğrula</button><span class="auth-status" data-status></span></form><div class="auth-divider">veya</div><button id="google" class="auth-secondary" style="width:100%">Google ile devam et</button><p style="font-size:9px;color:#657168;margin-top:14px">Telefon OTP için Supabase SMS sağlayıcısı, Google için Supabase Google OAuth sağlayıcısı etkin olmalıdır. Yapılandırılmamışsa ekran bunu açıkça bildirir.</p><div class="ataturk-signature"><strong>Sahadaki verin, senin kontrolünde.</strong><span>NexoraWildfire AI</span></div></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="../js/auth.js?v=20261008a"></script><script>
-(function(){const form=document.getElementById('phone-form'),status=document.querySelector('[data-status]'),otp=form.querySelector('[name=otp]'),verify=form.querySelector('[name=verify]'),google=document.getElementById('google'),next=new URLSearchParams(location.search).get('next')||'account.html';function msg(t){status.textContent=t}function ready(){return !!window.NovaAuth?.client()}document.addEventListener('nova:auth-ready',e=>{if(e.detail.session)location.replace(next)});form.onsubmit=async e=>{e.preventDefault();if(!ready())return msg('Hesap servisi yüklenemedi. Sayfayı yenileyin.');const phone=form.phone.value.replace(/\\s+/g,'');if(!/^\\+90\\d{10}$/.test(phone))return msg('Telefonu +90XXXXXXXXXX biçiminde gir.');msg('SMS kodu gönderiliyor…');const r=await window.NovaAuth.client().auth.signInWithOtp({phone});if(r.error)return msg(r.error.message||'SMS gönderilemedi.');otp.hidden=false;verify.hidden=false;otp.focus();msg('Kod gönderildi. 60 saniye içinde doğrula.');};verify.onclick=async()=>{const phone=form.phone.value.replace(/\\s+/g,'');const token=otp.value.trim();if(token.length!==6)return msg('6 haneli kodu gir.');msg('Doğrulanıyor…');const r=await window.NovaAuth.client().auth.verifyOtp({phone,token,type:'sms'});if(r.error)return msg(r.error.message||'Kod doğrulanamadı.');location.replace(next)};google.onclick=async()=>{if(!ready())return msg('Hesap servisi yüklenemedi.');const r=await window.NovaAuth.client().auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname.replace('auth.html','account.html')+'?next='+encodeURIComponent(next)}});if(r.error)msg(r.error.message||'Google ile giriş başlatılamadı.');};})();</script></body></html>
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020303">
+<title>NexoraWildfire AI | Güvenli Saha Hesabı</title>
+<link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../assets/nexora-wildfire-logo.png">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/auth.css"><link rel="stylesheet" href="../css/special-days.css">
+</head>
+<body>
+<header><a class="brand-lockup" href="../index.html"><img class="brand-logo" src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI"><div class="logo"><h1>NexoraWildfire AI</h1><p>Saha kimliği · tarım · arıcılık · orman</p></div></a><div class="status"><span></span> GÜVENLİ HESAP</div></header>
+<main class="auth-shell">
+<section class="auth-card auth-product-card">
+<div class="eyebrow">NEXORA / SAHA HESABI</div><h2>Verin seninle gelsin.</h2>
+<p>Alanların, saha rolün ve Nova-Alert tercihlerin hesabına bağlanır. Harita ve acil durum bilgileri hesap açmadan da kullanılabilir.</p>
+<div class="auth-method-tabs" role="tablist" aria-label="Giriş yöntemi">
+<button type="button" class="auth-method active" data-method="email">E-posta</button><button type="button" class="auth-method" data-method="google">Google</button><button type="button" class="auth-method" data-method="phone">SMS</button>
+</div>
+<section data-auth-panel="email">
+<div class="auth-mode-switch"><button type="button" data-email-mode="login" class="active">Giriş yap</button><button type="button" data-email-mode="signup">Hesap oluştur</button></div>
+<form id="email-form" class="auth-form">
+<label>E-posta adresi<input name="email" type="email" autocomplete="email" placeholder="ornek@eposta.com" required maxlength="254></label>
+<label>Parola<input name="password" type="password" autocomplete="current-password" placeholder="En az 8 karakter" required minlength="8" maxlength="128"></label>
+<button id="email-submit" type="submit">E-posta ile giriş yap →</button>
+<button id="reset-password" type="button" class="auth-secondary">Parolamı unuttum</button>
+<span class="auth-status" data-email-status role="status" aria-live="polite"></span>
+</form>
+<p class="auth-help">Hesap oluştururken Supabase e-posta doğrulaması açıksa gelen kutundaki bağlantıyı onayla. Parolan yalnızca Supabase Auth tarafından yönetilir.</p>
+</section>
+<section data-auth-panel="google" hidden>
+<div class="auth-provider-card"><div class="auth-provider-icon">G</div><h3>Google hesabınla devam et</h3><p>Tek tıklamayla güvenli giriş. Google sağlayıcısı Supabase panelinde etkin değilse önce OAuth kurulumu gerekir.</p><button type="button" id="google" class="auth-secondary auth-provider-button">Google ile devam et ↗</button><span class="auth-status" data-google-status role="status" aria-live="polite"></span></div>
+</section>
+<section data-auth-panel="phone" hidden>
+<form id="phone-form" class="auth-form">
+<label>Telefon numarası<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx" required></label>
+<button type="submit">SMS kodu gönder →</button>
+<label data-otp-label hidden>SMS doğrulama kodu<input name="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="6 haneli kod" maxlength="6"></label>
+<button name="verify" type="button" class="auth-secondary" hidden>Kodu doğrula</button><span class="auth-status" data-phone-status role="status" aria-live="polite"></span>
+</form>
+<p class="auth-help">SMS girişinin çalışması için Supabase Phone Auth ve bir SMS sağlayıcısı etkin olmalıdır. Sağlayıcı ücretleri olabilir.</p>
+</section>
+<div class="auth-trust-row"><span>● Supabase Auth</span><span>● Oturum güvenliği</span><span>● Acil harita açık</span></div>
+<div class="ataturk-signature"><strong>Sahadaki verin, senin kontrolünde.</strong><span>NexoraWildfire AI</span></div>
+</section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script>
+<script src="../js/auth.js?v=20261010a"></script>
+<script>
+(function(){
+ const auth=()=>window.NovaAuth?.client(), next=new URLSearchParams(location.search).get('next')||'account.html';
+ const safeNext=/^(https?:|\/\/)/i.test(next)?'account.html':next;
+ const emailForm=document.getElementById('email-form'), emailStatus=document.querySelector('[data-email-status]');
+ const phoneForm=document.getElementById('phone-form'), phoneStatus=document.querySelector('[data-phone-status]');
+ let emailMode='login',pendingPhone='';
+ function msg(el,t){el.textContent=t}
+ function authReady(){if(!auth()){msg(emailStatus,'Supabase bağlantısı yüklenemedi. İnternet bağlantısını kontrol edip yenile.');return false}return true}
+ document.querySelectorAll('[data-method]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-method]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('[data-auth-panel]').forEach(x=>x.hidden=x.dataset.authPanel!==b.dataset.method)}));
+ document.querySelectorAll('[data-email-mode]').forEach(b=>b.addEventListener('click',()=>{emailMode=b.dataset.emailMode;document.querySelectorAll('[data-email-mode]').forEach(x=>x.classList.toggle('active',x===b));document.getElementById('email-submit').textContent=emailMode==='signup'?'Ücretsiz hesap oluştur →':'E-posta ile giriş yap →';emailForm.querySelector('[name=password]').autocomplete=emailMode==='signup'?'new-password':'current-password';msg(emailStatus,'')}));
+ emailForm.addEventListener('submit',async e=>{e.preventDefault();if(!authReady())return;const email=emailForm.email.value.trim().toLowerCase(),password=emailForm.password.value;msg(emailStatus,'İşlem yapılıyor…');const c=auth();let r;
+ if(emailMode==='signup')r=await c.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname+'?next='+encodeURIComponent(safeNext)}});
+ else r=await c.auth.signInWithPassword({email,password});
+ if(r.error){msg(emailStatus,r.error.message||'E-posta işlemi tamamlanamadı.');return}
+ if(r.data?.session){location.replace(safeNext);return}
+ msg(emailStatus,emailMode==='signup'?'Hesap isteği alındı. E-posta doğrulama bağlantısını kontrol et.':'Giriş için e-posta doğrulaması gerekiyorsa gelen kutunu kontrol et.');
+ });
+ document.getElementById('reset-password').onclick=async()=>{if(!authReady())return;const email=emailForm.email.value.trim().toLowerCase();if(!email)return msg(emailStatus,'Önce e-posta adresini yaz.');msg(emailStatus,'Parola sıfırlama bağlantısı isteniyor…');const r=await auth().auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});msg(emailStatus,r.error?(r.error.message||'İstek başarısız.'):'E-posta sağlayıcısı etkinse parola sıfırlama bağlantısı gönderildi.');};
+ document.getElementById('google').onclick=async()=>{const s=document.querySelector('[data-google-status]');if(!authReady())return msg(s,'Supabase bağlantısı yüklenemedi.');msg(s,'Google yönlendirmesi başlatılıyor…');const r=await auth().auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname+'?next='+encodeURIComponent(safeNext)}});if(r.error)msg(s,r.error.message||'Google girişi başlatılamadı. Supabase OAuth ayarlarını kontrol et.')};
+ phoneForm.addEventListener('submit',async e=>{e.preventDefault();if(!authReady())return;pendingPhone=phoneForm.phone.value.replace(/\s+/g,'');if(!/^\+\d{8,15}$/.test(pendingPhone))return msg(phoneStatus,'Uluslararası biçimde gir: +905xxxxxxxxx');msg(phoneStatus,'SMS gönderiliyor…');const r=await auth().auth.signInWithOtp({phone:pendingPhone});if(r.error)return msg(phoneStatus,r.error.message||'SMS gönderilemedi.');phoneForm.querySelector('[data-otp-label]').hidden=false;phoneForm.querySelector('[name=verify]').hidden=false;phoneForm.querySelector('[name=otp]').focus();msg(phoneStatus,'Kod gönderildi. SMS kodunu girip doğrula.')});
+ phoneForm.querySelector('[name=verify]').onclick=async()=>{const token=phoneForm.querySelector('[name=otp]').value.trim();if(token.length!==6)return msg(phoneStatus,'6 haneli doğrulama kodunu gir.');msg(phoneStatus,'Doğrulanıyor…');const r=await auth().auth.verifyOtp({phone:pendingPhone,token,type:'sms'});if(r.error)return msg(phoneStatus,r.error.message||'Kod doğrulanamadı.');location.replace(safeNext)};
+ document.addEventListener('nova:auth-ready',e=>{if(e.detail.session)location.replace(safeNext)});
+})();
+</script></body></html>
