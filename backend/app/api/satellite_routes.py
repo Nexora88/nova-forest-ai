@@ -35,3 +35,47 @@ def satellite_status():
             },
         },
     }
+
+@router.get("/live-check")
+def satellite_live_check():
+    """Live source diagnostics; catalog discovery is not presented as processed imagery."""
+    import os
+    from app.services.ndvi_service import search_latest_scene
+    from app.services.firms_service import get_firms_alerts
+
+    # A small Trakya search verifies the public CDSE STAC catalog is reachable.
+    # Full raster/statistical processing remains a queued worker task.
+    try:
+        scene = search_latest_scene(41.6771, 26.5557, days=45, max_cloud=60)
+        catalog = {
+            "status": "scene_found" if scene else "no_matching_scene",
+            "source": "Copernicus Data Space Ecosystem STAC",
+            "latest_scene": scene,
+            "is_processed_imagery": False,
+        }
+    except Exception as exc:
+        catalog = {
+            "status": "error",
+            "source": "Copernicus Data Space Ecosystem STAC",
+            "error_type": type(exc).__name__,
+            "is_processed_imagery": False,
+        }
+
+    firms = get_firms_alerts(days=1)
+    return {
+        "checked_at_utc": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+        "sentinel2_catalog": catalog,
+        "sentinel2_processing": {
+            "status": "credentials_configured" if os.getenv("CDSE_CLIENT_ID") and os.getenv("CDSE_CLIENT_SECRET") else "not_configured",
+            "execution": "queued_worker_required",
+            "note": "Catalog scene discovery alone does not prove NDVI/NDMI processing. Submit POST /jobs/ndvi-timeseries and verify a completed job with non-empty series.",
+        },
+        "nasa_firms": {
+            "status": firms.get("status", "unknown"),
+            "alert_count": firms.get("alert_count"),
+            "days": firms.get("days", 1),
+            "source": firms.get("source", "NASA FIRMS"),
+            "note": "Zero alerts is not proof of zero fire risk; check status and coverage.",
+        },
+    }
+
