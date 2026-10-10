@@ -58,8 +58,6 @@ class MobileUiSmokeTests(unittest.TestCase):
         context = self.browser.new_context(viewport={"width": width, "height": height}, locale="en-US")
         context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
-        # Third-party API/CDN failures must not stop local UI controls from being tested.
-        page.route("https://**/*", lambda route: route.abort())
         return context, page
 
     def test_all_pages_expose_language_and_install_controls(self):
@@ -87,6 +85,8 @@ class MobileUiSmokeTests(unittest.TestCase):
             menu.click()
             self.assertGreater(page.locator("nav.nx-nav > a:visible").count(), 0)
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
+            page.wait_for_selector("#nexora-language-toggle", timeout=10000)
+            page.wait_for_function("document.documentElement.lang === 'en'", timeout=10000)
             self.assertEqual(page.locator("html").get_attribute("lang"), "en")
             page.locator("#nexora-language-toggle").click()
             self.assertEqual(page.locator("html").get_attribute("lang"), "tr")
@@ -101,8 +101,7 @@ class MobileUiSmokeTests(unittest.TestCase):
     def test_global_napa_demo_renders_geojson_and_reports_missing_live_sources_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
-        page.route("https://**/*", lambda route: route.abort())
-        page.route("https://unpkg.com/**", lambda route: route.continue_())
+        page.route("https://api.open-meteo.com/**", lambda route: route.abort())
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector("[data-global-demo]", timeout=20000)
