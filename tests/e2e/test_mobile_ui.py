@@ -97,6 +97,23 @@ class MobileUiSmokeTests(unittest.TestCase):
         finally:
             context.close()
 
+
+    def test_global_napa_demo_renders_geojson_and_reports_missing_live_sources_honestly(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
+        page = context.new_page()
+        page.route("https://**/*", lambda route: route.abort())
+        page.route("https://unpkg.com/**", lambda route: route.continue_())
+        try:
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("[data-global-demo]", timeout=20000)
+            page.locator("[data-global-demo]").click()
+            page.wait_for_function("Boolean(window.nexoraGlobalLayer && window.nexoraGlobalLayer.getBounds)", timeout=10000)
+            self.assertIn("Napa", page.locator("[data-global-demo-status]").inner_text())
+            self.assertIn("GeoJSON: PASS", page.locator("[data-global-demo-status]").inner_text())
+            self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
     def test_desktop_more_menu_is_compact_and_keyboard_accessible(self):
         context, page = self.new_page(width=1440, height=900)
         try:
