@@ -125,6 +125,20 @@
     ["Bu demo yalnızca harita geometrisini, güncel hava durumunu ve sağlayıcı yanıtını kontrol eder; eğitilmiş bir Kaliforniya yangın-risk modeli veya resmî uyarı değildir.","This demo checks map geometry, current weather, and the provider response only; it is not a trained California fire-risk model or an official alert."],
     ["NASA FIRMS:","NASA FIRMS:"],["sıcak nokta gözlemi","hotspot observations"],["nem","humidity"],["rüzgâr","wind"],
     ["Uydu ve eğitilmiş ML durumu doğrulanmadı.","Satellite and trained-ML status remain unverified."],
+    ["YANGIN RİSKİ","WILDFIRE RISK"],["RİSK HARİTASI","RISK MAP"],["VERİ AKIŞI BEKLENİYOR","WAITING FOR DATA STREAM"],
+    ["KÖY / MAHALLE","VILLAGE / NEIGHBOURHOOD"],["SEÇİLİ SAHA","SELECTED AREA"],["ALANIM","MY AREA"],["ALANLARIM","MY AREAS"],
+    ["VERİLER YÜKLENİYOR…","LOADING DATA…"],["RİSK HESAPLANIYOR","CALCULATING RISK"],["ÇEVRİMDIŞI","OFFLINE"],
+    ["KATMANLAR","LAYERS"],["VERİ KATMANI","DATA LAYER"],["UYDU","SATELLITE"],["ORMAN","FOREST"],["TARIM","AGRICULTURE"],
+    ["POLEN","POLLEN"],["SU / TOPRAK","WATER / SOIL"],["KARANLIK","DARK"],["AÇIK","LIGHT"],["TOPOĞRAFYA","TOPOGRAPHY"],
+    ["İNSANİ HARİTA","HUMANITARIAN MAP"],["STANDART","STANDARD"],["CANLI","LIVE"],["SİSTEM ÇALIŞIYOR","SYSTEM OPERATIONAL"],
+    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],["Saha ağı · güvenli özel mesajlar","Field network · private messaging"],
+    ["SİSTEM KAPSAMI","SYSTEM COVERAGE"],["OPERASYON MERKEZİ","OPERATIONS CENTER"],["TARIM / SULAMA","AGRICULTURE / IRRIGATION"],
+    ["Sıcaklık Analizi","Temperature Analysis"],["Nem Seviyesi","Humidity Level"],["Rüzgar Hızı","Wind Speed"],["AI Değerlendirme","AI Assessment"],
+    ["Uydu katmanı","Satellite layer"],["Orman katmanı","Forest layer"],["Tarım katmanı","Agriculture layer"],["Arıcılık katmanı","Beekeeping layer"],["Atmosfer katmanı","Atmosphere layer"],
+    ["Haritada alan ekle","Add an area on the map"],["Alan ekle","Add area"],["Alanı kaydet","Save area"],["Bildirim ayarları","Notification settings"],
+    ["Risk eşiği","Risk threshold"],["Nova-Alert'i etkinleştir","Enable Nova-Alert"],["Kaydet ve tarayıcı izni ver","Save and grant browser permission"],
+    ["İlk alanını oluştur.","Create your first area."],["Henüz geçmiş yok.","No history yet."],["Veri yok","No data"],["Veri bekleniyor…","Waiting for data…"],
+    ["KURUMSAL YETKİLİ ÇALIŞMA ALANI","AUTHORIZED ENTERPRISE WORKSPACE"],["Canlı hava verisi","Live weather data"],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
