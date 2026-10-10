@@ -39,7 +39,7 @@ jobs:
         run: python -m compileall -q app scripts
       - name: Run focused data quality and model tests
         env:
-          PYTHONPATH: ..
+          PYTHONPATH: .:..
         run: |
           pytest -q \
             tests/test_thrace_dataset_pipeline.py \
