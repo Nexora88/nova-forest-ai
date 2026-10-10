@@ -59,6 +59,17 @@ for html in CORE_HTML:
         if parsed.path and not target.is_file():
             errors.append(f"{html}: missing local asset {raw} -> {target.relative_to(ROOT.resolve())}")
 
+# Regression guards for the saved-area bug: local-first save and storage ordering.
+map_source = (ROOT / "js/map.js").read_text(encoding="utf-8")
+areas_source = (ROOT / "js/areas.js").read_text(encoding="utf-8")
+areas_page = (ROOT / "pages/areas.html").read_text(encoding="utf-8")
+if "Local-first: persist the geometry before any network request can fail." not in map_source:
+    errors.append("Saved-area workflow must persist locally before cloud sync.")
+if 'window.addEventListener("nova:areas-updated"' not in areas_source:
+    errors.append("Saved areas page must refresh after an area is added.")
+if areas_page.find('src="../js/nova-storage.js') > areas_page.find('src="../js/areas.js'):
+    errors.append("pages/areas.html must load nova-storage.js before areas.js.")
+
 if errors:
     print("CORE SMOKE TEST FAILED")
     print("\n".join(f"- {error}" for error in errors))
