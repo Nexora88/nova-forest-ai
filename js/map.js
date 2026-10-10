@@ -41,15 +41,10 @@ function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
- let n=0,active=false;
- const blocker=document.createElement("div");blocker.className="mobile-map-gesture";blocker.innerHTML="<b>HARİTAYI HAREKET ETTİRMEK İÇİN İKİ PARMAK</b><span>Sayfayı tek parmakla kaydırabilirsin.</span>";
- document.querySelector(".map-section")?.appendChild(blocker);
- map.getContainer().addEventListener("touchstart",e=>{
-   n=e.touches.length;
-   if(n>=2){active=true;map.dragging.enable();blocker.classList.remove("show")}
-   else if(!active){map.dragging.disable();blocker.classList.add("show");clearTimeout(window.__nmgt);window.__nmgt=setTimeout(()=>blocker.classList.remove("show"),1400)}
- },{passive:true});
- map.getContainer().addEventListener("touchend",e=>{if(e.touches.length<2){active=false;map.dragging.disable()}},{passive:true});
+ // Keep one-finger pan and pinch zoom enabled; the old two-finger gate made the map feel broken.
+ map.dragging.enable();
+ map.touchZoom.enable();
+ map.scrollWheelZoom.disable();
 }
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
@@ -205,7 +200,7 @@ function toggleDraw(){
  else{map.doubleClickZoom.enable();map.off("click",drawClick)}
 }
 function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
-async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}if(!window.NovaAuth?.isLoggedIn()){toggleDraw();window.NovaAuth?.requireAccount("map.html");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:crypto.randomUUID?.()||Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};try{const cloud=await window.NovaAuth.saveArea(area);area.id=String(cloud.id);area.createdAt=cloud.created_at;try{await window.NovaSeeds?.award("area","area:"+String(cloud.id))}catch{}}catch(e){setStatus("Alan buluta kaydedilemedi • "+(e.message||"hesap bağlantısını kontrol et"));toggleDraw();return}const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus("ALAN KAYDEDİLDİ • hesap bulutu + IndexedDB yerel önbellek.");}
+async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}if(!window.NovaAuth?.isLoggedIn()){toggleDraw();window.NovaAuth?.requireAccount("map.html");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:crypto.randomUUID?.()||Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};try{const cloud=await window.NovaAuth.saveArea(area);area.id=String(cloud.id);area.createdAt=cloud.created_at;try{await window.NovaSeeds?.award("area","area:"+String(cloud.id))}catch{}}catch(e){area.syncStatus="pending";area.syncError=e.message||"network_error";setStatus(e instanceof TypeError&&/fetch/i.test(e.message)?"Sunucuya ulaşılamadı (Failed to fetch). Çizimin kaybolmaması için bu cihazda yerel olarak saklanıyor; bulut eşitlemesi beklemede.":"Bulut eşitlemesi yapılamadı. Çizimin kaybolmaması için bu cihazda yerel olarak saklanıyor.");}const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus(area.syncStatus==="pending"?"ALAN CİHAZA KAYDEDİLDİ • Bulut eşitlemesi beklemede.":"ALAN KAYDEDİLDİ • hesap bulutu + IndexedDB yerel önbellek.");}
 function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.forEach(a=>{L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+a.name+" · "+a.type,{className:"saved-field-label"}).addTo(fieldLayer)})}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
