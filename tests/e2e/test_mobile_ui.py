@@ -58,7 +58,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         context = self.browser.new_context(viewport={"width": width, "height": height}, locale="en-US")
         context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         return context, page
 
@@ -108,7 +108,7 @@ class MobileUiSmokeTests(unittest.TestCase):
     def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
         page.route("https://unpkg.com/**", lambda route: route.continue_())
         page.route("https://api.open-meteo.com/**", lambda route: route.abort())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
@@ -182,7 +182,7 @@ class MobileUiSmokeTests(unittest.TestCase):
 
                 def route_request(route):
                     url = route.request.url
-                    if url.startswith(BASE):
+                    if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
