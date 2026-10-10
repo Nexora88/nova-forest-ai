@@ -1,0 +1,47 @@
+name: Thrace research data pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "docs/THRACE_DATASET_PIPELINE.md"
+      - ".github/workflows/thrace-research-tests.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - "docs/THRACE_DATASET_PIPELINE.md"
+      - ".github/workflows/thrace-research-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-data-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Compile backend and research scripts
+        run: python -m compileall -q app scripts
+      - name: Run focused data quality and model tests
+        run: |
+          pytest -q \
+            tests/test_thrace_dataset_pipeline.py \
+            tests/test_ml_fire_model.py \
+            tests/test_weather_and_risk_data_quality.py \
+            tests/test_forecast_data_quality.py \
+            tests/test_firms_service.py
