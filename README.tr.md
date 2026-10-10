@@ -6,6 +6,14 @@ NexoraWildfire AI; orman yangını farkındalığı, tarım, su ve toprak, arıc
 
 [English README](README.md) · [AI destekli geliştirme beyanı](AI_ASSISTED_DEVELOPMENT.md) · [Küresel ölçeklenebilirlik](docs/GLOBAL_SCALABILITY.md) · [Katkı rehberi](.github/CONTRIBUTING.md)
 
+## Vizyon ve misyon
+
+**Vizyon:** Güvenilir çevresel istihbaratı topluluklar, çiftçiler, arıcılar, araştırmacılar ve çevre ekipleri için erişilebilir kılmak; Trakya'dan başlayıp yalnızca veri kapsamı ve doğrulama yeterli olduğunda genişlemek.
+
+**Misyon:** Gerçek gözlemleri ve açıkça etiketlenmiş göstergeleri kullanışlı, erişilebilir bir çalışma alanında birleştirmek; kayıtlı alan verilerini korumak; belirsizliği ve veri sağlayıcı hatalarını açıkça göstermek; deneysel çıktıları resmî uyarı gibi sunmamak.
+
+**Ürün ilkeleri:** Görünüşten önce kanıt, varsayılan gizlilik, şeffaf sınırlamalar, mobil erişilebilirlik ve sahada gerçek bir işi kolaylaştıran özellikler.
+
 ## Mevcut yetenekler
 
 - PWA desteği ve çevrimdışı öncelikli uygulama kabuğu.
