@@ -52,6 +52,16 @@ class RasterJob(BaseModel):
     user_id: str
 
 
+
+
+class EnterpriseReportJob(BaseModel):
+    user_id: str
+    company_name: str = Field(min_length=2, max_length=120)
+    asset_name: str = Field(min_length=2, max_length=120)
+    asset_type: str
+    asset_geojson: Dict[str, Any]
+    buffer_m: int = Field(default=500, ge=100, le=5000)
+
 @app.get("/health")
 def health():
     return {"status": "healthy", "service": "nexora-satellite-worker-api"}
@@ -101,6 +111,31 @@ def submit_raster_job(
     )
     return {"job_id": job.id, "status": "queued", "kind": "risk-raster"}
 
+
+
+
+@app.post("/internal/jobs/enterprise-report", status_code=202)
+def submit_enterprise_report(
+    request: EnterpriseReportJob,
+    worker_token: str | None = Header(default=None, alias="X-Nexora-Worker-Token"),
+    header_user_id: str | None = Header(default=None, alias="X-Nexora-User-Id"),
+):
+    user_id = _authorize(worker_token, header_user_id)
+    if user_id != request.user_id:
+        raise HTTPException(status_code=403, detail="User identity mismatch.")
+    if request.asset_type not in {"transmission_line", "substation", "wind_turbine", "other"}:
+        raise HTTPException(status_code=422, detail="Unsupported asset type.")
+    if len(str(request.asset_geojson)) > 1_000_000:
+        raise HTTPException(status_code=413, detail="GeoJSON exceeds 1 MB.")
+    from app.enterprise_report_tasks import run_enterprise_report
+    payload = request.dict()
+    job = _queue().enqueue(
+        run_enterprise_report, payload,
+        job_timeout=1200, result_ttl=3600, failure_ttl=86400,
+        retry=Retry(max=1, interval=[60]),
+        meta={"user_id": user_id, "kind": "enterprise-report"},
+    )
+    return {"job_id": job.id, "status": "queued", "kind": "enterprise-report"}
 
 @app.get("/internal/jobs/{job_id}")
 def get_job(
