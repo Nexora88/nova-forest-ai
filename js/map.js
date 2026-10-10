@@ -200,7 +200,43 @@ function toggleDraw(){
  else{map.doubleClickZoom.enable();map.off("click",drawClick)}
 }
 function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
-async function finishDraw(){if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}if(!window.NovaAuth?.isLoggedIn()){toggleDraw();window.NovaAuth?.requireAccount("map.html");return}map.off("click",drawClick);map.doubleClickZoom.enable();const name=prompt("Alan adı","Yeni Tarla");if(!name){toggleDraw();return}const type=prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel";const area={id:crypto.randomUUID?.()||Date.now().toString(),name,type:type.toLowerCase(),province:selectedProvince||"Trakya / İstanbul",district:"",coordinates:drawingPoints,createdAt:new Date().toISOString()};try{const cloud=await window.NovaAuth.saveArea(area);area.id=String(cloud.id);area.createdAt=cloud.created_at;try{await window.NovaSeeds?.award("area","area:"+String(cloud.id))}catch{}}catch(e){area.syncStatus="pending";area.syncError=e.message||"network_error";setStatus(e instanceof TypeError&&/fetch/i.test(e.message)?"Sunucuya ulaşılamadı (Failed to fetch). Çizimin kaybolmaması için bu cihazda yerel olarak saklanıyor; bulut eşitlemesi beklemede.":"Bulut eşitlemesi yapılamadı. Çizimin kaybolmaması için bu cihazda yerel olarak saklanıyor.");}const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");areas.push(area);localStorage.setItem(areaKey,JSON.stringify(areas));try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Date.now()})}catch{}toggleDraw();renderSavedAreas();setStatus(area.syncStatus==="pending"?"ALAN CİHAZA KAYDEDİLDİ • Bulut eşitlemesi beklemede.":"ALAN KAYDEDİLDİ • hesap bulutu + IndexedDB yerel önbellek.");}
+async function finishDraw(){
+ if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}
+ map.off("click",drawClick);map.doubleClickZoom.enable();
+ const name=prompt("Alan adı","Yeni Tarla");
+ if(!name){toggleDraw();return}
+ const type=(prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel").trim().toLowerCase();
+ const originalId=String(crypto.randomUUID?.()||Date.now().toString());
+ const now=Date.now();
+ const area={id:originalId,name:name.trim(),type:type||"genel",province:selectedProvince||"Trakya / İstanbul",district:selectedDistrict||"",coordinates:drawingPoints.map(p=>[Number(p[0]),Number(p[1])]),createdAt:new Date(now).toISOString(),updatedAt:now,syncStatus:"local"};
+ // Local-first: persist the geometry before any network request can fail.
+ let areas=[];try{areas=JSON.parse(localStorage.getItem(areaKey)||"[]")}catch{}
+ areas=areas.filter(x=>String(x.id)!==originalId);areas.push(area);
+ localStorage.setItem(areaKey,JSON.stringify(areas));
+ try{await window.NovaStore?.put("areas",{...area,id:String(area.id),updatedAt:now})}catch(e){console.warn("Local IndexedDB save",e)}
+ let cloudSynced=false;
+ if(window.NovaAuth?.isLoggedIn()){
+   area.syncStatus="pending";
+   try{
+     const cloud=await window.NovaAuth.saveArea(area);
+     const cloudId=String(cloud.id);
+     area.cloudId=cloudId;area.id=cloudId;area.createdAt=cloud.created_at||area.createdAt;area.updatedAt=Date.now();area.syncStatus="synced";delete area.syncError;
+     if(cloudId!==originalId){try{await window.NovaStore?.remove("areas",originalId)}catch{}}
+     cloudSynced=true;
+     try{await window.NovaSeeds?.award("area","area:"+cloudId)}catch{}
+   }catch(e){
+     area.syncStatus="pending";area.syncError=e?.message||"network_error";
+     console.warn("Cloud area sync pending",e);
+   }
+   let current=[];try{current=JSON.parse(localStorage.getItem(areaKey)||"[]")}catch{}
+   current=current.filter(x=>String(x.id)!==originalId&&String(x.id)!==String(area.id));current.push(area);
+   localStorage.setItem(areaKey,JSON.stringify(current));
+   try{await window.NovaStore?.put("areas",{...area,id:String(area.id),updatedAt:area.updatedAt||Date.now()})}catch(e){console.warn("IndexedDB area sync",e)}
+ }
+ toggleDraw();renderSavedAreas();
+ window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{id:String(area.id)}}));
+ setStatus(cloudSynced?"ALAN KAYDEDİLDİ • cihaz + hesap bulutu eşitlendi.":area.syncStatus==="pending"?"ALAN CİHAZA KAYDEDİLDİ • bulut eşitlemesi beklemede.":"ALAN CİHAZA KAYDEDİLDİ • giriş yaptığında eşitleyebilirsin.");
+}
 function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");const polygons=new Map();areas.forEach(a=>{const polygon=L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+a.name+" · "+a.type,{className:"saved-field-label"}).addTo(fieldLayer);polygons.set(String(a.id),polygon)});const focusId=new URLSearchParams(location.search).get("area");if(focusId&&polygons.has(String(focusId))){const target=polygons.get(String(focusId));map.fitBounds(target.getBounds(),{padding:[30,30],maxZoom:15});target.openTooltip();setStatus("SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR");}}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
