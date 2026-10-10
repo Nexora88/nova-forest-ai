@@ -131,3 +131,31 @@ Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki so
 - Canlı veri ile simülasyon açıkça ayrılır.
 - PWA servis worker önbelleği sürümlenir; kritik yeni görseller shell'e dahil edilir.
 - Tek resmi NexoraWildfire logosu kullanılır; dinamik marka enjeksiyonu mevcut brand-lockup varsa ikinci logo üretmez.
+
+
+## Ürünleşme notları · 10 Ekim 2026
+
+### Hesap ve kimlik
+- Supabase Auth üzerinden e-posta/parola ile giriş, hesap oluşturma ve parola sıfırlama akışı arayüzü.
+- Google OAuth ve telefon OTP ekranları mevcut; Google OAuth istemci bilgileri / yönlendirme URL'leri ile SMS sağlayıcısı Supabase Auth panelinde yapılandırılmalıdır.
+- Acil durum haritası ve çevresel veri görüntüleme giriş yapmayı zorunlu tutmaz. Buluta alan kaydetme ve özel mesajlar hesap gerektirir.
+
+### Özel mesajlar
+- `pages/messages.html` saha kullanıcı adıyla kişi bulma, konuşma açma, mesaj gönderme ve gelen kutusu ekranını içerir.
+- `supabase/migrations/20261010000000_private_messages.sql` konuşma, katılımcı, dizin ve mesaj tablolarını RLS ile kurar.
+- Mesajlar yalnızca katılımcılara açılır; e-posta/telefon dizinde gösterilmez. Realtime kullanılamazsa arayüz periyodik yenilemeyle çalışır.
+- Mesajlar uçtan uca şifrelenmiş değildir; hassas kişisel veri veya acil durum bilgileri paylaşılmamalıdır.
+
+### Ücretsiz / anahtarsız harita katmanları
+- **Altlık haritalar:** OpenStreetMap, CARTO Dark, CARTO Light, OpenTopoMap, HOT Humanitarian ve Esri World Imagery.
+- **NASA GIBS:** MODIS gerçek renkli uydu görüntüsü (güncel olmayabilir; sahne tarihi harita katmanında seçilir).
+- **Open-Meteo:** Trakya ve yakın çevre için sıcaklık, nem, rüzgar ve yağış göstergeleri.
+- **Open-Meteo Air Quality / CAMS:** PM2.5, PM10, ozon, UV ve mevcut saatlik polen tahmini.
+- **Open-Meteo Marine:** seçili kıyı noktalarında dalga yüksekliği/periyodu.
+- **Open-Meteo Elevation:** örnek noktaların arazi yükseltisi.
+- **USGS Earthquake Hazards Program:** küresel son 7 günlük deprem gözlemleri.
+- Bu servislerin ücretsiz kullanımı hizmet şartları, atıf ve hız sınırlarına tabidir. Katmanlar kaynak erişilemediğinde boş kalabilir; resmi afet alarmı yerine geçmez. NASA GIBS katmanı Sentinel-2/NDVI ürünü değildir.
+
+### Tohum puanı güvenliği
+- `supabase/migrations/20261010010000_secure_seed_awards.sql` günlük ve özel gün ödüllerini Türkiye tarihine göre doğrular, alan puanını yalnızca kullanıcının kendi bulut alanına bağlar ve doğrulanmış rapor akışı kurulana kadar rapor ödülünü kapalı tutar.
+- Supabase Auth sağlayıcıları, e-posta teslimatı, OAuth ve SMS gerçek kullanıcılarla test edilmeden “uçtan uca üretim doğrulaması tamamlandı” kabul edilmemelidir.
