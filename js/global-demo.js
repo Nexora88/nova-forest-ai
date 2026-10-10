@@ -66,7 +66,7 @@
         status.textContent = "Location selected. Fetching current Open-Meteo weather and NASA FIRMS response…";
         const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast");
         weatherUrl.search = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:"temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",timezone:"auto"}).toString();
-        const firmsUrl = new URL(API_BASE + "/satellite/firms");
+        const firmsUrl = new URL(API_BASE + "/satellite/firms", location.origin);
         Object.entries({west,south,east,north,days:1}).forEach(([k,v])=>firmsUrl.searchParams.set(k,String(v)));
         const [weatherResult,firmsResult] = await Promise.allSettled([
           fetch(weatherUrl).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}),
