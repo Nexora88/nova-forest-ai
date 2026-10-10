@@ -123,8 +123,8 @@
     ["FIRMS_MAP_KEY anahtarını backend ortam değişkenlerinde tanımlayarak gerçek sıcak nokta sorgularını etkinleştir.","set FIRMS_MAP_KEY in the backend environment to enable real hotspot queries."],
     ["Son bir gün için","for the last day"],["Sıfır gözlem, yangın riskinin sıfır olduğunu kanıtlamaz.","Zero observations do not prove zero fire risk."],
     ["Bu demo yalnızca harita geometrisini, güncel hava durumunu ve sağlayıcı yanıtını kontrol eder; eğitilmiş bir Kaliforniya yangın-risk modeli veya resmî uyarı değildir.","This demo checks map geometry, current weather, and the provider response only; it is not a trained California fire-risk model or an official alert."],
-    ["NASA FIRMS:","NASA FIRMS:"],["hotspot observations","sıcak nokta gözlemi"],["humidity","nem"],["wind","rüzgâr"],
-    ["Satellite and trained-ML status remain unverified.","Uydu ve eğitilmiş ML durumu doğrulanmadı."],
+    ["NASA FIRMS:","NASA FIRMS:"],["sıcak nokta gözlemi","hotspot observations"],["nem","humidity"],["rüzgâr","wind"],
+    ["Uydu ve eğitilmiş ML durumu doğrulanmadı.","Satellite and trained-ML status remain unverified."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
