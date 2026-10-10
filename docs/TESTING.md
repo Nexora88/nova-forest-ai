@@ -5,8 +5,9 @@
 The GitHub Actions workflow at .github/workflows/validate.yml runs:
 
 1. Python bytecode compilation for backend application and training scripts.
-2. Tests proving the optional Random Forest API fails closed when the model artifact is missing or invalid.
+2. Tests proving the separate nine-feature Random Forest API fails closed when its model artifact is missing or invalid, and that the UCI research model fails closed when its artifact is missing.
 3. Node.js syntax checks for JavaScript files in the js directory.
+4. Chromium smoke tests for all ten pages, English navigation labels, language switching, mobile/desktop navigation, the install lifecycle, and the Napa GeoJSON demo.
 
 These checks validate syntax and selected safety properties; they do not prove live provider availability, map rendering on every device, or model accuracy.
 
@@ -20,7 +21,7 @@ These checks validate syntax and selected safety properties; they do not prove l
 - Test the saved-area “View on map” action and each area's alert preference.
 - Test offline behavior after loading the app once, and confirm unavailable data is not replaced with invented values.
 - Verify push notifications with real credentials and a test account; do not infer delivery from permission alone.
-- Check /ml/status. A not_trained status is expected until a documented real labelled dataset has been used to train and evaluate the model.
+- Check `/ml/research-status` and confirm the versioned UCI research artifact reports `ready`; treat `/ml/status` separately because the nine-feature operational model intentionally remains fail-closed until a matching labelled dataset exists.
 - Run the application on a narrow mobile viewport and with keyboard-only navigation.
 
 ## Production release gate
