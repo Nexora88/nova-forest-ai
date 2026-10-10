@@ -68,7 +68,7 @@ def specialized(
         "coordinates": {"latitude": lat, "longitude": lon},
         "weather": weather,
         "apiary": apiary_risk(**common, pollen=pollen),
-        "forest": forest_risk(**common, ndvi=ndvi, ndmi=ndmi, fire_hotspots=fire_hotspots or 0),
+        "forest": forest_risk(**common, ndvi=ndvi, ndmi=ndmi, fire_hotspots=fire_hotspots),
         "input_quality": {
             "weather": weather["status"],
             "pollen_provided": pollen is not None,
