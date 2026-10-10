@@ -8,14 +8,16 @@ async function loadAreas(){
   let local=[];
   try{local=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
   const merged=new Map(indexed.map(a=>[String(a.id),a]));
+  // localStorage is written first by the map save flow; it must win on id collisions
+  // so an older IndexedDB copy cannot hide a newly drawn or edited polygon.
   for(const area of local){
-    const id=String(area.id);
-    const previous=merged.get(id);
-    if(!previous||area.syncStatus==="pending"||(Number(area.updatedAt)||0)>(Number(previous.updatedAt)||0))merged.set(id,{...area,id});
+    if(!area||area.id==null)continue;
+    const id=String(area.id),previous=merged.get(id);
+    merged.set(id,{...(previous||{}),...area,id,updatedAt:Number(area.updatedAt)||Date.parse(area.createdAt)||Number(previous?.updatedAt)||Date.now()});
   }
-  areaCache=Array.from(merged.values());
+  areaCache=Array.from(merged.values()).filter(a=>a&&a.id!=null);
   localStorage.setItem(KEY,JSON.stringify(areaCache));
-  for(const area of areaCache){try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:area.updatedAt||Date.now()})}catch{}}
+  for(const area of areaCache){try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()})}catch{}}
   return areaCache;
 }
 async function removeArea(id){if(window.NovaAuth?.isLoggedIn()){try{await window.NovaAuth.deleteArea(String(id))}catch(e){console.warn("Cloud area delete",e)}}areaCache=areaCache.filter(a=>String(a.id)!==String(id));localStorage.setItem(KEY,JSON.stringify(areaCache));try{await window.NovaStore.remove("areas",String(id))}catch{}}
@@ -116,4 +118,10 @@ async function checkNativeAlerts(){
     }catch{}
   }
 }
-render();document.addEventListener("nova:auth-ready",()=>render());document.addEventListener("nova:areas-synced",()=>render());checkNativeAlerts();setInterval(()=>{render();checkNativeAlerts()},300000);
+render();
+document.addEventListener("nova:auth-ready",()=>render());
+document.addEventListener("nova:areas-synced",()=>render());
+window.addEventListener("nova:areas-updated",()=>render());
+window.addEventListener("storage",event=>{if(event.key===KEY)render()});
+window.addEventListener("nova:idb-ready",()=>render());
+checkNativeAlerts();setInterval(()=>{render();checkNativeAlerts()},300000);
