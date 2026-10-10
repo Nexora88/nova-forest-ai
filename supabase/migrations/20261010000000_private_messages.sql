@@ -93,7 +93,6 @@ begin
   join public.nexora_dm_participants p2 on p2.conversation_id=p1.conversation_id
   where p1.user_id=sender and p2.user_id=recipient
   group by p1.conversation_id
-  having count(*)=2
   limit 1;
   if existing_id is not null then return existing_id; end if;
 
