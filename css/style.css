@@ -875,3 +875,13 @@ main{padding-bottom:76px}
 /* Keep floating controls reachable above the full-screen mobile drawer. */
 #nexora-language-toggle{z-index:100001!important}
 #nexora-install{z-index:100002!important}
+
+
+/* Map planning motion: safe-area drafts breathe softly; routes show direction without implying official guidance. */
+.nx-safe-zone-outline{animation:nxZonePulse 3.2s ease-in-out infinite;filter:drop-shadow(0 0 5px rgba(0,255,136,.22))}
+.nx-animated-route{stroke-dasharray:10 8;animation:nxRouteFlow 1.35s linear infinite;filter:drop-shadow(0 0 4px rgba(72,186,255,.38))}
+@keyframes nxRouteFlow{to{stroke-dashoffset:-36}}
+@keyframes nxZonePulse{0%,100%{stroke-opacity:.72;fill-opacity:.08}50%{stroke-opacity:1;fill-opacity:.19}}
+.nx-planning-tools{animation:nxPanelEnter .32s ease-out both}
+@keyframes nxPanelEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.nx-safe-zone-outline,.nx-animated-route,.nx-planning-tools{animation:none!important;filter:none!important}}
