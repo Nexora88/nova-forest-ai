@@ -740,3 +740,33 @@ html,body{max-width:100%;overflow-x:hidden}button,a{touch-action:manipulation}.l
 
 /* Shared Atatürk history, quote carousel and responsive archive gallery */
 .ataturk-photo-gallery{margin:28px 0;padding:24px;border:1px solid #1c4b2c;border-radius:18px;background:linear-gradient(140deg,rgba(0,255,102,.055),rgba(0,0,0,.82))}.ataturk-photo-gallery .section-heading{margin-bottom:18px}.ataturk-photo-gallery h2{color:#e7ffed;margin:8px 0}.ataturk-photo-gallery .section-heading p{color:#9eafa2;line-height:1.6}.ataturk-photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.ataturk-photo-card{min-width:0;overflow:hidden;border:1px solid #1d4028;border-radius:13px;background:#060b07}.ataturk-photo-card>a{display:block;height:210px;background:linear-gradient(135deg,#101d14,#050705);overflow:hidden}.ataturk-photo-card img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .25s ease}.ataturk-photo-card a:hover img{transform:scale(1.025)}.ataturk-photo-caption{display:flex;flex-direction:column;gap:8px;padding:13px}.ataturk-photo-caption strong{color:#e8f7eb;font-size:14px}.ataturk-photo-caption span{font-size:12px;color:#00e65c}.ataturk-photo-credit{margin:14px 0 0;color:#8e9a91;font-size:12px;line-height:1.7}.ataturk-photo-credit a{color:#00e65c}.ataturk-photo-card.photo-unavailable>a:after{content:"Fotoğraf kaynağına erişilemedi · arşiv bağlantısını aç";display:block;padding:18px;color:#9cae9f;font-size:12px}.ataturk-quote-controls button{min-height:40px;padding:8px 13px;border:1px solid #245b36;border-radius:8px;background:#07130b;color:#e6ffeb;cursor:pointer}.ataturk-quote-controls button:hover{border-color:#00ff66}@media(max-width:760px){.ataturk-photo-gallery{padding:16px}.ataturk-photo-grid{grid-template-columns:1fr;gap:12px}.ataturk-photo-card>a{height:230px}.ataturk-quote-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.ataturk-quote-controls button{flex:1}}
+
+
+/* Compact shared navigation and install controls */
+.nx-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nx-nav-toggle{display:none;min-height:44px;padding:10px 14px;border:1px solid #245b36;border-radius:10px;background:#07130b;color:#eaffef;font:700 13px system-ui;cursor:pointer}
+.nx-nav-toggle-label{margin-left:8px}
+.nx-nav-more{position:relative;display:inline-flex}
+.nx-nav-more-toggle{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:9px 14px;border:1px solid #245b36;border-radius:9px;background:#07130b;color:#dfffe7;font:inherit;cursor:pointer}
+.nx-nav-more-links{display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:10000;min-width:210px;padding:8px;border:1px solid #245b36;border-radius:12px;background:#050a06;box-shadow:0 16px 40px #000a}
+.nx-nav-more-open .nx-nav-more-links{display:grid;gap:4px}
+.nx-nav-more-links a{display:block;min-height:42px;padding:12px;border-radius:8px;text-decoration:none}
+.nx-nav-more-links a:hover,.nx-nav-more-links a:focus-visible{background:#102619;color:#00ff66}
+.nexora-language-toggle{left:14px!important;right:auto!important;bottom:14px!important}
+#nexora-install{right:14px;bottom:14px;z-index:99998;display:flex;align-items:center;gap:9px;min-height:48px;padding:10px 14px;border:1px solid #00ff66;border-radius:999px;background:#06110a;color:#eaffef;font:700 12px system-ui;box-shadow:0 8px 26px #0009;cursor:pointer}
+#nexora-install[hidden]{display:none!important}
+#nexora-install img{width:24px;height:24px;border-radius:7px;object-fit:cover}
+@media(max-width:760px){
+  nav.nx-nav{display:grid;grid-template-columns:1fr;align-items:stretch;gap:6px;padding:10px 12px;overflow:visible}
+  .nx-nav-toggle{display:flex;align-items:center;justify-content:flex-start;width:100%;min-height:48px}
+  nav.nx-nav:not(.nx-nav-open)>a,nav.nx-nav:not(.nx-nav-open)>.nx-nav-more{display:none}
+  nav.nx-nav.nx-nav-open>a{display:flex;align-items:center;min-height:46px;width:100%;padding:12px 14px}
+  nav.nx-nav.nx-nav-open>.nx-nav-more{display:block}
+  nav.nx-nav .nx-nav-more-toggle{display:none}
+  nav.nx-nav .nx-nav-more-links{position:static;display:none;min-width:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+  nav.nx-nav.nx-nav-open .nx-nav-more-links{display:grid;gap:5px}
+  nav.nx-nav .nx-nav-more-links a{min-height:46px;padding:12px 14px;border:1px solid #183b24;border-radius:9px;background:#050a06}
+  #nexora-install{right:12px;bottom:12px;min-height:46px;padding:9px 12px}
+  .nexora-language-toggle{left:12px!important;bottom:12px!important;min-height:46px}
+  body{padding-bottom:66px}
+}
