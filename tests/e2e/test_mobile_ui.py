@@ -1,6 +1,7 @@
 """Real Chromium smoke checks for the responsive bilingual UI and install lifecycle."""
 from __future__ import annotations
 
+import json
 import os
 import socket
 import subprocess
@@ -134,6 +135,52 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertGreater(page.locator("nav .nx-nav-more-links a").count(), 0)
         finally:
             context.close()
+
+
+
+    def test_saved_area_persistence_reload_delete_mobile_and_desktop(self):
+        # Responsive browser E2E for persisted areas. The initial area is a fixture;
+        # physical-device certification remains a separate manual check.
+        for width, height in ((390, 844), (1440, 900)):
+            with self.subTest(width=width):
+                context = self.browser.new_context(viewport={"width": width, "height": height}, locale="tr-TR")
+                context.add_init_script("""
+                    if (!sessionStorage.getItem('qa-area-fixture-seeded')) {
+                      localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+                        id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
+                        district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                        createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                      }]));
+                      sessionStorage.setItem('qa-area-fixture-seeded','1');
+                    }
+                """)
+                page = context.new_page()
+
+                def route_request(route):
+                    url = route.request.url
+                    if url.startswith(BASE):
+                        route.continue_()
+                    elif "api.open-meteo.com/v1/forecast" in url:
+                        route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
+                    elif "air-quality-api.open-meteo.com" in url:
+                        route.fulfill(json={"current":{"alder_pollen":0,"birch_pollen":0,"grass_pollen":0,"mugwort_pollen":0,"olive_pollen":0,"ragweed_pollen":0}})
+                    else:
+                        route.abort()
+
+                page.route("**/*", route_request)
+                try:
+                    page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector(".area-card h3", timeout=20000)
+                    self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    page.reload(wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector(".area-card h3", timeout=20000)
+                    self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    page.locator("[data-delete]").click()
+                    page.wait_for_function("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]').every(a=>a.name!=='QA Saved Area')", timeout=10000)
+                    page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
+                    self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                finally:
+                    context.close()
 
 
 if __name__ == "__main__":
