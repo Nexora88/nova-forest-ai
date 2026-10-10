@@ -36,7 +36,7 @@
  ["Resmî acil durum yönlendirmesi değildir.","This is not official emergency guidance."],["Planlama alanı","Planning area"],["Hat çiz","Draw a line"],["Alan çiz","Draw an area"],
  ["Koordinatlar","Coordinates"],["Yer adı","Place name"],["Enlem","Latitude"],["Boylam","Longitude"],["Konuma git ve analiz et","Go to location and analyze"],
  ["Yer adı veya koordinat gir","Enter a place name or coordinates"],["Yer bulunamadı","Place not found"],["Hava durumu","Weather"],["NASA FIRMS durumu","NASA FIRMS status"],
- ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
+ ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"],
  ["SUPABASE · ZAMAN SERİSİ","SUPABASE · TIME SERIES"],
  ["Günlük çevre geçmişi","Daily environmental history"],
  ["Alanların kaydedilmiş çevresel göstergeleri. Grafik yalnızca veritabanındaki gerçek kayıtları gösterir.","Saved environmental indicators for your areas. The chart only shows real records from the database."],
