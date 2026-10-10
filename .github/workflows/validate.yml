@@ -80,7 +80,7 @@ jobs:
           import json
           import requests
 
-          base = "https://nova-forest-ai-backend.vercel.app"
+          base = "https://nova-forest-ai.vercel.app/api"
 
           try:
               health = requests.get(base + "/health", timeout=20)
