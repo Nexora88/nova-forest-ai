@@ -1,7 +1,6 @@
-from typing import Dict
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from app.engine.ml_fire_model import FEATURES, model_status, predict
+from app.engine.ml_fire_model import model_status, predict
 
 router = APIRouter(prefix="/ml", tags=["Predictive ML"])
 
@@ -26,8 +25,10 @@ def predictive_model_status():
 @router.post("/predict")
 def predictive_fire_risk(features: FireFeatures):
     try:
-        return predict(features.model_dump())
+        return predict(features.dict())
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail={"status": "model_not_ready", "message": str(exc)})
-    except (ValueError, OSError, ImportError) as exc:
+    except ImportError as exc:
+        raise HTTPException(status_code=503, detail="ML runtime bağımlılıkları ayrı model servisine kurulmalıdır.")
+    except (ValueError, OSError) as exc:
         raise HTTPException(status_code=422, detail=str(exc))
