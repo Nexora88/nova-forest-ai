@@ -5,17 +5,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="description" content="Environmental intelligence for forests, farms, and the people who care for them. Explore available wildfire, agriculture, soil, pollen, and satellite-data signals in one map-first workspace.">
+<meta name="description" content="NexoraWildfire AI brings traceable environmental data, forest-risk awareness, field intelligence and satellite discovery into one compact decision workspace.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#020303">
 <title>NexoraWildfire AI | Environmental Intelligence</title>
-<link rel="stylesheet" href="css/style.css?v=20261010a"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
+<link rel="stylesheet" href="css/style.css?v=20261010b"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 <link rel="stylesheet" href="css/product-ui.css?v=20261007e"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="favicon.png"><link rel="stylesheet" href="css/province-feedback.css?v=20261007a"><link rel="stylesheet" href="css/special-days.css?v=20261008a"><link rel="stylesheet" href="css/auth.css?v=20261008a"></head>
 <body>
 <header>
   <a class="brand-lockup" href="index.html" aria-label="NexoraWildfire AI ana sayfa"><img class="brand-logo" src="assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu"><div class="logo"><h1>NexoraWildfire AI</h1><p>Trakya çevresel istihbarat • tarım • orman • ekosistem</p></div></a>
-  <div class="status"><span></span> SİSTEM ÇALIŞIYOR</div>
+  <div class="status" title="Durum, kaynak bağlantılarına göre değişebilir"><span></span> TRakya · PİLOT</div>
 </header>
 <nav><a class="active" href="index.html">Ana Panel</a><a href="pages/map.html">Risk Haritası</a><a href="pages/areas.html">Alanlarım</a><a href="pages/weather.html">Atmosfer</a><a href="pages/satellite.html">Uydu Merkezi</a><a href="pages/about.html">Sistem</a><a href="pages/feedback.html">Feedback</a></nav>
 
@@ -30,7 +30,19 @@
       <a href="pages/satellite.html" class="secondary-action">Uydu merkezine git</a>
     </div>
   </div>
-  <div class="hero-terminal"><span>SİSTEM KAPSAMI</span><strong>TÜRKİYE</strong><small>81 il / 973 ilçe + alan katmanı<br>offline vector sınırlar + uydu katmanı<br>5 dk canlı gözlem döngüsü</small></div>
+  <div class="hero-terminal"><span>AKTİF PİLOT ALANI</span><strong>TRAKYA</strong><small>Edirne · Kırklareli · Tekirdağ<br>Kaynak erişimi ve veri kapsamı katmana göre değişir<br>Gözlem ≠ doğrulanmış yangın</small></div>
+</section>
+
+<section class="nx-signal-strip" aria-label="Platform kapsamı">
+  <a href="pages/map.html"><span class="nx-signal-icon">⌖</span><span><small>GÖZLEM</small><strong>Risk haritası</strong></span><b>↗</b></a>
+  <a href="pages/areas.html"><span class="nx-signal-icon">◇</span><span><small>SAHA</small><strong>Alanlarım</strong></span><b>↗</b></a>
+  <a href="pages/satellite.html"><span class="nx-signal-icon">◉</span><span><small>UYDU</small><strong>Sahne keşfi</strong></span><b>↗</b></a>
+  <a href="pages/weather.html"><span class="nx-signal-icon">≋</span><span><small>ATMOSFER</small><strong>Hava ve polen</strong></span><b>↗</b></a>
+</section>
+<section class="nx-integrity-line">
+  <span class="nx-integrity-dot" aria-hidden="true"></span>
+  <p><strong>Veri dürüstlüğü</strong> · Gerçek kaynaklar, zaman damgaları ve belirsizlik. Uydu sahnesi keşfi, NDVI hesabı veya doğrulanmış yangın kaydıyla aynı şey değildir.</p>
+  <a href="pages/about.html">Nasıl çalışır? →</a>
 </section>
 
 <section class="ataturk-vision">
