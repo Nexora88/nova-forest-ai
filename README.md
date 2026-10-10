@@ -16,7 +16,7 @@ Ana panelde Trakya odaklı çevresel durum görünür. Harita katmanları ve mev
 
 ## Karar destek mantığı
 
-Sistem tek bir “AI skoru” üretip sonucu kesin gerçek gibi sunmaz. Farklı çevresel göstergeler birlikte değerlendirilir ve kullanıcıya **risk, durum, uyarı ve koşul** sinyalleri gösterilir.
+Mevcut hava/çevre motoru şeffaf, kural tabanlı karar desteğidir; tek başına makine öğrenmesi modeli değildir. Ayrı bir Random Forest eğitim ve çıkarım hattı eklendi. Model, yalnızca doğrulanmış ve etiketli gerçek veriyle eğitilip artefaktı bulunduğunda tahmin üretir; eğitim yapılmadıysa `/ml/status` `not_trained` döndürür ve `/ml/predict` 503 verir. Bu ayrım, kural skorlarının yapay zekâ diye sunulmasını engeller.
 
 Önemli girdiler:
 
@@ -33,7 +33,7 @@ Sistem tek bir “AI skoru” üretip sonucu kesin gerçek gibi sunmaz. Farklı 
 ## Mevcut ana modüller
 
 ### 🌲 Orman / yangın
-Sıcaklık, nem, rüzgar, bitki stresi ve çevresel koşullar üzerinden risk değerlendirmesi yapılır. Sentinel-2 ve FIRMS entegrasyonları gerçek veri erişimi yapılandırıldığında genişletilebilir.
+Sıcaklık, nem, rüzgar, bitki stresi ve çevresel koşullar üzerinden risk değerlendirmesi yapılır. CDSE STAC kataloğunda gerçek Sentinel-2 sahne keşfi kimlik bilgisi olmadan yapılabilir. Alan bazlı işlenmiş NDVI/NDMI istatistikleri ve risk rasterı için CDSE istemci kimlik bilgileri gerekir. NASA FIRMS sıcak nokta sorguları için geçerli MAP_KEY gerekir; anahtar veya gözlem yokluğu “yangın yok” anlamına gelmez.
 
 ### 🌾 Tarım istihbaratı
 Toprak nemi, yağış, ET₀, sıcaklık ve VPD göstergeleri sulama ve tarla çalışması için erken karar destek sinyallerine dönüştürülür.
@@ -166,3 +166,14 @@ Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki so
 - The push subscription table has owner-scoped RLS policies. The backend uses a server-only `SUPABASE_ADMIN_KEY`; never place that key in browser JavaScript or commit it.
 - To enable actual background push delivery, configure `SUPABASE_ADMIN_KEY`, `VAPID_PRIVATE_KEY_B64`, and a matching `VAPID_PUBLIC_KEY` in the backend's Vercel Production environment, then redeploy. The current Vercel backend environment list has not exposed configured variables to this integration, so push delivery is not claimed as active.
 - The generic `/notifications/send` route intentionally returns HTTP 501 rather than pretending to send a message. Risk evaluation remains a separate endpoint.
+
+
+## Tahminleyici ML, uydu işleme ve ölçekleme
+
+- `GET /ml/status`: gerçek model artefaktı ve eğitim metaverisini bildirir.
+- `POST /ml/predict`: dokuz meteorolojik/uydu/geçmiş yangın girdisiyle eğitilmiş Random Forest modelinden 7 günlük deneysel olasılık ister; model yoksa 503 döner.
+- `backend/scripts/train_fire_model.py`: yalnızca belgelenmiş gerçek etiketli CSV ile eğitim yapar; en az 500 satır ve her sınıfta 50 örnek ister, zamana göre ayrılmış test kümesinde metrik üretir. Sentetik eğitim verisi oluşturulmaz.
+- CDSE STAC sahne keşfi ile CDSE Statistical/Process API üzerinden piksel işleme farklı durumlardır. Gerçek NDVI/NDMI için `CDSE_CLIENT_ID` ve `CDSE_CLIENT_SECRET` yalnızca sunucu ortamında tanımlanmalıdır.
+- Vercel kısa API ve PWA katmanı olarak kalmalı. Büyük raster, çok bölgeli tarihsel analiz ve model eğitimi kuyruklu bir Docker worker/VPS veya yönetilen container hizmetine taşınmalıdır. Uygulama planı ve kabul testleri: [docs/AI-SATELLITE-AND-SCALING.md](docs/AI-SATELLITE-AND-SCALING.md).
+
+Eğitim ortamı için `backend/requirements-ml.txt` kullanılır; bu ağır bilimsel bağımlılıklar varsayılan Vercel API bağımlılıklarına eklenmez. Model eğitilmeden, canlı CDSE işlem çıktısı doğrulanmadan veya FIRMS anahtarı yapılandırılmadan bunların üretimde aktif olduğu iddia edilmez.
