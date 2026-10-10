@@ -72,8 +72,13 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_selector("#nexora-install", timeout=10000)
                     self.assertTrue(page.locator("#nexora-install").is_visible(), f"install control missing on {path}")
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"page language metadata was not switched to English on {path}")
                     if page.locator("nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
+                        nav_text = page.locator("nav").evaluate("(el) => el.textContent")
+                        self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
+                        self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
+                        self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
                 finally:
                     context.close()
 
