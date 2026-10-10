@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.services.ndvi_service import get_ndvi_status
-from app.services.firms_service import get_firms_alerts
+from app.services.firms_service import get_firms_alerts, validate_bbox
 
 router = APIRouter(prefix="/satellite", tags=["Satellite"])
 
@@ -14,11 +14,11 @@ def nasa_firms_area(
     days: int = Query(1, ge=1, le=10),
 ):
     """Query NASA FIRMS for a small WGS84 bounding box anywhere on Earth."""
-    if west >= east or south >= north:
-        raise HTTPException(status_code=422, detail="Invalid bounding box: west must be less than east and south less than north.")
-    if east - west > 10 or north - south > 10:
-        raise HTTPException(status_code=422, detail="Bounding box is too large; maximum width and height are 10 degrees.")
-    return get_firms_alerts(days=days, bbox={"west": west, "south": south, "east": east, "north": north})
+    try:
+        bbox = validate_bbox(west, south, east, north)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return get_firms_alerts(days=days, bbox=bbox)
 
 @router.get("/status")
 def satellite_status():
