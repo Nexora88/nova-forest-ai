@@ -45,7 +45,7 @@ Depending on service availability and configuration, the project can use:
 - **Open-Meteo** for weather and selected environmental variables.
 - **OpenStreetMap / Nominatim** for map and settlement context.
 - **Copernicus Sentinel-2 / CDSE** for satellite scene discovery and, when credentials and processing services are configured, derived vegetation indices.
-- **NASA FIRMS / VIIRS** for hotspot observations when a valid backend MAP_KEY is configured.
+- **NASA FIRMS / VIIRS** for hotspot observations when a valid backend FIRMS_MAP_KEY is configured.
 
 A missing API key, failed request, unavailable scene, or missing observation must never be interpreted as zero risk. NASA GIBS basemap imagery is not the same thing as a processed Sentinel-2 NDVI product.
 
