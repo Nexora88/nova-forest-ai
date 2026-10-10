@@ -18,8 +18,12 @@ TRAKYA_BBOX = {
 }
 
 
-def get_firms_alerts(days: int = 1) -> dict:
-    """NASA FIRMS VIIRS alan gözlemlerini getirir."""
+def get_firms_alerts(days: int = 1, bbox: dict | None = None) -> dict:
+    """Fetch NASA FIRMS VIIRS observations for a validated geographic bounding box.
+
+    When no box is supplied, preserve the original Thrace pilot behavior.
+    """
+    selected_bbox = bbox or TRAKYA_BBOX
     api_key = os.getenv("FIRMS_MAP_KEY")
 
     if not api_key:
@@ -27,12 +31,13 @@ def get_firms_alerts(days: int = 1) -> dict:
             "status": "not_configured",
             "alert_count": 0,
             "alerts": [],
-            "source": "NASA FIRMS"
+            "source": "NASA FIRMS",
+            "bbox": selected_bbox
         }
 
     area = (
-        f"{TRAKYA_BBOX['west']},{TRAKYA_BBOX['south']},"
-        f"{TRAKYA_BBOX['east']},{TRAKYA_BBOX['north']}"
+        f"{selected_bbox['west']},{selected_bbox['south']},"
+        f"{selected_bbox['east']},{selected_bbox['north']}"
     )
     url = f"{FIRMS_URL}/{api_key}/VIIRS_SNPP_NRT/{area}/{days}"
 
@@ -61,7 +66,8 @@ def get_firms_alerts(days: int = 1) -> dict:
             "alert_count": len(alerts),
             "alerts": alerts,
             "days": days,
-            "source": "NASA FIRMS"
+            "source": "NASA FIRMS",
+            "bbox": selected_bbox
         }
 
     except requests.RequestException as error:
@@ -71,5 +77,6 @@ def get_firms_alerts(days: int = 1) -> dict:
             "alerts": [],
             "days": days,
             "source": "NASA FIRMS",
+            "bbox": selected_bbox,
             "error": str(error)
         }
