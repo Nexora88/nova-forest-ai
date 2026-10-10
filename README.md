@@ -177,3 +177,8 @@ Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki so
 - Vercel kısa API ve PWA katmanı olarak kalmalı. Büyük raster, çok bölgeli tarihsel analiz ve model eğitimi kuyruklu bir Docker worker/VPS veya yönetilen container hizmetine taşınmalıdır. Uygulama planı ve kabul testleri: [docs/AI-SATELLITE-AND-SCALING.md](docs/AI-SATELLITE-AND-SCALING.md).
 
 Eğitim ortamı için `backend/requirements-ml.txt` kullanılır; bu ağır bilimsel bağımlılıklar varsayılan Vercel API bağımlılıklarına eklenmez. Model eğitilmeden, canlı CDSE işlem çıktısı doğrulanmadan veya FIRMS anahtarı yapılandırılmadan bunların üretimde aktif olduğu iddia edilmez.
+
+
+### Ayrı uydu işleme worker'ı
+
+Redis/RQ kuyruklu, Docker ile çalışan ayrı uydu worker'ı ve kimlik doğrulamalı görev API'si için kurulum adımları: [docs/worker-deployment.md](docs/worker-deployment.md). Vercel worker bağlanana kadar kuyruk uçları açıkça `503 worker_not_configured` döndürür; ağır işlemin canlıya taşındığı varsayılmaz.

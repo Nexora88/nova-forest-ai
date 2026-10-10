@@ -1,0 +1,51 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    volumes:
+      - nexora-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks: [worker-private]
+
+  worker-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    env_file:
+      - .env.worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "${WORKER_BIND_ADDRESS:-127.0.0.1}:8081:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [worker-private]
+
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    command: ["sh", "-c", "rq worker satellite --url \"$REDIS_URL\""]
+    env_file:
+      - .env.worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [worker-private]
+
+networks:
+  worker-private:
+    driver: bridge
+
+volumes:
+  nexora-redis:
