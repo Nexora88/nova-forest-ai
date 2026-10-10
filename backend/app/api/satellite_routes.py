@@ -66,50 +66,54 @@ def provider_credentials_status(probe: bool = Query(False)):
             "copernicus_sentinel_hub": copernicus,
             "open_meteo": {"status": "public_no_api_key_required", "secret_exposed": False},
         },
-        "note": "Only configuration status and non-sensitive provider diagnostics are returned. Secret values and access tokens are never returned.",
+        "note": "Configuration is not proof of a successful data query. Secret values and access tokens are never returned.",
     }
+
 
 @router.get("/status")
 def satellite_status():
     ndvi = get_ndvi_status(None)
     firms = get_firms_alerts(days=1)
+    firms_status = firms.get("status", "unknown")
+    ndvi_status = ndvi.get("status", "unknown")
+    has_processed_ndvi = ndvi.get("ndvi") is not None
     return {
         "system": "NexoraWildfire AI",
-        "status": "online",
+        "status": "available" if firms_status == "available" and has_processed_ndvi else "partial",
+        "checked_at_note": "Provider query status is returned separately; this endpoint does not claim all satellite processing is complete.",
         "sources": {
             "sentinel_2": {
-                "status": "observation_ready",
-                "ndvi": ndvi["ndvi"],
-                "ndvi_status": ndvi["status"],
-                "classification": ndvi["classification"],
-                "resolution_m": 10,
-                "bands": {
-                    "red": "B04",
-                    "nir": "B08",
-                    "red_edge": ["B05", "B06", "B07", "B8A"],
-                    "swir": ["B11", "B12"],
-                },
-                "purpose": "Vegetation condition and land-cover indicators",
+                "status": "processed_value_available" if has_processed_ndvi else "ndvi_not_computed",
+                "ndvi": ndvi.get("ndvi"),
+                "ndvi_status": ndvi_status,
+                "classification": ndvi.get("classification"),
+                "latest_scene": ndvi.get("latest_scene"),
+                "processed_imagery": has_processed_ndvi,
+                "nominal_pixel_size_m": 10,
+                "bands_used_by_ndvi": {"red": "B04", "nir": "B08"},
+                "purpose": "Vegetation condition indicator; catalog discovery alone is not NDVI processing",
             },
             "nasa_firms": {
-                "status": firms["status"],
+                "status": firms_status,
                 "sensor": "VIIRS SNPP NRT",
-                "alert_count": firms["alert_count"],
-                "alerts": firms["alerts"],
+                "alert_count": firms.get("alert_count") if firms_status == "available" else None,
+                "alerts": firms.get("alerts", []) if firms_status == "available" else [],
+                "bbox": firms.get("bbox"),
                 "purpose": "Satellite thermal anomaly / hotspot observation",
+                "note": "A missing provider or zero detections is not proof of zero fire risk.",
             },
         },
     }
+
 
 @router.get("/live-check")
 def satellite_live_check():
     """Live source diagnostics; catalog discovery is not presented as processed imagery."""
     import os
+    from datetime import datetime, timezone
     from app.services.ndvi_service import search_latest_scene
     from app.services.firms_service import get_firms_alerts
 
-    # A small Trakya search verifies the public CDSE STAC catalog is reachable.
-    # Full raster/statistical processing remains a queued worker task.
     try:
         scene = search_latest_scene(41.6771, 26.5557, days=45, max_cloud=60)
         catalog = {
@@ -128,19 +132,18 @@ def satellite_live_check():
 
     firms = get_firms_alerts(days=1)
     return {
-        "checked_at_utc": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+        "checked_at_utc": datetime.now(timezone.utc).isoformat(),
         "sentinel2_catalog": catalog,
         "sentinel2_processing": {
             "status": "credentials_configured" if os.getenv("CDSE_CLIENT_ID") and os.getenv("CDSE_CLIENT_SECRET") else "not_configured",
             "execution": "queued_worker_required",
-            "note": "Catalog scene discovery alone does not prove NDVI/NDMI processing. Submit POST /jobs/ndvi-timeseries and verify a completed job with non-empty series.",
+            "note": "Catalog scene discovery alone does not prove NDVI/NDMI processing. Submit POST /jobs/ndvi-timeseries and verify a completed job with a non-empty series.",
         },
         "nasa_firms": {
             "status": firms.get("status", "unknown"),
-            "alert_count": firms.get("alert_count"),
+            "alert_count": firms.get("alert_count") if firms.get("status") == "available" else None,
             "days": firms.get("days", 1),
             "source": firms.get("source", "NASA FIRMS"),
-            "note": "Zero alerts is not proof of zero fire risk; check status and coverage.",
+            "note": "Zero detections are not proof of zero fire risk; verify provider status and spatial/time coverage.",
         },
     }
-
