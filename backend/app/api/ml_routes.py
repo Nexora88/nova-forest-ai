@@ -1,0 +1,33 @@
+from typing import Dict
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+from app.engine.ml_fire_model import FEATURES, model_status, predict
+
+router = APIRouter(prefix="/ml", tags=["Predictive ML"])
+
+
+class FireFeatures(BaseModel):
+    temperature_max: float = Field(ge=-60, le=70)
+    humidity_min: float = Field(ge=0, le=100)
+    wind_max: float = Field(ge=0, le=250)
+    precipitation_sum: float = Field(ge=0, le=2000)
+    ndvi_mean: float = Field(ge=-1, le=1)
+    ndmi_mean: float = Field(ge=-1, le=1)
+    et0: float = Field(ge=0, le=50)
+    vpd: float = Field(ge=0, le=20)
+    previous_fire_1km_30d: float = Field(ge=0, le=1000)
+
+
+@router.get("/status")
+def predictive_model_status():
+    return model_status()
+
+
+@router.post("/predict")
+def predictive_fire_risk(features: FireFeatures):
+    try:
+        return predict(features.model_dump())
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail={"status": "model_not_ready", "message": str(exc)})
+    except (ValueError, OSError, ImportError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
