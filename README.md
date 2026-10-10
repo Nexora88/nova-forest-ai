@@ -4,7 +4,7 @@
 
 NexoraWildfire AI brings together environmental observations for wildfire awareness, agriculture, soil and water, beekeeping, pollen, and ecosystem monitoring. The project starts in **Thrace (Trakya), Türkiye** and is being developed with a global-coordinate architecture in mind.
 
-[Turkish documentation](README.tr.md) · [AI-assisted development disclosure](AI_ASSISTED_DEVELOPMENT.md) · [Global scalability notes](docs/GLOBAL_SCALABILITY.md) · [Contributing](.github/CONTRIBUTING.md)
+[Turkish documentation](README.tr.md) · [AI-assisted development disclosure](AI_ASSISTED_DEVELOPMENT.md) · [Global scalability notes](docs/GLOBAL_SCALABILITY.md) · [Rise readiness checklist](docs/RISE_READINESS.md) · [Contributing](.github/CONTRIBUTING.md)
 
 ## Why this project exists
 
