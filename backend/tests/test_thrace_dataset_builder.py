@@ -2,7 +2,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-# The pipeline script lives at repository root while the backend tests may run from backend/.
+# The pipeline script lives at repository root while backend tests may run from backend/.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from scripts.build_thrace_fire_dataset import haversine_km, number, parse_date, read_firms_csv
@@ -16,11 +16,11 @@ def test_haversine_zero_and_distance():
 def test_read_firms_csv_filters_date_and_bbox(tmp_path):
     path = tmp_path / "firms.csv"
     path.write_text(
-        "latitude,longitude,acq_date,acq_time,confidence,frp\\n"
-        "41.7,26.5,2020-07-01,1030,nominal,4.2\\n"
-        "41.7,26.5,2020-07-02,1030,high,5.1\\n"
-        "41.7,30.5,2020-07-01,1030,high,5.1\\n"
-        "bad,26.5,2020-07-01,1030,low,1\\n",
+        "latitude,longitude,acq_date,acq_time,confidence,frp\n"
+        "41.7,26.5,2020-07-01,1030,nominal,4.2\n"
+        "41.7,26.5,2020-07-02,1030,high,5.1\n"
+        "41.7,30.5,2020-07-01,1030,high,5.1\n"
+        "bad,26.5,2020-07-01,1030,low,1\n",
         encoding="utf-8",
     )
     detections, summary = read_firms_csv(
