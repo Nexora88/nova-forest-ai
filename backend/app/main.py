@@ -17,8 +17,21 @@ app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel ri
 import os
 from app.security import security_middleware
 
-ALLOWED_ORIGINS=[x.strip() for x in os.getenv("ALLOWED_ORIGINS","https://nexora88.github.io").split(",") if x.strip()]
-app.add_middleware(security_middleware)
+# Keep public production frontends allowed even when ALLOWED_ORIGINS is set in the hosting environment.
+# Preview URLs remain excluded; add any private/custom origin explicitly through ALLOWED_ORIGINS.
+DEFAULT_PUBLIC_ORIGINS = {
+    "https://nexora88.github.io",
+    "https://nova-forest-ai.vercel.app",
+    "https://nova-forest-ai-nexora88s-projects.vercel.app",
+    "https://nova-forest-ai-git-main-nexora88s-projects.vercel.app",
+}
+CONFIGURED_ORIGINS = {
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+}
+ALLOWED_ORIGINS = sorted(DEFAULT_PUBLIC_ORIGINS | CONFIGURED_ORIGINS)
+app.middleware("http")(security_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,

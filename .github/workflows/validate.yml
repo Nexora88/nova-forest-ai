@@ -1,0 +1,122 @@
+name: Validate NexoraWildfire AI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test and ML dependencies
+        run: python -m pip install --upgrade pip -r backend/requirements.txt pytest httpx
+      - name: Train research model from the official UCI dataset
+        run: python backend/scripts/train_uci_research_model.py
+      - name: Compile backend Python sources
+        run: python -m compileall -q backend/app backend/scripts
+      - name: Run backend tests
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest -q backend/tests
+      - name: Check JavaScript syntax
+        run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull-request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Chromium test runner
+        run: |
+          python -m pip install --upgrade pip playwright
+          python -m playwright install --with-deps chromium
+      - name: Test bilingual controls, mobile menu, desktop menu, and install lifecycle
+        run: python tests/e2e/test_mobile_ui.py
+
+  provider-diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install HTTP client
+        run: python -m pip install --upgrade requests
+      - name: Probe current production provider credentials without exposing secrets
+        run: |
+          python - <<'PY'
+          import json
+          import requests
+
+          base = "https://nova-forest-ai.vercel.app/api"
+
+          try:
+              health = requests.get(base + "/health", timeout=20)
+              print("Production backend health HTTP:", health.status_code)
+              if not health.ok:
+                  print("Backend health endpoint did not return success; provider results are unverified.")
+                  raise SystemExit(0)
+          except requests.RequestException as exc:
+              print("Production backend unavailable:", type(exc).__name__)
+              raise SystemExit(0)
+
+          try:
+              live_response = requests.get(base + "/satellite/live-check", timeout=75)
+              print("Live provider diagnostic HTTP:", live_response.status_code)
+              if live_response.ok:
+                  live = live_response.json()
+                  firms = live.get("nasa_firms", {})
+                  catalog = live.get("sentinel2_catalog", {})
+                  processing = live.get("sentinel2_processing", {})
+                  print("NASA FIRMS status:", firms.get("status", "unknown"))
+                  print("NASA FIRMS observations returned:", firms.get("alert_count", "not reported"))
+                  print("Copernicus STAC catalog:", catalog.get("status", "unknown"))
+                  print("Copernicus credential configuration:", processing.get("status", "unknown"))
+              else:
+                  print("Live provider diagnostic returned a non-success response; no credentials or response body were printed.")
+          except (requests.RequestException, ValueError) as exc:
+              print("Live provider diagnostic failed:", type(exc).__name__)
+
+          geometry = {
+              "type": "Polygon",
+              "coordinates": [[
+                  [-122.40, 38.35], [-122.39, 38.35], [-122.39, 38.36],
+                  [-122.40, 38.36], [-122.40, 38.35]
+              ]]
+          }
+          try:
+              response = requests.post(
+                  base + "/ndvi/area-timeseries",
+                  json={"geometry": geometry, "days": 30, "interval": "P30D"},
+                  timeout=90,
+              )
+              print("Copernicus NDVI processing probe HTTP:", response.status_code)
+              if response.ok:
+                  data = response.json()
+                  print("Copernicus NDVI processing status:", data.get("status", "unknown"))
+                  series = data.get("series", [])
+                  print("Copernicus time-series samples:", len(series) if isinstance(series, list) else "not reported")
+                  if data.get("error_type"):
+                      print("Copernicus error type:", data.get("error_type"))
+              else:
+                  print("Copernicus NDVI probe returned a non-success response; response body omitted.")
+          except (requests.RequestException, ValueError) as exc:
+              print("Copernicus NDVI probe failed:", type(exc).__name__)
+          PY

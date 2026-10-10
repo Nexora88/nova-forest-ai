@@ -1,184 +1,53 @@
-# 🌲 NexoraWildfire AI
+# NexoraWildfire AI
 
-**Nexora çatısı altında geliştirilen çevresel istihbarat ve karar destek sistemi.**
+**Environmental intelligence for forests, farms, and the people who care for them.**
 
-NexoraWildfire AI; orman, tarım, su-toprak, arıcılık, polen ve çevresel risk göstergelerini aynı operasyon ekranında birleştiren **PWA + offline-first** bir saha ürünüdür. Amaç yalnızca bir risk haritası göstermek değil, gerçek veri kaynaklarını anlaşılır sinyallere dönüştürmektir.
+NexoraWildfire AI is an independent project built to make environmental observations easier to explore in one place. Starting in Thrace (Trakya), Türkiye, it brings together a map-first experience for wildfire awareness, forest health, agriculture, soil and water, beekeeping, pollen, and satellite-data discovery.
 
-## Sistem ne yapıyor?
+The product is inspired by a simple idea associated with Mustafa Kemal Atatürk's vision for a science-led, productive Republic: **protecting nature also means protecting the people and work that depend on it.** The platform is a modern, practical expression of that purpose—not an official government service and not affiliated with Atatürk-related institutions.
 
-NexoraWildfire AI mevcut verileri kullanıcı kararlarına yaklaşan bir hiyerarşide işler:
+## Explore the product
 
-**İl → İlçe → Köy/Mahalle → Alan → çevresel gözlem → risk/sinyal → karar desteği**
+- **Interactive environmental map** with available geographic layers and saved areas.
+- **Field workspace** for users to save a farm, apiary, forest, or other area and revisit its available environmental signals.
+- **Weather and environmental indicators** when supported data providers are reachable.
+- **Satellite-data discovery** designed to support vegetation and land-observation workflows.
+- **Installable, responsive web app** with an offline-first shell and local saved-area experience.
+- **Turkish and English interface**, with English as the default for this public-facing version.
 
-Ana panelde Trakya odaklı çevresel durum görünür. Harita katmanları ve mevcut analiz panelleri üzerinden kullanıcı; yangın/çevre riski, orman sağlığı, tarım koşulları, toprak nemi, sulama ihtiyacı, polen ve arıcılık uçuş koşullarını inceleyebilir.
+## Why it matters
 
-İlk ürünleşme sahası **Edirne**'dir. İlçe ve köy/mahalle seviyesine inilerek gerçek yerleşim verileriyle saha görünümü oluşturulur. Kullanıcı kendi tarla, arılık veya orman alanını **Alanlarım** bölümünde kaydedebilir.
+Environmental information is often scattered across separate tools. NexoraWildfire AI aims to make relevant observations more accessible to local communities, farmers, beekeepers, nature observers, and environmental teams—without pretending that every data source is always available or that an indicator is a guaranteed prediction.
 
-## Karar destek mantığı
+## Current scope
 
-Mevcut hava/çevre motoru şeffaf, kural tabanlı karar desteğidir; tek başına makine öğrenmesi modeli değildir. Ayrı bir Random Forest eğitim ve çıkarım hattı eklendi. Model, yalnızca doğrulanmış ve etiketli gerçek veriyle eğitilip artefaktı bulunduğunda tahmin üretir; eğitim yapılmadıysa `/ml/status` `not_trained` döndürür ve `/ml/predict` 503 verir. Bu ayrım, kural skorlarının yapay zekâ diye sunulmasını engeller.
+The first practical focus is Thrace, Türkiye. The interface and data pipeline are being developed with reusable geographic inputs in mind, but global map rendering alone does not prove that every provider, model, or workflow is validated worldwide.
 
-Önemli girdiler:
+The app may display rule-based indicators, provider observations, satellite discovery results, and machine-learning research outputs. These are different types of evidence and must not be presented as interchangeable. The current research model was trained on a small historical Algerian dataset; its metrics do **not** validate predictions for Türkiye. NexoraWildfire AI is experimental decision support, not an official warning service. In an emergency, follow the instructions of the relevant authorities.
 
-- Sıcaklık, bağıl nem ve rüzgar
-- Yağış ve toprak nemi
-- ET₀ ve VPD gibi su/atmosfer göstergeleri
-- Bitki stresi için NDVI/NDMI altyapısı
-- Uydu gözlemleri
-- Polen ve hava kalitesi sinyalleri
-- Yapılandırıldığında NASA FIRMS / VIIRS sıcak nokta gözlemleri
+## Technology
 
-Üretilmemiş uydu, yangın veya model başarım verisi sahte değerlerle doldurulmaz. Sistem mevcut veri durumunu açıkça belirtir.
+- Front end: HTML, CSS, JavaScript, Leaflet, and Progressive Web App features.
+- Optional backend: FastAPI.
+- Cloud features: Supabase where configured.
+- External data integrations: Open-Meteo, Copernicus/Sentinel-2 discovery, and NASA FIRMS where credentials and endpoints are configured.
 
-## Mevcut ana modüller
+Provider access and production behavior must be verified independently; code for an integration is not proof that its live connection is working.
 
-### 🌲 Orman / yangın
-Sıcaklık, nem, rüzgar, bitki stresi ve çevresel koşullar üzerinden risk değerlendirmesi yapılır. CDSE STAC kataloğunda gerçek Sentinel-2 sahne keşfi kimlik bilgisi olmadan yapılabilir. Alan bazlı işlenmiş NDVI/NDMI istatistikleri ve risk rasterı için CDSE istemci kimlik bilgileri gerekir. NASA FIRMS sıcak nokta sorguları için geçerli MAP_KEY gerekir; anahtar veya gözlem yokluğu “yangın yok” anlamına gelmez.
+## Try it
 
-### 🌾 Tarım istihbaratı
-Toprak nemi, yağış, ET₀, sıcaklık ve VPD göstergeleri sulama ve tarla çalışması için erken karar destek sinyallerine dönüştürülür.
+- **Live app:** https://nexora88.github.io/nova-forest-ai/
+- **Source code:** https://github.com/Nexora88/nova-forest-ai
+- **Bug reports and product suggestions:** https://github.com/Nexora88/nova-forest-ai/issues
+- **Turkish documentation:** [README.tr.md](README.tr.md)
+- **Contributing:** [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)
+- **Global architecture notes:** [docs/GLOBAL_SCALABILITY.md](docs/GLOBAL_SCALABILITY.md)
+- **AI-assisted development disclosure:** [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md)
 
-### 🐝 Nova-Bee
-Sıcaklık, rüzgar, yağış ve polen koşullarını birlikte değerlendirerek arıcılık için bölgesel uçuş koşulu göstergesi sağlar.
+## Project direction
 
-### 🌼 Polen & hava
-CAMS tabanlı atmosfer/polen sinyalleri çevresel farkındalık için izlenir. Polen göstergesi bitki sağlığının kesin ölçümü olarak yorumlanmaz.
+The priority is to make the core product genuinely useful and dependable: clear map layers, understandable indicators, reliable saved areas, transparent data status, accessible mobile use, and feedback from real users. New features should earn their place by solving a user problem—not by making the interface look more complicated.
 
-## Harita
+---
 
-Leaflet tabanlı operasyon haritası Türkiye ve Trakya odaklı katmanları gösterir. İl ve ilçe geometrileri yerel GeoJSON ile çalışabildiği için temel harita yapısı bağlantı kesildiğinde de açılabilir.
-
-Harita katmanları:
-
-- 🔥 Çevre / yangın riski
-- 🌲 Orman sağlığı
-- 💧 Su / toprak nemi
-- 🌾 Tarım koşulu
-- 🌼 Polen
-
-Köy/mahalle noktaları parsel veya mülkiyet sınırı değildir; yalnızca çevresel analiz için referans yerleşim noktalarıdır.
-
-## NexoraWildfire EDGE
-
-- PWA olarak kurulabilir.
-- IndexedDB yerel veri deposu kullanır.
-- Servis çalışanı uygulama kabuğunu çevrimdışı açabilir.
-- Son geçerli gözlemlerle yerel karar destek motoru çalışabilir.
-- Nova-Alert yerel bildirim merkezi olarak görev yapar.
-- Güncelleme hazır olduğunda uygulama içinden yeni sürüm alınabilir.
-- Mobil ekranlara uyumludur.
-
-> Çevrimdışı mod yeni internet verisi ürettiğini iddia etmez. Son geçerli veriyi kullanır ve açıkça karar destek olarak etiketler.
-
-## Veri kaynakları
-
-- **Open-Meteo:** sıcaklık, nem, rüzgar, yağış, toprak nemi, ET₀ ve VPD.
-- **OpenStreetMap / Nominatim:** ilçe altındaki köy/mahalle yerleşim noktaları.
-- **Copernicus Sentinel-2:** gerçek NDVI/NDMI zaman serisi altyapısı; CDSE erişimi yapılandırıldığında kullanılır.
-- **NASA FIRMS / VIIRS:** API erişimi yapılandırıldığında sıcak nokta gözlemleri.
-
-## Sistem hakkında
-
-NexoraWildfire AI'nin sistem sayfasında ürünün teknik yaklaşımının yanında çevre, üretim ve kırsal yaşam odağı da açıkça anlatılır. Atatürk'ün “Köylü milletin efendisidir.” sözü, projenin orman yangınlarının tarım alanları ve üreticinin emeği üzerindeki etkisini de dikkate alan toplumsal misyonunu anlatmak için kullanılır.
-
-Bu ifade tarihsel bir alıntıdır; sistem herhangi bir siyasi amaç taşımaz. Projenin amacı çevresel verileri anlaşılır karar desteğine dönüştürmektir.
-
-## Backend
-
-`backend/` altında FastAPI servisi bulunur.
-
-```bash
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-Önemli uçlar:
-
-- `/health`
-- `/risk-analysis`
-- `/satellite/status`
-- `/weather`
-- `/forecast-risk`
-- `/ndvi/status/{region}`
-- `/ndvi/area-timeseries`
-- `/notifications/status`
-
-## Ürün hedefi
-
-NexoraWildfire AI'yi özellik listesi şişen bir demo yerine, mevcut modülleri daha doğru veri, daha iyi açıklama ve daha güvenilir karar desteğiyle geliştirmek temel yaklaşımdır. Yeni bir özellik ancak mevcut sistemi anlamlı biçimde güçlendiriyorsa eklenir.
-
-Sonraki geliştirmelerde öncelik; gerçek veri erişimlerinin sağlamlaştırılması, mevcut tahmin/risk mantığının açıklanabilirliğinin artırılması, harita katmanlarının doğruluğunun yükseltilmesi ve saha kullanımının iyileştirilmesidir.
-
-## Geliştirici
-
-**Ahmet Eymen Bakraç**  
-**Nexora / Nexora88**  
-2026
-
-
-## Vercel üretim mimarisi
-
-Bu depo statik arayüz + FastAPI backend'i aynı Vercel projesinde tutacak şekilde yapılandırılmıştır. Vercel ayarlarında Root Directory repository root (./) kullanılmalıdır. Services erişimi açıksa Framework Preset: Services seçilir; Build Command ve Output Directory elle değiştirilmez. Depodaki vercel.json web servisini kökte, FastAPI servisini backend/ altında tanımlar ve /api/* isteklerini backend'e yönlendirir.
-
-### Nova-Alert bildirim mimarisi
-
-Bildirimler GitHub Pages'a bağlı değildir. Vercel sürümünde tarayıcı bildirimi ve Web Push aboneliği aynı NexoraWildfire alan adı üzerindeki /api/notifications/* backend uçlarına gider. VAPID özel anahtarı, Supabase admin anahtarı ve diğer gizli değerler yalnızca Vercel backend ortam değişkenlerinde tutulmalıdır; frontend'e yazılmamalıdır.
-
-Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki sonsuz asyncio worker döngüsü kaldırıldı. Abonelik ve test bildirimi istek-temelli çalışır; periyodik risk taraması için kalıcı bir scheduler gerektiğinde Vercel Cron (plan sınırları dahilinde) veya Supabase pg_cron + pg_net kullanılmalıdır. Böylece bildirim motoru GitHub Actions gibi frontend barındırma katmanına bağımlı kalmaz.
-
-### Üretim doğrulama ilkeleri
-
-- Gerçek model değerlendirmesi olmadan doğruluk/F1 gibi metrikler uydurulmaz.
-- Canlı veri ile simülasyon açıkça ayrılır.
-- PWA servis worker önbelleği sürümlenir; kritik yeni görseller shell'e dahil edilir.
-- Tek resmi NexoraWildfire logosu kullanılır; dinamik marka enjeksiyonu mevcut brand-lockup varsa ikinci logo üretmez.
-
-
-## Ürünleşme notları · 10 Ekim 2026
-
-### Hesap ve kimlik
-- Supabase Auth üzerinden e-posta/parola ile giriş, hesap oluşturma ve parola sıfırlama akışı arayüzü.
-- Google OAuth ve telefon OTP ekranları mevcut; Google OAuth istemci bilgileri / yönlendirme URL'leri ile SMS sağlayıcısı Supabase Auth panelinde yapılandırılmalıdır.
-- Acil durum haritası ve çevresel veri görüntüleme giriş yapmayı zorunlu tutmaz. Buluta alan kaydetme ve özel mesajlar hesap gerektirir.
-
-### Özel mesajlar
-- `pages/messages.html` saha kullanıcı adıyla kişi bulma, konuşma açma, mesaj gönderme ve gelen kutusu ekranını içerir.
-- `supabase/migrations/20261010000000_private_messages.sql` konuşma, katılımcı, dizin ve mesaj tablolarını RLS ile kurar.
-- Mesajlar yalnızca katılımcılara açılır; e-posta/telefon dizinde gösterilmez. Realtime kullanılamazsa arayüz periyodik yenilemeyle çalışır.
-- Mesajlar uçtan uca şifrelenmiş değildir; hassas kişisel veri veya acil durum bilgileri paylaşılmamalıdır.
-
-### Ücretsiz / anahtarsız harita katmanları
-- **Altlık haritalar:** OpenStreetMap, CARTO Dark, CARTO Light, OpenTopoMap, HOT Humanitarian ve Esri World Imagery.
-- **NASA GIBS:** MODIS gerçek renkli uydu görüntüsü (güncel olmayabilir; sahne tarihi harita katmanında seçilir).
-- **Open-Meteo:** Trakya ve yakın çevre için sıcaklık, nem, rüzgar ve yağış göstergeleri.
-- **Open-Meteo Air Quality / CAMS:** PM2.5, PM10, ozon, UV ve mevcut saatlik polen tahmini.
-- **Open-Meteo Marine:** seçili kıyı noktalarında dalga yüksekliği/periyodu.
-- **Open-Meteo Elevation:** örnek noktaların arazi yükseltisi.
-- **USGS Earthquake Hazards Program:** küresel son 7 günlük deprem gözlemleri.
-- Bu servislerin ücretsiz kullanımı hizmet şartları, atıf ve hız sınırlarına tabidir. Katmanlar kaynak erişilemediğinde boş kalabilir; resmi afet alarmı yerine geçmez. NASA GIBS katmanı Sentinel-2/NDVI ürünü değildir.
-
-### Tohum puanı güvenliği
-- `supabase/migrations/20261010010000_secure_seed_awards.sql` günlük ve özel gün ödüllerini Türkiye tarihine göre doğrular, alan puanını yalnızca kullanıcının kendi bulut alanına bağlar ve doğrulanmış rapor akışı kurulana kadar rapor ödülünü kapalı tutar.
-- Supabase Auth sağlayıcıları, e-posta teslimatı, OAuth ve SMS gerçek kullanıcılarla test edilmeden “uçtan uca üretim doğrulaması tamamlandı” kabul edilmemelidir.
-
-
-### Nova-Alert / Web Push security
-- `/notifications/push/subscribe`, `unsubscribe` and `test` require a valid Supabase access token; each subscription is linked to its authenticated `user_id`.
-- The push subscription table has owner-scoped RLS policies. The backend uses a server-only `SUPABASE_ADMIN_KEY`; never place that key in browser JavaScript or commit it.
-- To enable actual background push delivery, configure `SUPABASE_ADMIN_KEY`, `VAPID_PRIVATE_KEY_B64`, and a matching `VAPID_PUBLIC_KEY` in the backend's Vercel Production environment, then redeploy. The current Vercel backend environment list has not exposed configured variables to this integration, so push delivery is not claimed as active.
-- The generic `/notifications/send` route intentionally returns HTTP 501 rather than pretending to send a message. Risk evaluation remains a separate endpoint.
-
-
-## Tahminleyici ML, uydu işleme ve ölçekleme
-
-- `GET /ml/status`: gerçek model artefaktı ve eğitim metaverisini bildirir.
-- `POST /ml/predict`: dokuz meteorolojik/uydu/geçmiş yangın girdisiyle eğitilmiş Random Forest modelinden 7 günlük deneysel olasılık ister; model yoksa 503 döner.
-- `backend/scripts/train_fire_model.py`: yalnızca belgelenmiş gerçek etiketli CSV ile eğitim yapar; en az 500 satır ve her sınıfta 50 örnek ister, zamana göre ayrılmış test kümesinde metrik üretir. Sentetik eğitim verisi oluşturulmaz.
-- CDSE STAC sahne keşfi ile CDSE Statistical/Process API üzerinden piksel işleme farklı durumlardır. Gerçek NDVI/NDMI için `CDSE_CLIENT_ID` ve `CDSE_CLIENT_SECRET` yalnızca sunucu ortamında tanımlanmalıdır.
-- Vercel kısa API ve PWA katmanı olarak kalmalı. Büyük raster, çok bölgeli tarihsel analiz ve model eğitimi kuyruklu bir Docker worker/VPS veya yönetilen container hizmetine taşınmalıdır. Uygulama planı ve kabul testleri: [docs/AI-SATELLITE-AND-SCALING.md](docs/AI-SATELLITE-AND-SCALING.md).
-
-Eğitim ortamı için `backend/requirements-ml.txt` kullanılır; bu ağır bilimsel bağımlılıklar varsayılan Vercel API bağımlılıklarına eklenmez. Model eğitilmeden, canlı CDSE işlem çıktısı doğrulanmadan veya FIRMS anahtarı yapılandırılmadan bunların üretimde aktif olduğu iddia edilmez.
-
-
-### Ayrı uydu işleme worker'ı
-
-Redis/RQ kuyruklu, Docker ile çalışan ayrı uydu worker'ı ve kimlik doğrulamalı görev API'si için kurulum adımları: [docs/worker-deployment.md](docs/worker-deployment.md). Vercel worker bağlanana kadar kuyruk uçları açıkça `503 worker_not_configured` döndürür; ağır işlemin canlıya taşındığı varsayılmaz.
+**Independent project by Ahmet Eymen Bakraç · Nexora**

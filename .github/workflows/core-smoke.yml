@@ -1,0 +1,29 @@
+name: Core product smoke tests
+
+on:
+  pull_request:
+  push:
+    branches: [main, master, fix/mobile-map-enterprise-ux-network-errors]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check required core files and local assets
+        run: python3 scripts/smoke_test.py
+      - name: Check core JavaScript syntax
+        run: |
+          node --check js/map.js
+          node --check js/areas.js
+          node --check js/free-data-layers.js
+          node --check js/nova-storage.js
+          node --check js/nova-offline-engine.js
+          node --check js/pwa.js

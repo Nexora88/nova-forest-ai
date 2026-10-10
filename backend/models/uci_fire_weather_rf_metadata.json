@@ -1,0 +1,48 @@
+{
+  "model_type": "RandomForestClassifier",
+  "model_version": "uci-algerian-fire-weather-rf-1.0.0",
+  "trained_at": "2026-10-10T12:48:25.955686+00:00",
+  "features": [
+    "temperature_max",
+    "humidity_min",
+    "wind_max",
+    "precipitation_sum"
+  ],
+  "target": "same-day observed fire / not-fire class",
+  "dataset": {
+    "name": "Algerian Forest Fires",
+    "source": "UCI Machine Learning Repository",
+    "url": "https://archive.ics.uci.edu/dataset/547/algerian+forest+fires+dataset",
+    "doi": "10.24432/C5KW4N",
+    "license": "CC BY 4.0",
+    "period": "June-September 2012",
+    "rows": 244,
+    "label_counts": {
+      "not fire": 106,
+      "fire": 138
+    },
+    "archive_sha256": "9a8b34893cd99a91e0d04a1220356c48dcb2a4aa9767113bd6f26ed03b71b7b8"
+  },
+  "evaluation": {
+    "method": "Train on Bejaia; evaluate on geographically held-out Sidi-Bel Abbes",
+    "train_region": "Bejaia",
+    "train_rows": 122,
+    "test_region": "Sidi-Bel Abbes",
+    "test_rows": 122,
+    "metrics": {
+      "accuracy": 0.7869,
+      "balanced_accuracy": 0.7984,
+      "precision": 0.8955,
+      "recall": 0.7595,
+      "f1": 0.8219,
+      "roc_auc": 0.9208
+    }
+  },
+  "scope": "research_prototype",
+  "limitations": [
+    "Only 244 daily observations from two Algerian regions in 2012.",
+    "The geographic holdout does not establish performance in Thrace/Türkiye, California, or other regions.",
+    "Only four weather features are used; vegetation, fuel moisture, terrain, ignition, and human activity are omitted.",
+    "The output is a same-day class probability, not a seven-day forecast, calibrated probability, official warning, or operational fire prediction."
+  ]
+}

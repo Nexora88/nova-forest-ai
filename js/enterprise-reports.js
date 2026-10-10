@@ -46,7 +46,7 @@
       link.dataset.reportDownload = "true"; status.after(link);
       const ds = result.data_status || {};
       setStatus("PDF hazır. Sentinel-2: " + (ds.sentinel2 || "bilinmiyor") + " · FIRMS 10 gün: " + (ds.firms_10d || "bilinmiyor") + " · FIRMS 5 yıl: " + (ds.firms_5y || "unavailable") + " · 3 aylık tahmin: " + (ds.weather_3m || "unavailable") + ". Bağlantı 15 dakika geçerli.");
-    } catch (error) { setStatus(error.message || "Rapor hazırlanamadı.", true); }
+    } catch (error) { const message = error instanceof TypeError && /fetch/i.test(error.message) ? "Sunucuya ulaşılamadı (Failed to fetch). Backend dağıtımı, CORS izni veya ağ bağlantısı kontrol edilmeli; rapor gönderilmedi." : (error.message || "Rapor hazırlanamadı."); setStatus(message, true); }
     finally { submit.disabled = false; }
   });
 })();
