@@ -37,6 +37,9 @@
 
       toggle.addEventListener("click", () => {
         const open = nav.classList.toggle("nx-nav-open");
+        document.body.classList.toggle("nx-menu-open", open);
+        document.body.style.overflow = open ? "hidden" : "";
+        document.body.style.overscrollBehavior = open ? "none" : "";
         toggle.setAttribute("aria-expanded", String(open));
         toggle.querySelector(".nx-nav-toggle-label").textContent = open ? "Close" : "Menu";
       });
@@ -44,10 +47,22 @@
         const open = more.classList.toggle("nx-nav-more-open");
         moreToggle.setAttribute("aria-expanded", String(open));
       });
+      nav.addEventListener("click", event => {
+        if (event.target.closest("a") && nav.classList.contains("nx-nav-open")) {
+          nav.classList.remove("nx-nav-open");
+          document.body.classList.remove("nx-menu-open");
+          document.body.style.overflow = "";
+          document.body.style.overscrollBehavior = "";
+          toggle.setAttribute("aria-expanded", "false");
+        }
+      });
       nav.addEventListener("keydown", event => {
         if (event.key === "Escape") {
           nav.classList.remove("nx-nav-open");
           more.classList.remove("nx-nav-more-open");
+          document.body.classList.remove("nx-menu-open");
+          document.body.style.overflow = "";
+          document.body.style.overscrollBehavior = "";
           toggle.setAttribute("aria-expanded", "false");
           moreToggle.setAttribute("aria-expanded", "false");
           toggle.focus();
