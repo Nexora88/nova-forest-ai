@@ -159,3 +159,10 @@ Vercel Functions kalıcı bir süreç değildir. Bu nedenle backend içindeki so
 ### Tohum puanı güvenliği
 - `supabase/migrations/20261010010000_secure_seed_awards.sql` günlük ve özel gün ödüllerini Türkiye tarihine göre doğrular, alan puanını yalnızca kullanıcının kendi bulut alanına bağlar ve doğrulanmış rapor akışı kurulana kadar rapor ödülünü kapalı tutar.
 - Supabase Auth sağlayıcıları, e-posta teslimatı, OAuth ve SMS gerçek kullanıcılarla test edilmeden “uçtan uca üretim doğrulaması tamamlandı” kabul edilmemelidir.
+
+
+### Nova-Alert / Web Push security
+- `/notifications/push/subscribe`, `unsubscribe` and `test` require a valid Supabase access token; each subscription is linked to its authenticated `user_id`.
+- The push subscription table has owner-scoped RLS policies. The backend uses a server-only `SUPABASE_ADMIN_KEY`; never place that key in browser JavaScript or commit it.
+- To enable actual background push delivery, configure `SUPABASE_ADMIN_KEY`, `VAPID_PRIVATE_KEY_B64`, and a matching `VAPID_PUBLIC_KEY` in the backend's Vercel Production environment, then redeploy. The current Vercel backend environment list has not exposed configured variables to this integration, so push delivery is not claimed as active.
+- The generic `/notifications/send` route intentionally returns HTTP 501 rather than pretending to send a message. Risk evaluation remains a separate endpoint.
