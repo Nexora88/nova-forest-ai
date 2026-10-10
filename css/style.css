@@ -871,3 +871,7 @@ main{padding-bottom:76px}
 .nx-vision-link p{margin:0;color:#91a397;font:450 12px/1.7 Inter,system-ui,sans-serif}
 .nx-vision-link a{flex:none;text-decoration:none;padding:12px 15px;border:1px solid #2a4c33;border-radius:10px;color:#d5e7d9;background:#08130b;font:700 12px Inter,system-ui,sans-serif}
 @media(max-width:700px){.nx-vision-link{align-items:stretch;flex-direction:column;gap:12px}.nx-vision-link a{text-align:center}}
+
+/* Keep floating controls reachable above the full-screen mobile drawer. */
+#nexora-language-toggle{z-index:100001!important}
+#nexora-install{z-index:100002!important}
