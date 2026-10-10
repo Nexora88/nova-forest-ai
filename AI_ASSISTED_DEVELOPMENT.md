@@ -23,7 +23,7 @@ Large language model (LLM) tools and AI coding assistants are used as productivi
 
 ## Current machine-learning status
 
-The repository includes an optional Random Forest training and inference pipeline. It is not considered operational merely because the code exists. A trained artifact, documented label source, and evaluation on a chronological holdout are required before reporting model predictions or performance. See the backend ML documentation and the /ml/status endpoint.
+The repository includes an optional Random Forest training and inference pipeline. It is not considered operational merely because the code exists. The UCI research prototype has a versioned artifact, documented label source, and a geographic holdout (train on Béjaïa, test on Sidi-Bel Abbès). That evaluation is specific to a small Algerian dataset and does not validate deployment in Türkiye or other regions. The separate nine-feature model remains unavailable until a suitable matching dataset and independent evaluation exist. See the backend ML documentation and the /ml/status endpoint.
 
 ## Scope and limitations
 
