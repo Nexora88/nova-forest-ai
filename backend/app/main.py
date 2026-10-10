@@ -31,7 +31,7 @@ CONFIGURED_ORIGINS = {
     if origin.strip()
 }
 ALLOWED_ORIGINS = sorted(DEFAULT_PUBLIC_ORIGINS | CONFIGURED_ORIGINS)
-app.add_middleware(security_middleware)
+app.middleware("http")(security_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
