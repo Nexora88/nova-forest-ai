@@ -14,7 +14,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
 from shapely.ops import transform, unary_union
 from app.services.ndvi_service import get_area_ndvi_timeseries
 
@@ -46,9 +46,9 @@ def _asset_geometry(asset_geojson: dict, buffer_m: int):
     backward = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326", always_xy=True).transform
     buffered = transform(backward, transform(forward, combined).buffer(buffer_m))
     minx, miny, maxx, maxy = buffered.bounds
-    # CDSE statistics use a reproducible WGS84 envelope; it is not a cadastral polygon.
-    envelope = {"type":"Polygon","coordinates":[[[minx,miny],[maxx,miny],[maxx,maxy],[minx,maxy],[minx,miny]]]}
-    return envelope, [minx,miny,maxx,maxy], [lon,lat]
+    # Use the actual buffered asset geometry for Sentinel-2 statistics.
+    buffered_geojson = mapping(buffered)
+    return buffered_geojson, [minx,miny,maxx,maxy], [lon,lat]
 
 def _weather(lat: float, lon: float) -> dict:
     try:
@@ -123,7 +123,7 @@ def _pdf(payload: dict, bbox: list[float], ndvi: dict, firms: dict, weather: dic
       Paragraph("Yönetici özeti",s["NXHead"]),
       Paragraph("Bu rapor, sağlanan varlık geometrisi çevresindeki erişilebilen uydu bitki göstergelerini, sıcak nokta akışını ve meteorolojik karar destek sinyallerini birleştirir. Eksik veri sıfır risk olarak yorumlanmaz.",s["NXBody"]),
       Paragraph("Varlık geometrisi ve etki alanı",s["NXHead"]),
-      Paragraph(f"Varlık tamponu UTM metre koordinatlarında hesaplandı. Uydu istatistiği WGS84 sınırlayıcı dikdörtgen üzerinden alınır; bu, parsel sınırı veya kesin mühendislik etki alanı değildir. Sınırlar [batı, güney, doğu, kuzey]: {[round(v,6) for v in bbox]}.",s["NXBody"]),
+      Paragraph(f"Varlık tamponu UTM metre koordinatlarında hesaplandı ve Sentinel-2 istatistiğinde tamponlanmış gerçek geometri kullanıldı. FIRMS alan sorgusu için sınırlayıcı dikdörtgen kullanılır; bu, parsel sınırı veya kesin mühendislik etki alanı değildir. Sınırlar [batı, güney, doğu, kuzey]: {[round(v,6) for v in bbox]}.",s["NXBody"]),
       Paragraph("Sentinel-2 NDVI / NDMI",s["NXHead"])]
     if ndvi.get("status") == "available":
         series = ndvi.get("series",[])
