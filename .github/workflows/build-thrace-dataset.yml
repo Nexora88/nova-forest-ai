@@ -30,7 +30,7 @@ jobs:
       run:
         working-directory: backend
     env:
-      FIRMS_MAP_KEY: \${{ secrets.FIRMS_MAP_KEY }}
+      FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
       PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4
@@ -52,9 +52,9 @@ jobs:
       - name: Build dataset from NASA FIRMS and Open-Meteo
         run: |
           python scripts/build_thrace_dataset.py \
-            --start-date "\${{ inputs.start_date }}" \
-            --end-date "\${{ inputs.end_date }}" \
-            --max-positive "\${{ inputs.max_positive }}" \
+            --start-date "${{ inputs.start_date }}" \
+            --end-date "${{ inputs.end_date }}" \
+            --max-positive "${{ inputs.max_positive }}" \
             --output data/thrace_fire_dataset.csv
       - name: Train and evaluate with chronological holdout
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Publish dataset and evaluation as a workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: thrace-hotspot-research-\${{ github.run_number }}
+          name: thrace-hotspot-research-${{ github.run_number }}
           path: |
             backend/data/thrace_fire_dataset.csv
             backend/models/fire_risk.joblib
