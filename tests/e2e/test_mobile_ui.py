@@ -1,6 +1,7 @@
 """Real Chromium smoke checks for the responsive bilingual UI and install lifecycle."""
 from __future__ import annotations
 
+import json
 import os
 import socket
 import subprocess
