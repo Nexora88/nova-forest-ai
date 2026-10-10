@@ -22,7 +22,6 @@ PAGES = [
     "/pages/satellite.html",
     "/pages/about.html",
     "/pages/enterprise.html",
-    "/pages/messages.html",
     "/pages/account.html",
     "/pages/auth.html",
 ]
