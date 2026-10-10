@@ -74,7 +74,7 @@ def predict(features: dict[str, float]) -> dict[str, Any]:
     return {
         "status": "available",
         "model_type": status["model_type"],
-        "hotspot_proxy_probability_7d": round(probability, 4),
+        "hotspot_proxy_probability": round(probability, 4),
         "target": "firms_hotspot_proxy",
         "model_version": metadata.get("model_version"),
         "trained_at": metadata.get("trained_at"),
