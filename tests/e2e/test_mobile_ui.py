@@ -139,7 +139,7 @@ class MobileUiSmokeTests(unittest.TestCase):
               }
             }""")
             page.locator('[data-plan="finish"]').click()
-            saved = page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-planning-overlays-v1') || '{\\"features\\":[]}')")
+            saved = page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-planning-overlays-v1') || JSON.stringify({features:[]}))")
             self.assertEqual(len(saved["features"]), 1)
             self.assertEqual(saved["features"][0]["properties"]["official"], False)
             self.assertEqual(saved["features"][0]["properties"]["kind"], "zone")
