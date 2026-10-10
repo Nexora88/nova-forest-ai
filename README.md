@@ -31,8 +31,9 @@ This is an architecture goal, not a claim that every provider or analysis endpoi
 The repository includes an optional Random Forest training and inference pipeline.
 
 - GET /ml/status reports whether a model artifact and metadata are available.
-- POST /ml/predict requires a valid trained artifact; it returns a not-ready response if the model is missing or invalid.
-- backend/scripts/train_fire_model.py requires documented real labelled data and evaluates on a chronological holdout.
+- POST /ml/predict is reserved for the separate nine-feature model and returns a not-ready response until that model is trained with matching documented labels.
+- GET /ml/research-status and POST /ml/research-predict expose the separate four-feature research prototype trained from the UCI Algerian Forest Fires dataset.
+- `backend/scripts/train_uci_research_model.py` downloads the documented UCI archive, records its SHA-256 hash, and evaluates a geographic holdout (train on Béjaïa, test on Sidi-Bel Abbès). This is not a chronological holdout.
 - Synthetic labels must not be used to create the appearance of model readiness.
 - No model accuracy or operational performance is claimed unless a real training run produced those metrics.
 
@@ -71,7 +72,7 @@ The static frontend can be served from the repository root using any local stati
 
 ## Optional ML environment
 
-Install backend/requirements-ml.txt in a dedicated training or worker environment. Training requires a documented source of real labelled observations and the NEXORA_LABEL_SOURCE environment variable. The training script intentionally stops when data or labels are missing. Do not commit private datasets, provider keys, trained artifacts containing sensitive data, or secrets.
+Install `backend/requirements.txt` for the reproducible UCI research model. Run `python backend/scripts/train_uci_research_model.py` from the repository root to download the public dataset, evaluate the geographic holdout, and generate the versioned research artifact and metadata. The separate nine-feature model uses a different pipeline and remains unavailable until an appropriate documented dataset is collected. Never commit secrets or private datasets.
 
 See Global scalability and demo protocol in docs/GLOBAL_SCALABILITY.md for the acceptance checklist.
 
