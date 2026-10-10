@@ -28,7 +28,7 @@
   function paintSaved() {
     layer.clearLayers();
     const data = stored();
-    L.geoJSON(data, {style:f => ({color:f.properties?.kind==="zone"?"#00ff88":"#48baff",weight:f.properties?.kind==="zone"?2:4,dashArray:f.properties?.kind==="zone"?"7 5":null,fillColor:"#00ff88",fillOpacity:f.properties?.kind==="zone"?.12:0}), pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,color:"#eaffef",fillColor:"#00ff88",fillOpacity:1})}).eachLayer(item => {
+    L.geoJSON(data, {style:f => ({color:f.properties?.kind==="zone"?"#00ff88":"#48baff",weight:f.properties?.kind==="zone"?2:4,dashArray:f.properties?.kind==="zone"?"7 5":"10 8",fillColor:"#00ff88",fillOpacity:f.properties?.kind==="zone"?.12:0,className:f.properties?.kind==="zone"?"nx-safe-zone-outline":"nx-animated-route"}), pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,color:"#eaffef",fillColor:"#00ff88",fillOpacity:1})}).eachLayer(item => {
       const p = item.feature?.properties || {};
       item.bindPopup("<strong>"+(p.kind==="zone"?"Güvenli alan taslağı":"Hat / rota taslağı")+"</strong><br><small>Resmî güvenlik verisi değildir.</small>");
       layer.addLayer(item);
@@ -54,8 +54,8 @@
     if (!mode) return;
     points.push([e.latlng.lat,e.latlng.lng]);
     if (preview) map.removeLayer(preview);
-    if (mode==="zone" && points.length>=2) preview = L.polygon(points,{color:"#00ff88",weight:2,dashArray:"6 5",fillOpacity:.08}).addTo(map);
-    if (mode==="line" && points.length>=2) preview = L.polyline(points,{color:"#48baff",weight:4,dashArray:"7 5"}).addTo(map);
+    if (mode==="zone" && points.length>=2) preview = L.polygon(points,{color:"#00ff88",weight:2,dashArray:"6 5",fillOpacity:.08,className:"nx-safe-zone-outline"}).addTo(map);
+    if (mode==="line" && points.length>=2) preview = L.polyline(points,{color:"#48baff",weight:4,dashArray:"10 8",className:"nx-animated-route"}).addTo(map);
     finish.disabled = points.length < (mode==="zone"?3:2);
     say(points.length+" nokta seçildi. Çizimi bitirdiğinde taslak cihazına kaydedilir.");
   }
