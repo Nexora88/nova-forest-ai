@@ -49,19 +49,19 @@
         if (id !== requestId) return;
         const {lat, lon, label} = target;
         latInput.value = String(lat); lonInput.value = String(lon);
-        if (typeof L !== "undefined" && typeof map !== "undefined") {
-          map.setView([lat, lon], 10, {animate: true});
-          if (marker) map.removeLayer(marker);
-          marker = L.marker([lat, lon]).addTo(map).bindPopup("<b>" + esc(label) + "</b><br>Global live-data check").openPopup();
-          if (polygonLayer) map.removeLayer(polygonLayer);
+        if (typeof L !== "undefined" && window.map && typeof window.map.setView === "function") {
+          window.map.setView([lat, lon], 10, {animate: true});
+          if (marker) window.map.removeLayer(marker);
+          marker = L.marker([lat, lon]).addTo(window.map).bindPopup("<b>" + esc(label) + "</b><br>Global live-data check").openPopup();
+          if (polygonLayer) window.map.removeLayer(polygonLayer);
         }
         const half = 0.15;
         const west = Math.max(-180, lon-half), east = Math.min(180, lon+half);
         const south = Math.max(-90, lat-half), north = Math.min(90, lat+half);
-        if (typeof L !== "undefined" && typeof map !== "undefined") {
-          polygonLayer = L.rectangle([[south,west],[north,east]], {color:"#00ff66",weight:2,fillColor:"#00ff66",fillOpacity:.08,dashArray:"5 5"}).addTo(map);
-          if (hotspotLayer) map.removeLayer(hotspotLayer);
-          hotspotLayer = L.layerGroup().addTo(map);
+        if (typeof L !== "undefined" && window.map && typeof window.map.setView === "function") {
+          polygonLayer = L.rectangle([[south,west],[north,east]], {color:"#00ff66",weight:2,fillColor:"#00ff66",fillOpacity:.08,dashArray:"5 5"}).addTo(window.map);
+          if (hotspotLayer) window.map.removeLayer(hotspotLayer);
+          hotspotLayer = L.layerGroup().addTo(window.map);
         }
         status.textContent = "Location selected. Fetching current Open-Meteo weather and NASA FIRMS response…";
         const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast");
