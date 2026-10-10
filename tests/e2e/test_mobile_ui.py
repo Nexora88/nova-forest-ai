@@ -177,6 +177,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
                     page.locator("[data-delete]").click()
                     page.wait_for_function("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]').every(a=>a.name!=='QA Saved Area')", timeout=10000)
+                    page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
                     self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
                 finally:
                     context.close()
