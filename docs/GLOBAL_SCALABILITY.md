@@ -8,7 +8,7 @@ This statement describes the intended architecture, not a claim that every provi
 
 ## What the global demo proves
 
-The map demo uses a sample GeoJSON polygon near Napa Valley, California. It demonstrates that the map can render and zoom to coordinates outside Türkiye and can request current weather for those coordinates from Open-Meteo when the service is reachable.
+The map demo uses a sample GeoJSON polygon near Napa Valley, California. It demonstrates that the map can render and zoom to coordinates outside Türkiye, request current weather from Open-Meteo, and query the new bounded /satellite/firms endpoint for NASA FIRMS hotspots when FIRMS_MAP_KEY is configured. A not_configured or provider error response is shown honestly.
 
 ## What it does not prove
 
@@ -21,7 +21,7 @@ The map demo uses a sample GeoJSON polygon near Napa Valley, California. It demo
 
 1. Validate the GeoJSON against RFC 7946 and enforce coordinate bounds and size limits.
 2. Request weather data for the polygon's representative coordinate and display source/time or an explicit unavailable state.
-3. Check the NASA FIRMS backend status and configured key without exposing credentials to the browser.
+3. Query /satellite/firms for the demo bounding box; the backend uses FIRMS_MAP_KEY and never sends the secret to the browser.
 4. Check Copernicus/CDSE catalog availability separately from authenticated pixel-processing availability.
 5. Run the ML endpoint only when a verified model artifact and metadata are present.
 6. Save request timestamps, provider status, errors, and model version for reproducibility.
