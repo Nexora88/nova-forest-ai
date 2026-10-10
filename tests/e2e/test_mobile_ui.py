@@ -105,7 +105,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
 
-    def test_global_napa_demo_renders_geojson_and_reports_missing_live_sources_honestly(self):
+    def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
         page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
@@ -114,11 +114,12 @@ class MobileUiSmokeTests(unittest.TestCase):
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
-            page.wait_for_selector("[data-global-demo]", timeout=20000)
-            page.locator("[data-global-demo]").click()
-            page.wait_for_function("Boolean(window.nexoraGlobalLayer && window.nexoraGlobalLayer.getBounds)", timeout=10000)
-            self.assertIn("Napa", page.locator("[data-global-demo-status]").inner_text())
-            self.assertIn("GeoJSON: PASS", page.locator("[data-global-demo-status]").inner_text())
+            page.wait_for_selector("[data-global-form]", timeout=20000)
+            page.locator("[data-lat]").fill("38.375")
+            page.locator("[data-lon]").fill("-122.375")
+            page.locator("[data-global-form] button[type=submit]").click()
+            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates 38.375, -122.375')", timeout=10000)
+            self.assertIn("Open-Meteo unavailable", page.locator("[data-global-demo-status]").inner_text())
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
         finally:
             context.close()
