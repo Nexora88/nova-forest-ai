@@ -19,7 +19,7 @@
       window.nexoraGlobalHotspots = L.layerGroup().addTo(map);
       map.fitBounds(window.nexoraGlobalLayer.getBounds(),{padding:[24,24],maxZoom:10});
       status.textContent = "GeoJSON rendered at Napa Valley, California. Requesting weather and NASA FIRMS status…";
-      const apiBase = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai-backend.vercel.app" : "/api")).replace(/\/$/,"");
+      const apiBase = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai.vercel.app/api" : "/api")).replace(/\/$/,"");
       const weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=38.375&longitude=-122.375&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=auto";
       const firmsUrl = apiBase + "/satellite/firms?west=-122.55&south=38.20&east=-122.20&north=38.55&days=1";
       const [weatherResult,firmsResult] = await Promise.allSettled([
