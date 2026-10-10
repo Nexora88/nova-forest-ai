@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#020303">
 <title>NexoraWildfire AI | Trakya Çevresel İstihbarat</title>
 <link rel="stylesheet" href="css/style.css?v=20261010a"><link rel="stylesheet" href="css/enterprise-reports.css?v=20261010b"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 <link rel="stylesheet" href="css/product-ui.css?v=20261007e"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="favicon.png"><link rel="stylesheet" href="css/province-feedback.css?v=20261007a"><link rel="stylesheet" href="css/special-days.css?v=20261008a"><link rel="stylesheet" href="css/auth.css?v=20261008a"></head>
 <body>
 <header>
@@ -56,13 +56,13 @@
     <div><strong>Uydu ve meteoroloji</strong><p>Sentinel-2 zaman serisi, erişilebilen NASA FIRMS akışı ve mevcut hava tahmini.</p></div>
   </div>
   <p class="report-note">Kurumsal yetki gerekir. Bu ilk sürümde ödeme/abonelik sağlayıcısı bağlı değildir; erişim sunucu tarafında yetkili hesap listesiyle yönetilir. 5 yıllık FIRMS arşivi ve 3 aylık hava tahmini hazır değilse rapor bunları açıkça “veri yok” olarak işaretler; uydurma değer üretmez.</p>
-  <form data-enterprise-report-form>
+  <div class="enterprise-map-wrap"><div class="enterprise-map-heading"><strong>Varlık güzergâhını haritada çiz</strong><small>Çizgi: elektrik hattı · Çokgen: RES/trafo etki alanı · Nokta: tek türbin</small></div><div id="enterprise-asset-map" aria-label="Kurumsal varlık çizim haritası"></div><p class="map-draw-status" data-draw-status>Harita yüklenince çizim araçlarını kullanabilir veya GeoJSON yükleyebilirsin.</p></div><form data-enterprise-report-form>
     <div class="enterprise-report-grid">
       <label>Şirket adı<input name="company_name" minlength="2" maxlength="120" required placeholder="Örn. Enerji şirketi"></label>
       <label>Varlık adı<input name="asset_name" minlength="2" maxlength="120" required placeholder="Örn. Kuzey iletim hattı"></label>
       <label>Varlık türü<select name="asset_type" required><option value="transmission_line">Yüksek gerilim hattı</option><option value="substation">Trafo merkezi</option><option value="wind_turbine">Rüzgâr türbini (RES)</option><option value="other">Diğer altyapı</option></select></label>
       <label>Tampon mesafesi<select name="buffer_m"><option value="100">100 metre</option><option value="250">250 metre</option><option value="500" selected>500 metre</option><option value="1000">1 kilometre</option><option value="2500">2,5 kilometre</option><option value="5000">5 kilometre</option></select></label>
-      <label>Varlık GeoJSON dosyası<input type="file" accept=".json,.geojson,application/geo+json,application/json" required><small>WGS84 GeoJSON: FeatureCollection, LineString, Point veya Polygon. En fazla 1 MB.</small></label>
+      <label>Varlık GeoJSON dosyası (isteğe bağlı)<input type="file" accept=".json,.geojson,application/geo+json,application/json"><small>WGS84 GeoJSON: FeatureCollection, LineString, Point veya Polygon. En fazla 1 MB.</small></label>
     </div>
     <button type="submit">Kurumsal PDF raporu oluştur</button>
     <span data-report-status role="status" aria-live="polite">Rapor oluşturmak için giriş ve kurumsal yetki gerekir.</span>
@@ -98,6 +98,6 @@
 </section>
 </main>
 <footer><p>NexoraWildfire AI · Geliştirici: <strong>Ahmet Eymen Bakraç</strong> · Nexora88 © 2026</p></footer>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script src="js/agri-intelligence.js?v=20261008a"></script><script src="js/dashboard.js?v=20261007a"></script><script src="js/map.js?v=20261010c"></script><script src="js/free-data-layers.js?v=20261010b"></script><script src="js/onboarding.js?v=20261007b"></script><script src="js/offline.js?v=20261007a"></script>
-<script src="js/nova-storage.js?v=20261007c"></script><script src="js/nova-offline-engine.js?v=20261007c"></script><script src="js/install-update.js?v=20261007c"></script><script src="js/edge-ui.js?v=20261007c"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="js/auth.js?v=20261008a"></script><script src="js/nexora-product.js?v=20261008b"></script><script src="js/province-feedback.js?v=20261007a"></script><script src="js/pwa.js?v=20261008"></script><script src="js/enterprise-reports.js?v=20261010b"></script><script src="js/special-days.js?v=20261008a"></script></body></html>
+<script src="js/nova-storage.js?v=20261007c"></script><script src="js/nova-offline-engine.js?v=20261007c"></script><script src="js/install-update.js?v=20261007c"></script><script src="js/edge-ui.js?v=20261007c"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="js/auth.js?v=20261008a"></script><script src="js/nexora-product.js?v=20261008b"></script><script src="js/province-feedback.js?v=20261007a"></script><script src="js/pwa.js?v=20261008"></script><script src="js/enterprise-asset-map.js?v=20261010c"></script><script src="js/enterprise-reports.js?v=20261010c"></script><script src="js/special-days.js?v=20261008a"></script></body></html>

@@ -26,12 +26,12 @@
     const session = window.NovaAuth?.session?.();
     if (!session?.access_token) { setStatus("Kurumsal rapor için giriş yapmalısınız.", true); return; }
     const file = form.querySelector('input[type="file"]').files?.[0];
-    if (!file) { setStatus("Varlığın GeoJSON dosyasını seçin.", true); return; }
-    if (file.size > 1000000) { setStatus("GeoJSON dosyası 1 MB sınırını aşamaz.", true); return; }
+    if (file && file.size > 1000000) { setStatus("GeoJSON dosyası 1 MB sınırını aşamaz.", true); return; }
+    if (!file && !window.NexoraEnterpriseDraw?.geojson) { setStatus("Haritada varlık çiz veya GeoJSON dosyası yükle.", true); return; }
     submit.disabled = true;
     try {
       setStatus("GeoJSON doğrulanıyor…");
-      const geojson = JSON.parse(await file.text());
+      const geojson = file ? JSON.parse(await file.text()) : window.NexoraEnterpriseDraw.geojson;
       const payload = {company_name:form.elements.company_name.value.trim(),asset_name:form.elements.asset_name.value.trim(),asset_type:form.elements.asset_type.value,buffer_m:Number(form.elements.buffer_m.value),asset_geojson:geojson};
       const response = await fetch(API_BASE + "/enterprise/reports", {method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer " + session.access_token},body:JSON.stringify(payload)});
       const body = await response.json().catch(() => ({}));

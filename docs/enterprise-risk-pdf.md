@@ -1,46 +1,24 @@
-# NexoraWildfire AI — Kurumsal varlık risk PDF raporu
+# Kurumsal Varlık Raporu — Nova-Enterprise Report
 
-## Kapsam
-Kurumsal rapor akışı GeoJSON varlıklarını (iletim hattı, trafo merkezi, RES türbini) alır; seçilen tamponu metre cinsinden UTM koordinatlarında üretir ve uzun işlemleri Vercel dışındaki Docker/RQ worker kuyruğuna gönderir. PDF özel Supabase Storage alanına yüklenir ve 15 dakikalık imzalı URL ile indirilir.
+## Akış ve sınırlar
+- Kullanıcı, ana sayfadaki çizim haritasında bir elektrik hattını (LineString), türbin noktasını veya saha çokgenini çizer; alternatif olarak GeoJSON yükler.
+- FastAPI oturum belirtecini Supabase Auth üzerinden doğrular ve yalnızca sunucu tarafında `NEXORA_ENTERPRISE_USER_IDS` ile yetkilendirilmiş hesapların işini kuyruğa alır.
+- Redis/RQ işi ayrı Docker worker üzerinde yürütür. ReportLab PDF üretimi Vercel istek sürecinde çalışmaz.
+- PDF, özel Supabase Storage bucket'ına yüklenir. Kullanıcıya 15 dakika geçerli imzalı indirme URL'i döner. Redis'e PDF baytları yazılmaz.
+- DM geçmişi son 20 mesajla açılır; yukarı kaydırınca eski sayfalar çekilir. Gelen kutusu en fazla 50 konuşma ile sınırlıdır.
+- Profil özeti tarayıcıda kullanıcı ID'siyle eşleşen, 10 dakika TTL'li cache'ten gösterilir; arka planda Supabase'den yenilenir. Oturum kapanınca cache temizlenir.
 
-## PDF bölümleri
-- Varlık özeti, varlık geometrisi ve tampon alanı açıklaması
-- Copernicus Sentinel-2 L2A NDVI/NDMI zaman serisi (CDSE erişimi varsa)
-- NASA FIRMS/VIIRS son 10 günlük sıcak nokta akışı (MAP_KEY ve kaynak erişimi varsa)
-- OpenStreetMap etiketli itfaiye istasyonu ve OSRM yaklaşık yol mesafesi (servisler erişilebilirse)
-- Open-Meteo günlük hava tahmini (en çok 16 gün)
-- Kaynak durumu, veri boşlukları ve saha doğrulaması gereken aksiyon önerileri
+## PDF veri katmanları
+- Copernicus Sentinel-2 L2A Statistical API: NDVI/NDMI zaman serisi. Tamponlanmış varlık geometrisi kullanılır; FIRMS alan sorgusu sınırlayıcı kutuyla yapılır.
+- NASA FIRMS/VIIRS: yapılandırılmış MAP key varsa son 10 günlük akış. Beş yıllık arşiv bu sürümde üretilmiyor.
+- Open-Meteo: kullanılabilir günlük tahmin penceresi (en çok 16 gün); üç aylık mevsimsel tahmin mevcut değil.
+- OpenStreetMap/Overpass + OSRM: etiketlenmiş istasyon ve yaklaşık yol rotası; gerçek müdahale süresi garantisi değil.
+- Eksik veya yapılandırılmamış kaynak “veri yok” olarak işaretlenir. Bu durum sıfır risk anlamına gelmez.
 
-## Bilinçli sınırlamalar
-- Beş yıllık FIRMS arşiv sayısı bu ilk sürümde üretilmez; PDF'de unavailable olarak gösterilir. Son 10 günlük akış geçmiş beş yılın yerine geçmez.
-- Open-Meteo günlük tahmini 16 günle sınırlıdır. Üç aylık meteoroloji tahmini varmış gibi gösterilmez; mevsimsel model entegrasyonu eklenene kadar unavailable yazılır.
-- Uydu istatistiği için tampon geometrisinin sınırlayıcı dikdörtgeni kullanılır. Bu, hassas mühendislik/GIS tampon kesişimi veya mülkiyet/parsel sınırı değildir.
-- OSM istasyon/yol verisi eksik olabilir; tahmini sürüş süresi müdahale garantisi değildir.
-- Eğitilmiş ve bağımsız test edilmiş model bulunmadıkça ML yangın olasılığı rapora eklenmez. Kural tabanlı meteorolojik indeks olasılık gibi adlandırılmaz.
-- Rapor bir mühendislik uygunluk raporu veya acil durum planının yerine geçmez.
+## Kurulum / erişim
+Worker sunucusunda `backend/.env.worker.example` değerlerini gerçek ortam değişkenleriyle yapılandırın: `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET`, `FIRMS_MAP_KEY`, `SUPABASE_URL`, `SUPABASE_ADMIN_KEY`, `NEXORA_ARTIFACT_BUCKET`, `NEXORA_WORKER_TOKEN`. Backend Vercel Production ortamına `NEXORA_WORKER_URL`, aynı `NEXORA_WORKER_TOKEN`, `SUPABASE_URL`, `SUPABASE_ANON_KEY` ve onaylı kurumsal kullanıcıların virgülle ayrılmış Supabase UUID'lerini içeren `NEXORA_ENTERPRISE_USER_IDS` eklenmelidir. Secret'ları Git'e veya istemci JavaScript'ine koymayın.
 
-## Yapılandırma
+Bu sürümde ödeme sağlayıcısı, abonelik webhook'u ve e-posta servisi bağlı değildir; erişim manuel sunucu allowlist'iyle sınırlıdır. Ticari kullanımdan önce faturalandırma/abonelik doğrulaması, kullanım kotası, denetim kayıtları ve kurumsal sözleşme eklenmelidir.
 
-### Vercel backend ortamı
-- NEXORA_ENTERPRISE_USER_IDS: virgülle ayrılmış, kurumsal rapor yetkisi verilmiş Supabase kullanıcı UUID'leri. Bu ilk sürümde ödeme entegrasyonu olmadığı için yetki yalnızca sunucu tarafı allowlist ile verilir.
-- NEXORA_WORKER_URL
-- NEXORA_WORKER_TOKEN
-- SUPABASE_URL
-- SUPABASE_ANON_KEY veya SUPABASE_PUBLISHABLE_KEY
-
-### Ayrı Docker worker ortamı
-Mevcut backend/.env.worker.example değerlerine ek olarak:
-- FIRMS_MAP_KEY
-- CDSE_CLIENT_ID ve CDSE_CLIENT_SECRET
-- SUPABASE_URL
-- SUPABASE_ADMIN_KEY
-- NEXORA_ARTIFACT_BUCKET (özel bucket; varsayılan nexora-job-artifacts)
-
-Supabase Storage bucket özel tutulmalı; raporlar herkese açık URL ile sunulmamalıdır. Worker'a yalnızca NEXORA_WORKER_TOKEN üzerinden erişim verin.
-
-## API
-- POST /api/enterprise/reports — giriş + kurumsal allowlist gerektirir, 202 ile görev kimliği döndürür.
-- GET /api/enterprise/reports/{job_id} — aynı kullanıcıya ait görevin durumunu ve tamamlanınca kısa süreli PDF bağlantısını döndürür.
-
-## Ön yüz
-Ana paneldeki Kurumsal Analiz bölümü, GeoJSON dosyası ve varlık bilgilerini gönderir. Ödeme sağlayıcısı veya otomatik abonelik doğrulaması bu sürümde yoktur; ücretli erişim için önce kullanıcı allowlist'i manuel yönetilir.
+## Model güvenliği
+Random Forest yalnızca belgelenmiş gerçek etiketli eğitim CSV'si ve bağımsız zaman bazlı test mevcut olduğunda eğitilir. Eğitim artefaktı yoksa `/ml/status` `not_trained` döndürür ve API yüzde uydurmaz. Şu anki model betiği kronolojik holdout raporlar; coğrafi bağımsız test için konum bazlı holdout veri hazırlığı ayrıca gereklidir.
