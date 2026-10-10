@@ -5,7 +5,7 @@
   function init() {
     const mapElement = document.getElementById("map");
     const host = document.querySelector(".map-section");
-    if (!mapElement || !host || typeof L === "undefined" || typeof map === "undefined") return;
+    if (!mapElement || !host) return;
     const panel = document.createElement("section");
     panel.className = "global-demo-panel";
     panel.style.cssText = "margin:16px 0;padding:16px;border:1px solid #285a38;border-radius:14px;background:#07100a;color:#dfffe7";
@@ -49,16 +49,20 @@
         if (id !== requestId) return;
         const {lat, lon, label} = target;
         latInput.value = String(lat); lonInput.value = String(lon);
-        map.setView([lat, lon], 10, {animate: true});
-        if (marker) map.removeLayer(marker);
-        marker = L.marker([lat, lon]).addTo(map).bindPopup("<b>" + esc(label) + "</b><br>Global live-data check").openPopup();
-        if (polygonLayer) map.removeLayer(polygonLayer);
+        if (typeof L !== "undefined" && typeof map !== "undefined") {
+          map.setView([lat, lon], 10, {animate: true});
+          if (marker) map.removeLayer(marker);
+          marker = L.marker([lat, lon]).addTo(map).bindPopup("<b>" + esc(label) + "</b><br>Global live-data check").openPopup();
+          if (polygonLayer) map.removeLayer(polygonLayer);
+        }
         const half = 0.15;
         const west = Math.max(-180, lon-half), east = Math.min(180, lon+half);
         const south = Math.max(-90, lat-half), north = Math.min(90, lat+half);
-        polygonLayer = L.rectangle([[south,west],[north,east]], {color:"#00ff66",weight:2,fillColor:"#00ff66",fillOpacity:.08,dashArray:"5 5"}).addTo(map);
-        if (hotspotLayer) map.removeLayer(hotspotLayer);
-        hotspotLayer = L.layerGroup().addTo(map);
+        if (typeof L !== "undefined" && typeof map !== "undefined") {
+          polygonLayer = L.rectangle([[south,west],[north,east]], {color:"#00ff66",weight:2,fillColor:"#00ff66",fillOpacity:.08,dashArray:"5 5"}).addTo(map);
+          if (hotspotLayer) map.removeLayer(hotspotLayer);
+          hotspotLayer = L.layerGroup().addTo(map);
+        }
         status.textContent = "Location selected. Fetching current Open-Meteo weather and NASA FIRMS response…";
         const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast");
         weatherUrl.search = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:"temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",timezone:"auto"}).toString();
@@ -80,7 +84,7 @@
             firms.alerts.forEach(a => {
               const aLat = Number(a.latitude), aLon = Number(a.longitude);
               if (!Number.isFinite(aLat) || !Number.isFinite(aLon)) return;
-              L.circleMarker([aLat,aLon],{radius:6,color:"#ff453a",weight:1,fillColor:"#ff453a",fillOpacity:.9})
+              if (typeof L !== "undefined" && hotspotLayer) L.circleMarker([aLat,aLon],{radius:6,color:"#ff453a",weight:1,fillColor:"#ff453a",fillOpacity:.9})
                 .bindTooltip("NASA FIRMS · " + (a.confidence || "confidence unavailable") + " · " + (a.acq_date || "date unavailable"))
                 .addTo(hotspotLayer);
             });
