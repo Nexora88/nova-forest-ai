@@ -6,9 +6,13 @@ const ACTIVE_PROVINCES=new Set(["Edirne","Tekirdağ","Kırklareli","Çanakkale",
 const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
 const isMobile=matchMedia("(max-width: 700px)").matches; const map=L.map("map",{zoomControl:true,doubleClickZoom:true,dragging:!isMobile,scrollWheelZoom:!isMobile,touchZoom:true,tap:true}).setView([41.15,27.1],8); if(isMobile){map.dragging.disable();map.touchZoom.enable();map.doubleClickZoom.disable();}
-const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
+const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
-L.control.layers({"Temel Harita":base,"Uydu":sat},null,{collapsed:false}).addTo(map);
+const dark=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:"© OpenStreetMap © CARTO"});
+const light=L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:"© OpenStreetMap © CARTO"});
+const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors · © OpenTopoMap (CC-BY-SA)"});
+const humanitarian=L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors · Humanitarian style"});
+L.control.layers({"OSM · Standart":base,"Uydu · Esri":sat,"Karanlık · CARTO":dark,"Açık · CARTO":light,"Topoğrafya · OpenTopoMap":topo,"İnsani harita · HOT":humanitarian},null,{collapsed:true,position:"topright"}).addTo(map);
 const scan=document.createElement("div");scan.className="nova-satellite-scan";scan.innerHTML="<span>UYDU ANALİZİ • VECTOR OVERLAY • OFFLINE SINIRLAR</span><i></i>";document.querySelector(".map-section")?.appendChild(scan);
 map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
 
