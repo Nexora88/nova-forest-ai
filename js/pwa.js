@@ -11,7 +11,7 @@
     button.className = "nexora-install-button";
     button.setAttribute("aria-label", "Install NexoraWildfire AI");
     button.innerHTML = '<img src="' + new URL("assets/nexora-wildfire-logo.png", root).href + '" alt=""><span>Install app</span>';
-    button.hidden = true;
+    button.hidden = false;
     document.body.appendChild(button);
 
     const hide = () => {
@@ -27,7 +27,7 @@
     });
     button.addEventListener("click", async () => {
       if (!deferred) {
-        button.querySelector("span").textContent = "Use your browser menu to install";
+        button.querySelector("span").textContent = /iphone|ipad|ipod/i.test(navigator.userAgent) ? "Share → Add to Home Screen" : "Use your browser menu to install";
         return;
       }
       const promptEvent = deferred;
