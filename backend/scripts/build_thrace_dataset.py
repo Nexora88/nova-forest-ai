@@ -63,7 +63,10 @@ def fetch_firms(start, end, map_key, session):
             body = response.text.strip()
             if not body or body.lower().startswith("invalid"):
                 raise RuntimeError(f"NASA FIRMS returned an unusable response for {source}, {first}.")
-            for row in csv.DictReader(io.StringIO(body)):
+            reader = csv.DictReader(io.StringIO(body))
+            if not reader.fieldnames or not {"latitude", "longitude", "acq_date"}.issubset(set(reader.fieldnames)):
+                raise RuntimeError(f"NASA FIRMS response did not contain the expected CSV columns for {source}, {first}.")
+            for row in reader:
                 try:
                     lat, lon = float(row["latitude"]), float(row["longitude"])
                     day = parse_date(row["acq_date"])
@@ -137,7 +140,9 @@ def row_from_sample(day, lat, lon, weather, label, label_type, label_source, sou
         "date": day.isoformat(), "latitude": lat, "longitude": lon,
         **{feature: weather[feature] for feature in FEATURES},
         "label": label, "label_type": label_type, "label_source": label_source,
-        "source_time": source_row.get("acq_time", ""),
+        "acquisition_date_utc": source_row.get("acq_date", day.isoformat()),
+        "acquisition_time_utc": source_row.get("acq_time", ""),
+        "weather_interval": "daily local calendar day; ERA5-Land reanalysis",
         "brightness": source_row.get("bright_ti4", source_row.get("brightness", "")),
         "frp": source_row.get("frp", ""),
         "weather_source": weather["weather_source"],
