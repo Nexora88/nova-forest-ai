@@ -1,0 +1,6 @@
+# Isolated training/inference environment; do not add to Vercel's default requirements.
+-r requirements.txt
+numpy
+pandas
+scikit-learn
+joblib
