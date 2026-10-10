@@ -15,7 +15,7 @@ Produce repeatable evidence that the core product works for a small set of real 
 
 ## Pilot locations
 
-Use a fixed, documented set of test points in Edirne, Kırklareli, and Tekirdağ. Record the exact coordinates or named location, test time in Europe/Istanbul, device/browser, and network conditions for every run. Do not change the locations mid-comparison.
+Use these fixed city-centre test points for the first repeatability cycle (WGS84 latitude, longitude): Edirne (41.6771, 26.5557), Kırklareli (41.7355, 27.2252), and Tekirdağ (40.9780, 27.5110). These are test points, not weather-station ground truth. Record test time in Europe/Istanbul, device/browser, network conditions, provider response time, HTTP status, source timestamp, and units for every run. Do not change locations mid-comparison.
 
 ## Repeatable test protocol
 
@@ -32,9 +32,20 @@ For each location:
 
 | Run ID | Date/time (Europe/Istanbul) | Location / coordinates | Device + browser | Network | Map | Save/reload/delete | Provider + timestamp | Mismatches / notes |
 |---|---|---|---|---|---|---|---|---|
-| TRK-001 | Pending real run | Edirne test point | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
-| TRK-002 | Pending real run | Kırklareli test point | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
-| TRK-003 | Pending real run | Tekirdağ test point | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
+| TRK-001 | Pending real run | Edirne (41.6771, 26.5557) | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
+| TRK-002 | Pending real run | Kırklareli (41.7355, 27.2252) | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
+| TRK-003 | Pending real run | Tekirdağ (40.9780, 27.5110) | Pending | Online | Not tested | Not tested | Not captured | No results claimed yet |
+
+## Metrics to report (do not pre-fill results)
+
+- **Map success rate:** successful loads / attempted loads.
+- **Area workflow success:** save → reload → reopen on map → delete completed without data loss / attempts.
+- **Data completeness:** returned fields with valid units and provider timestamps / expected fields.
+- **Provider latency:** request duration in milliseconds; report median and range after repeated runs.
+- **Value agreement:** compare app display with the same provider response for the same coordinates and timestamp; record absolute differences. This checks data handling, not whether the provider forecast matches actual weather.
+- **Offline retention:** whether the saved polygon remains viewable after a reload with the network disabled, on the tested device/browser.
+
+Each metric must include sample count, failures, and the test environment. Keep screenshots/logs with timestamps and redact tokens or account details.
 
 ## Acceptance criteria
 
@@ -44,6 +55,8 @@ For each location:
 - On each pilot location, the saved-area workflow succeeds on desktop and mobile.
 - Live data is labelled with source and timestamp where available; missing data is shown as unavailable, not silently replaced with a plausible number.
 - At least three repeat runs per location are documented before making reliability claims.
+- The save → reload → reopen → delete sequence passes on each tested device; failures are logged, not omitted.
+- Displayed live values match the corresponding provider response for the same coordinates/time within the UI's displayed rounding.
 - Offline behaviour is reported only for the functions actually tested offline.
 
 ## Research integrity
