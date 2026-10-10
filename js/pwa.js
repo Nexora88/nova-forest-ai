@@ -4,13 +4,13 @@
   function boot() {
     if (installed()) return;
     let deferred = null;
-    const root = new URL("../", document.currentScript?.src || location.href);
+    const root = new URL("./", document.querySelector('link[rel="manifest"]')?.href || location.href);
     const button = document.createElement("button");
     button.id = "nexora-install";
     button.type = "button";
     button.className = "nexora-install-button";
     button.setAttribute("aria-label", "Install NexoraWildfire AI");
-    button.innerHTML = '<img src="' + new URL("assets/nexora-wildfire-logo.png", root).href + '" alt=""><span>Install app</span>';
+    button.innerHTML = '<span class="nexora-install-icon" aria-hidden="true">↓</span><span>Install app</span>';
     button.hidden = false;
     document.body.appendChild(button);
 
