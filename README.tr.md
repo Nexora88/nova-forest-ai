@@ -66,3 +66,8 @@ Katkılar memnuniyetle karşılanır. Gerçek dışı veri ve metrik eklemeyin; 
 ## Önemli sınırlama
 
 NexoraWildfire AI geliştirilmekte olan bir araştırma ve karar destek projesidir. Resmî uyarı sistemi değildir, yangını kesin olarak tahmin etmeyi garanti etmez ve yerel kurumların, uzman değerlendirmesinin veya acil durum prosedürlerinin yerini almamalıdır.
+
+
+## Araştırma amaçlı makine öğrenmesi prototipi
+
+UCI Algerian Forest Fires veri setiyle yeniden üretilebilir bir Random Forest araştırma modeli eğitilmiştir. Coğrafi ayırımlı test metrikleri ve sınırlamalar [model kartında](docs/ML_MODEL_CARD.md) belgelenmiştir. 2012 tarihli küçük Cezayir veri seti **Trakya/Türkiye için doğrulanmamıştır** ve operasyonel yangın tahmini değildir. Dokuz özellikli, yedi günlük ayrı model; uygun etiketli geçmiş veri toplanana kadar tahmin üretmez.
