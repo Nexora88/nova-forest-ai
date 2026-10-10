@@ -20,6 +20,55 @@ def nasa_firms_area(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return get_firms_alerts(days=days, bbox=bbox)
 
+
+@router.get("/providers/status")
+def provider_credentials_status(probe: bool = Query(False)):
+    """Report credential presence without exposing secrets; optionally validate them with providers."""
+    import os
+    from datetime import datetime, timezone
+    import requests
+
+    firms_key = os.getenv("FIRMS_MAP_KEY", "").strip()
+    firms = {"status": "not_configured" if not firms_key else "configured", "secret_exposed": False}
+    if probe and firms_key:
+        try:
+            response = requests.get(
+                "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/",
+                params={"MAP_KEY": firms_key},
+                timeout=12,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            if isinstance(payload, dict) and payload.get("transaction_limit") is not None:
+                firms.update({"status": "authorized", "transaction_limit": payload.get("transaction_limit"), "current_transactions": payload.get("current_transactions")})
+            else:
+                firms["status"] = "invalid_or_unrecognized_response"
+        except Exception as exc:
+            firms.update({"status": "validation_failed", "error_type": type(exc).__name__})
+
+    client_id = os.getenv("CDSE_CLIENT_ID", "").strip()
+    client_secret = os.getenv("CDSE_CLIENT_SECRET", "").strip()
+    copernicus = {"status": "not_configured" if not (client_id and client_secret) else "configured", "secret_exposed": False}
+    if probe and client_id and client_secret:
+        try:
+            from app.services.ndvi_service import _token
+            token = _token()
+            copernicus["status"] = "authorized" if token else "not_configured"
+            copernicus["token_received"] = bool(token)
+        except Exception as exc:
+            copernicus.update({"status": "validation_failed", "error_type": type(exc).__name__, "token_received": False})
+
+    return {
+        "checked_at_utc": datetime.now(timezone.utc).isoformat(),
+        "probe_requested": probe,
+        "providers": {
+            "nasa_firms": firms,
+            "copernicus_sentinel_hub": copernicus,
+            "open_meteo": {"status": "public_no_api_key_required", "secret_exposed": False},
+        },
+        "note": "Only configuration status and non-sensitive provider diagnostics are returned. Secret values and access tokens are never returned.",
+    }
+
 @router.get("/status")
 def satellite_status():
     ndvi = get_ndvi_status(None)
