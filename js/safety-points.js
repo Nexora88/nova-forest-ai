@@ -10,7 +10,7 @@
       <div class="nx-safety-head"><span class="nx-safety-pulse" aria-hidden="true"></span><div><strong>HARİTADA KAYITLI GÜVENLİ NOKTALAR</strong><small>Toplanma alanı · barınak · itfaiye</small></div></div>
       <p class="nx-safety-warning">Bu arama OpenStreetMap'e katkı yapan kullanıcıların kaydettiği noktaları gösterir; resmî veya güncel güvenlik garantisi değildir. Haritayı aramak istediğin bölgeye getirip sorgula. Acil durumda 112'yi ara ve yetkili kurumların talimatlarına uy.</p>
       <div class="nx-safety-controls"><label>Arama yarıçapı <select data-safety-radius><option value="5000">5 km</option><option value="10000" selected>10 km</option><option value="25000">25 km</option></select></label><button type="button" data-safety-search>Yakındaki noktaları ara</button><button type="button" data-safety-clear>Katmanı temizle</button></div>
-      <div class="nx-safety-status" role="status" aria-live="polite">Harita merkezinin çevresindeki kayıtlı noktaları aramak için düğmeye bas.</div>
+      <div class="nx-safety-status" data-safety-status role="status" aria-live="polite">Harita merkezinin çevresindeki kayıtlı noktaları aramak için düğmeye bas.</div>
       <div class="nx-safety-results" data-safety-results></div>
       <small class="nx-safety-source">Kaynak: OpenStreetMap · kayıtlar eksik veya güncelliğini yitirmiş olabilir.</small>`;
     host.insertAdjacentElement("afterend", panel);
@@ -23,7 +23,7 @@
     const esc = value => String(value || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     let requestId = 0;
     const say = text => { status.textContent = text; };
-    clear.addEventListener("click", () => { requestId++; layer.clearLayers(); results.replaceChildren(); say("Güvenli nokta katmanı temizlendi."); });
+    clear.addEventListener("click", () => { requestId++; search.disabled = false; layer.clearLayers(); results.replaceChildren(); say("Güvenli nokta katmanı temizlendi."); });
     search.addEventListener("click", async () => {
       const id = ++requestId;
       const center = map.getCenter();
