@@ -30,6 +30,9 @@ TARGET = "fire_within_7d"
 
 
 def main() -> None:
+    label_source = os.getenv("NEXORA_LABEL_SOURCE", "").strip()
+    if not label_source:
+        raise SystemExit("Set NEXORA_LABEL_SOURCE to document the real fire-label source before training.")
     if not DATA.is_file():
         raise SystemExit(f"Training data not found: {DATA}. Use documented real labels; synthetic data is forbidden.")
     frame = pd.read_csv(DATA)
@@ -84,11 +87,9 @@ def main() -> None:
         "features": FEATURES,
         "target": TARGET,
         "evaluation": metrics,
-        "label_source": os.getenv("NEXORA_LABEL_SOURCE", "UNSPECIFIED"),
+        "label_source": label_source,
         "notes": "Chronological holdout; metrics are dataset-specific and not a guarantee of operational performance.",
     }
-    if metadata["label_source"] == "UNSPECIFIED":
-        raise SystemExit("Set NEXORA_LABEL_SOURCE to document the real fire-label source before production training.")
     (OUT / "fire_risk_metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(metadata, ensure_ascii=False, indent=2))
 
