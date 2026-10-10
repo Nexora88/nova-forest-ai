@@ -139,6 +139,14 @@
     ["Risk eşiği","Risk threshold"],["Nova-Alert'i etkinleştir","Enable Nova-Alert"],["Kaydet ve tarayıcı izni ver","Save and grant browser permission"],
     ["İlk alanını oluştur.","Create your first area."],["Henüz geçmiş yok.","No history yet."],["Veri yok","No data"],["Veri bekleniyor…","Waiting for data…"],
     ["KURUMSAL YETKİLİ ÇALIŞMA ALANI","AUTHORIZED ENTERPRISE WORKSPACE"],["Canlı hava verisi","Live weather data"],
+    ["Menu","Menü"],["Close","Kapat"],["More","Diğer"],["Install app","Uygulamayı yükle"],["Use your browser menu to install","Yüklemek için tarayıcı menüsünü kullan"],["Share → Add to Home Screen","Paylaş → Ana Ekrana Ekle"],
+    ["Documented fire-weather model","Belgelenmiş yangın-hava durumu modeli"],["Checking the backend model artifact and evaluation record…","Backend model dosyası ve değerlendirme kaydı kontrol ediliyor…"],
+    ["Research model status:","Araştırma modeli durumu:"],["No prediction is presented until a valid model artifact is available.","Geçerli model dosyası hazır olana kadar tahmin gösterilmez."],
+    ["Live model status could not be verified from this page. The UI will not invent training metrics.","Canlı model durumu bu sayfadan doğrulanamadı. Arayüz eğitim metrikleri uydurmaz."],
+    ["RESEARCH PROTOTYPE","ARAŞTIRMA PROTOTİPİ"],["labelled daily observations","etiketli günlük gözlem"],["period not reported","dönem belirtilmemiş"],
+    ["Accuracy","Doğruluk"],["Balanced accuracy","Dengeli doğruluk"],["Precision","Kesinlik"],["Recall","Duyarlılık"],["F1","F1"],["ROC AUC","ROC AUC"],
+    ["This model uses historical Algerian weather observations from 2012. It is not validated for Thrace/Türkiye, is not a seven-day forecast, and must not be used as an official warning.","Bu model 2012 tarihli Cezayir meteoroloji gözlemlerini kullanır. Trakya/Türkiye için doğrulanmamıştır, yedi günlük tahmin değildir ve resmî uyarı olarak kullanılmamalıdır."],
+    ["Live model status could not be verified from this page.","Canlı model durumu bu sayfadan doğrulanamadı."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
