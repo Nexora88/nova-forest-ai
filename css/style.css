@@ -770,3 +770,15 @@ html,body{max-width:100%;overflow-x:hidden}button,a{touch-action:manipulation}.l
   .nexora-language-toggle{left:12px!important;bottom:12px!important;min-height:46px}
   body{padding-bottom:66px}
 }
+
+
+.ml-research-panel{margin:24px 0;padding:22px;border:1px solid #245b36;border-radius:16px;background:linear-gradient(135deg,rgba(0,255,102,.06),rgba(0,0,0,.85))}
+.ml-research-panel h2{margin:8px 0 12px;color:#eaffef}
+.ml-research-panel [data-ml-state]{color:#b9cbbc;line-height:1.6}
+.ml-metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.ml-metric{padding:13px;border:1px solid #1d4229;border-radius:10px;background:#050a06;display:flex;flex-direction:column;gap:8px}
+.ml-metric span{font-size:11px;color:#a9b8ad}
+.ml-metric strong{font-size:22px;color:#00ff66}
+.ml-research-note{font-size:12px;line-height:1.65;color:#9cad9f}
+.ml-research-note a{color:#00ff66}
+@media(max-width:600px){.ml-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ml-metric strong{font-size:19px}}
