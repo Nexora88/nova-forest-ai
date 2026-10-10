@@ -7,3 +7,4 @@ pywebpush==2.5.0
 
 scikit-learn
 joblib
+pandas
