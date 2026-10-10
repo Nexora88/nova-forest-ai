@@ -34,3 +34,10 @@ The map demo uses a sample GeoJSON polygon near Napa Valley, California. It demo
 - Weather failures are reported without invented values.
 - Missing NASA/CDSE credentials produce an honest unavailable state.
 - An untrained model returns the documented not-ready response rather than a rule-based fallback.
+
+
+## ML evidence and provider credential checks
+
+The research-only Random Forest is trained from the UCI Algerian Forest Fires dataset (244 daily observations, 2012). Its geographic holdout metrics and limitations are documented in `docs/ML_MODEL_CARD.md`. The model does not establish predictive performance in Thrace/Türkiye or California. The primary nine-feature/seven-day model remains unavailable until a matching, documented labelled dataset is collected and evaluated.
+
+After deploying the backend, call `GET /satellite/providers/status?probe=true` to check NASA FIRMS and Copernicus credential configuration. The endpoint returns status only and never returns keys or tokens. `authorized` means the provider accepted the credential probe; it does not by itself prove imagery processing or end-to-end risk outputs. Confirm Copernicus processing by completing a queued NDVI job with a non-empty time series.
