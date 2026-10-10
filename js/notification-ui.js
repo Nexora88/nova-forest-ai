@@ -35,12 +35,15 @@ if(notifyForm){
   notifyForm.onsubmit=async e=>{
     e.preventDefault();
     const enabled=notifyForm.enabled.checked;
-    const threshold=Number(notifyForm.threshold.value||70);
+    const threshold=Math.max(25,Math.min(100,Number(notifyForm.threshold.value||70)));
     localStorage.setItem(NOVA_ALERT_SETTINGS_KEY,JSON.stringify({enabled,threshold}));
-    let permission="disabled";
-    if(enabled)permission=await requestNovaBrowserPermission();
     const status=document.querySelector("[data-notify-status]");
-    if(status)status.textContent=enabled?(permission==="granted"?"Nova-Alert aktif • cihaz bildirimi için Web Push hazır.":"Nova-Alert aktif • tarayıcı izni verilmedi."):"Nova-Alert kapalı.";
+    if(!enabled){if(status)status.textContent="Nova-Alert kapalı.";return}
+    const permission=await requestNovaBrowserPermission();
+    if(permission!=="granted"){if(status)status.textContent="Nova-Alert yerel olarak açık; tarayıcı bildirim izni verilmedi.";return}
+    const area=JSON.parse(localStorage.getItem(PUSH_AREA_KEY)||"null")||{name:"Genel Nova-Alert",lat:41.0082,lon:28.9784};
+    const result=await enableNovaWebPush(area);
+    if(status)status.textContent=result.ok?"Nova-Alert aktif • hesap ve sunucu Web Push aboneliği kaydedildi.":result.reason==="login_required"?"Tarayıcı izni açık. Kişisel arka plan bildirimi için hesabına giriş yap.":result.reason==="server"?"Tarayıcı izni açık; sunucu VAPID/Supabase anahtarları henüz yapılandırılmadı.":result.reason==="permission"?"Tarayıcı bildirim izni verilmedi.":"Tarayıcı izni açık; Web Push kurulumu tamamlanamadı.";
   };
 }
 window.NovaAlert={settings:getNovaAlertSettings,save:saveNovaAlert,browser:showNovaBrowserAlert,requestPermission:requestNovaBrowserPermission,enablePush:enableNovaWebPush};
