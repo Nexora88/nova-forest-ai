@@ -37,6 +37,23 @@
  ["Koordinatlar","Coordinates"],["Yer adı","Place name"],["Enlem","Latitude"],["Boylam","Longitude"],["Konuma git ve analiz et","Go to location and analyze"],
  ["Yer adı veya koordinat gir","Enter a place name or coordinates"],["Yer bulunamadı","Place not found"],["Hava durumu","Weather"],["NASA FIRMS durumu","NASA FIRMS status"],
  ["Güvenli bölge","Safe zone"],["Tahliye rotası","Evacuation route"],["Planlama taslağı","Planning draft"],["Resmî veri değildir","Not official data"]
+ ["SUPABASE · ZAMAN SERİSİ","SUPABASE · TIME SERIES"],
+ ["Günlük çevre geçmişi","Daily environmental history"],
+ ["Alanların kaydedilmiş çevresel göstergeleri. Grafik yalnızca veritabanındaki gerçek kayıtları gösterir.","Saved environmental indicators for your areas. The chart only shows real records from the database."],
+ ["CANLI SENKRON","LIVE SYNC"],
+ ["Supabase bağlantısı hazırlanıyor…","Preparing Supabase connection…"],
+ ["Kayıtlı geçmiş aranıyor…","Looking for saved history…"],
+ ["Henüz veri yok","No data yet"],
+ ["Geçmişi görmek için hesabına giriş yap.","Sign in to view your history."],
+ ["Önce Harita bölümünden bir alan kaydet.","Save an area from the Map section first."],
+ ["Supabase geçmiş kayıtları yükleniyor…","Loading saved history from Supabase…"],
+ ["Supabase'den gerçek kayıtlar yüklendi.","Real records loaded from Supabase."],
+ ["Henüz geçmiş kaydı yok; grafik veri geldiğinde otomatik oluşacak.","No history records yet; the chart will appear automatically when data arrives."],
+ ["Geçmiş yüklenemedi: ","History could not be loaded: "],
+ [" kayıt · son: "," records · latest: "],
+ [" · gösterge "," · indicator "],
+ ["Gerçek kayıtlar","Real records"],
+ ["Günlük çevre geçmişi","Daily environmental history"],
  ];
  const toEn=new Map(pairs), toTr=new Map(pairs.map(([a,b])=>[b,a]));
  const originals=new WeakMap();
