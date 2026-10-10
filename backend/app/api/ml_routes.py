@@ -11,11 +11,9 @@ class FireFeatures(BaseModel):
     humidity_min: float = Field(ge=0, le=100)
     wind_max: float = Field(ge=0, le=250)
     precipitation_sum: float = Field(ge=0, le=2000)
-    ndvi_mean: float = Field(ge=-1, le=1)
-    ndmi_mean: float = Field(ge=-1, le=1)
     et0: float = Field(ge=0, le=50)
-    vpd: float = Field(ge=0, le=20)
-    previous_fire_1km_30d: float = Field(ge=0, le=1000)
+    vpd_max: float = Field(ge=0, le=20)
+    precipitation_previous_6d: float = Field(ge=0, le=2000)
 
 
 class ResearchFireFeatures(BaseModel):
