@@ -698,3 +698,41 @@ html,body{max-width:100%;overflow-x:hidden}button,a{touch-action:manipulation}.l
 @media(max-width:700px){.selected-field-panel{left:10px;right:10px;top:58px;width:auto}}
 
 .free-layer-note{position:relative;z-index:500;margin:8px 0 0;padding:10px 12px;border:1px solid #214a2d;border-radius:10px;background:rgba(3,9,5,.92);display:flex;flex-wrap:wrap;align-items:center;gap:7px 12px;color:#7f9084;font-size:9px}.free-layer-note b{color:#00ff66;font:800 9px "Courier New";letter-spacing:.8px}.free-layer-note span{color:#b8c9bd}.free-layer-note small{flex-basis:100%;color:#637268;font-size:9px;line-height:1.5}
+
+/* ===== MOBILE MAP / PREMIUM DASHBOARD POLISH ===== */
+@media(max-width:700px){
+ html,body{max-width:100%;overflow-x:hidden}
+ header{padding:16px 14px;align-items:flex-start;gap:12px}
+ .brand-lockup{max-width:calc(100% - 8px)}
+ .brand-lockup .logo h1{font-size:clamp(17px,5vw,22px);letter-spacing:1px;overflow-wrap:anywhere}
+ .brand-lockup .logo p{font-size:10px;line-height:1.45}
+ .status{padding:8px 10px;font-size:9px;white-space:normal;text-align:center}
+ nav{justify-content:flex-start;gap:8px;padding:10px 12px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+ nav a{flex:0 0 auto;font-size:12px;padding:8px 10px}
+ main{padding:14px}
+ #map{height:min(62vh,520px);min-height:340px;touch-action:pan-x pan-y}
+ .map-toolbar{align-items:flex-start;flex-direction:column;gap:6px;font-size:10px;overflow-wrap:anywhere}
+ .leaflet-control-zoom a,.leaflet-control-layers-toggle,.leaflet-draw-toolbar a{width:42px!important;height:42px!important;line-height:42px!important}
+ .leaflet-draw-actions a{min-height:40px;line-height:40px}
+ .leaflet-control-layers{max-width:min(210px,62vw)}
+ .leaflet-popup-content{max-width:68vw}
+ .hero-command{padding:22px 18px}
+ .command-strip{gap:1px}
+ .command-strip div{min-width:0;padding:12px}
+ .command-strip strong{font-size:12px;overflow-wrap:anywhere}
+ .ataturk-quote-panel{grid-template-columns:38px minmax(0,1fr);gap:10px;padding:20px 16px}
+ .ataturk-quote-content h2{font-size:22px}
+ .ataturk-quote-content blockquote{font-size:20px}
+ .ataturk-quote-controls{flex-wrap:wrap}
+}
+.ataturk-quote-panel{display:grid;grid-template-columns:70px minmax(0,1fr);gap:22px;align-items:center;margin:30px 0;padding:30px;border:1px solid #285a38;border-radius:18px;background:radial-gradient(circle at 10% 20%,rgba(0,255,102,.09),transparent 42%),linear-gradient(135deg,#07100a,#030504)}
+.ataturk-quote-mark{color:#00ff66;font:100px/1 Georgia,serif;opacity:.7}
+.ataturk-quote-content h2{color:#edf4ee;margin:8px 0 16px;font-size:28px}
+.ataturk-quote-content blockquote{margin:0 0 10px;padding-left:16px;border-left:3px solid #00ff66;color:#00ff66;font:italic 26px/1.4 Georgia,serif}
+.ataturk-quote-content p{color:#a4afa7;line-height:1.6;margin:8px 0}
+.ataturk-quote-content cite{color:#738277;font-size:11px;font-style:normal}
+.ataturk-quote-controls{display:flex;align-items:center;gap:12px;margin-top:18px;color:#8c9a90;font-size:11px}
+.ataturk-quote-controls button{min-height:40px;padding:8px 12px;border:1px solid #285a38;border-radius:9px;color:#dfffe7;background:#07120b;cursor:pointer}
+.ataturk-quote-controls button:hover{border-color:#00ff66}
+.enterprise-report{scroll-margin-top:12px}
+.enterprise-report .leaflet-container{touch-action:pan-x pan-y}
