@@ -124,6 +124,29 @@ class MobileUiSmokeTests(unittest.TestCase):
         finally:
             context.close()
 
+    def test_map_planning_overlays_are_available_and_saved_as_drafts(self):
+        context, page = self.new_page()
+        try:
+            page.route("https://unpkg.com/**", lambda route: route.continue_())
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#nx-planning-tools", timeout=20000)
+            self.assertTrue(page.locator('[data-plan="zone"]').is_visible())
+            self.assertTrue(page.locator('[data-plan="line"]').is_visible())
+            page.locator('[data-plan="zone"]').click()
+            page.evaluate("""() => {
+              for (const [lat, lng] of [[41,27],[41.01,27.01],[41.02,27]]) {
+                window.map.fire('click', {latlng: L.latLng(lat,lng)});
+              }
+            }""")
+            page.locator('[data-plan="finish"]').click()
+            saved = page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-planning-overlays-v1') || '{\\"features\\":[]}')")
+            self.assertEqual(len(saved["features"]), 1)
+            self.assertEqual(saved["features"][0]["properties"]["official"], False)
+            self.assertEqual(saved["features"][0]["properties"]["kind"], "zone")
+            self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
     def test_desktop_more_menu_is_compact_and_keyboard_accessible(self):
         context, page = self.new_page(width=1440, height=900)
         try:
