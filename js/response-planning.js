@@ -62,7 +62,7 @@
   function complete() {
     if (!mode || points.length < (mode==="zone"?3:2)) { say(mode==="zone"?"Alan için en az 3 köşe gerekir.":"Hat için en az 2 nokta gerekir."); return; }
     const kind = mode;
-    const geometry = kind==="zone" ? {type:"Polygon",coordinates:[[...points.map(([lat,lon])=>[lon,lat]),[points[0][1],points[0][0]]]} : {type:"LineString",coordinates:points.map(([lat,lon])=>[lon,lat])};
+    const geometry = kind==="zone" ? {type:"Polygon",coordinates:[[...points.map(([lat,lon])=>[lon,lat]),[points[0][1],points[0][0]]]]} : {type:"LineString",coordinates:points.map(([lat,lon])=>[lon,lat])};
     persist({type:"Feature",geometry,properties:{kind,createdAt:new Date().toISOString(),label:kind==="zone"?"Kullanıcı alan taslağı":"Kullanıcı hat taslağı",official:false}});
     stop("Çizim kaydedildi. Lütfen bunu gerçek güvenlik/tahliye yönlendirmesi olarak kullanma.");
   }
