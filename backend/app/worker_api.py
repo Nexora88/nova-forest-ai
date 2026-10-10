@@ -73,10 +73,8 @@ def submit_ndvi_job(
         run_ndvi_timeseries, request.geometry, request.days, request.interval,
         job_timeout=600, result_ttl=3600, failure_ttl=86400,
         retry=Retry(max=2, interval=[15, 60]),
+        meta={"user_id": user_id, "kind": "ndvi-timeseries"},
     )
-    job.meta["user_id"] = user_id
-    job.meta["kind"] = "ndvi-timeseries"
-    job.save_meta()
     return {"job_id": job.id, "status": "queued", "kind": "ndvi-timeseries"}
 
 
@@ -99,10 +97,8 @@ def submit_raster_job(
         request.width, request.height,
         job_timeout=900, result_ttl=3600, failure_ttl=86400,
         retry=Retry(max=2, interval=[30, 120]),
+        meta={"user_id": user_id, "kind": "risk-raster"},
     )
-    job.meta["user_id"] = user_id
-    job.meta["kind"] = "risk-raster"
-    job.save_meta()
     return {"job_id": job.id, "status": "queued", "kind": "risk-raster"}
 
 

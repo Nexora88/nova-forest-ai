@@ -4,7 +4,7 @@ This worker moves long-running Sentinel-2 Statistical API calls and risk-raster 
 
 ## What is implemented
 
-- Authenticated Vercel endpoints: `POST /api/jobs/ndvi-timeseries`, `POST /api/jobs/risk-raster`, and `GET /api/jobs/{job_id}`.
+- Authenticated Vercel endpoints: `POST /api/jobs/ndvi-timeseries`, `POST /api/jobs/risk-raster`, and `GET /api/jobs/{job_id}`. The old synchronous `GET /ndvi/risk-raster` route is disabled with an explicit `410 async_worker_required` response so Vercel cannot accidentally perform the heavy raster computation.
 - The API validates the Supabase access token through Supabase Auth before proxying a job.
 - The worker API accepts requests only with `X-Nexora-Worker-Token`; job status is scoped to the authenticated user ID.
 - Redis/RQ provides persistent queueing, bounded execution time, retries and result expiry.
@@ -24,7 +24,7 @@ This worker moves long-running Sentinel-2 Statistical API calls and risk-raster 
    docker compose -f compose.worker.yml ps
    docker compose -f compose.worker.yml logs --tail=100 worker-api queue-worker
    ```
-5. Keep Redis private. The compose file does not publish Redis. By default the worker API binds to localhost only; put it behind a TLS reverse proxy such as Caddy/Nginx and set `WORKER_BIND_ADDRESS=127.0.0.1`. Do not expose port 8081 directly to the internet.
+5. Keep Redis private. The compose file does not publish Redis. By default the worker API binds to localhost only; put it behind a TLS reverse proxy such as Caddy/Nginx and set `WORKER_BIND_ADDRESS=127.0.0.1`. Do not expose port 8081 directly to the internet. Use a reverse proxy with HTTPS and set `NEXORA_WORKER_URL` to that HTTPS origin.
 6. Set these **backend Production** environment variables in both Vercel projects only if that project serves the API:
    - `NEXORA_WORKER_URL`: the HTTPS URL of the worker API behind the reverse proxy, without a trailing slash.
    - `NEXORA_WORKER_TOKEN`: exactly the same long random secret as in `.env.worker`.
