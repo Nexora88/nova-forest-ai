@@ -846,14 +846,14 @@ footer{margin-top:30px;border-top:1px solid var(--nx-line);padding:22px 16px;col
 
 /* Mobile UX hardening · safe fixed controls, modal navigation, and map gestures */
 body{scroll-padding-bottom:100px}
-main{padding-bottom:clamp(104px,12vh,144px)}
+main{padding-bottom:76px}
 .hero-command,.hero,.science-box,.nova-dashboard,.map-section{scroll-margin-bottom:110px}
 .nexora-install-icon{display:grid;place-items:center;width:24px;height:24px;border:1px solid #27683d;border-radius:7px;background:#0b2112;color:#5cff8d;font:800 19px/1 system-ui}
 #nexora-install{bottom:14px;right:14px}
 .nexora-language-toggle{bottom:14px!important;left:14px!important;right:auto!important}
 @media(max-width:760px){
  body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
- main{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+ main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
  nav.nx-nav.nx-nav-open{position:fixed;inset:0;z-index:100000;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;align-items:stretch;gap:7px;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;padding:calc(14px + env(safe-area-inset-top)) 14px calc(22px + env(safe-area-inset-bottom));background:rgba(2,6,3,.985);backdrop-filter:blur(22px);border:0}
  body.nx-menu-open{overflow:hidden!important;overscroll-behavior:none}
  body.nx-menu-open>header,body.nx-menu-open>main,body.nx-menu-open>footer{pointer-events:none}
@@ -865,3 +865,9 @@ main{padding-bottom:clamp(104px,12vh,144px)}
  #map{touch-action:pan-y pinch-zoom;overscroll-behavior:contain;margin-bottom:18px}
  .map-section{padding-bottom:18px}
 }
+
+.nx-vision-link{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:26px 0;padding:clamp(18px,3vw,30px);border:1px solid #214c2e;border-radius:16px;background:linear-gradient(120deg,rgba(0,255,102,.07),rgba(4,9,6,.94))}
+.nx-vision-link h2{margin:8px 0;color:#eaf7ed;font:750 clamp(20px,2.5vw,30px)/1.15 Inter,system-ui,sans-serif;letter-spacing:-.035em}
+.nx-vision-link p{margin:0;color:#91a397;font:450 12px/1.7 Inter,system-ui,sans-serif}
+.nx-vision-link a{flex:none;text-decoration:none;padding:12px 15px;border:1px solid #2a4c33;border-radius:10px;color:#d5e7d9;background:#08130b;font:700 12px Inter,system-ui,sans-serif}
+@media(max-width:700px){.nx-vision-link{align-items:stretch;flex-direction:column;gap:12px}.nx-vision-link a{text-align:center}}
