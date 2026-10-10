@@ -6,6 +6,8 @@ NexoraWildfire AI is an independently developed environmental decision-support p
 
 The project's product direction, system architecture, offline-first strategy, data-source choices, feature priorities, and decisions about what the system must not claim are led by the developer, Ahmet Eymen Bakraç. The project focuses on making environmental data more understandable for wildfire awareness, agriculture, beekeeping, and ecosystem monitoring.
 
+The project is led by a 14-year-old independent developer. The age of the developer is context for the learning journey, not a substitute for technical evidence, independent review, or reproducible validation.
+
 ## Use of AI tools
 
 Large language model (LLM) tools and AI coding assistants are used as productivity aids for implementation, code explanation, debugging, documentation, and test design. They are treated as assistants—not as autonomous owners of the project or as evidence that a feature works. Generated suggestions are reviewed and adapted by the developer; important behavior still requires tests, source verification, and deployment checks.
