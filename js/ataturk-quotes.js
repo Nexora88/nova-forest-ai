@@ -53,7 +53,7 @@
     const archive = document.createElement("a");
     archive.href = "https://arsiv.ttk.gov.tr/details?id=11023&materialType=F&query=Ankara.";
     archive.target = "_blank"; archive.rel = "noopener noreferrer"; archive.textContent = "Türk Tarih Kurumu arşiv kaydını görüntüle";
-    note.append(" ", archive);
+    note.append(" ", archive);\n    const tractorSource = document.createElement("a");\n    tractorSource.href = "https://bilimcocuk.tubitak.gov.tr/wp-content/uploads/sites/157/2025/09/4b1bf8c7-1eb7-4c09-a022-613d6ab43ad2.pdf";\n    tractorSource.target = "_blank"; tractorSource.rel = "noopener noreferrer"; tractorSource.textContent = "Atatürk’ün traktör sürerken fotoğrafını içeren TÜBİTAK tarihî fotoğraf derlemesi";\n    note.append(" · ", tractorSource);
     section.appendChild(note);
     return section;
   }
