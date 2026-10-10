@@ -842,3 +842,26 @@ footer{margin-top:30px;border-top:1px solid var(--nx-line);padding:22px 16px;col
  .hero-actions a{flex:1 1 150px}
 }
 @media(prefers-reduced-motion:reduce){.hero-actions a,.nx-signal-strip>a,.intelligence-card{transition:none!important}.hero-actions a:hover,.nx-signal-strip>a:hover,.intelligence-card:hover{transform:none!important}}
+
+
+/* Mobile UX hardening · safe fixed controls, modal navigation, and map gestures */
+body{scroll-padding-bottom:100px}
+main{padding-bottom:clamp(104px,12vh,144px)}
+.hero-command,.hero,.science-box,.nova-dashboard,.map-section{scroll-margin-bottom:110px}
+.nexora-install-icon{display:grid;place-items:center;width:24px;height:24px;border:1px solid #27683d;border-radius:7px;background:#0b2112;color:#5cff8d;font:800 19px/1 system-ui}
+#nexora-install{bottom:14px;right:14px}
+.nexora-language-toggle{bottom:14px!important;left:14px!important;right:auto!important}
+@media(max-width:760px){
+ body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+ main{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+ nav.nx-nav.nx-nav-open{position:fixed;inset:0;z-index:100000;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;align-items:stretch;gap:7px;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;padding:calc(14px + env(safe-area-inset-top)) 14px calc(22px + env(safe-area-inset-bottom));background:rgba(2,6,3,.985);backdrop-filter:blur(22px);border:0}
+ body.nx-menu-open{overflow:hidden!important;overscroll-behavior:none}
+ body.nx-menu-open>header,body.nx-menu-open>main,body.nx-menu-open>footer{pointer-events:none}
+ nav.nx-nav.nx-nav-open>.nx-nav-toggle{position:sticky;top:0;background:#07130b;z-index:2}
+ #nexora-install{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));min-height:46px;padding:9px 12px}
+ .nexora-language-toggle{left:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;min-height:46px}
+ .hero-command h2{overflow-wrap:break-word;text-wrap:pretty}
+ .hero-actions{position:relative;z-index:1;margin-bottom:10px}
+ #map{touch-action:pan-y pinch-zoom;overscroll-behavior:contain;margin-bottom:18px}
+ .map-section{padding-bottom:18px}
+}
