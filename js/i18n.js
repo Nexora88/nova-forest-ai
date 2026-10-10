@@ -37,6 +37,32 @@
     ["Trafo merkezi","Substation"],["Rüzgâr türbini (RES)","Wind turbine"],["Diğer","Other"],["100 metre","100 metres"],["1 kilometre","1 kilometre"],
     ["Giriş ve kurumsal yetki","Sign-in and enterprise authorization"],["Nexora çatısı altında geliştirilen","Developed under the Nexora umbrella"],
     ["Ürün sayfası","Product page"],["Geri","Back"],["İleri","Next"],["Güncelle","Refresh"],["Yenile","Reload"]
+    ["Orman, tarım ve ekosistem","Forests, agriculture, and ecosystems"],["Uydu • Tarla • Ekosistem İstihbaratı","Satellite • Field • Ecosystem Intelligence"],
+    ["Trakya + İstanbul Çevresel İstihbarat","Thrace + Istanbul Environmental Intelligence"],["Türkiye • 81 İL • 973 İLÇE • OFFLINE VECTOR","TÜRKIYE • 81 PROVINCES • 973 DISTRICTS • OFFLINE VECTOR"],
+    ["İl geometrileri ve 973 ilçe sınırı yerel GeoJSON olarak uygulamaya gömülüdür.","Province geometries and 973 district boundaries are bundled as local GeoJSON."],
+    ["Harita bağlantı kesildiğinde bile idari vektör sınırlar çalışır; canlı hava ve yerleşim verisi ağ varsa güncellenir.","Administrative vector boundaries remain available offline; live weather and settlement data update when a network is available."],
+    ["İdari sınırlar resmi mülkiyet/parsel sınırı değildir.","Administrative boundaries are not official property or parcel boundaries."],
+    ["Harita üzerindeki filtrelerden hangi çevresel göstergenin renkleri belirlediğini seç.","Use the map filters to choose which environmental indicator controls the colors."],
+    ["Toprak nemi, ET₀ ve sıcaklık; sulama ve tarla çalışması için erken sinyal üretir.","Soil moisture, ET₀, and temperature provide early signals for irrigation and field work."],
+    ["Polen verisi atmosferik bir sinyaldir.","Pollen data is an atmospheric signal."],
+    ["Bitki çeşitliliğinin kesin tespiti için Sentinel-2 spektral sınıflandırma katmanı ayrıca kurulacaktır.","A Sentinel-2 spectral classification layer is needed to assess plant diversity."],
+    ["NEXORAWILDFIRE / GEOSPATIAL COMMAND","NEXORAWILDFIRE / GEOSPATIAL COMMAND"],["VERİ KATMANI","DATA LAYER"],
+    ["ALAN ÇİZİMİ","DRAW AREA"],["ALAN KAYDEDİLDİ","AREA SAVED"],["ALAN CİHAZA KAYDEDİLDİ","AREA SAVED ON DEVICE"],
+    ["SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR","SELECTED AREA SHOWN ON MAP"],["YEREL VERİ","LOCAL DATA"],["SON YEREL VERİ","LAST CACHED DATA"],
+    ["GLOBAL SCALE TEST","GLOBAL SCALE TEST"],["Demo: Global Scale Test · Napa Valley","Demo: Global Scale Test · Napa Valley"],
+    ["Kaliforniya Napa Vadisi","Napa Valley, California"],["No global demo has been run yet.","Henüz küresel demo çalıştırılmadı."],
+    ["GeoJSON rendered at Napa Valley, California. Requesting current weather…","Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Güncel hava durumu isteniyor…"],
+    ["Sign-in and enterprise authorization are required to generate a report.","Rapor oluşturmak için giriş ve kurumsal yetki gerekir."],
+    ["Model eğitimi için doğrulanmış, etiketli geçmiş veri ve model artefaktı gerekli.","A verified labelled historical dataset and model artifact are required for training."],
+    ["Eksik özellikler:","Missing features:"],["Tüm model girdileri sonlu sayısal değer olmalıdır.","All model inputs must be finite numeric values."],
+    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle.","Monitor Thrace's forests, fields, and ecosystems in one decision workspace."],
+    ["Alan Ekle ile kendi tarla, arılık veya orman poligonunu kaydet ve Alanlarım ekranında canlı durumunu izle.","Use Add Area to save your own field, apiary, or forest polygon and monitor it in My Areas."],
+    ["Bu konumu seçili saha seviyesinde açarak çevresel sinyalleri incele.","Open this location as a selected field to inspect environmental signals."],
+    ["Bu seviye seçili bir coğrafi gözlem noktasıdır; resmî parsel veya mülkiyet sınırı değildir.","This is a geographic observation point, not an official parcel or property boundary."],
+    ["Sistem şu anda bir pilot bölgede","The system is currently being tested in a pilot region"],["Geliştirilmekte olan bir araştırma ve karar destek projesidir.","A developing research and decision-support project."],
+    ["Bu deneysel olasılık, yalnızca eğitim verisinin temsil ettiği koşullarda karar desteğidir; resmi yangın alarmı veya kesin tahmin değildir.","This experimental probability is decision support only for conditions represented by the training data; it is not an official fire alert or a guaranteed forecast."],
+    ["Bir sonraki işleme katmanında","In the next processing layer"],["Gerçek piksel hesabı backend işleme katmanına bağlanacak.","Real pixel calculations will be connected to the backend processing layer."],
+    ["Polen ≠ biyoçeşitlilik.","Pollen ≠ biodiversity."],["Bitki çeşitliliği için Sentinel-2'nin çok bantlı yansımaları, red-edge bantları, zaman serisi ve arazi örtüsü sınıfları birlikte değerlendirilmelidir.","Plant diversity assessment should combine Sentinel-2 multispectral reflectance, red-edge bands, time series, and land-cover classes."]
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
