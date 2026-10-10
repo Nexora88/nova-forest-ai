@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from app.api.risk_routes import router as risk_router
 from app.api.satellite_routes import router as satellite_router
 from app.api.weather_routes import router as weather_router
@@ -32,7 +33,10 @@ CONFIGURED_ORIGINS = {
     if origin.strip()
 }
 ALLOWED_ORIGINS = sorted(DEFAULT_PUBLIC_ORIGINS | CONFIGURED_ORIGINS)
-app.middleware("http")(security_middleware)
+
+# Register the security function explicitly as a dispatch middleware. This avoids
+# the function being treated as a middleware class by the serverless runtime.
+app.add_middleware(BaseHTTPMiddleware, dispatch=security_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -41,6 +45,7 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept"],
     expose_headers=["X-Nexora-Risk-Type", "X-Nexora-Weather-Risk", "X-Nexora-Weather-Time"],
 )
+
 
 app.include_router(risk_router)
 app.include_router(satellite_router)
