@@ -8,8 +8,9 @@ from app.api.ndvi_routes import router as ndvi_router
 from app.api.forecast_routes import router as forecast_router
 from app.api.notification_routes import router as notification_router
 from app.api.environment_routes import router as environment_router
+from app.api.ml_routes import router as ml_router
 
-app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.2.0")
+app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.3.0")
 
 import os
 from app.security import security_middleware
@@ -33,6 +34,7 @@ app.include_router(ndvi_router)
 app.include_router(forecast_router)
 app.include_router(notification_router)
 app.include_router(environment_router)
+app.include_router(ml_router)
 
 @app.middleware("http")
 async def vercel_api_prefix(request, call_next):
@@ -47,8 +49,8 @@ async def vercel_api_prefix(request, call_next):
 
 @app.get("/")
 def root():
-    return {"system": "NexoraWildfire AI", "status": "online", "version": "1.2.0", "services": {"risk": "online", "weather": "online", "satellite": "online", "sentinel2_catalog": "online", "forecast_risk": "online", "notifications": "ready"}}
+    return {"system": "NexoraWildfire AI", "status": "online", "version": "1.3.0", "services": {"risk": "online", "weather": "online", "satellite": "online", "sentinel2_catalog": "online", "forecast_risk": "online", "notifications": "ready", "predictive_ml": "check /ml/status"}}
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.2.0"}
+    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.3.0"}
