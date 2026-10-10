@@ -64,12 +64,14 @@
   function init() {
     const main = document.querySelector("main");
     if (!main) return;
+    const isVisionPage = location.pathname.endsWith("/pages/vision.html");
     let panel = document.querySelector("[data-ataturk-quote]")?.closest(".ataturk-quote-panel");
-    if (!panel) {
+    if (!panel && isVisionPage) {
       panel = makePanel();
       const before = main.querySelector(".notice-panel, footer");
       if (before) before.before(panel); else main.appendChild(panel);
     }
+    if (!panel) return;
     if (!panel.querySelector("[data-quote-count]")) {
       const controls = document.createElement("div");
       controls.className = "ataturk-quote-controls";
@@ -89,7 +91,7 @@
     panel.querySelector("[data-quote-prev]")?.addEventListener("click", () => show(index - 1));
     panel.querySelector("[data-quote-next]")?.addEventListener("click", () => show(index + 1));
     show(0);
-    if (!document.querySelector(".ataturk-photo-gallery")) {
+    if (isVisionPage && !document.querySelector(".ataturk-photo-gallery")) {
       const gallery = makeGallery();
       panel.after(gallery);
     }

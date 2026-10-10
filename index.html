@@ -9,15 +9,15 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#020303">
 <title>NexoraWildfire AI | Environmental Intelligence</title>
-<link rel="stylesheet" href="css/style.css?v=20261010b"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="css/style.css?v=20261010c"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css">
 <link rel="stylesheet" href="css/product-ui.css?v=20261007e"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="favicon.png"><link rel="stylesheet" href="css/province-feedback.css?v=20261007a"><link rel="stylesheet" href="css/special-days.css?v=20261008a"><link rel="stylesheet" href="css/auth.css?v=20261008a"></head>
 <body>
 <header>
   <a class="brand-lockup" href="index.html" aria-label="NexoraWildfire AI ana sayfa"><img class="brand-logo" src="assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu"><div class="logo"><h1>NexoraWildfire AI</h1><p>Trakya çevresel istihbarat • tarım • orman • ekosistem</p></div></a>
   <div class="status" title="Durum, kaynak bağlantılarına göre değişebilir"><span></span> TRAKYA · PİLOT</div>
 </header>
-<nav><a class="active" href="index.html">Ana Panel</a><a href="pages/map.html">Risk Haritası</a><a href="pages/areas.html">Alanlarım</a><a href="pages/weather.html">Atmosfer</a><a href="pages/satellite.html">Uydu Merkezi</a><a href="pages/about.html">Sistem</a><a href="pages/feedback.html">Feedback</a></nav>
+<nav><a class="active" href="index.html">Ana Panel</a><a href="pages/map.html">Risk Haritası</a><a href="pages/areas.html">Alanlarım</a><a href="pages/weather.html">Atmosfer</a><a href="pages/satellite.html">Uydu Merkezi</a><a href="pages/about.html">Sistem</a><a href="pages/feedback.html">Geri Bildirim</a><a href="pages/vision.html">Cumhuriyet Vizyonu</a></nav>
 
 <main>
 <section class="hero hero-command">
@@ -45,11 +45,9 @@
   <a href="pages/about.html">Nasıl çalışır? →</a>
 </section>
 
-<section class="ataturk-vision">
-  <div class="ataturk-portrait"><img src="assets/ataturk-1925.jpg" alt="Mustafa Kemal Atatürk, 1925"><span>Science, production, and public benefit</span></div>
-  <div class="ataturk-copy"><div class="eyebrow">NEXORA / OUR PURPOSE</div><h2>Protecting nature means protecting the people who depend on it.</h2><blockquote>“Köylü milletin efendisidir.”<cite>— Mustafa Kemal Atatürk</cite></blockquote><p>Inspired by a Republic vision grounded in science, production, and public benefit, NexoraWildfire AI brings available environmental observations closer to the people who work with forests, farms, apiaries, and local ecosystems.</p></div>
-</section>
 
+
+<section class="nx-vision-link"><div><div class="eyebrow">CUMHURİYET VİZYONU / BİLİM • ÜRETİM • TOPLUM</div><h2>Bilim, üretim ve toplumsal fayda için ilham.</h2><p>Atatürk’ün bilim ve üretim vizyonuna ayrılan tarihî arşivi ve sözleri ayrı sayfada keşfet.</p></div><a class="secondary-action" href="pages/vision.html">Cumhuriyet Vizyonu →</a></section>
 <section class="command-strip">
   <div><span>ORMAN</span><strong>Sağlık + yangın</strong></div>
   <div><span>TARIM</span><strong>Nem + sulama</strong></div>
@@ -89,17 +87,13 @@
   <div class="system-item"><div class="eyebrow">06 / GEÇMİŞ</div><strong>Zaman Serisi</strong><p>Yerel gözlem geçmişi şimdilik tarayıcıda tutulur; kalıcı sunucu geçmişi sonraki veri katmanıdır.</p></div>
 </section>
 
-<section class="ataturk-quote-panel" aria-labelledby="ataturk-quote-heading">
-<div class="ataturk-quote-mark" aria-hidden="true">“</div><div class="ataturk-quote-content">
-<div class="eyebrow">CUMHURİYET VİZYONU / BİLİM • BARIŞ • ÜRETİM</div><h2 id="ataturk-quote-heading">Geleceğe yön veren düşünceler</h2>
-<blockquote data-ataturk-quote aria-live="polite">“Hayatta en hakiki mürşit ilimdir.”</blockquote><p data-ataturk-context>Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.</p><cite>— Mustafa Kemal Atatürk</cite>
-<div class="ataturk-quote-controls"><button type="button" data-quote-prev aria-label="Önceki söz">←</button><span data-quote-count>1 / 3</span><button type="button" data-quote-next>Sonraki söz →</button></div></div></section>
+
 <section class="notice-panel">
   <div><div class="eyebrow">SİSTEM MANTIĞI</div><h2>Tek uygulama, farklı kullanıcılar.</h2></div>
   <p>Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir. NexoraWildfire'ın amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.</p>
 </section>
 </main>
 <footer><p>NexoraWildfire AI · Geliştirici: <strong>Ahmet Eymen Bakraç</strong> · Nexora88 © 2026</p></footer>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="js/agri-intelligence.js?v=20261008a"></script><script src="js/dashboard.js?v=20261007a"></script><script src="js/map.js?v=20261010c"></script><script src="js/free-data-layers.js?v=20261010b"></script><script src="js/onboarding.js?v=20261007b"></script><script src="js/offline.js?v=20261007a"></script>
-<script src="js/nova-storage.js?v=20261007c"></script><script src="js/nova-offline-engine.js?v=20261007c"></script><script src="js/install-update.js?v=20261007c"></script><script src="js/edge-ui.js?v=20261007c"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="js/auth.js?v=20261008a"></script><script src="js/nexora-product.js?v=20261008b"></script><script src="js/province-feedback.js?v=20261007a"></script><script src="js/pwa.js?v=20261010g"></script><script src="js/special-days.js?v=20261008a"></script><script src="js/ataturk-quotes.js?v=20261010e"></script><script src="js/mobile-nav.js?v=20261010g"></script><script src="js/i18n.js?v=20261010g"></script></body></html>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js"></script>
+<script src="js/agri-intelligence.js?v=20261008a"></script><script src="js/dashboard.js?v=20261007a"></script><script src="js/map.js?v=20261010d"></script><script src="js/free-data-layers.js?v=20261010b"></script><script src="js/onboarding.js?v=20261007b"></script><script src="js/offline.js?v=20261007a"></script>
+<script src="js/nova-storage.js?v=20261007c"></script><script src="js/nova-offline-engine.js?v=20261007c"></script><script src="js/install-update.js?v=20261007c"></script><script src="js/edge-ui.js?v=20261007c"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="js/auth.js?v=20261008a"></script><script src="js/nexora-product.js?v=20261008b"></script><script src="js/province-feedback.js?v=20261007a"></script><script src="js/pwa.js?v=20261010h"></script><script src="js/special-days.js?v=20261008a"></script><script src="js/ataturk-quotes.js?v=20261010f"></script><script src="js/mobile-nav.js?v=20261010h"></script><script src="js/i18n.js?v=20261010h"></script></body></html>

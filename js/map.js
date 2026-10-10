@@ -5,7 +5,7 @@ const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../da
 const ACTIVE_PROVINCES=new Set(["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"].map(x=>norm(x)));
 const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
-const isMobile=matchMedia("(max-width: 700px)").matches; const map=L.map("map",{zoomControl:true,doubleClickZoom:!isMobile,dragging:true,scrollWheelZoom:!isMobile,touchZoom:true}).setView([41.15,27.1],8); if(isMobile){map.dragging.enable();map.touchZoom.enable();map.doubleClickZoom.disable();map.scrollWheelZoom.disable();}
+const isMobile=matchMedia("(max-width: 700px)").matches; const map=L.map("map",{zoomControl:true,doubleClickZoom:!isMobile,dragging:!isMobile,scrollWheelZoom:!isMobile,touchZoom:true,gestureHandling:isMobile}).setView([41.15,27.1],8); if(isMobile){map.touchZoom.enable();map.doubleClickZoom.disable();map.scrollWheelZoom.disable();if(!map.gestureHandling)map.dragging.disable();}
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
 const dark=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:"© OpenStreetMap © CARTO"});
@@ -41,10 +41,9 @@ function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
- // Keep one-finger pan and pinch zoom enabled; the old two-finger gate made the map feel broken.
- map.dragging.enable();
- map.touchZoom.enable();
- map.scrollWheelZoom.disable();
+ map.touchZoom.enable(); map.scrollWheelZoom.disable();
+ // GestureHandling uses two fingers for map pan/zoom and leaves one-finger swipes to the page.
+ if(map.gestureHandling){map.gestureHandling.enable();} else {map.dragging.disable();}
 }
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
@@ -196,8 +195,8 @@ function saveHistory(rows){const old=JSON.parse(localStorage.getItem(historyKey)
 function toggleDraw(){
  drawMode=!drawMode;drawingPoints=[];if(drawingLine)map.removeLayer(drawingLine);if(drawingPolygon)map.removeLayer(drawingPolygon);
  const b=el(".map-filters [data-action='add']");if(b)b.textContent=drawMode?"✓ Noktaları seç":"＋ Alan Ekle";
- if(drawMode){map.doubleClickZoom.disable();setStatus("ALAN ÇİZİMİ • Haritada köşe noktalarına tıkla • son noktada çift tıkla");map.on("click",drawClick)}
- else{map.doubleClickZoom.enable();map.off("click",drawClick)}
+ if(drawMode){map.gestureHandling?.disable();map.dragging.enable();map.doubleClickZoom.disable();setStatus("ALAN ÇİZİMİ • Haritada köşe noktalarına tıkla • son noktada çift tıkla");map.on("click",drawClick)}
+ else{map.doubleClickZoom.enable();map.off("click",drawClick);if(isMobile){map.dragging.disable();map.gestureHandling?.enable();}}
 }
 function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.latlng.lng]);if(drawingLine)map.removeLayer(drawingLine);drawingLine=L.polyline(drawingPoints,{color:"#00ff66",weight:2,dashArray:"5 5"}).addTo(map);if(drawingPoints.length>=3){if(drawingPolygon)map.removeLayer(drawingPolygon);drawingPolygon=L.polygon(drawingPoints,{color:"#00ff66",fillOpacity:.16,weight:2}).addTo(map)}}
 async function finishDraw(){

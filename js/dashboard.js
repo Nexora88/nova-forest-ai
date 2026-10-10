@@ -27,7 +27,7 @@ async function load(){
  render(rows,live,live?Date.now():(old?.savedAt||Date.now()));
 }
 function render(rows,live,savedAt){
- const best=[...rows].sort((a,b)=>b.risk-a.risk)[0];
+ const best=[...rows].sort((a,b)=>b.risk-a.risk || a.w.h-b.w.h || b.w.t-a.w.t || b.w.wind-a.w.wind || a.name.localeCompare(b.name,"tr"))[0];
  const el=s=>document.querySelector(s);
  if(el("[data-highest-risk]"))el("[data-highest-risk]").innerHTML=best?best.name+' <b style="color:'+color(best.risk)+'">'+best.risk+'/100</b>':"Veri yok";
  if(el("[data-update-time]"))el("[data-update-time]").textContent=live?"Şimdi • canlı veri":new Date(savedAt).toLocaleString("tr-TR")+" • son geçerli kayıt";
@@ -42,7 +42,7 @@ function render(rows,live,savedAt){
 }
 document.addEventListener("DOMContentLoaded",()=>{
  const box=document.createElement("section");box.className="nova-dashboard";
- box.innerHTML='<div class="dashboard-head"><div><div class="eyebrow">NEXORAWILDFIRE / OPERASYON ÖZETİ</div><h2>Durumu haritaya girmeden gör.</h2></div><span data-network-state>VERİ BEKLENİYOR</span></div><div class="dashboard-grid"><article><small>EN YÜKSEK RİSKLİ BÖLGE</small><h3 data-highest-risk>Hesaplanıyor…</h3><p>Marmara odağındaki seçili bölgeler arasında mevcut meteorolojik risk sinyali.</p></article><article><small>SON GÜNCELLEME</small><h3 data-update-time>Hesaplanıyor…</h3><p>Canlı veri yoksa son geçerli yerel kayıt gösterilir.</p></article></div><div class="region-risk-list" data-region-risks></div><div class="science-box"><div><div class="eyebrow">BİLİMSEL ŞEFFAFLIK</div><h3>Risk skoru nasıl oluşuyor?</h3><p>Hava bileşeni sıcaklık, bağıl nem, rüzgar ve yağıştan oluşan açıklanabilir bir karar destek sinyalidir. Uydu bileşeni yalnızca gerçek NDVI geldiğinde eklenir.</p></div><div data-breakdown></div></div>';
+ box.innerHTML='<div class="dashboard-head"><div><div class="eyebrow">NEXORAWILDFIRE / OPERASYON ÖZETİ</div><h2>Durumu haritaya girmeden gör.</h2></div><span data-network-state>VERİ BEKLENİYOR</span></div><div class="dashboard-grid"><article><small>EN YÜKSEK RİSKLİ BÖLGE</small><h3 data-highest-risk>Hesaplanıyor…</h3><p>Skor eşitse önce daha düşük bağıl nem, ardından daha yüksek sıcaklık ve rüzgâr karşılaştırılır. Bu, meteorolojik önceliklendirmedir; doğrulanmış yangın bildirimi değildir.</p></article><article><small>SON GÜNCELLEME</small><h3 data-update-time>Hesaplanıyor…</h3><p>Canlı veri yoksa son geçerli yerel kayıt gösterilir.</p></article></div><div class="region-risk-list" data-region-risks></div><div class="science-box"><div><div class="eyebrow">BİLİMSEL ŞEFFAFLIK</div><h3>Risk skoru nasıl oluşuyor?</h3><p>Hava bileşeni sıcaklık, bağıl nem, rüzgar ve yağıştan oluşan açıklanabilir bir karar destek sinyalidir. Uydu bileşeni yalnızca gerçek NDVI geldiğinde eklenir.</p></div><div data-breakdown></div></div>';
  const mapSection=document.querySelector(".map-section");if(mapSection)mapSection.parentNode.insertBefore(box,mapSection);
  load();setInterval(load,300000);
 });

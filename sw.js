@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v11";
-const DATA_CACHE = "nexorawildfire-data-v11";
+const CACHE_NAME = "nexorawildfire-shell-v12";
+const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
   "./",
@@ -11,9 +11,12 @@ const APP_SHELL = [
   "./pages/weather.html",
   "./pages/satellite.html",
   "./pages/about.html",
+  "./pages/vision.html",
   "./css/style.css",
   "./css/field-ui.css",
   "./js/map.js",
+  "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
+  "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js",
   "./js/map-intelligence.js",
   "./js/areas.js",
   "./js/notification-ui.js",
@@ -29,7 +32,7 @@ const APP_SHELL = [
   "./css/product-ui.css",
   "./css/special-days.css",
   "./js/special-days.js",
-  "./js/ataturk-quotes.js?v=20261010e",
+  "./js/ataturk-quotes.js?v=20261010f",
   "./assets/nexora-wildfire-logo.png",
   "./assets/ataturk-1925.jpg",
   "./favicon.png",
