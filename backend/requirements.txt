@@ -2,6 +2,7 @@ fastapi
 uvicorn
 requests
 python-dotenv
+python-multipart
 pydantic
 pywebpush==2.5.0
 
