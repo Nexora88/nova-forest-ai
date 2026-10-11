@@ -24,7 +24,7 @@ def test_main_pages_share_navigation_translation_and_asset_fallback():
         "mobile-nav.js?v=20261011b",
         "i18n.js?v=20261011h",
         "i18n-extra.js?v=20261011c",
-        "asset-guard.js?v=20261011a",
+        "asset-guard.js?v=20261011b",
         "pwa.js?v=20261011b",
     ]
     for relative_path in MAIN_PAGES:
