@@ -6,9 +6,9 @@ Status: draft implementation only. This file is not legal advice and does not ce
 
 - Bilingual (Turkish/English) privacy/KVKK notice, terms of use, and experimental decision-support disclaimer at `pages/legal.html`.
 - Legal page is linked from main navigation and the common project footer.
-- New-account email registration requires the user to acknowledge the legal notice, terms, and safety limitations.
-- Google and SMS sign-in flows require the same acknowledgement before starting the provider flow.
-- Email sign-up stores version, acceptance timestamp, and language in Supabase Auth user metadata; provider sign-in attempts to persist the same metadata after authentication.
+- New-account email registration requires separate acknowledgements: one for the privacy notice/terms and one for the experimental-system safety notice.
+- Google and SMS sign-in flows require both acknowledgements before starting the provider flow.
+- Email sign-up stores draft document versions, acceptance timestamp, language, and safety-acknowledgement timestamp in Supabase Auth user metadata; provider sign-in attempts to persist the same metadata after authentication. This is not an immutable audit log.
 - The disclaimer explicitly says the product is not an official fire alert or emergency service, tells users to call 112 in Türkiye, and does not purport to waive mandatory legal rights.
 
 ## Required before public launch
