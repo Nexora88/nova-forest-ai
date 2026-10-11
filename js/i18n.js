@@ -316,3 +316,61 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();
 })();
+
+/* NexoraWildfire AI — project attribution footer. */
+(() => {
+  const styleId = "nexora-attribution-style";
+  function languageIsTurkish() {
+    return /^tr(?:-|$)/i.test(document.documentElement.lang || "tr");
+  }
+  function installStyle() {
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      .nexora-attribution { display:flex; flex-direction:column; align-items:center; gap:5px; margin:0; padding:18px 16px; text-align:center; color:#9db3a4; font-size:12px; line-height:1.65; }
+      .nexora-attribution [data-attribution-primary] { color:#d8e7dc; font-weight:600; letter-spacing:.01em; }
+      .nexora-attribution [data-attribution-secondary] { color:#819889; font-size:11px; }
+      footer.nexora-attribution-footer { margin-top:28px; border-top:1px solid rgba(0,255,102,.18); background:#050906; }
+      @media(prefers-reduced-motion:reduce) { .nexora-attribution { scroll-behavior:auto; } }
+    `;
+    document.head.appendChild(style);
+  }
+  function renderAttribution() {
+    if (!document.body || !document.head) return;
+    installStyle();
+    let footer = document.querySelector("footer");
+    if (!footer) {
+      footer = document.createElement("footer");
+      footer.className = "nexora-attribution-footer";
+      document.body.appendChild(footer);
+    }
+    let line = footer.querySelector("[data-nexora-attribution]");
+    if (!line) {
+      line = Array.from(footer.querySelectorAll("p")).find(p => /Ahmet Eymen Bakraç/i.test(p.textContent || ""));
+    }
+    if (!line) {
+      line = document.createElement("p");
+      footer.appendChild(line);
+    }
+    line.dataset.nexoraAttribution = "true";
+    line.classList.add("nexora-attribution");
+    line.replaceChildren();
+    const primary = document.createElement("span");
+    primary.dataset.attributionPrimary = "true";
+    primary.textContent = languageIsTurkish()
+      ? "Proje fikri ve geliştirme: Ahmet Eymen Bakraç"
+      : "Project concept and development: Ahmet Eymen Bakraç";
+    const secondary = document.createElement("span");
+    secondary.dataset.attributionSecondary = "true";
+    secondary.textContent = "NexoraWildfire AI · Independent environmental intelligence · © 2026";
+    line.append(primary, secondary);
+  }
+  function boot() {
+    renderAttribution();
+    const observer = new MutationObserver(() => renderAttribution());
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+  else boot();
+})();
