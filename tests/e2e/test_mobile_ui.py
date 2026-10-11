@@ -356,7 +356,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertIn("ha", page.locator("#atmo-spread-results .atmo-scenario-card").nth(2).inner_text())
             page.wait_for_function("document.querySelectorAll('#atmo-wind-projection-cards .atmo-wind-card').length === 3", timeout=10000)
             self.assertIn("90°", page.locator("#atmo-wind-projection-summary").inner_text())
-            self.assertIn("24.0 km/h", page.locator("#atmo-wind-projection-summary").inner_text())
+            self.assertRegex(page.locator("#atmo-wind-projection-summary").inner_text(), r"24\.0 km/(?:h|sa)")
             self.assertIn("km", page.locator("#atmo-wind-projection-cards").inner_text())
             self.assertRegex(page.locator("#atmo-wind-projection-caveat").inner_text(), r"gerçek yangın|operational fire-spread")
             self.assertEqual(page.locator("#atmo-carbon-values article").count(), 3)
