@@ -12,14 +12,6 @@ from app.services.weather_service import REGIONS, get_current_weather
 router = APIRouter()
 
 
-@router.get("/")
-def home():
-    return {
-        "project": "NexoraWildfire AI",
-        "message": "Environmental decision-support API is running",
-    }
-
-
 @router.get("/risk-test")
 def risk_test():
     # Explicit synthetic test fixture; never used as a live regional observation.
