@@ -9,7 +9,7 @@
     ["NOVA-ALERT / ERKEN UYARI","NOVA-ALERT / EARLY WARNING"],
     ["Kırsal Erken Uyarı Durumu","Rural Early Warning Status"],
     ["Yapay Zeka Model Kanıtı","AI Model Evidence"],
-    ["Akıllı Tahliye ve Kaçış Koridoru","Smart Evacuation and Escape Corridor"],
+    ["Akıllı Tahliye ve Kaçış Koridoru","Smart Evacuation and Escape Corridor"],["KÖY / ALAN","VILLAGE / AREA"],["GÜVENLİ TOPLANMA","SAFE ASSEMBLY"],["Risk Haritasında alan seç →","Select an area on the risk map →"],["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını simülasyon olarak gösterir.","In a real emergency, follow official authorities. This module only illustrates a fire-avoidance scenario for a selected area."],["SENARYO AKIŞ SİMÜLASYONU","SCENARIO FLOW SIMULATION"],["Kişisel saha çalışma alanı","Personal field workspace"],["Yasal Bilgiler","Legal"],["Geri Bildirim","Feedback"],
     ["Yangın Sonrası Rehabilitasyon ve Ağaçlandırma Öngörüsü","Post-Fire Restoration and Reforestation Outlook"],
     ["DOĞAL YENİLENME","NATURAL REGENERATION"],
     ["TÜR PLANLAMA","SPECIES PLANNING"],
