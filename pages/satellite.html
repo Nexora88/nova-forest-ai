@@ -21,7 +21,7 @@
  function init(){
   const mapEl=document.getElementById("ndvi-draw-map");
   if(!mapEl||typeof L==="undefined")return;
-  const API_BASE=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api")).replace(/\/$/,"");
+  const API_BASE=(window.NOVA_API_BASE||"https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/,"");
   const statusEl=document.getElementById("ndvi-draw-status");
   const resultEl=document.getElementById("ndvi-analysis-result");
   const points=[];
