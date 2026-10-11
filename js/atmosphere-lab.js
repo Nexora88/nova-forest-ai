@@ -203,8 +203,8 @@
     const video = $("atmo-camera-video");
     if (video) {
       video.srcObject = null;
-      if (wasCameraActive && !testVideoUrl) {
-        video.src = ARCHIVE_VIDEO_URL;
+      if (wasCameraActive) {
+        video.src = testVideoUrl || ARCHIVE_VIDEO_URL;
         video.controls = true;
         video.load();
       }
