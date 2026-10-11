@@ -25,7 +25,13 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.
 - **Responsive, installable web app** with an offline-first shell and local saved-area experience.
+- **Edge AI interface prototype:** [UAV / camera simulation](pages/uav-demo.html). This is a UI simulation only; it does not run YOLO or perform real smoke detection.
+- **Experimental weather-risk index:** [methodology and limitations](docs/NEXORA_RISK_INDEX.md). The current index is rule-based and has not been calibrated or validated for operational fire prediction.
 - **Turkish and English interface**, with English as the default for this public-facing version.
+
+## AI-assisted engineering
+
+Modern AI coding agents and LLM tools support implementation, code explanation, debugging, documentation, and test design. Product direction, architecture, review, and responsibility remain human-led. AI-generated code is not treated as proof of correctness: changes require review and reproducible tests. See [AI-assisted development disclosure](AI_ASSISTED_DEVELOPMENT.md).
 
 ## Current scope and evidence
 
@@ -33,7 +39,7 @@ The first practical focus is Thrace, Türkiye. Global coordinates and reusable g
 
 The app may display provider observations, rule-based indicators, satellite discovery results, and machine-learning research outputs. These are different forms of evidence. The research model trained on a small historical Algerian dataset is **not validated for Türkiye** and must not be represented as an operational wildfire forecast. NexoraWildfire AI is experimental decision support, not an official warning service. In an emergency, follow the relevant authorities.
 
-Provider access and production behavior must be verified independently; code for an integration is not proof that its live connection is working. Missing credentials, provider errors, and zero observations must not be presented as zero risk.
+Provider access and production behavior must be verified independently; code for an integration is not proof that its live connection is working. Missing credentials, provider errors, and zero observations must not be presented as zero risk. The UAV demo's detection boxes and latency are explicitly simulated and must not be presented as measured model performance.
 
 ## Pricing and sustainability
 
@@ -57,6 +63,7 @@ See [SaaS limits and pricing plan](docs/SAAS_LIMITS_AND_PRICING.md) for the cost
 - **Contributing:** [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)
 - **Global architecture notes:** [docs/GLOBAL_SCALABILITY.md](docs/GLOBAL_SCALABILITY.md)
 - **AI-assisted development disclosure:** [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md)
+- **Nexora Risk Index methodology:** [docs/NEXORA_RISK_INDEX.md](docs/NEXORA_RISK_INDEX.md)
 
 The priority is a dependable core product: clear map layers, understandable indicators, reliable saved areas, transparent data status, accessible mobile use, and feedback from real users. New features should solve a real user problem rather than add complexity for its own sake.
 
