@@ -598,6 +598,14 @@
     ["İletişim / gizlilik e-postası:","Contact / privacy email:"],
     ["Belge taslakları","Document drafts"],
     ["Yayın öncesi açık kalan işler","Outstanding pre-publication tasks"],
+    ["Ahmet Eymen Bakraç — bireysel proje sahibi.","Ahmet Eymen Bakraç — individual project owner."],
+    ["Doğrulanmış bir açık adres yayımlanmamıştır.","No verified public address is published."],
+    ["Henüz verilmedi; doğrulanana kadar yayımlanmayacaktır.","Not provided yet; it will not be published until verified."],
+    ["Bu sayfa NexoraWildfire AI için hazırlanan hukuki belge taslaklarını bir araya getirir.","This page brings together legal document drafts prepared for NexoraWildfire AI."],
+    ["Taslaklar gerçek uygulama veri akışları, sağlayıcılar ve saklama süreleri doğrulanıp hukuk uzmanı tarafından incelenmeden nihai hukuki belge veya uygunluk garantisi olarak değerlendirilmemelidir.","The drafts must not be treated as final legal documents or a compliance guarantee until actual application data flows, providers, and retention periods are verified and reviewed by a legal professional."],
+    ["Eksik kimlik ve iletişim bilgileri uydurulmamıştır.","Missing identity and contact details have not been invented."],
+    ["Gizlilik e-postası ve veri sorumlusuna ulaşılabilecek başvuru kanalı henüz belirlenmediğinden, bu sayfa şu an kişisel veri başvuruları için etkin bir iletişim kanalı sunmaz.","Because a privacy email and a channel for contacting the data controller have not yet been established, this page does not currently provide an active channel for personal-data requests."],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured."],
     ["Geliştirici imzası","Developer attribution"]
 
   ];
