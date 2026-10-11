@@ -3,6 +3,7 @@ uvicorn
 requests
 python-dotenv
 python-multipart
+Pillow
 pydantic
 pywebpush==2.5.0
 
