@@ -121,15 +121,20 @@ class MobileUiSmokeTests(unittest.TestCase):
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector("#evac-sim", timeout=15000)
+            self.assertTrue(page.locator("#evac-sim [data-run]").is_visible())
+            self.assertTrue(page.locator("#evac-sim [data-meter]").is_visible())
             page.locator("#evac-sim [data-run]").click()
-            page.wait_for_function("document.querySelector('#evac-sim [data-sim-status]').textContent.includes('yük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('düşük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('orta')", timeout=5000)
+            page.wait_for_function("document.querySelector('#evac-sim [data-sim-status]').textContent.includes('gösterge') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('yük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('düşük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('orta')", timeout=5000)
+            self.assertIn("/ 100", page.locator("#evac-sim [data-sim-index]").inner_text())
             page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             status = page.locator("#evac-sim [data-sim-status]").inner_text()
             detail = page.locator("#evac-sim [data-sim-detail]").inner_text()
             self.assertTrue(any(word in status.lower() for word in ("low", "moderate", "high")), status)
+            self.assertIn("Escape corridor", page.locator("#evac-sim h3").inner_text())
             self.assertIn("Inputs:", detail)
             self.assertNotIn("temsilî genişlik", detail)
+            self.assertGreaterEqual(int(page.locator("#evac-sim .evac-sim-meter").get_attribute("aria-valuenow")), 0)
             # A language switch must not remove or break the mobile-nav structure.
             self.assertTrue(page.locator("nav .nx-nav-toggle").count() == 1)
         finally:
