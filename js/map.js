@@ -152,7 +152,7 @@ async function openProvince(name){
  selectedProvince=name;selectedDistrict=null;setStatus("İLÇELER YÜKLENİYOR…");
  const gj=await fetch(districtPath).then(x=>x.json());districtFeatures=(gj.features||[]).filter(f=>norm((f.properties||{}).adm1_name1)===norm(name)||norm((f.properties||{}).adm1_name)===norm(name));
  const ws=await weatherFor(districtFeatures.map(f=>[Number(f.properties.center_lat),Number(f.properties.center_lon)]));
- districtRows=districtFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};return weatherRow(p.adm2_name1,p.area_sqkm,w,0,Number(p.center_lat),Number(p.center_lon))});
+ districtRows=districtFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{},metric=v=>v===null||v===undefined||v===""||!Number.isFinite(Number(v))?null:Number(v);const w={t:metric(c.temperature_2m),h:metric(c.relative_humidity_2m),wind:metric(c.wind_speed_10m),soil:metric(c.soil_moisture_0_to_7cm),et0:metric(d.et0_fao_evapotranspiration?.[0]),vpd:metric(c.vapour_pressure_deficit),precip:metric(c.precipitation)};return weatherRow(p.adm2_name1,p.area_sqkm,w,null,Number(p.center_lat),Number(p.center_lon))});
  await applyPollen(districtRows);drawDistricts();
  const bounds=L.geoJSON({type:"FeatureCollection",features:districtFeatures}).getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.08));
 }
