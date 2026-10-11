@@ -161,3 +161,22 @@ def build_enterprise_report(self, job_id: str, payload: dict):
     _send_email(user_id, payload["company_name"], payload["asset_name"], download_url)
     return {"kind": "enterprise-report", "user_id": user_id, "status": "completed", "download_url": download_url,
             "email_sent": True, "completed_at": datetime.now(timezone.utc).isoformat()}
+
+
+@celery_app.task(bind=True, name="worker.build_ndvi_timeseries", autoretry_for=(requests.RequestException,), retry_backoff=True, retry_kwargs={"max_retries": 3})
+def build_ndvi_timeseries(self, job_id: str, payload: dict):
+    """Run polygon NDVI/NDMI analysis in the worker, outside the short-lived API request."""
+    user_id = str(payload["user_id"])
+    self.update_state(state="PROGRESS", meta={"stage": "searching_sentinel2"})
+    geometry = payload["geometry"]
+    days = int(payload.get("days", 180))
+    interval = str(payload.get("interval", "P30D"))
+    analysis = analyze_area(geometry, days=days, interval=interval)
+    self.update_state(state="PROGRESS", meta={"stage": "finalizing_analysis"})
+    return {
+        "kind": "ndvi-timeseries",
+        "user_id": user_id,
+        "status": "completed",
+        "analysis": analysis,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+    }
