@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v14";
+const CACHE_NAME = "nexorawildfire-shell-v15";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -26,6 +26,7 @@ const APP_SHELL = [
   "./js/notification-ui.js",
   "./js/onboarding.js",
   "./js/dashboard.js",
+  "./js/role-dashboard.js?v=20261011a",
   "./js/nova-storage.js",
   "./js/nova-offline-engine.js",
   "./js/install-update.js",
