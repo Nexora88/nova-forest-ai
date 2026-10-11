@@ -931,7 +931,7 @@
   }
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
-  let lang = stored === "en" || stored === "tr" ? stored : "en";
+  let lang = stored === "en" || stored === "tr" ? stored : (/^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr");
   const ordered = (map) => [...map.entries()].sort((a,b) => b[0].length-a[0].length);
   function replace(text, target) {
     const entries = ordered(target === "en" ? trToEn : enToTr);
