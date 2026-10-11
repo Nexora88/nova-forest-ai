@@ -572,9 +572,7 @@
     ["Tanımlı otomatik olay eşikleri aşılmadı; bu ifade yangın olmadığına dair teyit değildir.","No configured event threshold was exceeded; this does not confirm that no fire exists."],
     ["İnternet yok ve yerel gözlem bulunamadı. Risk skoru üretilmedi.","Offline and no local observation is available. No risk score was produced."],
     ["Veri kaynağı:","Data source:"],["Bu göstergeler resmî yangın uyarısı değildir.","These indicators are not official wildfire warnings."],
-    ["Veri eksikliği, NDVI/NDMI değerinin sıfır olduğu anlamına gelmez.","Missing data does not mean NDVI/NDMI equals zero."]
-
-
+    ["Veri eksikliği, NDVI/NDMI değerinin sıfır olduğu anlamına gelmez.","Missing data does not mean NDVI/NDMI equals zero."],
     ["İHA / Gerçek YOLOv8 · NexoraWildfire AI","UAV / Real YOLOv8 · NexoraWildfire AI"],
     ["NexoraWildfire AI gerçek YOLOv8 yangın ve duman görüntü çıkarımı laboratuvarı.","NexoraWildfire AI real YOLOv8 fire and smoke image-inference lab."],
     ["Gerçek YOLOv8 yangın/duman çıkarım laboratuvarı.","Real YOLOv8 fire/smoke inference lab."],
@@ -592,8 +590,7 @@
     ["Bu analiz edilen karede model fire/smoke kutusu döndürmedi; bu, yangın olmadığını kanıtlamaz.","The model returned no fire/smoke boxes for this frame; that does not prove there is no fire."],
     ["Kare JPEG olarak hazırlanamadı.","Could not prepare the frame as JPEG."],["Video oynatılamadı:","Could not play video:"],
     ["Yerel video hazır. Kareler yalnızca gerçek algılama başlatıldığında API adresine gönderilir.","Local video is ready. Frames are sent to the API only when real detection starts."],
-    ["Yerel video","Local video"],["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."]
-
+    ["Yerel video","Local video"],["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."],
     ["Weather data by Open-Meteo.com","Hava verisi: Open-Meteo.com"],["Veri Durumu","Data Status"],["GÖZLEM HAZIR","OBSERVATION READY"],["VERİ YOK","DATA UNAVAILABLE"],["Güncel hava yanıtı alındı; bu kart yangın tahmini değildir.","A current weather response was received; this card is not a fire forecast."],["Hava API'si erişilemedi; risk skoru üretilmedi.","Weather API unavailable; no risk score was produced."],
 
   ];
