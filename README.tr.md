@@ -84,4 +84,5 @@ UCI Algerian Forest Fires veri setiyle yeniden üretilebilir bir Random Forest a
 - **Thrace dataset research workflow:** [docs/THRACE_DATASET.md](docs/THRACE_DATASET.md)
 - **Offline sync acceptance test:** [docs/OFFLINE_SYNC_ACCEPTANCE.md](docs/OFFLINE_SYNC_ACCEPTANCE.md)
 - **Enterprise report worker flow:** [docs/ENTERPRISE_REPORT_WORKFLOW.md](docs/ENTERPRISE_REPORT_WORKFLOW.md)
+- **NASA FIRMS live hotspots setup:** [docs/FIRMS_PROVIDER_SETUP.md](docs/FIRMS_PROVIDER_SETUP.md)
 - **Enterprise worker implementation:** [backend/worker/README.md](backend/worker/README.md)
