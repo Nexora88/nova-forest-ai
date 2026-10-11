@@ -5,6 +5,8 @@ from typing import Any, Dict, Literal
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 from app.api.jobs_routes import _authenticated_user, _worker_request
+from app.api.account_routes import reserve_usage, release_usage
+import uuid
 
 router = APIRouter(prefix="/enterprise/reports", tags=["Enterprise reports"])
 
@@ -30,8 +32,14 @@ def create_enterprise_report(request: EnterpriseReportRequest, authorization: st
         raise HTTPException(status_code=422, detail="GeoJSON FeatureCollection, Feature, LineString, Point veya Polygon gerekli.")
     if len(str(collection)) > 1_000_000:
         raise HTTPException(status_code=413, detail="GeoJSON en fazla 1 MB olabilir.")
-    payload = {"user_id":user_id,"company_name":request.company_name,"asset_name":request.asset_name,"asset_type":request.asset_type,"asset_geojson":collection,"buffer_m":request.buffer_m}
-    return _worker_request("POST", "/internal/jobs/enterprise-report", user_id, payload)
+    request_id = uuid.uuid4().hex
+    reserve_usage(user_id, "enterprise_report", request_id)
+    payload = {"user_id":user_id,"company_name":request.company_name,"asset_name":request.asset_name,"asset_type":request.asset_type,"asset_geojson":collection,"buffer_m":request.buffer_m,"request_id":request_id}
+    try:
+        return _worker_request("POST", "/internal/jobs/enterprise-report", user_id, payload)
+    except HTTPException:
+        release_usage(user_id, request_id)
+        raise
 
 @router.get("/{job_id}")
 def enterprise_report_status(job_id: str, authorization: str | None = Header(default=None)):
