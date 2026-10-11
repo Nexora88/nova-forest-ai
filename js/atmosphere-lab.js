@@ -158,7 +158,6 @@
       [T("CO₂ eşdeğeri","CO₂ equivalent"),number(co2,1)+" t",T("Kullanıcı katsayısı: ","User factor: ")+number(Number($("atmo-co2-factor").value),1)+" t/ha"],
       [T("Ekonomik etki","Economic impact"),"€"+Math.round(cost).toLocaleString("en-US"),T("Kullanıcı katsayısı: ","User factor: ")+"€"+Math.round(Number($("atmo-cost-factor").value)).toLocaleString("en-US")+"/ha"]
     ].forEach(item=>{const article=document.createElement("article"),small=document.createElement("small"),strong=document.createElement("strong"),note=document.createElement("small");small.textContent=item[0];strong.textContent=item[1];note.textContent=item[2];article.append(small,strong,note);values.appendChild(article);});
-    setText("atmo-carbon",T("Karbon ve ekonomik etki senaryosu","Carbon and economic impact scenario"));
     const origin=$("atmo-map-origin");origin.title=T("Senaryo merkezi: ","Scenario origin: ")+lat+", "+lon;
   }
   async function startCamera() {
@@ -166,6 +165,7 @@
     if(!navigator.mediaDevices?.getUserMedia) {status.textContent=T("Bu tarayıcı güvenli kamera erişimini desteklemiyor. HTTPS üzerinden dene.","This browser does not support secure camera access. Try HTTPS.");return;}
     try {
       cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+      $("atmo-camera-video").removeAttribute("src");$("atmo-camera-video").load();$("atmo-camera-video").controls=false;
       $("atmo-camera-video").srcObject=cameraStream;
       $("atmo-camera-start").disabled=true;$("atmo-camera-stop").disabled=false;
       status.textContent=T("Yerel kamera açık. YOLOv8 algılaması bağlı değil; nesne tespiti yapılmıyor.","Local camera active. YOLOv8 is not connected; no object detection is running.");
