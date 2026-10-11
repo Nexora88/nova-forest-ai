@@ -94,7 +94,10 @@ function evaluatePixel(s) {
     }
 
 def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"):
-    token=_token()
+    try:
+        token = _token()
+    except requests.RequestException as exc:
+        return {"status":"error","source":"Copernicus Sentinel-2 L2A / Statistical API","error_type":type(exc).__name__,"series":[]}
     if not token:
         return {"status":"not_configured","message":"Gerçek Sentinel-2 NDVI için CDSE_CLIENT_ID ve CDSE_CLIENT_SECRET backend ortam değişkenleri gerekli.","source":"Copernicus Sentinel-2 L2A","series":[]}
     try:
@@ -135,15 +138,18 @@ def _raster_weather(bbox):
     data = r.json()
     current = data.get("current", {})
     daily = data.get("daily", {})
-    return {
-        "temperature": float(current.get("temperature_2m") or 0),
-        "humidity": float(current.get("relative_humidity_2m") or 0),
-        "wind": float(current.get("wind_speed_10m") or 0),
-        "precipitation": float(current.get("precipitation") or 0),
-        "vpd": float(current.get("vapour_pressure_deficit") or 0),
-        "et0": float((daily.get("et0_fao_evapotranspiration") or [0])[0] or 0),
-        "observed_at": current.get("time"),
+    raw = {
+        "temperature": current.get("temperature_2m"),
+        "humidity": current.get("relative_humidity_2m"),
+        "wind": current.get("wind_speed_10m"),
+        "precipitation": current.get("precipitation"),
+        "vpd": current.get("vapour_pressure_deficit"),
+        "et0": (daily.get("et0_fao_evapotranspiration") or [None])[0],
     }
+    missing = [name for name, value in raw.items() if value is None]
+    if missing:
+        raise ValueError("Open-Meteo returned incomplete inputs: " + ", ".join(missing))
+    return {**{name: float(value) for name, value in raw.items()}, "observed_at": current.get("time")}
 
 
 def _weather_risk_score(weather):
