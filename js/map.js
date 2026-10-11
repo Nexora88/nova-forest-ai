@@ -309,4 +309,5 @@ function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(loca
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
 load();enableMobileMapGesture();setInterval(loadProvinceData,300000);
-\n})();\n
+
+})();
