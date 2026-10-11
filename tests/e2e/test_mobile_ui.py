@@ -60,6 +60,8 @@ class MobileUiSmokeTests(unittest.TestCase):
         context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
         page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://unpkg.com/") or route.request.url.startswith("https://cdn.jsdelivr.net/") else route.abort())
+        page.route("https://unpkg.com/**", lambda route: route.continue_())
+        page.route("https://cdn.jsdelivr.net/**", lambda route: route.continue_())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         return context, page
 
