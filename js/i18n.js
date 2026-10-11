@@ -559,6 +559,7 @@
     ["SAHA İSTİHBARAT KONTROLÜ","FIELD INTELLIGENCE CONTROL"],
     ["Kullanılamıyor","Unavailable"],
     ["Gerçek dünya ihtiyaçları için çevresel istihbarat","Environmental intelligence for real-world needs"],
+    ["Kaliforniya Napa Vadisi yakınında örnek bir GeoJSON poligonu yükle, güncel hava durumunu iste ve aynı sınır kutusu için NASA FIRMS’i kontrol et. Eksik kimlik bilgileri veya erişilemeyen sağlayıcılar açıkça bildirilir.","Load a sample GeoJSON polygon near Napa Valley, California, request current weather, and check NASA FIRMS for the same bounding box. Missing credentials or unavailable providers are reported explicitly."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
