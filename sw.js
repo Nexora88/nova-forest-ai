@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v35";
+const CACHE_NAME = "nexorawildfire-shell-v36";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -40,11 +40,11 @@ const APP_SHELL = [
   "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011f",
   "./js/global-demo.js?v=20261011g",
-  "./js/nova-storage.js",
-  "./js/nova-offline-engine.js",
-  "./js/install-update.js",
+  "./js/nova-storage.js?v=20261011b",
+  "./js/nova-offline-engine.js?v=20261011b",
+  "./js/install-update.js?v=20261011b",
   "./js/pwa.js",
-  "./js/edge-ui.js",
+  "./js/edge-ui.js?v=20261011b",
   "./js/live-risk-raster.js",
   "./js/nexora-product.js",
   "./css/product-ui.css",
