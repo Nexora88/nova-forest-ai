@@ -474,40 +474,27 @@
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
   const documentLang = /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
   let lang = stored === "en" || stored === "tr" ? stored : documentLang;
-  const ordered = (map) => [...map.entries()].sort((a,b) => b[0].length-a[0].length);
+  // Translate complete text values only. Substring translation caused mixed-language
+  // sentences (one English word inside an otherwise Turkish sentence).
   function replace(text, target) {
-    const entries = ordered(target === "en" ? trToEn : enToTr);
-    let out = String(text);
-    // Do not translate a dictionary key inside a larger word (e.g. "Orta" in "Ortalama").
-    // Phrase matching still works inside sentences, while preserving word boundaries.
-    for (const [from,to] of entries) {
-      if (!from) continue;
-      let cursor = 0, result = "", found = -1;
-      const startsWord = /[\p{L}\p{N}_]/u.test(from[0]);
-      const endsWord = /[\p{L}\p{N}_]/u.test(from[from.length - 1]);
-      while ((found = out.indexOf(from, cursor)) !== -1) {
-        const before = found > 0 ? out[found - 1] : "";
-        const afterIndex = found + from.length;
-        const after = afterIndex < out.length ? out[afterIndex] : "";
-        const leftOk = !startsWord || !before || !/[\p{L}\p{N}_]/u.test(before);
-        const rightOk = !endsWord || !after || !/[\p{L}\p{N}_]/u.test(after);
-        if (leftOk && rightOk) {
-          result += out.slice(cursor, found) + to;
-          cursor = afterIndex;
-        } else {
-          result += out.slice(cursor, found + from.length);
-          cursor = afterIndex;
-        }
-      }
-      if (cursor > 0) out = result + out.slice(cursor);
-    }
-    return out;
+    const source = String(text);
+    const trimmed = source.trim();
+    if (!trimmed) return source;
+    const dictionary = target === "en" ? trToEn : enToTr;
+    const translated = dictionary.get(trimmed);
+    if (translated === undefined) return source;
+    const start = source.indexOf(trimmed);
+    return source.slice(0, start) + translated + source.slice(start + trimmed.length);
   }
   // Dynamic widgets can replace text in an existing node. Keep the original
   // source when the last value was our translation; accept genuinely new app text.
   const originals = new WeakMap();
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
+    // data-tr/data-en is authoritative for simple labels. Do not immediately
+    // reverse-translate the value just written from those attributes.
+    const owner = node.parentElement;
+    if (owner?.matches?.("[data-tr][data-en]") && owner.children.length === 0) return;
     const current = node.nodeValue;
     let record = originals.get(node);
     if (!record) {
@@ -546,7 +533,6 @@
     });
   }
   function applyLanguage() {
-    translateDataContent();
     document.querySelectorAll("[data-tr-placeholder][data-en-placeholder]").forEach(el => {
       el.placeholder = lang === "en" ? el.dataset.enPlaceholder : el.dataset.trPlaceholder;
     });
@@ -557,6 +543,8 @@
       el.childNodes.forEach(translateNode);
     });
     translateAttributes();
+    // Apply explicit bilingual copy last so it always wins over generic text handling.
+    translateDataContent();
     const btn = document.getElementById("nexora-language-toggle");
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
@@ -581,10 +569,11 @@
         record.addedNodes.forEach(node => {
           if (node.nodeType === Node.TEXT_NODE) translateNode(node);
           else if (node.nodeType === Node.ELEMENT_NODE) {
-            translateDataContent(node);
             node.querySelectorAll?.("*").forEach(el => el.childNodes.forEach(translateNode));
             node.childNodes?.forEach(translateNode);
             translateAttributes(node);
+            // Keep data-tr/data-en widgets in the selected language after insertion.
+            translateDataContent(node);
           }
         });
       }
