@@ -28,6 +28,7 @@ Proje, Mustafa Kemal Atatürk'ün bilim, üretim ve toplumsal faydaya verdiği �
 - **Uydu sahnesi keşfi:** Bitki örtüsü ve arazi gözlemi iş akışlarını desteklemek üzere tasarlanmıştır.
 - **Mobil uyumlu, yüklenebilir web uygulaması:** Çevrimdışı öncelikli uygulama kabuğu ve yerel kayıtlı alan deneyimi.
 - **Türkçe ve İngilizce arayüz:** İlk dil, tarayıcı diline göre seçilir (Türkçe tarayıcılarda Türkçe, diğerlerinde İngilizce).
+- **İHA / görüntü laboratuvarı:** AGPL-3.0 lisanslı algılama çalışma zamanı ve model kaldırıldığı için yangın/duman çıkarımı şimdilik devre dışıdır. Yalnızca MIT lisanslama hedefiyle uyumlu bir model seçilip etiketli bölgesel verilerle bağımsız doğrulama yapıldıktan sonra yeniden etkinleştirilebilir.
 
 ## Mevcut kapsam ve kanıt
 
