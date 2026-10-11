@@ -93,7 +93,12 @@ async function liveEdge(lat,lon){
     return {...d,mode:"live"};
   }catch{
     try{
-      const rows=await window.NovaStore.getAll("observations");
+      // Offline cache lookup is best-effort too; a stalled IndexedDB read must
+      // not prevent the saved-area card from rendering its honest fallback.
+      const rows=await Promise.race([
+        window.NovaStore.getAll("observations"),
+        new Promise(resolve=>setTimeout(()=>resolve([]),500))
+      ]);
       const hit=rows.find(x=>Math.abs(x.lat-lat)<.02&&Math.abs(x.lon-lon)<.02);
       if(hit?.data){const e=window.NovaOfflineEngine.evaluate(hit.data.w,hit.data);return {...hit.data,risk:e.risk,offline:true,mode:"offline",offlineAlerts:e.alerts,updatedAt:hit.updatedAt}}
     }catch{}
