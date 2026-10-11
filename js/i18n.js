@@ -474,7 +474,21 @@
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
   const documentLang = /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
   let lang = stored === "en" || stored === "tr" ? stored : documentLang;
-  // Translate complete text values only. Substring translation caused mixed-language
+  // Translate longest known phrases inside complete and dynamic text nodes.
+  // Unicode-aware boundaries prevent replacing fragments inside unrelated words.
+  // A single alternation means newly inserted translations are never translated twice.
+  const phraseCache = new Map();
+  function replace(text, target) {
+    const source = String(text);
+    if (!source.trim()) return source;
+    const dictionary = target === "en" ? trToEn : enToTr;
+    let compiled = phraseCache.get(target);
+    if (!compiled) {
+      const locale = target === "en" ? "en" : "tr";
+      const entries = Array.from(dictionary.entries())
+        .filter(([from, to]) => from.trim() && to !== undefined)
+        .sort((a, b) => b[0].length - a[0].length);
+      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\  // Translate complete text values only. Substring translation caused mixed-language
   // sentences (one English word inside an otherwise Turkish sentence).
   function replace(text, target) {
     const source = String(text);
@@ -485,6 +499,27 @@
     if (translated === undefined) return source;
     const start = source.indexOf(trimmed);
     return source.slice(0, start) + translated + source.slice(start + trimmed.length);
+  }");
+      const alternatives = entries.map(([from]) => {
+        const first = from.trimStart().charAt(0);
+        const last = from.trimEnd().slice(-1);
+        const left = /[\\p{L}\\p{N}_]/u.test(first) ? "(?<![\\p{L}\\p{N}_])" : "";
+        const right = /[\\p{L}\\p{N}_]/u.test(last) ? "(?![\\p{L}\\p{N}_])" : "";
+        return left + escapeRegex(from) + right;
+      });
+      const lookup = new Map(entries.map(([from, to]) => [from.toLocaleLowerCase(locale), to]));
+      compiled = { regex: new RegExp(alternatives.join("|"), "giu"), lookup, locale };
+      phraseCache.set(target, compiled);
+    }
+    return source.replace(compiled.regex, match => {
+      const translated = compiled.lookup.get(match.toLocaleLowerCase(compiled.locale));
+      if (translated === undefined) return match;
+      if (match === match.toLocaleUpperCase(compiled.locale)) return translated.toLocaleUpperCase(compiled.locale);
+      if (match[0] === match[0].toLocaleLowerCase(compiled.locale) && match[0] !== match[0].toLocaleUpperCase(compiled.locale)) {
+        return translated[0].toLocaleLowerCase(compiled.locale) + translated.slice(1);
+      }
+      return translated;
+    });
   }
   // Dynamic widgets can replace text in an existing node. Keep the original
   // source when the last value was our translation; accept genuinely new app text.
