@@ -10,7 +10,14 @@ async function loadAreas(){
   try{local=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
   let indexed=[];
   try{indexed=await window.NovaStore.getAll("areas")}catch{}
-  const merged=new Map(indexed.map(a=>[String(a.id),a]));
+  // Re-read after IndexedDB resolves: another tab or the user may save/delete
+  // an area while this async read is in flight. A pre-await snapshot can erase
+  // a just-added local area when this function writes the merged cache back.
+  try {
+    const latest=JSON.parse(localStorage.getItem(KEY)||"[]");
+    if(Array.isArray(latest)) local=latest;
+  } catch {}
+  const merged=new Map(indexed.filter(a=>a&&a.id!=null).map(a=>[String(a.id),a]));
   // localStorage is written first by the map save flow; it must win on id collisions
   // so an older IndexedDB copy cannot hide a newly drawn or edited polygon.
   for(const area of local){
