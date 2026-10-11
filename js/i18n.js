@@ -1,6 +1,7 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
+    ["Köylü milletin efendisidir.","The farmer is the master of the nation."],
     ["CANLI TELEMETRİ","LIVE TELEMETRY"],
     ["MODEL KANITLARI","MODEL EVIDENCE"],
     ["SAHA GÜVENLİĞİ / SİMÜLASYON","FIELD SAFETY / SIMULATION"],
