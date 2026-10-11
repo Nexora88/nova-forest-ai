@@ -66,7 +66,23 @@ def get_firms_alerts(days: int = 1, bbox: dict | None = None) -> dict:
     try:
         response = requests.get(url, timeout=20)
         response.raise_for_status()
-        reader = csv.DictReader(io.StringIO(response.text))
+        body = (response.text or "").strip()
+        if not body:
+            return {
+                "status": "error", "alert_count": None, "alerts": [], "days": days,
+                "source": "NASA FIRMS", "bbox": selected_bbox, "checked_at_utc": checked_at,
+                "error_type": "EmptyProviderResponse",
+                "note": "NASA FIRMS returned an empty response; zero detections cannot be confirmed.",
+            }
+        reader = csv.DictReader(io.StringIO(body))
+        required = {"latitude", "longitude", "acq_date"}
+        if not reader.fieldnames or not required.issubset(set(reader.fieldnames)):
+            return {
+                "status": "error", "alert_count": None, "alerts": [], "days": days,
+                "source": "NASA FIRMS", "bbox": selected_bbox, "checked_at_utc": checked_at,
+                "error_type": "InvalidProviderResponse",
+                "note": "NASA FIRMS response did not contain the expected CSV columns; zero detections cannot be confirmed.",
+            }
         alerts = []
         invalid_rows = 0
 
