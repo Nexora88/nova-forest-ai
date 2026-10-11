@@ -1,5 +1,6 @@
 """API routes for real fire/smoke frame inference."""
 from io import BytesIO
+import os
 
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from starlette.concurrency import run_in_threadpool
@@ -7,6 +8,13 @@ from starlette.concurrency import run_in_threadpool
 from app.engine.yolo_fire_detector import detect_image, model_status
 
 router = APIRouter(prefix="/ml/yolo", tags=["YOLOv8 fire/smoke detection"])
+try:
+    DEFAULT_CONFIDENCE = float(os.getenv("NEXORA_YOLO_CONFIDENCE", "0.25"))
+except ValueError:
+    DEFAULT_CONFIDENCE = 0.25
+if not 0.05 <= DEFAULT_CONFIDENCE <= 0.95:
+    DEFAULT_CONFIDENCE = 0.25
+
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 MAX_IMAGE_PIXELS = 20_000_000
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
@@ -20,7 +28,7 @@ def yolo_status():
 @router.post("/detect")
 async def detect_frame(
     file: UploadFile = File(...),
-    confidence: float = Query(0.25, ge=0.05, le=0.95),
+    confidence: float = Query(DEFAULT_CONFIDENCE, ge=0.05, le=0.95),
 ):
     if file.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(status_code=415, detail="Yalnızca JPEG, PNG veya WebP görüntüsü kabul edilir.")
