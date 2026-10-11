@@ -4,117 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07130f">
-<meta name="description" content="NexoraWildfire AI gerçek YOLOv8 yangın ve duman görüntü çıkarımı laboratuvarı.">
-<title>İHA / Gerçek YOLOv8 · NexoraWildfire AI</title>
+<meta name="description" content="NexoraWildfire AI deneysel görüntü laboratuvarı ve lisans durumu.">
+<title>İHA / Görüntü Laboratuvarı · NexoraWildfire AI</title>
 <style>
-:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad;--amber:#ffce69;--red:#ff837a}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.5 system-ui,sans-serif}
-main{max-width:1080px;margin:auto;padding:clamp(14px,3vw,28px)}a{color:var(--green)}h1{font-size:clamp(1.7rem,4vw,2.7rem);line-height:1.15;margin:.4rem 0}h2{font-size:1.2rem;margin:.1rem 0 12px}p{color:var(--muted)}.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:clamp(14px,2.5vw,22px);margin:16px 0}
-.notice{border-left:3px solid var(--amber);padding:10px 14px;background:#332a153d;color:#ffe5a8}.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-button,input,select{font:inherit}input[type=text]{min-width:0;flex:1;background:#07130f;color:#e9fff0;border:1px solid var(--line);border-radius:9px;padding:10px;width:100%}
-button{background:var(--green);color:#04150b;border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}button.secondary{background:#193a2a;color:#e9fff0;border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
-label{font-size:.9rem;color:#d5e9dc}.field{display:flex;flex-direction:column;gap:6px;min-width:180px;flex:1}.api-row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-.stage{position:relative;background:#020805;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;place-items:center;min-height:220px}
-video{display:block;width:100%;max-height:65vh;background:#020805}#overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}.metric{font:600 1.08rem ui-monospace,monospace;color:var(--green);overflow-wrap:anywhere}.muted{color:var(--muted)}.status{display:inline-flex;align-items:center;gap:8px;font-weight:700}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--amber)}.status.ok .dot{background:var(--green)}.status.bad .dot{background:var(--red)}.small{font-size:.88rem}.warning{color:#ffe5a8}.success{color:var(--green)}.error{color:var(--red)}
-@media(max-width:560px){.controls button,.api-row button{width:100%}.field{min-width:100%}.stage{min-height:180px}}
+:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad;--amber:#ffce69}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.6 system-ui,sans-serif}
+main{max-width:860px;margin:auto;padding:clamp(16px,4vw,36px)}a{color:var(--green)}h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15}h2{font-size:1.2rem}.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,26px);margin:18px 0}.status{display:inline-block;border:1px solid #80652d;background:#332a153d;color:#ffe5a8;border-radius:999px;padding:5px 11px;font-weight:700}.muted{color:var(--muted)}li{margin:.6rem 0}
 </style>
 </head>
 <body><main>
 <a href="../index.html">← NexoraWildfire AI ana panel</a>
-<h1>İHA / Gerçek YOLOv8 laboratuvarı</h1>
-<p>Yerel videodan kareleri seçtiğin ML API'sine gönderir. Kutular yalnızca gerçek model API yanıtıyla çizilir; sahte algılama, rastgele gecikme veya uydurma GPS konumu üretilmez.</p>
-<div class="notice"><strong>Bilimsel sınır:</strong> Bu araştırma modeli duman/alev işaretleri için gerçek çıkarım yapabilir; Türkiye'deki saha koşulları için bağımsız olarak doğrulanmış değildir. Tek kare sonucu yangın teyidi veya resmi uyarı değildir. İHA/GPS koordinatı bu sayfada üretilmez.</div>
+<h1>İHA / Görüntü Laboratuvarı</h1>
+<p>Bu alan, ileride lisansı uyumlu ve bağımsız olarak değerlendirilmiş görüntü analizini desteklemek üzere ayrılmıştır.</p>
 <section class="panel">
-<h2>1 · Model servisine bağlan</h2>
-<div class="api-row">
-<div class="field"><label for="apiBase">API taban adresi</label><input id="apiBase" type="text" inputmode="url" value="" autocomplete="url"></div>
-<button id="connect">Bağlantıyı doğrula</button>
-</div>
-<p id="connectionText" class="small">Model servisi henüz doğrulanmadı.</p>
-<p class="small">ML container adresini gir. Standart Vercel API'sinde PyTorch/Ultralytics kurulu değilse durum açıkça gösterilir; bu durumda ML container'ı ayrıca dağıtıp adresini buraya girmen gerekir.</p>
+<span class="status">Çıkarım şu anda devre dışı</span>
+<h2>Neden kapalı?</h2>
+<p>Projenin MIT lisanslama hedefini korumak için AGPL-3.0 lisanslı Ultralytics çalışma zamanı ve üçüncü taraf yangın/duman model ağırlıkları etkin entegrasyondan kaldırıldı. Lisansı uygunluğu doğrulanmış bir alternatif seçilene kadar bu sayfa görüntü yüklemez ve algılama sonucu üretmez.</p>
 </section>
 <section class="panel">
-<h2>2 · Video seç ve gerçek çıkarımı çalıştır</h2>
-<div class="controls">
-<label for="videoFile">Cihazından video seç:</label><input id="videoFile" type="file" accept="video/*">
-<label for="confidence">Güven eşiği</label><select id="confidence"><option value="0.25">0.25</option><option value="0.4">0.40</option><option value="0.5">0.50</option><option value="0.65">0.65</option></select>
-<button id="start" disabled>Gerçek algılamayı başlat</button><button id="stop" class="secondary" disabled>Durdur</button>
-</div>
-<p class="small">Video dosyasının tamamı yüklenmez. Oynatma sırasında belirli aralıklarla alınan JPEG kareleri seçtiğin API'ye gönderilir. API adresini yalnızca güvendiğin bir servise ayarla.</p>
-<div class="stage"><video id="video" controls playsinline></video><canvas id="overlay" aria-label="Gerçek model algılama kutuları"></canvas></div>
+<h2>Bilimsel ve güvenlik sınırları</h2>
+<ul>
+<li>Trakya koşullarında etiketli pozitif ve negatif yangın/duman görüntüleriyle bağımsız doğruluk değerlendirmesi yapılmış değildir.</li>
+<li>Bu sistem resmî uyarı, yangın teyidi veya doğrulanmış yangın tahmini olarak sunulmaz.</li>
+<li>İleride seçilecek model; lisansı, ağırlıkların kaynağı, eğitim verisi koşulları ve kullanım izinleri incelendikten sonra etkinleştirilecektir.</li>
+<li>Modelin teknik olarak çalışması tek başına doğruluk kanıtı sayılmaz. Bölgesel etiketli test, yanlış pozitif/negatif analizi ve belgelenmiş sınırlamalar gerekir.</li>
+</ul>
 </section>
 <section class="panel">
-<h2>3 · Gerçek API telemetrisi</h2>
-<div class="grid">
-<div><p>Model durumu</p><div id="modelStatus" class="metric">DOĞRULANMADI</div></div>
-<div><p>Son çıkarım süresi</p><div id="latency" class="metric">—</div></div>
-<div><p>Son karedeki algılamalar</p><div id="count" class="metric">—</div></div>
-<div><p>Son kare çözünürlüğü</p><div id="dimensions" class="metric">—</div></div>
-</div>
-<p id="detail" aria-live="polite">Bağlantı doğrulaması bekleniyor.</p>
-<p class="small muted">Konum türü: görüntü piksel koordinatları. GPS, harita konumu ve saha alarmı bu API tarafından üretilmez.</p>
+<h2>Sonraki adım</h2>
+<p class="muted">Öncelik, MIT lisansını koruyarak güvenilir ve sürdürülebilir bir model yolu belirlemektir. Uyumlu bir model ve uygun değerlendirme verisi hazır olana kadar algılama özelliği kapalı kalacaktır.</p>
+<p><a href="../THIRD_PARTY_NOTICES.md">Üçüncü taraf lisans bildirimleri</a> · <a href="../docs/SCIENTIFIC_STATUS.md">Bilimsel durum ve doğrulama planı</a></p>
 </section>
-</main>
-<script>
-const apiBase=document.querySelector('#apiBase'),connectButton=document.querySelector('#connect'),fileInput=document.querySelector('#videoFile'),video=document.querySelector('#video'),overlay=document.querySelector('#overlay'),startButton=document.querySelector('#start'),stopButton=document.querySelector('#stop'),confidence=document.querySelector('#confidence'),connectionText=document.querySelector('#connectionText'),modelStatus=document.querySelector('#modelStatus'),latency=document.querySelector('#latency'),count=document.querySelector('#count'),dimensions=document.querySelector('#dimensions'),detail=document.querySelector('#detail');
-const frameCanvas=document.createElement('canvas');let objectUrl=null,modelInfo=null,running=false,loopTimer=null,lastDetections=[];
-apiBase.value = 'https://nexorawildfire-ml-production.up.railway.app';
-function baseUrl(){return apiBase.value.trim().replace(/\/+$/,'');}
-function setConnection(kind,message){connectionText.className='small '+kind;connectionText.textContent=message;}
-function responseError(data,status){const d=data&&data.detail;return typeof d==='string'?d:(d&&d.message)||((data&&data.message)||('HTTP '+status));}
-async function checkConnection(){
- const base=baseUrl();if(!/^https?:\/\//i.test(base)){setConnection('error','API adresi http:// veya https:// ile başlamalı.');return;}
- connectButton.disabled=true;setConnection('','Model servisi kontrol ediliyor…');modelStatus.textContent='KONTROL EDİLİYOR';
- try{
-  const response=await fetch(base+'/ml/yolo/status',{headers:{Accept:'application/json'}});
-  const data=await response.json().catch(()=>({message:'API geçerli JSON döndürmedi.'}));
-  if(!response.ok)throw new Error(responseError(data,response.status));
-  modelInfo=data;
-  if(!data.runtime_available){modelStatus.textContent='ORTAM EKSİK';setConnection('error','API erişilebilir; ancak gerçek YOLOv8 çalışma ortamı eksik. ML container kurulmalı.');}
-  else if(data.status==='weights_missing'){modelStatus.textContent='AĞIRLIKLAR EKSİK';setConnection('error',data.message||'Model ağırlıkları bulunamadı.');}
-  else{modelStatus.textContent=data.weights_loaded?'MODEL YÜKLÜ':'KAYNAK HAZIR';setConnection('success','API erişilebilir. '+(data.message||'')); }
-  updateControls();
- }catch(error){modelInfo=null;modelStatus.textContent='BAĞLANTI YOK';setConnection('error','Bağlantı doğrulanamadı: '+error.message+' — CORS, adres ve servis durumunu kontrol et.');updateControls();}
- finally{connectButton.disabled=false;}
-}
-function updateControls(){startButton.disabled=running||!video.src||!modelInfo||!modelInfo.runtime_available||modelInfo.status==='weights_missing';stopButton.disabled=!running;}
-function drawDetections(detections,width,height){
- const ctx=overlay.getContext('2d');overlay.width=width;overlay.height=height;ctx.clearRect(0,0,width,height);lastDetections=detections||[];
- ctx.lineWidth=Math.max(2,width/400);ctx.font='bold '+Math.max(14,width/70)+'px system-ui';
- for(const item of lastDetections){const b=item.box_normalized;if(!b||b.length!==4)continue;const x=b[0]*width,y=b[1]*height,w=(b[2]-b[0])*width,h=(b[3]-b[1])*height;
-  ctx.strokeStyle=item.class_name==='fire'?'#ff665f':'#65ff9a';ctx.fillStyle=ctx.strokeStyle;ctx.strokeRect(x,y,w,h);
-  const label=item.class_name.toUpperCase()+' '+Math.round(item.confidence*100)+'%';const labelWidth=ctx.measureText(label).width+12;const labelY=Math.max(0,y-26);ctx.fillRect(x,labelY,labelWidth,24);ctx.fillStyle='#07130f';ctx.fillText(label,x+6,labelY+17);
- }
-}
-async function detectNextFrame(){
- if(!running)return;
- if(video.paused||video.ended||!video.videoWidth){loopTimer=setTimeout(detectNextFrame,250);return;}
- try{
-  const maxSide=960,scale=Math.min(1,maxSide/Math.max(video.videoWidth,video.videoHeight));frameCanvas.width=Math.max(1,Math.round(video.videoWidth*scale));frameCanvas.height=Math.max(1,Math.round(video.videoHeight*scale));
-  frameCanvas.getContext('2d',{alpha:false}).drawImage(video,0,0,frameCanvas.width,frameCanvas.height);
-  const blob=await new Promise(resolve=>frameCanvas.toBlob(resolve,'image/jpeg',0.82));if(!blob)throw new Error('Kare JPEG olarak hazırlanamadı.');
-  const form=new FormData();form.append('file',blob,'frame.jpg');
-  const sentAt=performance.now();const response=await fetch(baseUrl()+'/ml/yolo/detect?confidence='+encodeURIComponent(confidence.value),{method:'POST',body:form});
-  const data=await response.json().catch(()=>({message:'API geçerli JSON döndürmedi.'}));
-  if(!response.ok)throw new Error(responseError(data,response.status));
-  drawDetections(data.detections,data.image.width,data.image.height);latency.textContent=String(data.inference_ms)+' ms model';count.textContent=String(data.detection_count);dimensions.textContent=data.image.width+' × '+data.image.height;
-  detail.textContent=data.detection_count?data.detection_count+' gerçek model kutusu döndü. Bu sonuç tek başına yangın teyidi değildir.':'Bu analiz edilen karede model fire/smoke kutusu döndürmedi; bu, yangın olmadığını kanıtlamaz.';
-  modelStatus.textContent='ÇIKARIM AKTİF';setConnection('success','Gerçek YOLOv8 API yanıtı alındı. Uçtan uca süre: '+Math.round(performance.now()-sentAt)+' ms.');
- }catch(error){detail.textContent='Gerçek çıkarım durdu: '+error.message;setConnection('error','Model API hatası. Sahte sonuç gösterilmiyor.');stopDetection();return;}
- loopTimer=setTimeout(detectNextFrame,900);
-}
-async function startDetection(){
- if(!modelInfo||!modelInfo.runtime_available){await checkConnection();if(!modelInfo||!modelInfo.runtime_available)return;}
- if(!video.src)return;
- running=true;updateControls();detail.textContent='Gerçek model çıkarımı başlatılıyor; ilk kare model ağırlıklarının indirilmesini tetikleyebilir.';
- try{await video.play();detectNextFrame();}catch(error){running=false;updateControls();detail.textContent='Video oynatılamadı: '+error.message;}
-}
-function stopDetection(){running=false;clearTimeout(loopTimer);loopTimer=null;overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);updateControls();if(modelStatus.textContent==='ÇIKARIM AKTİF')modelStatus.textContent=modelInfo&&modelInfo.weights_loaded?'MODEL YÜKLÜ':'KAYNAK HAZIR';}
-connectButton.addEventListener('click',checkConnection);
-fileInput.addEventListener('change',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);const file=fileInput.files&&fileInput.files[0];if(!file)return;objectUrl=URL.createObjectURL(file);video.src=objectUrl;drawDetections([],1,1);detail.textContent='Yerel video hazır. Kareler yalnızca gerçek algılama başlatıldığında API adresine gönderilir.';updateControls();});
-startButton.addEventListener('click',startDetection);stopButton.addEventListener('click',stopDetection);video.addEventListener('ended',stopDetection);video.addEventListener('pause',()=>{if(running){clearTimeout(loopTimer);loopTimer=setTimeout(detectNextFrame,250);}});
-checkConnection();
-</script>
-<script src="../js/i18n.js?v=20261011g"></script>
-</body></html>
+</main></body></html>
