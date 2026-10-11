@@ -6,6 +6,8 @@ from typing import Any, Dict
 
 import requests
 from fastapi import APIRouter, Header, HTTPException
+from app.api.account_routes import reserve_usage, release_usage
+import uuid
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/jobs", tags=["Satellite jobs"])
@@ -95,10 +97,16 @@ def enqueue_ndvi_timeseries(
     coordinates = geometry.get("coordinates", [])
     if len(str(coordinates)) > 100_000:
         raise HTTPException(status_code=413, detail="Polygon çok büyük; alanı küçültün.")
-    return _worker_request(
-        "POST", "/internal/jobs/ndvi-timeseries", user_id,
-        {"geometry": geometry, "days": request.days, "interval": request.interval, "user_id": user_id},
-    )
+    request_id = uuid.uuid4().hex
+    reserve_usage(user_id, "ndvi_timeseries", request_id)
+    try:
+        return _worker_request(
+            "POST", "/internal/jobs/ndvi-timeseries", user_id,
+            {"geometry": geometry, "days": request.days, "interval": request.interval, "user_id": user_id, "request_id": request_id},
+        )
+    except HTTPException:
+        release_usage(user_id, request_id)
+        raise
 
 
 @router.post("/risk-raster", status_code=202)
@@ -111,9 +119,16 @@ def enqueue_risk_raster(
         raise HTTPException(status_code=422, detail="Geçerli bbox gerekli.")
     if request.east - request.west > 2 or request.north - request.south > 2:
         raise HTTPException(status_code=422, detail="Tek görev için bbox genişliği en fazla 2 derece olabilir.")
+    request_id = uuid.uuid4().hex
+    reserve_usage(user_id, "risk_raster", request_id)
     payload = request.dict()
     payload["user_id"] = user_id
-    return _worker_request("POST", "/internal/jobs/risk-raster", user_id, payload)
+    payload["request_id"] = request_id
+    try:
+        return _worker_request("POST", "/internal/jobs/risk-raster", user_id, payload)
+    except HTTPException:
+        release_usage(user_id, request_id)
+        raise
 
 
 @router.get("/{job_id}")
