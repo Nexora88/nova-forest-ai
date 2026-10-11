@@ -315,9 +315,13 @@ class MobileUiSmokeTests(unittest.TestCase):
             if url.startswith(BASE):
                 route.continue_()
             elif "api.open-meteo.com/v1/forecast" in url:
+                from datetime import datetime, timedelta
+                now = datetime.now().replace(minute=0, second=0, microsecond=0)
+                recent = (now - timedelta(hours=24)).strftime("%Y-%m-%dT%H:00")
+                current_time = now.strftime("%Y-%m-%dT%H:00")
                 route.fulfill(status=200, content_type="application/json", body=json.dumps({
                     "current": {
-                        "time": "2026-10-11T12:00",
+                        "time": current_time,
                         "temperature_2m": 30,
                         "relative_humidity_2m": 35,
                         "wind_speed_10m": 24,
@@ -326,7 +330,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     },
                     "current_units": {"temperature_2m": "°C"},
                     "hourly": {
-                        "time": ["2026-10-10T12:00", "2026-10-11T12:00"],
+                        "time": [recent, current_time],
                         "relative_humidity_2m": [50, 35],
                         "temperature_2m": [25, 30],
                         "wind_speed_10m": [12, 24]
