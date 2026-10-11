@@ -1,4 +1,4 @@
-# Isolated training/inference environment; do not add to Vercel's default requirements.
+# Optional ML/research environment. Keep dependencies license-reviewed before release.
 -r requirements.txt
 numpy
 pandas
@@ -10,6 +10,6 @@ shapely
 pyproj
 reportlab
 
-# Real fire/smoke frame inference (AGPL-3.0 ecosystem; review before distribution)
-ultralytics>=8.3,<9
-huggingface_hub>=0.25,<2
+# Intentionally no Ultralytics, YOLO checkpoints, or Hugging Face model downloader.
+# Fire/smoke inference remains disabled until a permissively licensed and validated
+# model is selected. This preserves the project's MIT source-code licensing intent.
