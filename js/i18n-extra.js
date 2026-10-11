@@ -70,7 +70,13 @@
    const en=lang()==="en", dict=en?toEn:toTr;
    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-   for(const n of nodes){if(!originals.has(n)) originals.set(n,n.nodeValue);const raw=originals.get(n).trim();if(!raw)continue;const replacement=dict.get(raw);if(replacement){const lead=originals.get(n).match(/^\s*/)?.[0]||"",tail=originals.get(n).match(/\s*$/)?.[0]||"";n.nodeValue=lead+replacement+tail}}
+   for(const n of nodes){
+     if(n.parentElement?.closest?.("[data-no-translate],[data-user-content]"))continue;
+     if(!originals.has(n)) originals.set(n,n.nodeValue);
+     const raw=originals.get(n).trim();if(!raw)continue;
+     const translated=dict.get(raw);
+     if(translated){const lead=originals.get(n).match(/^\s*/)?.[0]||"",tail=originals.get(n).match(/\s*$/)?.[0]||"";n.nodeValue=lead+translated+tail}
+   }
    root.querySelectorAll?.("[placeholder],[title],[aria-label]").forEach(el=>{let saved=attributeOriginals.get(el);if(!saved){saved={};attributeOriginals.set(el,saved)}for(const attr of ["placeholder","title","aria-label"]){if(!el.hasAttribute(attr))continue;if(!(attr in saved))saved[attr]=el.getAttribute(attr);const orig=saved[attr];if(dict.has(orig))el.setAttribute(attr,dict.get(orig));}});
  }
  document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))requestAnimationFrame(()=>translate());},true);
