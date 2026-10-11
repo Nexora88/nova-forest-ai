@@ -3,7 +3,7 @@ from app.main import app
 
 
 def test_live_regions_endpoint_is_registered():
-    paths = {route.path for route in app.routes}
+    paths = set(app.openapi()['paths'])
     assert "/regions" in paths
 
 
