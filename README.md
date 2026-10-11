@@ -70,3 +70,7 @@ The priority is a dependable core product: clear map layers, understandable indi
 ---
 
 **Independent project by Ahmet Eymen Bakraç · Nexora · 2026**
+
+## Gerçek YOLOv8 çıkarımı
+
+İHA / Yapay Zekâ sayfası ve model servisinin kurulumu, model kaynağı/lisansı, API sözleşmesi ve doğrulama sınırları için [YOLO çıkarım rehberini](docs/YOLO_INFERENCE.md) inceleyin. Çalışan çıkarım için `backend/requirements-ml.txt` ile ayrı ML container gerekir; Vercel statik/standart API dağıtımı tek başına PyTorch modelinin çalıştığı anlamına gelmez.
