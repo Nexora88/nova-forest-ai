@@ -107,6 +107,25 @@ class MobileUiSmokeTests(unittest.TestCase):
         finally:
             context.close()
 
+    def test_enterprise_demo_form_never_claims_to_send_without_contact_email(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/enterprise.html", wait_until="domcontentloaded", timeout=30000)
+            form = page.locator("[data-enterprise-demo-form]")
+            self.assertTrue(form.is_visible())
+            form.locator('[name="contact_name"]').fill("Test Contact")
+            form.locator('[name="company"]').fill("Test Company")
+            form.locator('[name="email"]').fill("contact@example.com")
+            form.locator('[name="interest"]').select_option(label="Kurumsal iş birliği")
+            form.locator('[name="acknowledgement"]').check()
+            form.locator('button[type="submit"]').click()
+            self.assertTrue(page.locator("[data-demo-draft-panel]").is_visible())
+            self.assertIn("gönderilmedi", page.locator("[data-demo-status]").inner_text().lower())
+            self.assertIn("Test Company", page.locator("[data-demo-draft]").input_value())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
     def test_mobile_menu_language_toggle_and_install_lifecycle(self):
         context, page = self.new_page()
         try:
