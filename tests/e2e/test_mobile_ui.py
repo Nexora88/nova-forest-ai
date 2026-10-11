@@ -78,10 +78,10 @@ class MobileUiSmokeTests(unittest.TestCase):
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
                     self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"Turkish should be the first-visit language on {path}")
                     page.locator("#nexora-language-toggle").click()
-                    page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
+                    page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
                     self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"language toggle did not switch to English on {path}")
                     page.locator("#nexora-language-toggle").click()
-                    page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
+                    page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
                     self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"language toggle did not return to Turkish on {path}")
                     if page.locator("nav.nx-nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
