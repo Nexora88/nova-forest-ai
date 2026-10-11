@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020303">
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020303"><meta name="nexora-enterprise-contact-email" content="">
 <meta name="description" content="NexoraWildfire AI kurumsal altyapı varlık çizimi ve çevresel risk raporu çalışma alanı."><title>NexoraWildfire AI | Kurumsal Varlık Analizi</title>
 <link rel="manifest" href="../manifest.webmanifest"><link rel="stylesheet" href="../css/style.css?v=20261010d"><link rel="stylesheet" href="../css/enterprise-reports.css?v=20261010d">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"><link rel="icon" type="image/png" href="../favicon.png"><link rel="stylesheet" href="../css/auth.css?v=20261010d"></head>
@@ -27,8 +27,24 @@
     <span data-report-status role="status" aria-live="polite">Rapor oluşturmak için giriş ve kurumsal yetki gerekir.</span>
   </form>
 </section>
+<section class="enterprise-demo" id="enterprise-demo" aria-labelledby="enterprise-demo-title">
+  <div class="demo-heading"><div><span class="eyebrow">NEXORA / BUSINESS</span><h2 id="enterprise-demo-title">Kurumsal Plan · Demo ve Teklif Talebi</h2><p>Kuruluşunuzun ihtiyaçlarını konuşalım. Bu form ödeme almaz ve abonelik başlatmaz; talep e-posta taslağı olarak hazırlanır.</p></div><span class="demo-chip">ÖN GÖRÜŞME</span></div>
+  <form data-enterprise-demo-form>
+    <div class="demo-form-grid">
+      <label>Ad soyad<input name="contact_name" autocomplete="name" minlength="2" maxlength="100" required placeholder="Adınız soyadınız"></label>
+      <label>Şirket / kurum<input name="company" autocomplete="organization" minlength="2" maxlength="120" required placeholder="Kurumunuzun adı"></label>
+      <label>İş e-postası<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="ad@kurum.com"></label>
+      <label>İlgilendiğiniz alan<select name="interest" required><option value="">Bir seçenek belirleyin</option><option value="Enerji altyapısı ve varlık risk raporu">Enerji altyapısı ve varlık risk raporu</option><option value="Kurumsal yangın ve çevre risk takibi">Kurumsal yangın ve çevre risk takibi</option><option value="Tarım, arazi ve uydu analizi">Tarım, arazi ve uydu analizi</option><option value="Kurumsal iş birliği">Kurumsal iş birliği</option><option value="Diğer">Diğer</option></select></label>
+      <label class="demo-message-label">İhtiyacınız (isteğe bağlı)<textarea name="message" rows="4" maxlength="2000" placeholder="Hangi iş akışını değerlendirmek istiyorsunuz? Hassas koordinat veya gizli şirket verisi yazmayın."></textarea></label>
+    </div>
+    <label class="demo-consent"><input type="checkbox" name="acknowledgement" required><span>Bu formun ödeme veya abonelik başlatmadığını ve iletişim kanalının yapılandırılmamış olabileceğini anladım.</span></label>
+    <div class="demo-actions"><button type="submit">Demo / Teklif Talebi Oluştur <span aria-hidden="true">↗</span></button><span data-demo-status role="status" aria-live="polite">Gönderim için doğrulanmış kurumsal iletişim e-postası yapılandırılmalıdır.</span></div>
+    <div data-demo-draft-panel hidden><label for="enterprise-demo-draft">Talep taslağı</label><textarea id="enterprise-demo-draft" data-demo-draft rows="8" readonly></textarea><button type="button" class="demo-copy-button" data-demo-copy>Talep metnini kopyala</button></div>
+  </form>
+  <p class="demo-privacy-note">Gizlilik: Bu sayfa form bilgilerini kendiliğinden bir sunucuya göndermez. İletişim adresi yapılandırılmamışsa yalnızca yerel talep taslağı oluşturulur; gerçek gönderim yapılmış gibi gösterilmez.</p>
+</section>
 <section class="report-note"><strong>Erişim notu:</strong> Arayüzün açık olması rapor oluşturma yetkisi vermez. Hesap ve kurumsal yetki sunucu tarafında doğrulanır; abonelik/ödeme akışı henüz etkin değildir.</section></main>
 <footer><p>NexoraWildfire AI · Kurumsal analiz alanı · © 2026</p></footer>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script>window.NOVA_API_BASE=window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api");</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="../js/auth.js?v=20261010d"></script><script src="../js/enterprise-asset-map.js?v=20261010d"></script><script src="../js/enterprise-reports.js?v=20261010d"></script><script src="../js/pwa.js?v=20261010g"></script><script src="../js/ataturk-quotes.js?v=20261010e"></script><script src="../js/mobile-nav.js?v=20261010g"></script><script src="../js/i18n.js?v=20261011f"></script></body></html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="../js/auth.js?v=20261010d"></script><script src="../js/enterprise-asset-map.js?v=20261010d"></script><script src="../js/enterprise-reports.js?v=20261010d"></script><script src="../js/enterprise-demo.js?v=20261011a"></script><script src="../js/pwa.js?v=20261010g"></script><script src="../js/ataturk-quotes.js?v=20261010e"></script><script src="../js/mobile-nav.js?v=20261010g"></script><script src="../js/i18n.js?v=20261011i"></script></body></html>

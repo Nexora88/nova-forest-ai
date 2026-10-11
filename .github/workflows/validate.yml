@@ -59,27 +59,39 @@ jobs:
           python-version: "3.11"
       - name: Install HTTP client
         run: python -m pip install --upgrade requests
-      - name: Probe current production provider credentials without exposing secrets
+      - name: Probe preview provider credentials without exposing secrets
+        env:
+          NEXORA_PROVIDER_TEST_API_BASE: ${{ vars.NEXORA_PROVIDER_TEST_API_BASE }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           python - <<'PY'
           import json
+          import os
           import requests
 
-          base = "https://nova-forest-ai.vercel.app/api"
+          base = os.getenv("NEXORA_PROVIDER_TEST_API_BASE", "").strip().rstrip("/")
+          bypass_secret = os.getenv("VERCEL_AUTOMATION_BYPASS_SECRET", "").strip()
+          if not base.startswith("https://"):
+              print("Provider preview API base is missing. Set the GitHub Actions variable NEXORA_PROVIDER_TEST_API_BASE to the preview API URL ending in /api.")
+              raise SystemExit(1)
+          session = requests.Session()
+          if bypass_secret:
+              session.headers.update({"x-vercel-protection-bypass": bypass_secret})
+          provider_failures = []
 
           try:
-              health = requests.get(base + "/health", timeout=20)
-              print("Production backend health HTTP:", health.status_code)
+              health = session.get(base + "/health", timeout=20)
+              print("Preview backend health HTTP:", health.status_code)
               if not health.ok:
                   print("Backend health endpoint did not return success; provider results are unverified.")
-                  raise SystemExit(0)
+                  raise SystemExit(1)
           except requests.RequestException as exc:
-              print("Production backend unavailable:", type(exc).__name__)
-              raise SystemExit(0)
+              print("Preview backend unavailable:", type(exc).__name__)
+              raise SystemExit(1)
 
           try:
-              live_response = requests.get(base + "/satellite/live-check", timeout=75)
-              print("Live provider diagnostic HTTP:", live_response.status_code)
+              live_response = session.get(base + "/satellite/live-check", timeout=75)
+              print("Preview live provider diagnostic HTTP:", live_response.status_code)
               if live_response.ok:
                   live = live_response.json()
                   firms = live.get("nasa_firms", {})
@@ -89,34 +101,59 @@ jobs:
                   print("NASA FIRMS observations returned:", firms.get("alert_count", "not reported"))
                   print("Copernicus STAC catalog:", catalog.get("status", "unknown"))
                   print("Copernicus credential configuration:", processing.get("status", "unknown"))
+                  if firms.get("status") != "available":
+                      provider_failures.append("NASA FIRMS is not available with a live response")
+                  if catalog.get("status") != "scene_found":
+                      provider_failures.append("Copernicus STAC scene discovery did not find a matching scene")
+                  if processing.get("status") != "credentials_configured":
+                      provider_failures.append("Copernicus processing credentials are not configured")
               else:
                   print("Live provider diagnostic returned a non-success response; no credentials or response body were printed.")
+                  provider_failures.append("Live provider diagnostic endpoint returned a non-success response")
           except (requests.RequestException, ValueError) as exc:
               print("Live provider diagnostic failed:", type(exc).__name__)
+              provider_failures.append("Live provider diagnostic request failed")
 
-          geometry = {
-              "type": "Polygon",
-              "coordinates": [[
-                  [-122.40, 38.35], [-122.39, 38.35], [-122.39, 38.36],
-                  [-122.40, 38.36], [-122.40, 38.35]
-              ]]
+          probes = {
+              "Thrace, Türkiye": (True, [[26.55, 41.67], [26.56, 41.67], [26.56, 41.68], [26.55, 41.68], [26.55, 41.67]]),
+              "California, North America": (False, [[-122.40, 38.35], [-122.39, 38.35], [-122.39, 38.36], [-122.40, 38.36], [-122.40, 38.35]]),
+              "Queensland, Australia": (False, [[153.02, -27.47], [153.03, -27.47], [153.03, -27.46], [153.02, -27.46], [153.02, -27.47]]),
           }
-          try:
-              response = requests.post(
-                  base + "/ndvi/area-timeseries",
-                  json={"geometry": geometry, "days": 30, "interval": "P30D"},
-                  timeout=90,
-              )
-              print("Copernicus NDVI processing probe HTTP:", response.status_code)
-              if response.ok:
-                  data = response.json()
-                  print("Copernicus NDVI processing status:", data.get("status", "unknown"))
-                  series = data.get("series", [])
-                  print("Copernicus time-series samples:", len(series) if isinstance(series, list) else "not reported")
-                  if data.get("error_type"):
-                      print("Copernicus error type:", data.get("error_type"))
-              else:
-                  print("Copernicus NDVI probe returned a non-success response; response body omitted.")
-          except (requests.RequestException, ValueError) as exc:
-              print("Copernicus NDVI probe failed:", type(exc).__name__)
+          for region, (required, ring) in probes.items():
+              geometry = {"type": "Polygon", "coordinates": [ring]}
+              try:
+                  response = session.post(
+                      base + "/ndvi/area-timeseries",
+                      json={"geometry": geometry, "days": 90, "interval": "P30D"},
+                      timeout=90,
+                  )
+                  print(region, "NDVI probe HTTP:", response.status_code)
+                  if response.ok:
+                      data = response.json()
+                      series = data.get("series", [])
+                      sample_count = len(series) if isinstance(series, list) else 0
+                      provider_status = data.get("status", "unknown")
+                      print(region, "NDVI status:", provider_status, "samples:", sample_count)
+                      if required and (provider_status != "available" or sample_count == 0):
+                          provider_failures.append(region + " did not return verified NDVI samples")
+                      elif not required and (provider_status != "available" or sample_count == 0):
+                          print(region, "is informational only; no global-coverage claim is permitted without verified samples.")
+                  elif required:
+                      print(region, "required NDVI probe returned a non-success response; response body omitted.")
+                      provider_failures.append(region + " NDVI endpoint returned a non-success response")
+                  else:
+                      print(region, "optional regional probe unavailable; no global-coverage claim is permitted.")
+              except (requests.RequestException, ValueError) as exc:
+                  if required:
+                      print(region, "required NDVI probe failed:", type(exc).__name__)
+                      provider_failures.append(region + " NDVI request failed")
+                  else:
+                      print(region, "optional regional probe unavailable:", type(exc).__name__)
+
+          if provider_failures:
+              print("LIVE PROVIDER GATE FAILED:")
+              for failure in provider_failures:
+                  print("-", failure)
+              raise SystemExit(1)
+          print("LIVE PROVIDER GATE PASSED: required live data providers and NDVI samples were verified.")
           PY

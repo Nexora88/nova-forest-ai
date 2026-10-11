@@ -426,6 +426,31 @@
     ["Aylık kullanım","Monthly usage"],
     ["Kota doldu","Quota reached"],
     ["Kota bilgisi alınamadı","Could not load quota information"],
+    ["Kurumsal Plan · Demo ve Teklif Talebi","Enterprise Plan · Request a Demo or Quote"],
+    ["Kuruluşunuzun ihtiyaçlarını konuşalım. Bu form ödeme almaz ve abonelik başlatmaz; talep e-posta taslağı olarak hazırlanır.","Let's discuss your organization's needs. This form does not accept payment or start a subscription; it prepares an email draft."],
+    ["ÖN GÖRÜŞME","INITIAL CONSULTATION"],
+    ["Ad soyad","Full name"],
+    ["Şirket / kurum","Company / organization"],
+    ["İş e-postası","Business email"],
+    ["İlgilendiğiniz alan","Area of interest"],
+    ["Bir seçenek belirleyin","Choose an option"],
+    ["Enerji altyapısı ve varlık risk raporu","Energy infrastructure and asset risk reports"],
+    ["Kurumsal yangın ve çevre risk takibi","Enterprise wildfire and environmental risk monitoring"],
+    ["Tarım, arazi ve uydu analizi","Agriculture, land, and satellite analysis"],
+    ["Kurumsal iş birliği","Enterprise collaboration"],
+    ["İhtiyacınız (isteğe bağlı)","Your needs (optional)"],
+    ["Hangi iş akışını değerlendirmek istiyorsunuz? Hassas koordinat veya gizli şirket verisi yazmayın.","What workflow would you like to evaluate? Do not enter sensitive coordinates or confidential company data."],
+    ["Bu formun ödeme veya abonelik başlatmadığını ve iletişim kanalının yapılandırılmamış olabileceğini anladım.","I understand that this form does not start a payment or subscription and that the contact channel may not be configured."],
+    ["Demo / teklif al","Request a demo / quote"],
+    ["Demo / Teklif Talebi Oluştur","Create demo / quote request"],
+    ["Gönderim için doğrulanmış kurumsal iletişim e-postası yapılandırılmalıdır.","A verified enterprise contact email must be configured for sending."],
+    ["Talep taslağı","Request draft"],
+    ["Talep metnini kopyala","Copy request text"],
+    ["Gizlilik: Bu sayfa form bilgilerini kendiliğinden bir sunucuya göndermez. İletişim adresi yapılandırılmamışsa yalnızca yerel talep taslağı oluşturulur; gerçek gönderim yapılmış gibi gösterilmez.","Privacy: This page does not automatically send form data to a server. If no contact address is configured, it only creates a local request draft and never pretends that a request was sent."],
+    ["E-posta uygulaman açılıyorsa talep taslağı hazır. Gönderimi e-posta uygulamanda onaylamalısın.","If your email app opens, the request draft is ready. You must confirm sending in your email app."],
+    ["İletişim e-postası henüz yapılandırılmadığı için talep gönderilmedi. Taslağı kopyalayabilir; adres tanımlandığında form e-posta uygulamasını açacaktır.","The request was not sent because the contact email is not configured. You can copy the draft; once an address is configured, the form will open your email app."],
+    ["Talep taslağı panoya kopyalandı; gönderilmedi.","The request draft was copied to the clipboard; it was not sent."],
+    ["Otomatik kopyalama kullanılamıyor. Metni seçip cihazının Kopyala komutunu kullan.","Automatic copying is unavailable. Select the text and use your device's Copy command."],
     ["Fiyatlandırma henüz belirlenmedi","Pricing has not been finalized"],
     ["Ödeme devre dışı","Payments disabled"],
     ["Plan karşılaştırması","Plan comparison"],
@@ -555,6 +580,59 @@
     ["Veri sağlayıcıları","Data providers"],
     ["Supabase hesap profili","Supabase account profile"],
     ["Kontrol ediliyor","Checking"],
+
+    ["Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.","Developed by independent developer Ahmet Eymen Bakraç."],
+    ["Bağımsız proje","Independent project"],
+    ["Hukuki belgeler","Legal documents"],
+    ["Hukuki belgeler (taslak)","Legal documents (draft)"],
+    ["KVKK Aydınlatma Metni","KVKK Privacy Notice"],
+    ["Gizlilik Politikası","Privacy Policy"],
+    ["Kullanım Koşulları ve Sorumluluk Reddi","Terms of Use and Disclaimer"],
+    ["Belgeler taslak aşamasındadır; hukuki inceleme ve iletişim kanalı tamamlanmadan nihai belge olarak değerlendirilmemelidir.","These documents are drafts and must not be treated as final until legal review and a privacy contact channel are in place."],
+    ["Bu sayfa, NexoraWildfire AI için hazırlanan hukuki belge taslaklarına erişim sağlar. Veri sorumlusunun iletişim bilgisi henüz yayımlanmamıştır; bu nedenle kişisel veri başvuruları için etkin bir iletişim kanalı henüz bulunmamaktadır.","This page provides access to draft legal documents for NexoraWildfire AI. The data controller's contact details have not been published, so a working channel for personal-data requests is not yet available."],
+    ["Veri sorumlusu olarak belirtilen kişi","Person identified as the proposed data controller"],
+    ["Ahmet Eymen Bakraç · bireysel proje sahibi · Türkiye","Ahmet Eymen Bakraç · individual project owner · Türkiye"],
+    ["Açık adres yayımlanmamıştır. İletişim ve gizlilik e-postası, sahibi tarafından doğrulanıp sağlanana kadar eklenmeyecektir.","No public address is shown. Contact details and a privacy email will not be added until verified and supplied by the owner."],
+    ["Yayın durumu","Publication status"],
+    ["YAYINA HAZIR DEĞİL","NOT READY FOR PUBLICATION"],
+    ["Taslak belgeleri GitHub'da görüntüle","View draft documents on GitHub"],
+    ["KVKK Aydınlatma Metni taslağını aç","Open the KVKK Privacy Notice draft"],
+    ["Gizlilik Politikası taslağını aç","Open the Privacy Policy draft"],
+    ["Kullanım Koşulları taslağını aç","Open the Terms of Use draft"],
+    ["Bu proje resmî bir yangın uyarı sistemi değildir. Acil durumlarda yetkili kurumların yönlendirmelerini izleyin.","This project is not an official wildfire warning system. Follow the guidance of the relevant authorities in emergencies."],
+    ["Kayıt işlemi geçici olarak duraklatıldı","Registration is temporarily paused"],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor. Mevcut kullanıcılar giriş yapabilir.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured. Existing users can still sign in."],
+    ["Kullanım Koşulları","Terms of Use"],
+    ["Gizlilik","Privacy"],
+    ["Hakkında","About"],
+    ["Son kontrol","Last checked"],
+    ["Hukuki bilgilendirme · Taslak v0.1","Legal notice · Draft v0.1"],
+    ["Belgeler son hukuki incelemeden geçmemiştir. Kayıt sırasında hangi sürümü gördüğünüz kaydedilir.","The documents have not received final legal review. The versions shown during registration are recorded."],
+    ["taslağını okudum.","I have read the draft."],
+    ["taslağını okudum ve beta kullanım sınırlarını anladım.","I have read the draft and understand the beta-use limitations."],
+    ["Bu kutular hukuki incelemenin veya veri sorumlusu iletişim kanalının yerine geçmez. Kişisel veri iletişim adresi henüz tanımlı değildir.","These checkboxes do not replace legal review or a data-controller contact channel. A privacy contact address has not been configured yet."],
+    ["Devam etmek için iki hukuki bilgilendirme kutusunu da işaretle.","Please tick both legal information checkboxes to continue."],
+    ["Hukuki Belgeler","Legal Documents"],
+    ["Şeffaflık · Gizlilik · Güven","Transparency · Privacy · Trust"],
+    ["BELGE MERKEZİ","DOCUMENT HUB"],
+    ["Hukuki belgeler ve gizlilik","Legal documents and privacy"],
+    ["Veri sorumlusu bilgileri","Data controller information"],
+    ["Veri sorumlusu olarak belirtilen kişi:","Person identified as the proposed data controller:"],
+    ["Ülke:","Country:"],
+    ["Açık adres:","Public address:"],
+    ["İletişim / gizlilik e-postası:","Contact / privacy email:"],
+    ["Belge taslakları","Document drafts"],
+    ["Yayın öncesi açık kalan işler","Outstanding pre-publication tasks"],
+    ["Ahmet Eymen Bakraç — bireysel proje sahibi.","Ahmet Eymen Bakraç — individual project owner."],
+    ["Doğrulanmış bir açık adres yayımlanmamıştır.","No verified public address is published."],
+    ["Henüz verilmedi; doğrulanana kadar yayımlanmayacaktır.","Not provided yet; it will not be published until verified."],
+    ["Bu sayfa NexoraWildfire AI için hazırlanan hukuki belge taslaklarını bir araya getirir.","This page brings together legal document drafts prepared for NexoraWildfire AI."],
+    ["Taslaklar gerçek uygulama veri akışları, sağlayıcılar ve saklama süreleri doğrulanıp hukuk uzmanı tarafından incelenmeden nihai hukuki belge veya uygunluk garantisi olarak değerlendirilmemelidir.","The drafts must not be treated as final legal documents or a compliance guarantee until actual application data flows, providers, and retention periods are verified and reviewed by a legal professional."],
+    ["Eksik kimlik ve iletişim bilgileri uydurulmamıştır.","Missing identity and contact details have not been invented."],
+    ["Gizlilik e-postası ve veri sorumlusuna ulaşılabilecek başvuru kanalı henüz belirlenmediğinden, bu sayfa şu an kişisel veri başvuruları için etkin bir iletişim kanalı sunmaz.","Because a privacy email and a channel for contacting the data controller have not yet been established, this page does not currently provide an active channel for personal-data requests."],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured."],
+    ["Geliştirici imzası","Developer attribution"]
+
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
@@ -604,6 +682,25 @@
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
   }
+  function ensureLegalFooter() {
+    if (document.querySelector(".nx-legal-footer")) return;
+    const inPages = /\/pages\//.test(location.pathname);
+    const prefix = inPages ? "" : "pages/";
+    const footer = document.createElement("footer");
+    footer.className = "nx-legal-footer";
+    footer.innerHTML = '<div class="nx-legal-footer-inner">' +
+      '<div class="nx-legal-brand"><strong>NexoraWildfire AI</strong><span data-nx-attribution>Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.</span></div>' +
+      '<div class="nx-legal-links" role="group" aria-label="Hukuki bağlantılar">' +
+      '<a href="' + prefix + 'legal.html">Hukuki belgeler (taslak)</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KVKK_AYDINLATMA_METNI_TASLAK.md" target="_blank" rel="noopener noreferrer">KVKK Aydınlatma Metni</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/PRIVACY_POLICY_DRAFT.md" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KULLANIM_KOSULLARI_VE_SORUMLULUK_REDdi_TASLAK.md" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</a>' +
+      '</div><p class="nx-legal-disclaimer">NexoraWildfire AI resmî bir yangın uyarı sistemi değildir. Kaynak erişimi ve veri kapsamı değişebilir.</p></div>';
+    document.body.appendChild(footer);
+    const style = document.createElement("style");
+    style.textContent = ".nx-legal-footer{margin-top:42px;padding:24px clamp(16px,4vw,48px);border-top:1px solid #193c27;background:rgba(2,7,4,.96);color:#aebbb0;font:13px/1.6 system-ui,sans-serif}.nx-legal-footer-inner{max-width:1200px;margin:auto;display:grid;gap:14px}.nx-legal-brand{display:grid;gap:4px}.nx-legal-brand strong{color:#e9fff0;font-size:15px;letter-spacing:.02em}.nx-legal-brand span{color:#9aac9f}.nx-legal-links{display:flex;flex-wrap:wrap;gap:8px 18px}.nx-legal-links a{color:#bce9c7;text-decoration:none;text-underline-offset:4px}.nx-legal-links a:hover,.nx-legal-links a:focus-visible{text-decoration:underline;color:#fff}.nx-legal-disclaimer{margin:0;color:#7e9183;font-size:12px}.nx-legal-footer a:focus-visible{outline:2px solid #00ff66;outline-offset:3px;border-radius:3px}@media(max-width:600px){.nx-legal-footer{padding:20px 16px}.nx-legal-links{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.nx-legal-links a{overflow-wrap:anywhere}}";
+    document.head.appendChild(style);
+  }
   function init() {
     const button = document.createElement("button");
     button.id = "nexora-language-toggle";
@@ -616,6 +713,7 @@
     const style = document.createElement("style");
     style.textContent = ".nexora-language-toggle{position:fixed;right:14px;bottom:14px;z-index:99999;min-height:44px;padding:10px 14px;border:1px solid #00ff66;border-radius:999px;background:#06110a;color:#eaffef;font:700 12px system-ui;box-shadow:0 6px 24px #0009;cursor:pointer}.nexora-language-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}";
     document.head.appendChild(style);
+    ensureLegalFooter();
     applyLanguage();
     const observer = new MutationObserver(records => {
       for (const record of records) {

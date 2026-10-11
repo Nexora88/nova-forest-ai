@@ -43,6 +43,10 @@ Proje şu anda pilot ve doğrulama aşamasındadır. **Ödeme alma ve ücretli p
 
 Maliyet ölçümü ve lansman kontrol listesi için [SaaS limitleri ve fiyatlandırma planı](docs/SAAS_LIMITS_AND_PRICING.md) belgesine bakın.
 
+## Kurumsal talepler
+
+Kurumsal çalışma alanında demo/teklif talep formu bulunur. Form ödeme almaz ve abonelik başlatmaz. Güvenlik için form bilgileri sunucuya gönderilmez: `pages/enterprise.html` içindeki `nexora-enterprise-contact-email` meta alanına doğrulanmış kurumsal iletişim adresi eklenene kadar yalnızca kopyalanabilir yerel talep taslağı oluşturulur. Formu çalışan bir gönderim kanalı olarak duyurmadan önce gerçek iletişim adresini tanımla ve e-posta uygulamasına geçişi test et.
+
 ## Teknoloji
 
 - Ön yüz: HTML, CSS, JavaScript, Leaflet ve Progressive Web App özellikleri.

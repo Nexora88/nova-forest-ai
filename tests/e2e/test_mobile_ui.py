@@ -25,6 +25,7 @@ PAGES = [
     "/pages/enterprise.html",
     "/pages/account.html",
     "/pages/auth.html",
+    "/pages/legal.html",
 ]
 
 
@@ -72,6 +73,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_selector("#nexora-install", timeout=10000)
                     self.assertTrue(page.locator("#nexora-install").is_visible(), f"install control missing on {path}")
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
+                    self.assertTrue(page.locator(".nx-legal-footer").is_visible(), f"shared legal footer missing on {path}")
+                    self.assertIn("Ahmet Eymen Bakraç", page.locator(".nx-legal-footer").inner_text(), f"developer attribution missing on {path}")
                     self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"page language metadata was not switched to English on {path}")
                     if page.locator("nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
@@ -81,6 +84,47 @@ class MobileUiSmokeTests(unittest.TestCase):
                         self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
                 finally:
                     context.close()
+
+    def test_auth_signup_requires_both_legal_acknowledgements(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/auth.html", wait_until="domcontentloaded", timeout=30000)
+            page.locator('[data-email-mode="signup"]').click()
+            panel = page.locator("[data-legal-consents]")
+            self.assertTrue(panel.is_visible())
+            self.assertTrue(page.locator("[data-privacy-ack]").get_attribute("required") is not None)
+            self.assertTrue(page.locator("[data-terms-ack]").get_attribute("required") is not None)
+            page.locator("[data-privacy-ack]").check()
+            self.assertFalse(page.locator("[data-terms-ack]").is_checked())
+            self.assertTrue(panel.is_visible())
+            page.locator("[data-terms-ack]").check()
+            self.assertTrue(page.locator("[data-privacy-ack]").is_checked())
+            self.assertTrue(page.locator("[data-terms-ack]").is_checked())
+            page.locator('[data-email-mode="login"]').click()
+            self.assertFalse(panel.is_visible())
+            self.assertFalse(page.locator("[data-privacy-ack]").get_attribute("required"))
+            self.assertFalse(page.locator("[data-terms-ack]").get_attribute("required"))
+        finally:
+            context.close()
+
+    def test_enterprise_demo_form_never_claims_to_send_without_contact_email(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/enterprise.html", wait_until="domcontentloaded", timeout=30000)
+            form = page.locator("[data-enterprise-demo-form]")
+            self.assertTrue(form.is_visible())
+            form.locator('[name="contact_name"]').fill("Test Contact")
+            form.locator('[name="company"]').fill("Test Company")
+            form.locator('[name="email"]').fill("contact@example.com")
+            form.locator('[name="interest"]').select_option(value="Kurumsal iş birliği")
+            form.locator('[name="acknowledgement"]').check()
+            form.locator('button[type="submit"]').click()
+            self.assertTrue(page.locator("[data-demo-draft-panel]").is_visible())
+            self.assertRegex(page.locator("[data-demo-status]").inner_text().lower(), r"gönderilmedi|not sent")
+            self.assertIn("Test Company", page.locator("[data-demo-draft]").input_value())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
 
     def test_mobile_menu_language_toggle_and_install_lifecycle(self):
         context, page = self.new_page()

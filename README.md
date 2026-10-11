@@ -41,6 +41,10 @@ The project is currently in a pilot and verification stage. **Payments and autom
 
 See [SaaS limits and pricing plan](docs/SAAS_LIMITS_AND_PRICING.md) for the cost-measurement and launch checklist.
 
+## Enterprise enquiries
+
+The Enterprise workspace includes a demo/quote request form. It does not accept payment or activate a subscription. For safety, the static form does not send form data to a server: until a verified business contact email is configured in the `nexora-enterprise-contact-email` meta tag in `pages/enterprise.html`, it only creates a local copyable request draft. Once a real contact channel is verified, configure it and test the mail-client handoff before advertising the form as a working submission channel.
+
 ## Technology
 
 - Front end: HTML, CSS, JavaScript, Leaflet, and Progressive Web App features.
