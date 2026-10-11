@@ -40,7 +40,7 @@ def test_evacuation_simulation_is_reachable_from_map_and_system_page():
     for relative_path in ("pages/map.html", "pages/about.html"):
         html = (ROOT / relative_path).read_text(encoding="utf-8")
         assert "evacuation-panel" in html, f"{relative_path} has no simulation host"
-        assert "evacuation-sim.js?v=20261011b" in html, f"{relative_path} does not load the simulation"
+        assert "evacuation-sim.js?v=20261011c" in html, f"{relative_path} does not load the simulation"
         assert "evacuation-sim.css?v=20261011b" in html, f"{relative_path} does not load simulation styling"
 
 
