@@ -116,7 +116,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             form.locator('[name="contact_name"]').fill("Test Contact")
             form.locator('[name="company"]').fill("Test Company")
             form.locator('[name="email"]').fill("contact@example.com")
-            form.locator('[name="interest"]').select_option(label="Kurumsal iş birliği")
+            form.locator('[name="interest"]').select_option(value="Kurumsal iş birliği")
             form.locator('[name="acknowledgement"]').check()
             form.locator('button[type="submit"]').click()
             self.assertTrue(page.locator("[data-demo-draft-panel]").is_visible())
