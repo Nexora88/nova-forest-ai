@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from io import BytesIO
+from xml.sax.saxutils import escape
 from typing import Any, Iterable
 
 from reportlab.lib import colors
@@ -22,7 +23,7 @@ def _safe(value: Any) -> str:
         return "Not available"
     if isinstance(value, (dict, list, tuple)):
         return str(value)
-    return str(value)
+    return escape(str(value))
 
 
 def generate_environment_report(
