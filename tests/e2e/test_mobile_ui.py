@@ -306,6 +306,57 @@ class MobileUiSmokeTests(unittest.TestCase):
 
 
 
+    def test_atmosphere_lab_live_weather_risk_scenario_and_mobile_layout(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
+        page = context.new_page()
+
+        def route_request(route):
+            url = route.request.url
+            if url.startswith(BASE):
+                route.continue_()
+            elif "api.open-meteo.com/v1/forecast" in url:
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({
+                    "current": {
+                        "time": "2026-10-11T12:00",
+                        "temperature_2m": 30,
+                        "relative_humidity_2m": 35,
+                        "wind_speed_10m": 24,
+                        "wind_direction_10m": 270,
+                        "precipitation": 0
+                    },
+                    "current_units": {"temperature_2m": "°C"},
+                    "hourly": {
+                        "time": ["2026-10-10T12:00", "2026-10-11T12:00"],
+                        "relative_humidity_2m": [50, 35],
+                        "temperature_2m": [25, 30],
+                        "wind_speed_10m": [12, 24]
+                    }
+                }))
+            else:
+                route.abort()
+
+        page.route("**/*", route_request)
+        try:
+            page.goto(BASE + "/pages/weather.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.querySelector('#atmo-score')?.textContent !== '—'", timeout=15000)
+            self.assertEqual(page.locator("#atmo-temp").inner_text(), "30.0 °C")
+            self.assertEqual(page.locator("#atmo-humidity").inner_text(), "35 %")
+            self.assertEqual(page.locator("#atmo-wind").inner_text(), "24.0 km/h")
+            self.assertIn("/ 100", page.locator(".atmo-score-ring").inner_text())
+            self.assertIn("Sıcaklık", page.locator("#atmo-contributions").inner_text())
+            self.assertIn("15", page.locator("#atmo-humidity-meta").inner_text())
+            page.locator("#atmo-origin-lat").fill("41.67")
+            page.locator("#atmo-origin-lon").fill("26.55")
+            page.locator("#atmo-run-spread").click()
+            self.assertEqual(page.locator(".atmo-scenario-card").count(), 3)
+            self.assertIn("ha", page.locator(".atmo-scenario-card").nth(2).inner_text())
+            self.assertEqual(page.locator("#atmo-carbon-values article").count(), 3)
+            page.locator("#atmo-preview-alert").click()
+            self.assertIn("gönderilmedi", page.locator("#atmo-alert-preview").input_value())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
     def test_map_status_never_uses_an_unconditional_live_label(self):
         map_source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
         map_page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
