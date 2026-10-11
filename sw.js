@@ -36,7 +36,7 @@ const APP_SHELL = [
   "./js/map.js?v=20261011b",
   "./js/i18n.js?v=20261011h",
   "./js/i18n-extra.js?v=20261011c",
-  "./js/asset-guard.js?v=20261011a",
+  "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011d",
   "./js/global-demo.js?v=20261011g",
   "./js/nova-storage.js",
