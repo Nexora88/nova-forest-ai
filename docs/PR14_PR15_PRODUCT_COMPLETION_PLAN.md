@@ -45,6 +45,15 @@ By the end of PR #15, a first-time user should be able to open NexoraWildfire AI
 - Add an authenticated Supabase test only when a safe test environment and credentials are configured; otherwise report it explicitly as blocked, not passed.
 - No secrets or real user data in fixtures, logs, screenshots, or commits.
 
+### P1 — Atmosphere research lab (implemented in the PR #14 working branch; pending CI verification)
+- Rebuilt `pages/weather.html` with responsive layouts and a consistent Turkish/English UI.
+- Reads current Open-Meteo temperature, humidity, wind speed and direction; missing/incomplete data leaves metrics blank and shows an unavailable state.
+- Calculates an explicitly uncalibrated, rule-based 0–100 indicator with visible weighted contributions. It is not a fire probability, SHAP/LIME output, or a validated ML model.
+- Adds 30/60/120-minute illustrative spread rings and editable CO₂/economic assumptions. These are geometry/scenario estimates, not operational forecasts or official damage figures.
+- Adds optional browser-camera preview, local video selection, and an attributed NASA Earth Observatory archival smoke video. This is not a live drone stream; YOLOv8 is not connected and no bounding-box detections are fabricated.
+- Adds an alert-message draft preview only. No Supabase trigger, Twilio, SMS, WhatsApp or Telegram delivery is claimed.
+- E2E coverage checks live-data state rendering with deterministic fixtures, indicator contributions, scenario calculation, draft-not-sent behavior, and mobile horizontal overflow.
+
 ## PR #15 — Release hardening and production sign-off
 
 ### P0 — Live provider verification (owner configuration required)
