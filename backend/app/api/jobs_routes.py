@@ -6,7 +6,6 @@ from typing import Any, Dict
 
 import requests
 from fastapi import APIRouter, Header, HTTPException
-from app.api.account_routes import reserve_usage, release_usage
 import uuid
 from pydantic import BaseModel, Field
 
@@ -97,6 +96,7 @@ def enqueue_ndvi_timeseries(
     coordinates = geometry.get("coordinates", [])
     if len(str(coordinates)) > 100_000:
         raise HTTPException(status_code=413, detail="Polygon çok büyük; alanı küçültün.")
+    from app.api.account_routes import reserve_usage, release_usage
     request_id = uuid.uuid4().hex
     reserve_usage(user_id, "ndvi_timeseries", request_id)
     try:
@@ -119,6 +119,7 @@ def enqueue_risk_raster(
         raise HTTPException(status_code=422, detail="Geçerli bbox gerekli.")
     if request.east - request.west > 2 or request.north - request.south > 2:
         raise HTTPException(status_code=422, detail="Tek görev için bbox genişliği en fazla 2 derece olabilir.")
+    from app.api.account_routes import reserve_usage, release_usage
     request_id = uuid.uuid4().hex
     reserve_usage(user_id, "risk_raster", request_id)
     payload = request.dict()
