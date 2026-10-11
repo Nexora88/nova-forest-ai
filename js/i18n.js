@@ -587,6 +587,17 @@
     ["taslağını okudum ve beta kullanım sınırlarını anladım.","I have read the draft and understand the beta-use limitations."],
     ["Bu kutular hukuki incelemenin veya veri sorumlusu iletişim kanalının yerine geçmez. Kişisel veri iletişim adresi henüz tanımlı değildir.","These checkboxes do not replace legal review or a data-controller contact channel. A privacy contact address has not been configured yet."],
     ["Devam etmek için iki hukuki bilgilendirme kutusunu da işaretle.","Please tick both legal information checkboxes to continue."],
+    ["Hukuki Belgeler","Legal Documents"],
+    ["Şeffaflık · Gizlilik · Güven","Transparency · Privacy · Trust"],
+    ["BELGE MERKEZİ","DOCUMENT HUB"],
+    ["Hukuki belgeler ve gizlilik","Legal documents and privacy"],
+    ["Veri sorumlusu bilgileri","Data controller information"],
+    ["Veri sorumlusu olarak belirtilen kişi:","Person identified as the proposed data controller:"],
+    ["Ülke:","Country:"],
+    ["Açık adres:","Public address:"],
+    ["İletişim / gizlilik e-postası:","Contact / privacy email:"],
+    ["Belge taslakları","Document drafts"],
+    ["Yayın öncesi açık kalan işler","Outstanding pre-publication tasks"],
     ["Geliştirici imzası","Developer attribution"]
 
   ];
