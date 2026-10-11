@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v32";
+const CACHE_NAME = "nexorawildfire-shell-v33";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -24,7 +24,7 @@ const APP_SHELL = [
   "./js/map.js",
   "./js/evacuation-sim.js?v=20261011d",
   "./js/global-nav.js?v=20261011c",
-  "./js/mobile-nav.js?v=20261011b",
+  "./js/mobile-nav.js?v=20261011c",
   "./js/pwa.js?v=20261011b",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js",
