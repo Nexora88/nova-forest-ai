@@ -21,8 +21,6 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 def _safe(value: Any) -> str:
     if value is None or value == "":
         return "Not available"
-    if isinstance(value, (dict, list, tuple)):
-        return str(value)
     return escape(str(value))
 
 
@@ -61,7 +59,7 @@ def generate_environment_report(
     story = [
         Paragraph("NEXORAWILDFIRE AI", base["NXSmall"]),
         Spacer(1, 2 * mm),
-        Paragraph(title[:180], base["NXTitle"]),
+        Paragraph(_safe(title[:180]), base["NXTitle"]),
         Paragraph(f"<b>Area:</b> {_safe(area_name)}", base["BodyText"]),
         Paragraph(f"<b>Generated:</b> {_safe(stamp)}", base["BodyText"]),
         Spacer(1, 3 * mm),
