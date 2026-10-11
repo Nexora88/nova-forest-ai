@@ -581,6 +581,12 @@
     ["Gizlilik","Privacy"],
     ["Hakkında","About"],
     ["Son kontrol","Last checked"],
+    ["Hukuki bilgilendirme · Taslak v0.1","Legal notice · Draft v0.1"],
+    ["Belgeler son hukuki incelemeden geçmemiştir. Kayıt sırasında hangi sürümü gördüğünüz kaydedilir.","The documents have not received final legal review. The versions shown during registration are recorded."],
+    ["taslağını okudum.","I have read the draft."],
+    ["taslağını okudum ve beta kullanım sınırlarını anladım.","I have read the draft and understand the beta-use limitations."],
+    ["Bu kutular hukuki incelemenin veya veri sorumlusu iletişim kanalının yerine geçmez. Kişisel veri iletişim adresi henüz tanımlı değildir.","These checkboxes do not replace legal review or a data-controller contact channel. A privacy contact address has not been configured yet."],
+    ["Devam etmek için iki hukuki bilgilendirme kutusunu da işaretle.","Please tick both legal information checkboxes to continue."],
     ["Geliştirici imzası","Developer attribution"]
 
   ];
