@@ -50,6 +50,9 @@ Provider access and production behavior must be verified independently; code for
 - **Turkish documentation:** [README.tr.md](README.tr.md)
 - **Contributing:** [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)
 - **Global architecture notes:** [docs/GLOBAL_SCALABILITY.md](docs/GLOBAL_SCALABILITY.md)
+- **Thrace dataset research workflow:** [docs/THRACE_DATASET.md](docs/THRACE_DATASET.md)
+- **Offline sync acceptance test:** [docs/OFFLINE_SYNC_ACCEPTANCE.md](docs/OFFLINE_SYNC_ACCEPTANCE.md)
+- **Enterprise report worker flow:** [docs/ENTERPRISE_REPORT_WORKFLOW.md](docs/ENTERPRISE_REPORT_WORKFLOW.md)
 - **AI-assisted development disclosure:** [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md)
 
 ## Project direction
