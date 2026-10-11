@@ -9,7 +9,7 @@
     queensland: {name:"Queensland, Australia", lat:-27.4698, lon:153.0251},
     california: {name:"California, USA", lat:36.7783, lon:-119.4179}
   };
-  let weather = null, cameraStream = null, testVideoUrl = null;
+  let weather = null, cameraStream = null, testVideoUrl = null, weatherRequestId = 0;\n  const ARCHIVE_VIDEO_URL = "https://eoimages.gsfc.nasa.gov/images/imagerecords/154000/154641/namblackcarbon_geos5_20250803.mp4";
   const number = (v, digits=1) => Number.isFinite(Number(v)) ? Number(v).toFixed(digits) : "—";
   const setText = (id, value) => { const el=$(id); if(el) el.textContent=value; };
   const clip = (v,min,max) => Math.min(max,Math.max(min,v));
@@ -49,7 +49,7 @@
       weather={location:loc,current:c,hourly:payload.hourly||{},units:payload.current_units||{},retrievedAt:new Date().toISOString()};
       setText("atmo-temp",number(c.temperature_2m)+" °C");
       setText("atmo-humidity",number(c.relative_humidity_2m,0)+" %");
-      setText("atmo-wind",number(c.wind_speed_10m)+" km/h");
+      setText("atmo-wind",number(c.wind_speed_10m)+" "+T("km/sa","km/h"));
       setText("atmo-direction",number(c.wind_direction_10m,0)+"° · "+dirName(c.wind_direction_10m));
       setText("atmo-temp-meta","Open-Meteo · "+(payload.current_units?.temperature_2m||"°C"));
       setText("atmo-humidity-meta",T("Gözlem: ","Observed: ")+(c.time||"—"));
@@ -143,7 +143,7 @@
       const card=document.createElement("article");card.className="atmo-scenario-card";
       const title=document.createElement("span");title.textContent=r.minutes+" "+T("dakika","minutes");
       const area=document.createElement("strong");area.textContent=number(r.area,2)+" ha";
-      const detail=document.createElement("small");detail.textContent=T("Eliptik senaryo alanı; varsayımsal hız ","Elliptical scenario area; assumed rate ")+number(rate,1)+" km/h · "+T("ilerleme uzunluğu ","travel distance ")+number(r.length,2)+" km";
+      const detail=document.createElement("small");detail.textContent=T("Eliptik senaryo alanı; varsayımsal hız ","Elliptical scenario area; assumed rate ")+number(rate,1)+" "+T("km/sa","km/h")+" · "+T("ilerleme uzunluğu ","travel distance ")+number(r.length,2)+" km";
       card.append(title,area,detail);host.appendChild(card);
     });
     $("atmo-ring-30").style.setProperty("--diameter",Math.max(45,Math.min(110,45+rows[0].length*14))+"px");
@@ -181,7 +181,12 @@
   }
   function chooseVideo(file) {
     if(testVideoUrl) URL.revokeObjectURL(testVideoUrl);
-    if(!file){testVideoUrl=null;return;}
+    if(!file){
+      testVideoUrl=null;
+      const video=$("atmo-camera-video"); video.src=ARCHIVE_VIDEO_URL; video.controls=true; video.load();
+      setText("atmo-video-status",T("NASA arşiv duman görüntüsü hazır (canlı yayın değil). İstersen cihazından test videosu seçebilirsin.","NASA archival smoke footage is ready (not live). You can choose a local test video."));
+      return;
+    }
     testVideoUrl=URL.createObjectURL(file);
     stopCamera();
     $("atmo-camera-video").srcObject=null;
@@ -205,7 +210,11 @@
   }
   function bind() {
     $("atmo-refresh").addEventListener("click",loadWeather);
-    $("atmo-region").addEventListener("change",loadWeather);
+    $("atmo-region").addEventListener("change",()=>{
+      const loc=LOCATIONS[$("atmo-region").value] || LOCATIONS.edirne;
+      $("atmo-origin-lat").value=loc.lat; $("atmo-origin-lon").value=loc.lon;
+      loadWeather();
+    });
     $("atmo-run-spread").addEventListener("click",calculateSpread);
     $("atmo-camera-start").addEventListener("click",startCamera);
     $("atmo-camera-stop").addEventListener("click",stopCamera);
