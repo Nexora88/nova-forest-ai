@@ -330,7 +330,7 @@
     ["İngilizce","English"],
     ["Türkçe","Turkish"],
     ["Trakya çevresel istihbarat • tarım • orman • ekosistem","Thrace environmental intelligence • agriculture • forests • ecosystems"],
-    ["NEXORAWILDFIRE / TRAKYA ENVIRONMENTAL INTELLIGENCE","NEXORAWILDFIRE / THRACE ENVIRONMENTAL INTELLIGENCE"],
+    ["NEXORAWILDFIRE / TRAKYA ÇEVRESEL İSTİHBARAT","NEXORAWILDFIRE / THRACE ENVIRONMENTAL INTELLIGENCE"],
     ["Canlı çevre haritasını aç →","Open the live environmental map →"],
     ["Uydu merkezine git","Go to Satellite Hub"],
     ["AKTİF PİLOT ALANI","ACTIVE PILOT AREA"],
@@ -386,7 +386,6 @@
     ["VERİ SETİ BEKLENİYOR","WAITING FOR DATASET"],
     ["AKTİF ANALİZ","ACTIVE ANALYSIS"],
     ["Kurala dayalı risk motoru","Rule-based risk engine"],
-    ["Environmental intelligence for real-world needs","Gerçek dünya ihtiyaçları için çevresel istihbarat"],
     ["PRODUCT FEEDBACK","ÜRÜN GERİ BİLDİRİMİ"],
     ["NEXORA / BUILT WITH FEEDBACK","NEXORA / GERİ BİLDİRİMLE GELİŞİYOR"],
     ["SCIENCE · SERVICE · RESPONSIBILITY","BİLİM · HİZMET · SORUMLULUK"],
@@ -559,9 +558,7 @@
     ["Operasyonlar","Operations"],
     ["SAHA İSTİHBARAT KONTROLÜ","FIELD INTELLIGENCE CONTROL"],
     ["Kullanılamıyor","Unavailable"],
-    ["NEXORAWILDFIRE / TRAKYA ÇEVRESEL İSTİHBARATI","NEXORAWILDFIRE / TRAKYA ENVIRONMENTAL INTELLIGENCE"],
     ["Gerçek dünya ihtiyaçları için çevresel istihbarat","Environmental intelligence for real-world needs"],
-    ["Kaliforniya Napa Vadisi yakınında örnek bir GeoJSON poligonu yükle, güncel hava durumunu iste ve aynı sınır kutusu için NASA FIRMS'i kontrol et. Eksik kimlik bilgileri veya kullanılamayan sağlayıcılar açıkça bildirilir.","Load a sample GeoJSON polygon near Kaliforniya Napa Vadisi, request current weather, and check NASA FIRMS for the same bounding box. Missing credentials or unavailable providers are reported explicitly."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
