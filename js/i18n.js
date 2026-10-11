@@ -560,6 +560,20 @@
     ["Kullanılamıyor","Unavailable"],
     ["Gerçek dünya ihtiyaçları için çevresel istihbarat","Environmental intelligence for real-world needs"],
     ["Kaliforniya Napa Vadisi yakınında örnek bir GeoJSON poligonu yükle, güncel hava durumunu iste ve aynı sınır kutusu için NASA FIRMS’i kontrol et. Eksik kimlik bilgileri veya erişilemeyen sağlayıcılar açıkça bildirilir.","Load a sample GeoJSON polygon near Napa Valley, California, request current weather, and check NASA FIRMS for the same bounding box. Missing credentials or unavailable providers are reported explicitly."],
+
+    ["Alanların yerel/online durumu hesaplanıyor…","Checking local and online area status…"],
+    ["NEXORAWILDFIRE EDGE alan verilerini hazırlıyor…","Preparing NexoraWildfire Edge area data…"],
+    ["CANLI DURUM","LIVE STATUS"],["CANLI GÖZLEM","LIVE OBSERVATION"],["ÇEVRİMDIŞI / SON VERİ","OFFLINE / LAST AVAILABLE DATA"],["VERİ YOK","DATA UNAVAILABLE"],
+    ["Gözlem zamanı:","Observation time:"],["Son yerel kayıt:","Last local record:"],["Gözlem zamanı mevcut değil","Observation time unavailable"],
+    ["Sıcaklık","Temperature"],["Toprak nemi","Soil moisture"],["Tarım göstergesi","Agriculture indicator"],["Arı uçuş göstergesi","Bee-flight indicator"],
+    ["Bu alanın risk uyarılarını izle","Monitor risk alerts for this area"],["Bu alan için bildirimleri aç","Enable notifications for this area"],["Haritada görüntüle →","View on map →"],
+    ["Yerel olay merkezi","Local event centre"],["Otomatik olaylar","Automated events"],["SU STRESİ","WATER STRESS"],["NEM DÜŞÜYOR","MOISTURE DECLINING"],["HAVA / SU KAYBI","ATMOSPHERIC WATER LOSS"],["RÜZGAR","WIND"],["YAĞIŞ","PRECIPITATION"],["ARICILIK UYARISI","BEEKEEPING ALERT"],["TARIM UYARISI","AGRICULTURE ALERT"],["UYDU SU STRESİ","SATELLITE WATER STRESS"],["UYDU TRENDİ","SATELLITE TREND"],["SİSTEM NORMAL","NO RULE THRESHOLD EXCEEDED"],
+    ["Canlı veri erişilemiyor ve kullanılabilir yerel kayıt bulunamadı. Bu durum sıfır risk anlamına gelmez.","Live data is unavailable and no usable local record exists. This does not mean zero risk."],
+    ["Tanımlı otomatik olay eşikleri aşılmadı; bu ifade yangın olmadığına dair teyit değildir.","No configured event threshold was exceeded; this does not confirm that no fire exists."],
+    ["İnternet yok ve yerel gözlem bulunamadı. Risk skoru üretilmedi.","Offline and no local observation is available. No risk score was produced."],
+    ["Veri kaynağı:","Data source:"],["Bu göstergeler resmî yangın uyarısı değildir.","These indicators are not official wildfire warnings."],
+    ["Veri eksikliği, NDVI/NDMI değerinin sıfır olduğu anlamına gelmez.","Missing data does not mean NDVI/NDMI equals zero."]
+
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
