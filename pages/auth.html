@@ -108,4 +108,4 @@
  document.addEventListener('nova:auth-ready',async e=>{if(!e.detail.session)return;await recordAcceptance(e.detail.session.user.id);if(new URLSearchParams(location.search).get('recovery')==='1'){document.querySelectorAll('[data-auth-panel]').forEach(x=>x.hidden=true);document.querySelector('.auth-method-tabs').hidden=true;document.getElementById('recovery-panel').hidden=false;return}location.replace(safeNext)});
 syncConsents();
 })();
-</script><script src="../js/mobile-nav.js?v=20261010g"></script><script src="../js/i18n.js?v=20261011f"></script><script src="../js/pwa.js?v=20261010g"></script></body></html>
+</script><script src="../js/mobile-nav.js?v=20261010g"></script><script src="../js/i18n.js?v=20261011i"></script><script src="../js/pwa.js?v=20261010g"></script></body></html>
