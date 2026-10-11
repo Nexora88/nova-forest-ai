@@ -32,14 +32,20 @@ async def detect_frame(
 
     try:
         from PIL import Image, UnidentifiedImageError
-        image = Image.open(BytesIO(raw))
-        image.verify()
-        image = Image.open(BytesIO(raw)).convert("RGB")
-    except (ImportError, UnidentifiedImageError, OSError, ValueError) as exc:
-        raise HTTPException(status_code=422, detail="Görüntü çözümlenemedi veya geçersiz.") from exc
+    except ImportError as exc:
+        raise HTTPException(status_code=503, detail="Görüntü işleme bağımlılığı kurulu değil.") from exc
 
-    if image.width <= 0 or image.height <= 0 or image.width * image.height > MAX_IMAGE_PIXELS:
-        raise HTTPException(status_code=413, detail="Görüntü boyut sınırını aşıyor.")
+    try:
+        with Image.open(BytesIO(raw)) as probe:
+            width, height = probe.size
+            if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS:
+                raise HTTPException(status_code=413, detail="Görüntü boyut sınırını aşıyor.")
+            probe.verify()
+        image = Image.open(BytesIO(raw)).convert("RGB")
+    except HTTPException:
+        raise
+    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail="Görüntü çözümlenemedi veya geçersiz.") from exc
 
     try:
         return await run_in_threadpool(detect_image, image, confidence)
