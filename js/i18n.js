@@ -441,6 +441,7 @@
     ["İhtiyacınız (isteğe bağlı)","Your needs (optional)"],
     ["Hangi iş akışını değerlendirmek istiyorsunuz? Hassas koordinat veya gizli şirket verisi yazmayın.","What workflow would you like to evaluate? Do not enter sensitive coordinates or confidential company data."],
     ["Bu formun ödeme veya abonelik başlatmadığını ve iletişim kanalının yapılandırılmamış olabileceğini anladım.","I understand that this form does not start a payment or subscription and that the contact channel may not be configured."],
+    ["Demo / teklif al","Request a demo / quote"],
     ["Demo / Teklif Talebi Oluştur","Create demo / quote request"],
     ["Gönderim için doğrulanmış kurumsal iletişim e-postası yapılandırılmalıdır.","A verified enterprise contact email must be configured for sending."],
     ["Talep taslağı","Request draft"],
