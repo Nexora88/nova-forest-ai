@@ -103,35 +103,33 @@ jobs:
               print("Live provider diagnostic failed:", type(exc).__name__)
               provider_failures.append("Live provider diagnostic request failed")
 
-          geometry = {
-              "type": "Polygon",
-              "coordinates": [[
-                  [-122.40, 38.35], [-122.39, 38.35], [-122.39, 38.36],
-                  [-122.40, 38.36], [-122.40, 38.35]
-              ]]
+          probes = {
+              "Thrace, Türkiye": [[26.55, 41.67], [26.56, 41.67], [26.56, 41.68], [26.55, 41.68], [26.55, 41.67]],
+              "California, North America": [[-122.40, 38.35], [-122.39, 38.35], [-122.39, 38.36], [-122.40, 38.36], [-122.40, 38.35]],
+              "Queensland, Australia": [[153.02, -27.47], [153.03, -27.47], [153.03, -27.46], [153.02, -27.46], [153.02, -27.47]],
           }
-          try:
-              response = requests.post(
-                  base + "/ndvi/area-timeseries",
-                  json={"geometry": geometry, "days": 30, "interval": "P30D"},
-                  timeout=90,
-              )
-              print("Copernicus NDVI processing probe HTTP:", response.status_code)
-              if response.ok:
-                  data = response.json()
-                  print("Copernicus NDVI processing status:", data.get("status", "unknown"))
-                  series = data.get("series", [])
-                  print("Copernicus time-series samples:", len(series) if isinstance(series, list) else "not reported")
-                  if data.get("error_type"):
-                      print("Copernicus error type:", data.get("error_type"))
-                  if data.get("status") != "available" or not series:
-                      provider_failures.append("Copernicus NDVI returned no verified time-series samples")
-              else:
-                  print("Copernicus NDVI probe returned a non-success response; response body omitted.")
-                  provider_failures.append("Copernicus NDVI probe returned a non-success response")
-          except (requests.RequestException, ValueError) as exc:
-              print("Copernicus NDVI probe failed:", type(exc).__name__)
-              provider_failures.append("Copernicus NDVI probe request failed")
+          for region, ring in probes.items():
+              geometry = {"type": "Polygon", "coordinates": [ring]}
+              try:
+                  response = requests.post(
+                      base + "/ndvi/area-timeseries",
+                      json={"geometry": geometry, "days": 90, "interval": "P30D"},
+                      timeout=90,
+                  )
+                  print(region, "NDVI probe HTTP:", response.status_code)
+                  if response.ok:
+                      data = response.json()
+                      series = data.get("series", [])
+                      sample_count = len(series) if isinstance(series, list) else 0
+                      print(region, "NDVI status:", data.get("status", "unknown"), "samples:", sample_count)
+                      if data.get("status") != "available" or sample_count == 0:
+                          provider_failures.append(region + " did not return verified NDVI samples")
+                  else:
+                      print(region, "NDVI probe returned a non-success response; response body omitted.")
+                      provider_failures.append(region + " NDVI endpoint returned a non-success response")
+              except (requests.RequestException, ValueError) as exc:
+                  print(region, "NDVI probe failed:", type(exc).__name__)
+                  provider_failures.append(region + " NDVI request failed")
 
           if provider_failures:
               print("LIVE PROVIDER GATE FAILED:")
