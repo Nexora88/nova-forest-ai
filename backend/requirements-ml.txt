@@ -9,3 +9,7 @@ rq
 shapely
 pyproj
 reportlab
+
+# Real fire/smoke frame inference (AGPL-3.0 ecosystem; review before distribution)
+ultralytics>=8.3,<9
+huggingface_hub>=0.25,<2
