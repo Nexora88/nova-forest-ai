@@ -355,6 +355,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertRegex(page.locator("#atmo-contributions").inner_text(), r"Sıcaklık|Temperature")
             self.assertIn("15", page.locator("#atmo-humidity-meta").inner_text())
             page.locator("#atmo-region").select_option("canakkale")
+            page.wait_for_function("document.querySelector('#atmo-score')?.textContent !== '—'", timeout=5000)
             self.assertEqual(page.locator("#atmo-origin-lat").input_value(), "40.1553")
             self.assertEqual(page.locator("#atmo-origin-lon").input_value(), "26.4142")
             page.locator("#atmo-origin-lat").fill("41.67")
