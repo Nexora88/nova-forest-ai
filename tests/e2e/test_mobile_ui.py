@@ -207,5 +207,37 @@ class MobileUiSmokeTests(unittest.TestCase):
                     context.close()
 
 
+    def test_offline_saved_area_survives_reload_and_is_present_in_indexeddb(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR")
+        context.add_init_script("""
+            Object.defineProperty(Navigator.prototype, "onLine", {
+              configurable: true, get: () => false
+            });
+            localStorage.setItem("nexorawildfire-my-areas-v1", JSON.stringify([{
+              id:"offline-qa-area", name:"Offline QA Apiary", type:"arıcı",
+              province:"Edirne", district:"Keşan",
+              coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+              createdAt:"2026-10-11T00:00:00.000Z", updatedAt:Date.now()
+            }]));
+        """)
+        page = context.new_page()
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
+        try:
+            page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".area-card h3", timeout=20000)
+            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            page.wait_for_function("""async () => {
+              if (!window.NovaStore) return false;
+              const rows = await window.NovaStore.getAll("areas");
+              return rows.some(row => row.name === "Offline QA Apiary");
+            }""", timeout=10000)
+            page.reload(wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".area-card h3", timeout=20000)
+            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            self.assertFalse(page.evaluate("navigator.onLine"))
+        finally:
+            context.close()
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
