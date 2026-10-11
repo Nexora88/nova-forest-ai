@@ -67,17 +67,17 @@ setInterval(()=>{if(map.hasLayer(firmsHotspotLayer))refreshFirmsHotspots()},10*6
 
 const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
 const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
-let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
+let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;let weatherLive=false;
 
 function el(q){return document.querySelector(q)}
 function setStatus(t){const x=el("[data-map-status]");if(x)x.textContent=t}
-function band(v,kind){if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?0:v<50?1:v<75?2:3}
-function color(v){return palette[mode][band(Number(v)||0,mode)]}
-function label(v,kind){if(kind==="water")return v<.12?"KRİTİK KURU":v<.20?"STRES":v<.30?"NORMAL":"İYİ";if(kind==="crop")return v<25?"STRES":v<45?"DÜŞÜK":v<70?"İYİ":"ÇOK İYİ";if(kind==="pollen")return v<20?"DÜŞÜK":v<60?"ORTA":v<120?"YÜKSEK":"ÇOK YÜKSEK";return v<25?"DÜŞÜK":v<50?"ORTA":v<75?"YÜKSEK":"KRİTİK"}
-function riskScore(w,h=0){let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil<.18)s+=10;if(h>0)s+=10;return Math.min(100,s)}
-function cropScore(w){return Math.max(0,Math.min(100,100-(w.soil<.15?65:w.soil<.2?40:w.soil<.27?15:0)-(w.et0>5?20:w.et0>3?8:0)-(w.vpd>2?12:w.vpd>1.5?5:0)))}
-function forestScore(w){return Math.max(0,100-riskScore(w))}
-function beeScore(w,pollen=0){let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=35;else if(w.wind>15)s-=15;if(w.precip>1)s-=35;if(pollen>120)s-=5;return Math.max(0,Math.min(100,s))}
+function band(v,kind){if(v==null||!Number.isFinite(Number(v)))return -1;if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?0:v<50?1:v<75?2:3}
+function color(v){const b=band(v,mode);return b<0?"#64748b":palette[mode][b]}
+function label(v,kind){if(v==null||!Number.isFinite(Number(v)))return "VERİ YOK";if(kind==="water")return v<.12?"KRİTİK KURU":v<.20?"STRES":v<.30?"NORMAL":"İYİ";if(kind==="crop")return v<25?"STRES":v<45?"DÜŞÜK":v<70?"İYİ":"ÇOK İYİ";if(kind==="pollen")return v<20?"DÜŞÜK":v<60?"ORTA":v<120?"YÜKSEK":"ÇOK YÜKSEK";return v<25?"DÜŞÜK":v<50?"ORTA":v<75?"YÜKSEK":"KRİTİK"}
+function riskScore(w,h=0){if(![w.t,w.h,w.wind].every(v=>v!=null&&Number.isFinite(Number(v))))return null;let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil!=null&&w.soil<.18)s+=10;if(h>0)s+=10;return Math.min(100,s)}
+function cropScore(w){if(![w.soil,w.et0,w.vpd].every(v=>v!=null&&Number.isFinite(Number(v))))return null;return Math.max(0,Math.min(100,100-(w.soil<.15?65:w.soil<.2?40:w.soil<.27?15:0)-(w.et0>5?20:w.et0>3?8:0)-(w.vpd>2?12:w.vpd>1.5?5:0)))}
+function forestScore(w){const risk=riskScore(w);return risk==null?null:Math.max(0,100-risk)}
+function beeScore(w,pollen=null){if(![w.t,w.wind,w.precip].every(v=>v!=null&&Number.isFinite(Number(v))))return null;let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=35;else if(w.wind>15)s-=15;if(w.precip>1)s-=35;if(pollen!=null&&pollen>120)s-=5;return Math.max(0,Math.min(100,s))}
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
