@@ -60,6 +60,9 @@ jobs:
           PYTHONPATH: backend
         run: python -m pytest backend/tests -q
 
+      - name: Check local links and asset paths
+        run: python -m pytest tests/test_local_assets.py -q
+
       - name: Run responsive bilingual browser smoke tests
         env:
           PYTHONPATH: backend
