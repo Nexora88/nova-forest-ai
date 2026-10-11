@@ -19,11 +19,13 @@
   function accountHref(){return root+"pages/account.html"}
   function renderBadge(){
     document.querySelector(".nova-account-dock")?.remove();
-    const dock=document.createElement("a");dock.className="nova-account-dock";dock.href=accountHref();dock.title=session?"Profil ve saha merkezi":"Hesap oluştur / giriş yap";
-    const img=avatar();dock.innerHTML=img?'<img src="'+esc(img)+'" alt="Profil" loading="lazy" referrerpolicy="no-referrer">':'<span class="nova-avatar-fallback">'+esc(initials())+'</span>';const avatarImg=dock.querySelector("img");if(avatarImg)avatarImg.addEventListener("error",()=>{const fallback=document.createElement("span");fallback.className="nova-avatar-fallback";fallback.textContent=initials();avatarImg.replaceWith(fallback)},{once:true});
-    dock.insertAdjacentHTML("beforeend",'<span><b>'+(session?esc(displayName()):"HESAP")+'</b><small>'+(session?"Saha profili":"Giriş / kayıt")+'</small></span>');
+    const en=/^en(?:-|$)/i.test(document.documentElement.dataset.language||document.documentElement.lang||"tr");
+    const dock=document.createElement("a");dock.className="nova-account-dock";dock.href=accountHref();dock.title=session?(en?"Profile and field workspace":"Profil ve saha merkezi"):(en?"Create account / sign in":"Hesap oluştur / giriş yap");
+    const img=avatar();dock.innerHTML=img?'<img src="'+esc(img)+'" alt="'+(en?"Profile avatar":"Profil")+'" loading="lazy" referrerpolicy="no-referrer">':'<span class="nova-avatar-fallback">'+esc(initials())+'</span>';const avatarImg=dock.querySelector("img");if(avatarImg)avatarImg.addEventListener("error",()=>{const fallback=document.createElement("span");fallback.className="nova-avatar-fallback";fallback.textContent=initials();avatarImg.replaceWith(fallback)},{once:true});
+    dock.insertAdjacentHTML("beforeend",'<span><b>'+(session?esc(displayName()):(en?"ACCOUNT":"HESAP"))+'</b><small>'+(session?(en?"Field profile":"Saha profili"):(en?"Sign in / create account":"Giriş / kayıt"))+'</small></span>');
     document.body.appendChild(dock);
   }
+  window.addEventListener("nexora:languagechange",renderBadge);
   const AREA_DELETE_QUEUE_KEY="nexorawildfire-area-delete-queue-v1";
   const areaTypeToDb=type=>type?.includes("arı")?"apiary":type?.includes("orman")?"forest":type?.includes("çift")?"field":"other";
   const dbAreaToLocal=a=>({id:String(a.id),name:a.name,type:a.area_type==="field"?"çiftçi":a.area_type==="apiary"?"arıcı":a.area_type==="forest"?"orman":"genel",province:a.province||"",district:a.district||"",coordinates:a.coordinates||[],createdAt:a.created_at,updatedAt:a.updated_at,syncStatus:"synced"});
