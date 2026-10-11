@@ -1,6 +1,6 @@
 /* Global place/coordinate search with live provider checks. No synthetic weather or hotspot values. */
 (() => {
-  const API_BASE = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai.vercel.app/api" : "/api")).replace(/\/$/, "");
+  const API_BASE = (window.NOVA_API_BASE || "https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/, "");
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function init() {
     const mapElement = document.getElementById("map");
