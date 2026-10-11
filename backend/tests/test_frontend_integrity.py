@@ -21,7 +21,7 @@ MAIN_PAGES = [
 def test_main_pages_share_navigation_translation_and_asset_fallback():
     required = [
         "global-nav.js?v=20261011c",
-        "mobile-nav.js?v=20261011b",
+        "mobile-nav.js?v=20261011c",
         "i18n.js?v=20261011j",
         "i18n-extra.js?v=20261011c",
         "asset-guard.js?v=20261011b",
