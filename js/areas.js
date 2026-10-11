@@ -4,10 +4,12 @@ let areaCache=[];
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function getAreas(){return areaCache.length?areaCache:JSON.parse(localStorage.getItem(KEY)||"[]")}
 async function loadAreas(){
-  let indexed=[];
-  try{indexed=await window.NovaStore.getAll("areas")}catch{}
+  // Read the synchronous local cache first so saved areas remain visible even
+  // if IndexedDB is slow, blocked, or unavailable in a browser context.
   let local=[];
   try{local=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
+  let indexed=[];
+  try{indexed=await window.NovaStore.getAll("areas")}catch{}
   const merged=new Map(indexed.map(a=>[String(a.id),a]));
   // localStorage is written first by the map save flow; it must win on id collisions
   // so an older IndexedDB copy cannot hide a newly drawn or edited polygon.
