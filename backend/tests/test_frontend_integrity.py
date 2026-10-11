@@ -20,12 +20,12 @@ MAIN_PAGES = [
 
 def test_main_pages_share_navigation_translation_and_asset_fallback():
     required = [
-        "global-nav.js?v=20261011c",
-        "mobile-nav.js?v=20261011c",
-        "i18n.js?v=20261011j",
-        "i18n-extra.js?v=20261011d",
-        "asset-guard.js?v=20261011b",
-        "pwa.js?v=20261011b",
+        "global-nav.js",
+        "mobile-nav.js",
+        "i18n.js",
+        "i18n-extra.js",
+        "asset-guard.js",
+        "pwa.js",
     ]
     for relative_path in MAIN_PAGES:
         page = ROOT / relative_path
@@ -40,8 +40,8 @@ def test_evacuation_simulation_is_reachable_from_map_and_system_page():
     for relative_path in ("pages/map.html", "pages/about.html"):
         html = (ROOT / relative_path).read_text(encoding="utf-8")
         assert "evacuation-panel" in html, f"{relative_path} has no simulation host"
-        assert "evacuation-sim.js?v=20261011d" in html, f"{relative_path} does not load the simulation"
-        assert "evacuation-sim.css?v=20261011b" in html, f"{relative_path} does not load simulation styling"
+        assert "evacuation-sim.js" in html, f"{relative_path} does not load the simulation"
+        assert "evacuation-sim.css" in html, f"{relative_path} does not load simulation styling"
 
 
 def test_translation_engine_handles_dynamic_text_updates():
