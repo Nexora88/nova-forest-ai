@@ -631,8 +631,7 @@
     ["Eksik kimlik ve iletişim bilgileri uydurulmamıştır.","Missing identity and contact details have not been invented."],
     ["Gizlilik e-postası ve veri sorumlusuna ulaşılabilecek başvuru kanalı henüz belirlenmediğinden, bu sayfa şu an kişisel veri başvuruları için etkin bir iletişim kanalı sunmaz.","Because a privacy email and a channel for contacting the data controller have not yet been established, this page does not currently provide an active channel for personal-data requests."],
     ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured."],
-    ["Geliştirici imzası","Developer attribution"]
-
+    ["Geliştirici imzası","Developer attribution"],
     ["Köylü milletin efendisidir.","The farmer is the master of the nation."],
     ["CANLI TELEMETRİ","LIVE TELEMETRY"],
     ["MODEL KANITLARI","MODEL EVIDENCE"],
