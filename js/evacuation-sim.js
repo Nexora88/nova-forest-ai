@@ -35,6 +35,8 @@
   };
   function applyLanguage() {
     const tr = isTr();
+    const track = panel.querySelector(".evac-sim-track");
+    if (track) track.setAttribute("aria-label", tr ? "Temsili koridor akışı" : "Illustrative corridor flow");
     panel.querySelectorAll("[data-tr][data-en]").forEach(el => {
       if (el === status && lastLevel) return;
       if (el === detail && lastInputs) return;
