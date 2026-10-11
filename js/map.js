@@ -14,7 +14,7 @@ const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZo
 const humanitarian=L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors · Humanitarian style"});
 L.control.layers({"OSM · Standart":base,"Uydu · Esri":sat,"Karanlık · CARTO":dark,"Açık · CARTO":light,"Topoğrafya · OpenTopoMap":topo,"İnsani harita · HOT":humanitarian},null,{collapsed:true,position:"topright"}).addTo(map);
 const scan=document.createElement("div");scan.className="nova-satellite-scan";scan.innerHTML="<span>UYDU ANALİZİ • VECTOR OVERLAY • OFFLINE SINIRLAR</span><i></i>";document.querySelector(".map-section")?.appendChild(scan);
-map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
+map.on("baselayerchange",e=>scan.classList.toggle("active",e.name.startsWith("Uydu")));
 
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
 const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
@@ -22,6 +22,8 @@ const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","
 let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;
 
 function el(q){return document.querySelector(q)}
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function validSavedArea(a){return !!a&&a.id!=null&&typeof a.name==="string"&&Array.isArray(a.coordinates)&&a.coordinates.length>=3&&a.coordinates.every(p=>Array.isArray(p)&&p.length>=2&&Number.isFinite(Number(p[0]))&&Number.isFinite(Number(p[1]))&&Math.abs(Number(p[0]))<=90&&Math.abs(Number(p[1]))<=180)}
 function setStatus(t){const x=el("[data-map-status]");if(x)x.textContent=t}
 function band(v,kind){if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?0:v<50?1:v<75?2:3}
 function color(v){return palette[mode][band(Number(v)||0,mode)]}
@@ -202,9 +204,11 @@ function drawClick(e){if(!drawMode)return;drawingPoints.push([e.latlng.lat,e.lat
 async function finishDraw(){
  if(!drawMode||drawingPoints.length<3){setStatus("En az 3 nokta gerekli.");return}
  map.off("click",drawClick);map.doubleClickZoom.enable();
- const name=prompt("Alan adı","Yeni Tarla");
- if(!name){toggleDraw();return}
- const type=(prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel").trim().toLowerCase();
+ const rawName=prompt("Alan adı (en fazla 80 karakter)","Yeni Tarla");
+ if(rawName===null||!rawName.trim()){toggleDraw();return}
+ const name=rawName.trim().slice(0,80);
+ const rawType=(prompt("Alan türü: çiftçi / arıcı / orman / genel","çiftçi")||"genel").trim().toLocaleLowerCase("tr-TR");
+ const type=["çiftçi","arıcı","orman","genel"].includes(rawType)?rawType:"genel";
  const originalId=String(crypto.randomUUID?.()||Date.now().toString());
  const now=Date.now();
  const area={id:originalId,name:name.trim(),type:type||"genel",province:selectedProvince||"Trakya / İstanbul",district:selectedDistrict||"",coordinates:drawingPoints.map(p=>[Number(p[0]),Number(p[1])]),createdAt:new Date(now).toISOString(),updatedAt:now,syncStatus:"local"};
@@ -236,7 +240,7 @@ async function finishDraw(){
  window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{id:String(area.id)}}));
  setStatus(cloudSynced?"ALAN KAYDEDİLDİ • cihaz + hesap bulutu eşitlendi.":area.syncStatus==="pending"?"ALAN CİHAZA KAYDEDİLDİ • bulut eşitlemesi beklemede.":"ALAN CİHAZA KAYDEDİLDİ • giriş yaptığında eşitleyebilirsin.");
 }
-function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(localStorage.getItem(areaKey)||"[]");const polygons=new Map();areas.forEach(a=>{const polygon=L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+a.name+" · "+a.type,{className:"saved-field-label"}).addTo(fieldLayer);polygons.set(String(a.id),polygon)});const focusId=new URLSearchParams(location.search).get("area");if(focusId&&polygons.has(String(focusId))){const target=polygons.get(String(focusId));map.fitBounds(target.getBounds(),{padding:[30,30],maxZoom:15});target.openTooltip();setStatus("SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR");}}
+function renderSavedAreas(){fieldLayer.clearLayers();let areas=[];try{const raw=JSON.parse(localStorage.getItem(areaKey)||"[]");if(Array.isArray(raw))areas=raw.filter(validSavedArea)}catch{}const polygons=new Map();areas.forEach(a=>{try{const polygon=L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+escapeHtml(a.name)+" · "+escapeHtml(a.type),{className:"saved-field-label"}).addTo(fieldLayer);polygons.set(String(a.id),polygon)}catch(error){console.warn("Invalid saved area skipped",a?.id,error)}});const focusId=new URLSearchParams(location.search).get("area");if(focusId&&polygons.has(String(focusId))){const target=polygons.get(String(focusId));map.fitBounds(target.getBounds(),{padding:[30,30],maxZoom:15});target.openTooltip();setStatus("SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR");}}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
 load();enableMobileMapGesture();setInterval(loadProvinceData,300000);
