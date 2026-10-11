@@ -197,7 +197,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
                     self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
                     # Simulate a stale IndexedDB copy surviving an interrupted delete.
-                    await page.evaluate("""async () => {
+                    page.evaluate("""async () => {
                       const db = await new Promise((resolve, reject) => {
                         const req = indexedDB.open('nexorawildfire-edge', 1);
                         req.onsuccess = () => resolve(req.result);
@@ -210,8 +210,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                       });
                       db.close();
                     }""")
-                    await page.reload(wait_until="domcontentloaded", timeout=30000)
-                    await page.wait_for_selector("#empty", timeout=10000)
+                    page.reload(wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector("#empty", timeout=10000)
                     self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
                     self.assertTrue(page.locator("#empty").is_visible(), "deleted area must not be restored from stale IndexedDB")
                 finally:
