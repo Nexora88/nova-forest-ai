@@ -11,6 +11,11 @@ REQUIRED = [
     "pages/map.html",
     "pages/areas.html",
     "pages/feedback.html",
+    "pages/legal.html",
+    "docs/legal/KVKK_AYDINLATMA_METNI_TASLAK.md",
+    "docs/legal/PRIVACY_POLICY_DRAFT.md",
+    "docs/legal/KULLANIM_KOSULLARI_VE_SORUMLULUK_REDdi_TASLAK.md",
+    "js/i18n.js",
     "data/turkiye_iller.geojson",
     "data/admin/tur_admin2.geojson",
     "manifest.webmanifest",
@@ -21,7 +26,7 @@ REQUIRED = [
     "js/nova-offline-engine.js",
     "js/pwa.js",
 ]
-CORE_HTML = ["index.html", "pages/map.html", "pages/areas.html", "pages/feedback.html"]
+CORE_HTML = ["index.html", "pages/map.html", "pages/areas.html", "pages/feedback.html", "pages/legal.html"]
 
 class Assets(HTMLParser):
     def __init__(self):
@@ -69,6 +74,16 @@ if 'window.addEventListener("nova:areas-updated"' not in areas_source:
     errors.append("Saved areas page must refresh after an area is added.")
 if areas_page.find('src="../js/nova-storage.js') > areas_page.find('src="../js/areas.js'):
     errors.append("pages/areas.html must load nova-storage.js before areas.js.")
+
+# Legal-page and shared-footer regression checks.
+i18n_source = (ROOT / "js/i18n.js").read_text(encoding="utf-8")
+legal_page = (ROOT / "pages/legal.html").read_text(encoding="utf-8")
+for phrase in ["ensureLegalFooter", "Hukuki belgeler (taslak)", "Legal documents (draft)"]:
+    if phrase not in i18n_source:
+        errors.append(f"Shared footer translation missing: {phrase}")
+for phrase in ["YAYINA HAZIR DEĞİL", "KVKK_AYDINLATMA_METNI_TASLAK.md", "PRIVACY_POLICY_DRAFT.md", "KULLANIM_KOSULLARI_VE_SORUMLULUK_REDdi_TASLAK.md"]:
+    if phrase.lower() not in legal_page.lower():
+        errors.append(f"Legal hub draft disclosure/link missing: {phrase}")
 
 if errors:
     print("CORE SMOKE TEST FAILED")
