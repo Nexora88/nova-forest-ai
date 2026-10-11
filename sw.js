@@ -12,6 +12,7 @@ const APP_SHELL = [
   "./pages/satellite.html",
   "./pages/about.html",
   "./pages/vision.html",
+  "./pages/feedback.html",
   "./pages/enterprise.html",
   "./pages/events.html",
   "./pages/legal.html",
