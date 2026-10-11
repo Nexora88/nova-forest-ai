@@ -22,7 +22,7 @@ const APP_SHELL = [
   "./css/evacuation-sim.css?v=20261011b",
   "./js/map.js",
   "./js/evacuation-sim.js?v=20261011c",
-  "./js/global-nav.js?v=20261011b",
+  "./js/global-nav.js?v=20261011c",
   "./js/mobile-nav.js?v=20261011b",
   "./js/pwa.js?v=20261011b",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
