@@ -43,7 +43,7 @@
     ["Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol.","Mobile usability: device/browser type and the control that was difficult to use."],
     ["Herkese açık bir bildirime parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Herkese açık bildirimler başkaları tarafından görülebilir.","Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors."],
     ["Geri Bildirim","Feedback"],["Cumhuriyet Vizyonu","Republic Vision"],["İlham Kaynağımız","Our Inspiration"],
-    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Sistem","About the System"],
+    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Etkinlikler","Events"],["Uydu Merkezi","Satellite Hub"],["Sistem","About the System"],
     ["Çevresel Harita","Environmental Map"],["Çevresel İstihbarat","Environmental Intelligence"],["Çevresel istihbarat ve karar destek sistemi","Environmental intelligence and decision-support system"],
     ["CANLI KARAR MERKEZİ","LIVE DECISION CENTER"],["SİSTEM ÇEVRİMİÇİ","SYSTEM ONLINE"],["YETKİLİ ÇALIŞMA ALANI","AUTHORIZED WORKSPACE"],
     ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle","Monitor Thrace's forests, fields, and ecosystems in one decision workspace"],
