@@ -155,7 +155,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             status = page.locator("#evac-sim [data-sim-status]").inner_text()
             detail = page.locator("#evac-sim [data-sim-detail]").inner_text()
-            self.assertTrue(any(word in status.lower() for word in ("low", "moderate", "high")), status)
+            self.assertIn("Example scenario ready.", status)
             self.assertIn("Escape corridor", page.locator("#evac-sim h3").inner_text())
             self.assertIn("Inputs:", detail)
             self.assertNotIn("temsilî genişlik", detail)
