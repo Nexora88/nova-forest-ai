@@ -292,6 +292,12 @@
     }
   }
   function applyLanguage() {
+    document.querySelectorAll("[data-tr][data-en]").forEach(el => {
+      if (el.children.length === 0) el.textContent = lang === "en" ? el.dataset.en : el.dataset.tr;
+    });
+    document.querySelectorAll("[data-tr-placeholder][data-en-placeholder]").forEach(el => {
+      el.placeholder = lang === "en" ? el.dataset.enPlaceholder : el.dataset.trPlaceholder;
+    });
     document.documentElement.lang = lang;
     document.title = replace(document.title, lang);
     document.querySelectorAll("body *").forEach(el => {
