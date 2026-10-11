@@ -163,7 +163,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
     def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
-        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US", service_workers="block")
         page = context.new_page()
         def route_global_request(route):
             url = route.request.url
@@ -305,7 +305,7 @@ class MobileUiSmokeTests(unittest.TestCase):
 
 
     def test_map_status_does_not_claim_live_when_weather_provider_has_no_observations(self):
-        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR")
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
         page = context.new_page()
 
         def route_request(route):
