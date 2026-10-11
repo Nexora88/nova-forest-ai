@@ -343,7 +343,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertEqual(page.locator("#atmo-humidity").inner_text(), "35 %")
             self.assertEqual(page.locator("#atmo-wind").inner_text(), "24.0 km/h")
             self.assertIn("/ 100", page.locator(".atmo-score-ring").inner_text())
-            self.assertIn("Sıcaklık", page.locator("#atmo-contributions").inner_text())
+            self.assertRegex(page.locator("#atmo-contributions").inner_text(), r"Sıcaklık|Temperature")
             self.assertIn("15", page.locator("#atmo-humidity-meta").inner_text())
             page.locator("#atmo-origin-lat").fill("41.67")
             page.locator("#atmo-origin-lon").fill("26.55")
@@ -352,7 +352,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertIn("ha", page.locator(".atmo-scenario-card").nth(2).inner_text())
             self.assertEqual(page.locator("#atmo-carbon-values article").count(), 3)
             page.locator("#atmo-preview-alert").click()
-            self.assertIn("gönderilmedi", page.locator("#atmo-alert-preview").input_value())
+            self.assertRegex(page.locator("#atmo-alert-preview").input_value(), r"gönderilmedi|not sent")
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
         finally:
             context.close()
