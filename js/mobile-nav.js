@@ -1,4 +1,4 @@
-/* Accessible, compact navigation shared by every NexoraWildfire page. */
+/* Accessible, bilingual navigation shared by every NexoraWildfire page. */
 (() => {
   function initNavigation() {
     document.querySelectorAll("body > nav").forEach((nav, index) => {
@@ -13,63 +13,73 @@
       toggle.className = "nx-nav-toggle";
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-controls", "nx-nav-links-" + index);
-      toggle.innerHTML = '<span aria-hidden="true">☰</span><span class="nx-nav-toggle-label">Menu</span>';
-      const linksId = "nx-nav-links-" + index;
+      toggle.innerHTML = '<span aria-hidden="true">☰</span><span class="nx-nav-toggle-label"></span>';
       const more = document.createElement("div");
       more.className = "nx-nav-more";
       const moreToggle = document.createElement("button");
       moreToggle.type = "button";
       moreToggle.className = "nx-nav-more-toggle";
       moreToggle.setAttribute("aria-expanded", "false");
-      moreToggle.innerHTML = 'More <span aria-hidden="true">▾</span>';
+      const moreLabel = document.createElement("span");
+      const moreChevron = document.createElement("span");
+      moreChevron.setAttribute("aria-hidden", "true");
+      moreChevron.textContent = "▾";
+      moreToggle.append(moreLabel, document.createTextNode(" "), moreChevron);
       const moreLinks = document.createElement("div");
       moreLinks.className = "nx-nav-more-links";
-      moreLinks.id = linksId;
-      const keepPrimary = Math.min(3, links.length);
+      moreLinks.id = "nx-nav-links-" + index;
       links.forEach((link, i) => {
-        if (i < keepPrimary) nav.appendChild(link);
+        if (i < Math.min(3, links.length)) nav.appendChild(link);
         else moreLinks.appendChild(link);
       });
       more.append(moreToggle, moreLinks);
       nav.insertBefore(toggle, nav.firstChild);
       if (moreLinks.children.length) nav.appendChild(more);
-      else more.remove();
 
+      function syncLabels() {
+        const lang = document.documentElement.dataset.language || document.documentElement.lang || "tr";
+        const tr = /^tr(?:-|$)/i.test(lang);
+        const open = nav.classList.contains("nx-nav-open");
+        toggle.querySelector(".nx-nav-toggle-label").textContent = tr ? (open ? "Kapat" : "Menü") : (open ? "Close" : "Menu");
+        toggle.setAttribute("aria-label", tr ? (open ? "Menüyü kapat" : "Menüyü aç") : (open ? "Close menu" : "Open menu"));
+        moreLabel.textContent = tr ? "Diğer" : "More";
+        moreToggle.setAttribute("aria-label", tr ? "Diğer menü bağlantıları" : "More navigation links");
+      }
+      function closeMenu() {
+        nav.classList.remove("nx-nav-open");
+        more.classList.remove("nx-nav-more-open");
+        document.body.classList.remove("nx-menu-open");
+        document.body.style.overflow = "";
+        document.body.style.overscrollBehavior = "";
+        toggle.setAttribute("aria-expanded", "false");
+        moreToggle.setAttribute("aria-expanded", "false");
+        syncLabels();
+      }
       toggle.addEventListener("click", () => {
         const open = nav.classList.toggle("nx-nav-open");
         document.body.classList.toggle("nx-menu-open", open);
         document.body.style.overflow = open ? "hidden" : "";
         document.body.style.overscrollBehavior = open ? "none" : "";
         toggle.setAttribute("aria-expanded", String(open));
-        toggle.querySelector(".nx-nav-toggle-label").textContent = open ? "Close" : "Menu";
+        syncLabels();
       });
       moreToggle.addEventListener("click", () => {
         const open = more.classList.toggle("nx-nav-more-open");
         moreToggle.setAttribute("aria-expanded", String(open));
       });
       nav.addEventListener("click", event => {
-        if (event.target.closest("a") && nav.classList.contains("nx-nav-open")) {
-          nav.classList.remove("nx-nav-open");
-          document.body.classList.remove("nx-menu-open");
-          document.body.style.overflow = "";
-          document.body.style.overscrollBehavior = "";
-          toggle.setAttribute("aria-expanded", "false");
-        }
+        if (event.target.closest("a") && nav.classList.contains("nx-nav-open")) closeMenu();
       });
       nav.addEventListener("keydown", event => {
         if (event.key === "Escape") {
-          nav.classList.remove("nx-nav-open");
-          more.classList.remove("nx-nav-more-open");
-          document.body.classList.remove("nx-menu-open");
-          document.body.style.overflow = "";
-          document.body.style.overscrollBehavior = "";
-          toggle.setAttribute("aria-expanded", "false");
-          moreToggle.setAttribute("aria-expanded", "false");
+          closeMenu();
           toggle.focus();
         }
       });
+      window.addEventListener("nexora:languagechange", syncLabels);
+      syncLabels();
     });
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initNavigation, {once:true});
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initNavigation, { once: true });
   else initNavigation();
 })();
