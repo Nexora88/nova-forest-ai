@@ -15,9 +15,14 @@
       const response = await fetch(API_BASE + "/enterprise/reports/" + encodeURIComponent(jobId), {headers:{Authorization:"Bearer " + token}});
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.detail?.message || body.detail || "Rapor durumu alınamadı.");
-      if (body.status === "finished") return body.result;
-      if (body.status === "failed") throw new Error("PDF oluşturulamadı. Worker günlüklerini kontrol edin.");
-      setStatus("Analiz kuyruğa alındı… " + (attempt + 1) + "/90");
+      // Celery worker uses queued/running/completed; retain compatibility with the older RQ response shape.
+      if (body.status === "completed" || body.status === "finished") {
+        const result = body.result || body;
+        return { ...result, artifact_url: result.artifact_url || result.download_url || body.download_url };
+      }
+      if (body.status === "failed") throw new Error(body.message || "PDF oluşturulamadı. Worker günlüklerini kontrol edin.");
+      const stage = body.stage || body.meta?.stage;
+      setStatus((stage ? "Rapor hazırlanıyor: " + stage.replaceAll("_", " ") + " · " : "Raporunuz hazırlanıyor, bitince e-posta gönderilecek · ") + (attempt + 1) + "/90");
     }
     throw new Error("İşlem zaman aşımına uğradı. Daha sonra tekrar deneyin.");
   }
