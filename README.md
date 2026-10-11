@@ -25,9 +25,9 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.
 - **Responsive, installable web app** with an offline-first shell and local saved-area experience.
-- **Edge AI interface prototype:** [UAV / camera simulation](pages/uav-demo.html). This is a UI simulation only; it does not run YOLO or perform real smoke detection.
+- **Experimental image-analysis page:** [UAV / image lab](pages/uav-demo.html). Fire/smoke inference is intentionally disabled after removing the AGPL-licensed runtime and checkpoint. It will only be re-enabled after selecting a license-compatible model and validating it with labelled regional data.
 - **Experimental weather-risk index:** [methodology and limitations](docs/NEXORA_RISK_INDEX.md). The current index is rule-based and has not been calibrated or validated for operational fire prediction.
-- **Turkish and English interface**, with English as the default for this public-facing version.
+- **Turkish and English interface**; the initial language follows the browser locale (Turkish for Turkish locales, English otherwise).
 
 ## AI-assisted engineering
 
@@ -39,7 +39,7 @@ The first practical focus is Thrace, Türkiye. Global coordinates and reusable g
 
 The app may display provider observations, rule-based indicators, satellite discovery results, and machine-learning research outputs. These are different forms of evidence. The research model trained on a small historical Algerian dataset is **not validated for Türkiye** and must not be represented as an operational wildfire forecast. NexoraWildfire AI is experimental decision support, not an official warning service. In an emergency, follow the relevant authorities.
 
-Provider access and production behavior must be verified independently; code for an integration is not proof that its live connection is working. Missing credentials, provider errors, and zero observations must not be presented as zero risk. The UAV demo's detection boxes and latency are explicitly simulated and must not be presented as measured model performance.
+Provider access and production behavior must be verified independently; code for an integration is not proof that its live connection is working. Missing credentials, provider errors, and zero observations must not be presented as zero risk. The YOLO page draws boxes only from API responses. A working API response demonstrates integration, not detection accuracy; a synthetic blank-frame check is not positive fire/smoke validation.
 
 ## Pricing and sustainability
 
@@ -64,9 +64,28 @@ See [SaaS limits and pricing plan](docs/SAAS_LIMITS_AND_PRICING.md) for the cost
 - **Global architecture notes:** [docs/GLOBAL_SCALABILITY.md](docs/GLOBAL_SCALABILITY.md)
 - **AI-assisted development disclosure:** [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md)
 - **Nexora Risk Index methodology:** [docs/NEXORA_RISK_INDEX.md](docs/NEXORA_RISK_INDEX.md)
+- **Scientific status and validation plan:** [docs/SCIENTIFIC_STATUS.md](docs/SCIENTIFIC_STATUS.md)
+- **Third-party licenses and notices:** [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+- **Research model card:** [English](docs/ML_MODEL_CARD.md) · [Türkçe](docs/ML_MODEL_CARD.tr.md)
+
+The repository `LICENSE` covers Nexora-authored code only. Third-party model weights, datasets, map tiles, libraries, and provider data retain their own terms; see [Third-party notices](THIRD_PARTY_NOTICES.md). The MIT license does not relicense those materials. Licensing and deployment suitability for the AGPL-3.0 YOLO/Ultralytics stack must be reviewed before redistribution.
 
 The priority is a dependable core product: clear map layers, understandable indicators, reliable saved areas, transparent data status, accessible mobile use, and feedback from real users. New features should solve a real user problem rather than add complexity for its own sake.
 
 ---
 
 **Independent project by Ahmet Eymen Bakraç · Nexora · 2026**
+
+## Gerçek YOLOv8 çıkarımı
+
+İHA / Yapay Zekâ sayfası ve model servisinin kurulumu, model kaynağı/lisansı, API sözleşmesi ve doğrulama sınırları için [YOLO çıkarım rehberini](docs/YOLO_INFERENCE.md) inceleyin. Çalışan çıkarım için `backend/requirements-ml.txt` ile ayrı ML container gerekir; Vercel statik/standart API dağıtımı tek başına PyTorch modelinin çalıştığı anlamına gelmez.
+
+
+## Scientific status, licensing, and transparency
+
+- [Scientific status and validation plan](docs/SCIENTIFIC_STATUS.md)
+- [Third-party licenses and notices](THIRD_PARTY_NOTICES.md)
+- [Research model card — English](docs/ML_MODEL_CARD.md) · [Türkçe](docs/ML_MODEL_CARD.tr.md)
+- [AI-assisted development disclosure (English + Türkçe)](AI_ASSISTED_DEVELOPMENT.md)
+
+The MIT license applies to Nexora-authored code only; it does not relicense third-party weights, data, map tiles, or dependencies. AI coding assistants are used for technical debugging, code explanation, tests, translation, and documentation—not as the originator of the project concept. See the disclosure for the complete statement.

@@ -330,7 +330,7 @@
     ["İngilizce","English"],
     ["Türkçe","Turkish"],
     ["Trakya çevresel istihbarat • tarım • orman • ekosistem","Thrace environmental intelligence • agriculture • forests • ecosystems"],
-    ["NEXORAWILDFIRE / TRAKYA ENVIRONMENTAL INTELLIGENCE","NEXORAWILDFIRE / THRACE ENVIRONMENTAL INTELLIGENCE"],
+    ["NEXORAWILDFIRE / TRAKYA ÇEVRESEL İSTİHBARAT","NEXORAWILDFIRE / THRACE ENVIRONMENTAL INTELLIGENCE"],
     ["Canlı çevre haritasını aç →","Open the live environmental map →"],
     ["Uydu merkezine git","Go to Satellite Hub"],
     ["AKTİF PİLOT ALANI","ACTIVE PILOT AREA"],
@@ -386,7 +386,6 @@
     ["VERİ SETİ BEKLENİYOR","WAITING FOR DATASET"],
     ["AKTİF ANALİZ","ACTIVE ANALYSIS"],
     ["Kurala dayalı risk motoru","Rule-based risk engine"],
-    ["Environmental intelligence for real-world needs","Gerçek dünya ihtiyaçları için çevresel istihbarat"],
     ["PRODUCT FEEDBACK","ÜRÜN GERİ BİLDİRİMİ"],
     ["NEXORA / BUILT WITH FEEDBACK","NEXORA / GERİ BİLDİRİMLE GELİŞİYOR"],
     ["SCIENCE · SERVICE · RESPONSIBILITY","BİLİM · HİZMET · SORUMLULUK"],
@@ -555,12 +554,51 @@
     ["Veri sağlayıcıları","Data providers"],
     ["Supabase hesap profili","Supabase account profile"],
     ["Kontrol ediliyor","Checking"],
+    ["NEXORA / ÇEVRESEL İSTİHBARAT","NEXORA / ENVIRONMENTAL INTELLIGENCE"],
+    ["Operasyonlar","Operations"],
+    ["SAHA İSTİHBARAT KONTROLÜ","FIELD INTELLIGENCE CONTROL"],
+    ["Kullanılamıyor","Unavailable"],
+    ["Gerçek dünya ihtiyaçları için çevresel istihbarat","Environmental intelligence for real-world needs"],
+    ["Kaliforniya Napa Vadisi yakınında örnek bir GeoJSON poligonu yükle, güncel hava durumunu iste ve aynı sınır kutusu için NASA FIRMS’i kontrol et. Eksik kimlik bilgileri veya erişilemeyen sağlayıcılar açıkça bildirilir.","Load a sample GeoJSON polygon near Napa Valley, California, request current weather, and check NASA FIRMS for the same bounding box. Missing credentials or unavailable providers are reported explicitly."],
+
+    ["Alanların yerel/online durumu hesaplanıyor…","Checking local and online area status…"],
+    ["NEXORAWILDFIRE EDGE alan verilerini hazırlıyor…","Preparing NexoraWildfire Edge area data…"],
+    ["CANLI DURUM","LIVE STATUS"],["CANLI GÖZLEM","LIVE OBSERVATION"],["ÇEVRİMDIŞI / SON VERİ","OFFLINE / LAST AVAILABLE DATA"],["VERİ YOK","DATA UNAVAILABLE"],
+    ["Gözlem zamanı:","Observation time:"],["Son yerel kayıt:","Last local record:"],["Gözlem zamanı mevcut değil","Observation time unavailable"],
+    ["Sıcaklık","Temperature"],["Toprak nemi","Soil moisture"],["Tarım göstergesi","Agriculture indicator"],["Arı uçuş göstergesi","Bee-flight indicator"],
+    ["Bu alanın risk uyarılarını izle","Monitor risk alerts for this area"],["Bu alan için bildirimleri aç","Enable notifications for this area"],["Haritada görüntüle →","View on map →"],
+    ["Yerel olay merkezi","Local event centre"],["Otomatik olaylar","Automated events"],["SU STRESİ","WATER STRESS"],["NEM DÜŞÜYOR","MOISTURE DECLINING"],["HAVA / SU KAYBI","ATMOSPHERIC WATER LOSS"],["RÜZGAR","WIND"],["YAĞIŞ","PRECIPITATION"],["ARICILIK UYARISI","BEEKEEPING ALERT"],["TARIM UYARISI","AGRICULTURE ALERT"],["UYDU SU STRESİ","SATELLITE WATER STRESS"],["UYDU TRENDİ","SATELLITE TREND"],["SİSTEM NORMAL","NO RULE THRESHOLD EXCEEDED"],
+    ["Canlı veri erişilemiyor ve kullanılabilir yerel kayıt bulunamadı. Bu durum sıfır risk anlamına gelmez.","Live data is unavailable and no usable local record exists. This does not mean zero risk."],
+    ["Tanımlı otomatik olay eşikleri aşılmadı; bu ifade yangın olmadığına dair teyit değildir.","No configured event threshold was exceeded; this does not confirm that no fire exists."],
+    ["İnternet yok ve yerel gözlem bulunamadı. Risk skoru üretilmedi.","Offline and no local observation is available. No risk score was produced."],
+    ["Veri kaynağı:","Data source:"],["Bu göstergeler resmî yangın uyarısı değildir.","These indicators are not official wildfire warnings."],
+    ["Veri eksikliği, NDVI/NDMI değerinin sıfır olduğu anlamına gelmez.","Missing data does not mean NDVI/NDMI equals zero."],
+    ["İHA / Gerçek YOLOv8 · NexoraWildfire AI","UAV / Real YOLOv8 · NexoraWildfire AI"],
+    ["NexoraWildfire AI gerçek YOLOv8 yangın ve duman görüntü çıkarımı laboratuvarı.","NexoraWildfire AI real YOLOv8 fire and smoke image-inference lab."],
+    ["Gerçek YOLOv8 yangın/duman çıkarım laboratuvarı.","Real YOLOv8 fire/smoke inference lab."],
+    ["1 · Model servisine bağlan","1 · Connect to model service"],["API taban adresi","API base URL"],["Bağlantıyı doğrula","Verify connection"],
+    ["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."],["Model servisi kontrol ediliyor…","Checking model service…"],
+    ["2 · Video seç ve gerçek çıkarımı çalıştır","2 · Select a video and run real inference"],["Cihazından video seç:","Choose a video from your device:"],
+    ["Güven eşiği","Confidence threshold"],["Gerçek algılamayı başlat","Start real detection"],["Durdur","Stop"],
+    ["3 · Gerçek API telemetrisi","3 · Real API telemetry"],["Model durumu","Model status"],["Son çıkarım süresi","Last inference time"],
+    ["Son karedeki algılamalar","Detections in last frame"],["Son kare çözünürlüğü","Last frame resolution"],
+    ["Bağlantı doğrulaması bekleniyor.","Waiting for connection verification."],
+    ["Model çalışma ortamı kurulu değil. ML container içinde backend/requirements-ml.txt dosyasını yükleyin.","The YOLO runtime is not installed. Install backend/requirements-ml.txt in the ML container."],
+    ["Araştırma modeli Türkiye'deki saha koşulları için bağımsız olarak doğrulanmamıştır; resmi yangın alarmı değildir.","This research model has not been independently validated for field conditions in Türkiye; it is not an official fire alarm."],
+    ["Model kaynağı ayarlı; ağırlıklar ilk gerçek çıkarım isteğinde yüklenecek.","Model source is configured; weights will load on the first real inference request."],
+    ["Gerçek model çıkarımıdır; GPS konumu üretmez ve Türkiye saha koşullarında bağımsız doğrulanmamıştır. Resmi uyarı sistemi değildir.","This is real model inference; it does not produce GPS coordinates and has not been independently validated in Türkiye. It is not an official warning system."],
+    ["Bu analiz edilen karede model fire/smoke kutusu döndürmedi; bu, yangın olmadığını kanıtlamaz.","The model returned no fire/smoke boxes for this frame; that does not prove there is no fire."],
+    ["Kare JPEG olarak hazırlanamadı.","Could not prepare the frame as JPEG."],["Video oynatılamadı:","Could not play video:"],
+    ["Yerel video hazır. Kareler yalnızca gerçek algılama başlatıldığında API adresine gönderilir.","Local video is ready. Frames are sent to the API only when real detection starts."],
+    ["Yerel video","Local video"],["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."],
+    ["Weather data by Open-Meteo.com","Hava verisi: Open-Meteo.com"],["Veri Durumu","Data Status"],["GÖZLEM HAZIR","OBSERVATION READY"],["VERİ YOK","DATA UNAVAILABLE"],["Güncel hava yanıtı alındı; bu kart yangın tahmini değildir.","A current weather response was received; this card is not a fire forecast."],["Hava API'si erişilemedi; risk skoru üretilmedi.","Weather API unavailable; no risk score was produced."],
+
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
-  let lang = stored === "en" || stored === "tr" ? stored : "en";
+  let lang = stored === "en" || stored === "tr" ? stored : ((navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en");
   const ordered = (map) => [...map.entries()].sort((a,b) => b[0].length-a[0].length);
   function replace(text, target) {
     const entries = ordered(target === "en" ? trToEn : enToTr);
@@ -571,10 +609,12 @@
   const originals = new WeakMap();
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
+    // Preserve user-generated values such as saved area names; translate only UI copy.
+    if (node.parentElement?.closest(".area-card h3,[data-user-content]")) return;
     if (!originals.has(node)) originals.set(node, node.nodeValue);
-    const current = node.nodeValue;
-    const translated = replace(current, lang);
-    if (translated !== current) node.nodeValue = translated;
+    const source = originals.get(node);
+    const translated = replace(source, lang);
+    if (translated !== node.nodeValue) node.nodeValue = translated;
   }
   function translateAttributes(root=document) {
     const selector = "[placeholder],[title],[aria-label],[content]";

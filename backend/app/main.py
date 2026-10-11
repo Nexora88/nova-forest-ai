@@ -10,6 +10,7 @@ from app.api.forecast_routes import router as forecast_router
 from app.api.notification_routes import router as notification_router
 from app.api.environment_routes import router as environment_router
 from app.api.ml_routes import router as ml_router
+from app.api.yolo_routes import router as yolo_router
 from app.api.jobs_routes import router as jobs_router
 from app.api.enterprise_reports import router as enterprise_reports_router
 from app.api.account_routes import router as account_router
@@ -57,6 +58,7 @@ app.include_router(forecast_router)
 app.include_router(notification_router)
 app.include_router(environment_router)
 app.include_router(ml_router)
+app.include_router(yolo_router)
 app.include_router(jobs_router)
 app.include_router(enterprise_reports_router)
 app.include_router(account_router)

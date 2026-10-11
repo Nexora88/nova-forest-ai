@@ -120,3 +120,22 @@ jobs:
           except (requests.RequestException, ValueError) as exc:
               print("Copernicus NDVI probe failed:", type(exc).__name__)
           PY
+
+  deployed-ml-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Railway service health without requiring a removed AGPL detector
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+
+          base = "https://nexorawildfire-ml-production.up.railway.app"
+          request = urllib.request.Request(base + "/health", headers={"Accept": "application/json"})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              health = json.load(response)
+          if health.get("status") != "healthy":
+              raise SystemExit(f"ML service is not healthy: {health}")
+          print("Railway ML service health: healthy")
+          print("Fire/smoke inference remains intentionally disabled until a license-compatible model is validated.")
+          PY

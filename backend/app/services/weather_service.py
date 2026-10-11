@@ -1,8 +1,16 @@
 import math
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from copy import deepcopy
+from threading import Lock
+from time import monotonic
 
 import requests
 
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+CACHE_TTL_SECONDS = 60
+_CACHE = None
+_CACHE_AT = 0.0
+_CACHE_LOCK = Lock()
 
 REGIONS = {
     "Edirne": (41.6771, 26.5557),
@@ -20,7 +28,9 @@ def get_current_weather(latitude, longitude):
         "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
         "timezone": "Europe/Istanbul",
     }
-    response = requests.get(OPEN_METEO_URL, params=params, timeout=12)
+    # Five regions are fetched concurrently; keep each request below common
+    # serverless execution budgets instead of serially waiting up to a minute.
+    response = requests.get(OPEN_METEO_URL, params=params, timeout=8)
     response.raise_for_status()
     current = response.json().get("current", {})
     result = {
@@ -46,23 +56,49 @@ def get_current_weather(latitude, longitude):
     return result
 
 
+def _fetch_region(name, coordinates):
+    lat, lon = coordinates
+    try:
+        weather = get_current_weather(lat, lon)
+        return name, {
+            "region": name,
+            "coordinates": {"latitude": lat, "longitude": lon},
+            "weather": weather,
+            "status": weather["status"],
+        }
+    except requests.RequestException as exc:
+        return name, {
+            "region": name,
+            "coordinates": {"latitude": lat, "longitude": lon},
+            "status": "error",
+            "error_type": type(exc).__name__,
+            "error": "Weather provider request failed; no current values are available.",
+        }
+
+
 def get_region_weather():
-    results = []
-    for name, (lat, lon) in REGIONS.items():
-        try:
-            weather = get_current_weather(lat, lon)
-            results.append({
-                "region": name,
-                "coordinates": {"latitude": lat, "longitude": lon},
-                "weather": weather,
-                "status": weather["status"],
-            })
-        except requests.RequestException as exc:
-            results.append({
-                "region": name,
-                "coordinates": {"latitude": lat, "longitude": lon},
-                "status": "error",
-                "error_type": type(exc).__name__,
-                "error": "Weather provider request failed; no current values are available.",
-            })
+    global _CACHE, _CACHE_AT
+    now = monotonic()
+    with _CACHE_LOCK:
+        if _CACHE is not None and now - _CACHE_AT < CACHE_TTL_SECONDS:
+            return deepcopy(_CACHE)
+
+    results_by_name = {}
+    with ThreadPoolExecutor(max_workers=len(REGIONS)) as pool:
+        futures = {
+            pool.submit(_fetch_region, name, coordinates): name
+            for name, coordinates in REGIONS.items()
+        }
+        for future in as_completed(futures):
+            name, result = future.result()
+            results_by_name[name] = result
+
+    # Preserve the stable region order expected by the UI.
+    results = [results_by_name[name] for name in REGIONS]
+    # Cache only when at least one genuine provider response arrived. Never
+    # cache a full error response as if it were current weather.
+    if any(item.get("status") in {"available", "partial"} for item in results):
+        with _CACHE_LOCK:
+            _CACHE = deepcopy(results)
+            _CACHE_AT = monotonic()
     return results

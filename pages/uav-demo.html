@@ -1,43 +1,39 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07130f">
-<title>Canlı İHA / Edge AI Demo · NexoraWildfire AI</title>
+<meta name="description" content="NexoraWildfire AI deneysel görüntü laboratuvarı ve lisans durumu.">
+<title>İHA / Görüntü Laboratuvarı · NexoraWildfire AI</title>
 <style>
-:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.5 system-ui,sans-serif}
-main{max-width:1050px;margin:auto;padding:24px}a{color:var(--green)}h1{font-size:clamp(1.7rem,4vw,2.7rem);margin:.3rem 0}p{color:var(--muted)}
-.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}
-.notice{border-left:3px solid #ffce69;padding:10px 14px;background:#332a153d;color:#ffe5a8}
-.stage{position:relative;background:#020805;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:240px;display:grid;place-items:center}
-video{display:block;width:100%;max-height:65vh;background:#020805}#box{display:none;position:absolute;width:24%;height:20%;left:42%;top:28%;border:2px solid var(--green);box-shadow:0 0 14px #65ff9a88;pointer-events:none}
-#box span{position:absolute;left:-2px;top:-26px;background:var(--green);color:#04150b;font-size:12px;font-weight:800;padding:2px 6px}
-.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}button,input{font:inherit}button{background:var(--green);color:#04150b;border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.metric{font:600 1.1rem ui-monospace,monospace;color:var(--green)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad;--amber:#ffce69}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.6 system-ui,sans-serif}
+main{max-width:860px;margin:auto;padding:clamp(16px,4vw,36px)}a{color:var(--green)}h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15}h2{font-size:1.2rem}.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,26px);margin:18px 0}.status{display:inline-block;border:1px solid #80652d;background:#332a153d;color:#ffe5a8;border-radius:999px;padding:5px 11px;font-weight:700}.muted{color:var(--muted)}li{margin:.6rem 0}
 </style>
 </head>
 <body><main>
-<a href="../index.html">← NexoraWildfire AI</a>
-<h1>Canlı İHA / Edge AI Laboratuvarı</h1>
-<p>Video akışı üzerinde arayüz prototipi ve olay işaretleme demosu.</p>
-<div class="notice"><strong>Şeffaflık:</strong> Bu sayfa gerçek YOLOv8 çıkarımı yapmaz. Kutular ve tepki süresi simüle edilir; sonuçlar yangın tespiti, gerçek koordinat veya saha uyarısı olarak kullanılamaz. Gerçek model entegrasyonu ayrıca kurulup ölçülmelidir.</div>
+<a href="../index.html">← NexoraWildfire AI ana panel</a>
+<h1>İHA / Görüntü Laboratuvarı</h1>
+<p>Bu alan, ileride lisansı uyumlu ve bağımsız olarak değerlendirilmiş görüntü analizini desteklemek üzere ayrılmıştır.</p>
 <section class="panel">
-<h2>Video kaynağı</h2>
-<div class="controls"><label for="videoFile">Cihazından video seç:</label><input id="videoFile" type="file" accept="video/*"><button id="simulate" disabled>Simülasyonu başlat</button><button id="stop" disabled>Durdur</button></div>
-<p>Gizlilik için seçtiğin video tarayıcıda yerel oynatılır; sunucuya yüklenmez. İnternet videosu kullanacaksan yalnızca kullanım lisansı uygun bir kaynak indirip seç.</p>
-<div class="stage"><video id="video" controls playsinline></video><div id="box"><span>SIMÜLASYON · olası duman</span></div></div>
+<span class="status">Çıkarım şu anda devre dışı</span>
+<h2>Neden kapalı?</h2>
+<p>Projenin MIT lisanslama hedefini korumak için AGPL-3.0 lisanslı Ultralytics çalışma zamanı ve üçüncü taraf yangın/duman model ağırlıkları etkin entegrasyondan kaldırıldı. Lisansı uygunluğu doğrulanmış bir alternatif seçilene kadar bu sayfa görüntü yüklemez ve algılama sonucu üretmez.</p>
 </section>
-<section class="panel"><h2>Demo telemetrisi</h2><div class="grid">
-<div><p>Algılama durumu</p><div class="metric" id="status">BEKLEMEDE</div></div>
-<div><p>Gösterilen tepki süresi</p><div class="metric" id="latency">—</div></div>
-<div><p>Konum</p><div class="metric">ÜRETİLMİYOR</div></div>
-</div><p id="detail">Video seçildiğinde demo kontrolleri etkinleşir.</p></section>
-</main>
-<script>
-const file=document.querySelector('#videoFile'),video=document.querySelector('#video'),box=document.querySelector('#box'),start=document.querySelector('#simulate'),stop=document.querySelector('#stop'),status=document.querySelector('#status'),latency=document.querySelector('#latency'),detail=document.querySelector('#detail');
-let objectUrl=null,timer=null,visible=false;
-file.addEventListener('change',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);const f=file.files&&file.files[0];if(!f)return;objectUrl=URL.createObjectURL(f);video.src=objectUrl;start.disabled=false;detail.textContent='Yerel video hazır. Başlat düğmesi yalnızca görsel simülasyonu çalıştırır.';status.textContent='HAZIR';});
-start.addEventListener('click',()=>{if(!video.src)return;clearInterval(timer);video.play().catch(()=>{});start.disabled=true;stop.disabled=false;status.textContent='SİMÜLASYON AKTİF';detail.textContent='Rastgele zamanlarda dekoratif kutu gösterilir; görüntü analizi yapılmaz.';timer=setInterval(()=>{visible=!visible;box.style.display=visible?'block':'none';latency.textContent=visible?(Math.floor(35+Math.random()*70)+' ms · simüle'):'—';if(visible)status.textContent='SİMÜLE EDİLEN OLAY';else status.textContent='OLAY GÖSTERİLMİYOR';},1250);});
-function halt(){clearInterval(timer);timer=null;box.style.display='none';video.pause();start.disabled=!video.src;stop.disabled=true;status.textContent='DURDURULDU';latency.textContent='—';}
-stop.addEventListener('click',halt);video.addEventListener('ended',halt);
-</script></body></html>
+<section class="panel">
+<h2>Bilimsel ve güvenlik sınırları</h2>
+<ul>
+<li>Trakya koşullarında etiketli pozitif ve negatif yangın/duman görüntüleriyle bağımsız doğruluk değerlendirmesi yapılmış değildir.</li>
+<li>Bu sistem resmî uyarı, yangın teyidi veya doğrulanmış yangın tahmini olarak sunulmaz.</li>
+<li>İleride seçilecek model; lisansı, ağırlıkların kaynağı, eğitim verisi koşulları ve kullanım izinleri incelendikten sonra etkinleştirilecektir.</li>
+<li>Modelin teknik olarak çalışması tek başına doğruluk kanıtı sayılmaz. Bölgesel etiketli test, yanlış pozitif/negatif analizi ve belgelenmiş sınırlamalar gerekir.</li>
+</ul>
+</section>
+<section class="panel">
+<h2>Sonraki adım</h2>
+<p class="muted">Öncelik, MIT lisansını koruyarak güvenilir ve sürdürülebilir bir model yolu belirlemektir. Uyumlu bir model ve uygun değerlendirme verisi hazır olana kadar algılama özelliği kapalı kalacaktır.</p>
+<p><a href="../THIRD_PARTY_NOTICES.md">Üçüncü taraf lisans bildirimleri</a> · <a href="../docs/SCIENTIFIC_STATUS.md">Bilimsel durum ve doğrulama planı</a></p>
+</section>
+<script src="../js/i18n.js?v=20261011g"></script>
+</main></body></html>

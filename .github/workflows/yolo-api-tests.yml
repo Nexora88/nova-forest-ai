@@ -1,0 +1,31 @@
+name: YOLO and risk-index unit tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "feat/real-yolov8-openmeteo-validation"
+
+jobs:
+  python-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend test dependencies
+        run: |
+          python -m pip install -r backend/requirements.txt pytest httpx2 shapely pyproj reportlab
+      - name: Compile changed Python modules
+        run: |
+          python -m py_compile backend/nexora_risk_index.py
+          python -m py_compile backend/app/engine/yolo_fire_detector.py
+          python -m py_compile backend/app/api/yolo_routes.py
+      - name: Run backend test suite
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest -q backend/tests backend/test_nexora_risk_index.py
