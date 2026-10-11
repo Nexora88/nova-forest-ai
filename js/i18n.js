@@ -555,6 +555,34 @@
     ["Veri sağlayıcıları","Data providers"],
     ["Supabase hesap profili","Supabase account profile"],
     ["Kontrol ediliyor","Checking"],
+
+    ["Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.","Developed by independent developer Ahmet Eymen Bakraç."],
+    ["Bağımsız proje","Independent project"],
+    ["Hukuki belgeler","Legal documents"],
+    ["Hukuki belgeler (taslak)","Legal documents (draft)"],
+    ["KVKK Aydınlatma Metni","KVKK Privacy Notice"],
+    ["Gizlilik Politikası","Privacy Policy"],
+    ["Kullanım Koşulları ve Sorumluluk Reddi","Terms of Use and Disclaimer"],
+    ["Belgeler taslak aşamasındadır; hukuki inceleme ve iletişim kanalı tamamlanmadan nihai belge olarak değerlendirilmemelidir.","These documents are drafts and must not be treated as final until legal review and a privacy contact channel are in place."],
+    ["Bu sayfa, NexoraWildfire AI için hazırlanan hukuki belge taslaklarına erişim sağlar. Veri sorumlusunun iletişim bilgisi henüz yayımlanmamıştır; bu nedenle kişisel veri başvuruları için etkin bir iletişim kanalı henüz bulunmamaktadır.","This page provides access to draft legal documents for NexoraWildfire AI. The data controller's contact details have not been published, so a working channel for personal-data requests is not yet available."],
+    ["Veri sorumlusu olarak belirtilen kişi","Person identified as the proposed data controller"],
+    ["Ahmet Eymen Bakraç · bireysel proje sahibi · Türkiye","Ahmet Eymen Bakraç · individual project owner · Türkiye"],
+    ["Açık adres yayımlanmamıştır. İletişim ve gizlilik e-postası, sahibi tarafından doğrulanıp sağlanana kadar eklenmeyecektir.","No public address is shown. Contact details and a privacy email will not be added until verified and supplied by the owner."],
+    ["Yayın durumu","Publication status"],
+    ["YAYINA HAZIR DEĞİL","NOT READY FOR PUBLICATION"],
+    ["Taslak belgeleri GitHub'da görüntüle","View draft documents on GitHub"],
+    ["KVKK Aydınlatma Metni taslağını aç","Open the KVKK Privacy Notice draft"],
+    ["Gizlilik Politikası taslağını aç","Open the Privacy Policy draft"],
+    ["Kullanım Koşulları taslağını aç","Open the Terms of Use draft"],
+    ["Bu proje resmî bir yangın uyarı sistemi değildir. Acil durumlarda yetkili kurumların yönlendirmelerini izleyin.","This project is not an official wildfire warning system. Follow the guidance of the relevant authorities in emergencies."],
+    ["Kayıt işlemi geçici olarak duraklatıldı","Registration is temporarily paused"],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor. Mevcut kullanıcılar giriş yapabilir.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured. Existing users can still sign in."],
+    ["Kullanım Koşulları","Terms of Use"],
+    ["Gizlilik","Privacy"],
+    ["Hakkında","About"],
+    ["Son kontrol","Last checked"],
+    ["Geliştirici imzası","Developer attribution"]
+
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
@@ -604,6 +632,25 @@
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
   }
+  function ensureLegalFooter() {
+    if (document.querySelector(".nx-legal-footer")) return;
+    const inPages = /\/pages\//.test(location.pathname);
+    const prefix = inPages ? "" : "pages/";
+    const footer = document.createElement("footer");
+    footer.className = "nx-legal-footer";
+    footer.innerHTML = '<div class="nx-legal-footer-inner">' +
+      '<div class="nx-legal-brand"><strong>NexoraWildfire AI</strong><span data-nx-attribution>Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.</span></div>' +
+      '<nav class="nx-legal-links" aria-label="Hukuki bağlantılar">' +
+      '<a href="' + prefix + 'legal.html">Hukuki belgeler (taslak)</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KVKK_AYDINLATMA_METNI_TASLAK.md" target="_blank" rel="noopener noreferrer">KVKK Aydınlatma Metni</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/PRIVACY_POLICY_DRAFT.md" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KULLANIM_KOSULLARI_VE_SORUMLULUK_REDdi_TASLAK.md" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</a>' +
+      '</nav><p class="nx-legal-disclaimer">NexoraWildfire AI resmî bir yangın uyarı sistemi değildir. Kaynak erişimi ve veri kapsamı değişebilir.</p></div>';
+    document.body.appendChild(footer);
+    const style = document.createElement("style");
+    style.textContent = ".nx-legal-footer{margin-top:42px;padding:24px clamp(16px,4vw,48px);border-top:1px solid #193c27;background:rgba(2,7,4,.96);color:#aebbb0;font:13px/1.6 system-ui,sans-serif}.nx-legal-footer-inner{max-width:1200px;margin:auto;display:grid;gap:14px}.nx-legal-brand{display:grid;gap:4px}.nx-legal-brand strong{color:#e9fff0;font-size:15px;letter-spacing:.02em}.nx-legal-brand span{color:#9aac9f}.nx-legal-links{display:flex;flex-wrap:wrap;gap:8px 18px}.nx-legal-links a{color:#bce9c7;text-decoration:none;text-underline-offset:4px}.nx-legal-links a:hover,.nx-legal-links a:focus-visible{text-decoration:underline;color:#fff}.nx-legal-disclaimer{margin:0;color:#7e9183;font-size:12px}.nx-legal-footer a:focus-visible{outline:2px solid #00ff66;outline-offset:3px;border-radius:3px}@media(max-width:600px){.nx-legal-footer{padding:20px 16px}.nx-legal-links{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.nx-legal-links a{overflow-wrap:anywhere}}";
+    document.head.appendChild(style);
+  }
   function init() {
     const button = document.createElement("button");
     button.id = "nexora-language-toggle";
@@ -616,6 +663,7 @@
     const style = document.createElement("style");
     style.textContent = ".nexora-language-toggle{position:fixed;right:14px;bottom:14px;z-index:99999;min-height:44px;padding:10px 14px;border:1px solid #00ff66;border-radius:999px;background:#06110a;color:#eaffef;font:700 12px system-ui;box-shadow:0 6px 24px #0009;cursor:pointer}.nexora-language-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}";
     document.head.appendChild(style);
+    ensureLegalFooter();
     applyLanguage();
     const observer = new MutationObserver(records => {
       for (const record of records) {
