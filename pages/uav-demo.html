@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07130f">
+<title>Canlı İHA / Edge AI Demo · NexoraWildfire AI</title>
+<style>
+:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.5 system-ui,sans-serif}
+main{max-width:1050px;margin:auto;padding:24px}a{color:var(--green)}h1{font-size:clamp(1.7rem,4vw,2.7rem);margin:.3rem 0}p{color:var(--muted)}
+.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}
+.notice{border-left:3px solid #ffce69;padding:10px 14px;background:#332a153d;color:#ffe5a8}
+.stage{position:relative;background:#020805;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:240px;display:grid;place-items:center}
+video{display:block;width:100%;max-height:65vh;background:#020805}#box{display:none;position:absolute;width:24%;height:20%;left:42%;top:28%;border:2px solid var(--green);box-shadow:0 0 14px #65ff9a88;pointer-events:none}
+#box span{position:absolute;left:-2px;top:-26px;background:var(--green);color:#04150b;font-size:12px;font-weight:800;padding:2px 6px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}button,input{font:inherit}button{background:var(--green);color:#04150b;border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.metric{font:600 1.1rem ui-monospace,monospace;color:var(--green)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+</style>
+</head>
+<body><main>
+<a href="../index.html">← NexoraWildfire AI</a>
+<h1>Canlı İHA / Edge AI Laboratuvarı</h1>
+<p>Video akışı üzerinde arayüz prototipi ve olay işaretleme demosu.</p>
+<div class="notice"><strong>Şeffaflık:</strong> Bu sayfa gerçek YOLOv8 çıkarımı yapmaz. Kutular ve tepki süresi simüle edilir; sonuçlar yangın tespiti, gerçek koordinat veya saha uyarısı olarak kullanılamaz. Gerçek model entegrasyonu ayrıca kurulup ölçülmelidir.</div>
+<section class="panel">
+<h2>Video kaynağı</h2>
+<div class="controls"><label for="videoFile">Cihazından video seç:</label><input id="videoFile" type="file" accept="video/*"><button id="simulate" disabled>Simülasyonu başlat</button><button id="stop" disabled>Durdur</button></div>
+<p>Gizlilik için seçtiğin video tarayıcıda yerel oynatılır; sunucuya yüklenmez. İnternet videosu kullanacaksan yalnızca kullanım lisansı uygun bir kaynak indirip seç.</p>
+<div class="stage"><video id="video" controls playsinline></video><div id="box"><span>SIMÜLASYON · olası duman</span></div></div>
+</section>
+<section class="panel"><h2>Demo telemetrisi</h2><div class="grid">
+<div><p>Algılama durumu</p><div class="metric" id="status">BEKLEMEDE</div></div>
+<div><p>Gösterilen tepki süresi</p><div class="metric" id="latency">—</div></div>
+<div><p>Konum</p><div class="metric">ÜRETİLMİYOR</div></div>
+</div><p id="detail">Video seçildiğinde demo kontrolleri etkinleşir.</p></section>
+</main>
+<script>
+const file=document.querySelector('#videoFile'),video=document.querySelector('#video'),box=document.querySelector('#box'),start=document.querySelector('#simulate'),stop=document.querySelector('#stop'),status=document.querySelector('#status'),latency=document.querySelector('#latency'),detail=document.querySelector('#detail');
+let objectUrl=null,timer=null,visible=false;
+file.addEventListener('change',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);const f=file.files&&file.files[0];if(!f)return;objectUrl=URL.createObjectURL(f);video.src=objectUrl;start.disabled=false;detail.textContent='Yerel video hazır. Başlat düğmesi yalnızca görsel simülasyonu çalıştırır.';status.textContent='HAZIR';});
+start.addEventListener('click',()=>{if(!video.src)return;clearInterval(timer);video.play().catch(()=>{});start.disabled=true;stop.disabled=false;status.textContent='SİMÜLASYON AKTİF';detail.textContent='Rastgele zamanlarda dekoratif kutu gösterilir; görüntü analizi yapılmaz.';timer=setInterval(()=>{visible=!visible;box.style.display=visible?'block':'none';latency.textContent=visible?(Math.floor(35+Math.random()*70)+' ms · simüle'):'—';if(visible)status.textContent='SİMÜLE EDİLEN OLAY';else status.textContent='OLAY GÖSTERİLMİYOR';},1250);});
+function halt(){clearInterval(timer);timer=null;box.style.display='none';video.pause();start.disabled=!video.src;stop.disabled=true;status.textContent='DURDURULDU';latency.textContent='—';}
+stop.addEventListener('click',halt);video.addEventListener('ended',halt);
+</script></body></html>
