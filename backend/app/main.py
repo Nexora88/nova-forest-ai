@@ -12,9 +12,10 @@ from app.api.environment_routes import router as environment_router
 from app.api.ml_routes import router as ml_router
 from app.api.jobs_routes import router as jobs_router
 from app.api.enterprise_reports import router as enterprise_reports_router
+from app.api.account_routes import router as account_router
 from app.engine.ml_fire_model import model_status as fire_model_status
 
-app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.3.1")
+app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.4.0")
 
 import os
 from app.security import security_middleware
@@ -58,6 +59,7 @@ app.include_router(environment_router)
 app.include_router(ml_router)
 app.include_router(jobs_router)
 app.include_router(enterprise_reports_router)
+app.include_router(account_router)
 
 
 @app.middleware("http")
@@ -77,7 +79,7 @@ def root():
     return {
         "system": "NexoraWildfire AI",
         "status": "api_ready",
-        "version": "1.3.1",
+        "version": "1.4.0",
         "upstream_data_verified": False,
         "capabilities": {
             "risk_routes": "registered",
