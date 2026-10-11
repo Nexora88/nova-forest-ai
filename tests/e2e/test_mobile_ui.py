@@ -280,10 +280,19 @@ class MobileUiSmokeTests(unittest.TestCase):
                           hasNovaStore: !!window.NovaStore
                         })"""))
                         raise
-                    self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "user-entered area names must not be translated")
+                    page.locator("#nexora-language-toggle").click()
+                    page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "area name changed after switching to English")
+                    page.locator("#nexora-language-toggle").click()
+                    page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "area name changed after switching back to Turkish")
                     page.reload(wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
-                    self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area")
                     page.locator("[data-delete]").click()
                     page.wait_for_function("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]').every(a=>a.name!=='QA Saved Area')", timeout=10000)
                     page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
