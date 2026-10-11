@@ -116,4 +116,5 @@ fileInput.addEventListener('change',()=>{if(objectUrl)URL.revokeObjectURL(object
 startButton.addEventListener('click',startDetection);stopButton.addEventListener('click',stopDetection);video.addEventListener('ended',stopDetection);video.addEventListener('pause',()=>{if(running){clearTimeout(loopTimer);loopTimer=setTimeout(detectNextFrame,250);}});
 checkConnection();
 </script>
+<script src="../js/i18n.js?v=20261011g"></script>
 </body></html>
