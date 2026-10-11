@@ -43,7 +43,7 @@
     if (lastLevel && lastInputs) {
       status.textContent = messages[lastLevel][tr ? "tr" : "en"];
       detail.textContent = tr
-        ? `Girdi: ${lastInputs.people} kişi · temsili genişlik ${lastInputs.widthLabel} · engel ${lastInputs.blockLabel}. Sonuç yalnızca basit bir karşılaştırma göstergesidir; gerçek rota verisi veya saha ölçümü kullanılmadı.`
+        ? `Girdi: ${lastInputs.people} kişi · temsili genişlik ${width.options[width.selectedIndex].textContent} · engel ${block.options[block.selectedIndex].textContent}. Sonuç yalnızca basit bir karşılaştırma göstergesidir; gerçek rota verisi veya saha ölçümü kullanılmadı.`
         : `Inputs: ${lastInputs.people} people · illustrative width ${width.options[width.selectedIndex].textContent} · obstruction ${block.options[block.selectedIndex].textContent}. This is only a simple comparison indicator; no real route data or field measurements were used.`;
     }
   }
