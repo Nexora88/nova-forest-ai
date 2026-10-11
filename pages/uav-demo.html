@@ -28,7 +28,7 @@ video{display:block;width:100%;max-height:65vh;background:#020805}#overlay{posit
 <section class="panel">
 <h2>1 · Model servisine bağlan</h2>
 <div class="api-row">
-<div class="field"><label for="apiBase">API taban adresi</label><input id="apiBase" type="text" inputmode="url" value="https://nova-forest-ai.vercel.app/api" autocomplete="url"></div>
+<div class="field"><label for="apiBase">API taban adresi</label><input id="apiBase" type="text" inputmode="url" value="" autocomplete="url"></div>
 <button id="connect">Bağlantıyı doğrula</button>
 </div>
 <p id="connectionText" class="small">Model servisi henüz doğrulanmadı.</p>
@@ -59,6 +59,7 @@ video{display:block;width:100%;max-height:65vh;background:#020805}#overlay{posit
 <script>
 const apiBase=document.querySelector('#apiBase'),connectButton=document.querySelector('#connect'),fileInput=document.querySelector('#videoFile'),video=document.querySelector('#video'),overlay=document.querySelector('#overlay'),startButton=document.querySelector('#start'),stopButton=document.querySelector('#stop'),confidence=document.querySelector('#confidence'),connectionText=document.querySelector('#connectionText'),modelStatus=document.querySelector('#modelStatus'),latency=document.querySelector('#latency'),count=document.querySelector('#count'),dimensions=document.querySelector('#dimensions'),detail=document.querySelector('#detail');
 const frameCanvas=document.createElement('canvas');let objectUrl=null,modelInfo=null,running=false,loopTimer=null,lastDetections=[];
+apiBase.value = location.hostname.endsWith('.vercel.app') ? location.origin + '/api' : 'https://nova-forest-ai.vercel.app/api';
 function baseUrl(){return apiBase.value.trim().replace(/\/+$/,'');}
 function setConnection(kind,message){connectionText.className='small '+kind;connectionText.textContent=message;}
 function responseError(data,status){const d=data&&data.detail;return typeof d==='string'?d:(d&&d.message)||((data&&data.message)||('HTTP '+status));}
