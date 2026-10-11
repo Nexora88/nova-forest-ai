@@ -236,17 +236,14 @@ class MobileUiSmokeTests(unittest.TestCase):
             with self.subTest(width=width):
                 context = self.browser.new_context(viewport={"width": width, "height": height}, locale="tr-TR")
                 context.add_init_script("""
-                    if (location.origin === 'http://127.0.0.1:4173') {
-                      const key = 'nexorawildfire-my-areas-v1';
-                      const rows = JSON.parse(localStorage.getItem(key) || '[]');
-                      if (!rows.some(area => String(area.id) === 'qa-area-1')) {
-                        rows.push({
-                          id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
-                          district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
-                          createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
-                        });
-                        localStorage.setItem(key, JSON.stringify(rows));
-                      }
+                    try {
+                      localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+                        id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
+                        district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                        createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                      }]));
+                    } catch (error) {
+                      window.__qaAreaFixtureError = String(error);
                     }
                 """)
                 page = context.new_page()
@@ -265,7 +262,9 @@ class MobileUiSmokeTests(unittest.TestCase):
                 page.route("**/*", route_request)
                 try:
                     page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
-                    # The context init script seeds the fixture before app scripts run.
+                    # Assert the fixture is present before diagnosing app rendering.
+                    self.assertTrue(page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1') || '[]').some(a => a.name === 'QA Saved Area')"),
+                                    page.evaluate("window.__qaAreaFixtureError || 'saved-area fixture was not seeded'"))
                     page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
                       .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
                     self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
