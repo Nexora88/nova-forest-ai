@@ -1,3 +1,20 @@
+(function(){
+  if (!window.L) {
+    const host = document.getElementById("map");
+    const status = document.querySelector("[data-map-status]");
+    const english = /^en(?:-|$)/i.test(document.documentElement.dataset.language || document.documentElement.lang || "tr");
+    if (host) {
+      host.innerHTML = "";
+      const notice = document.createElement("div");
+      notice.className = "map-unavailable";
+      notice.setAttribute("role", "status");
+      notice.style.cssText = "display:grid;place-items:center;min-height:240px;padding:24px;text-align:center;color:#dfffe7;background:#07110c;border:1px solid #245b36;border-radius:12px";
+      notice.textContent = english ? "The map library could not be loaded. Check your connection and reload; map data was not simulated." : "Harita kütüphanesi yüklenemedi. Bağlantını kontrol edip sayfayı yenile; harita verisi taklit edilmedi.";
+      host.appendChild(notice);
+    }
+    if (status) status.textContent = english ? "Map library unavailable" : "Harita kütüphanesi kullanılamıyor";
+    return;
+  }
 const API_BASE=(window.NOVA_API_BASE||"https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/,"");
 const provincePath=document.location.pathname.includes("/pages/")?"../data/turkiye_iller.geojson":"data/turkiye_iller.geojson";
 const districtPath=document.location.pathname.includes("/pages/")?"../data/admin/tur_admin2.geojson":"data/admin/tur_admin2.geojson";
@@ -292,3 +309,4 @@ function renderSavedAreas(){fieldLayer.clearLayers();const areas=JSON.parse(loca
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
 load();enableMobileMapGesture();setInterval(loadProvinceData,300000);
+\n})();\n
