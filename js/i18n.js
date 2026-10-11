@@ -1,6 +1,8 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
+    ["“Ormanları korumak, geleceği korumaktır.”","“Protecting forests means protecting the future.”"],
+    ["NexoraWildfire AI · Proje ilkesi","NexoraWildfire AI · Project principle"],
     ["Bilim, üretim ve toplumsal fayda için ilham.","Inspired by science, production, and public benefit."],
     ["Atatürk’ün bilim ve üretim vizyonuna ayrılan tarihî arşivi ve sözleri ayrı sayfada keşfet.","Explore the historical archive and quotations about Atatürk’s vision for science and production on a dedicated page."],
     ["Bilim ve üretim vizyonundan ilham alan bir çevresel gelecek.","An environmental future inspired by science and production."],
@@ -286,6 +288,7 @@
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
+    window.dispatchEvent(new CustomEvent("nexora:languagechange", { detail: { lang } }));
   }
   function init() {
     const button = document.createElement("button");
