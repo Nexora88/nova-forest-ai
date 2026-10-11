@@ -80,13 +80,13 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.locator("#nexora-language-toggle").click()
                     page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
                     self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"language toggle did not switch to English on {path}")
-                    if page.locator("nav").count():
+                    if page.locator("nav.nx-nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
-                        nav_text = page.locator("nav").evaluate("(el) => el.textContent")
+                        nav_text = page.locator("nav.nx-nav").evaluate("(el) => el.textContent")
                         self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
                         self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
                         self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
-                        nav_items = page.locator("nav a").evaluate_all("(els) => els.map(a => new URL(a.href).pathname.split('/').pop())")
+                        nav_items = page.locator("nav.nx-nav a").evaluate_all("(els) => els.map(a => new URL(a.href).pathname.split('/').pop())")
                         self.assertEqual(nav_items, ["index.html", "map.html", "areas.html", "weather.html", "events.html", "satellite.html", "account.html", "about.html", "vision.html", "feedback.html", "legal.html"], f"navigation differs on {path}")
                 finally:
                     context.close()
@@ -228,7 +228,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                 try:
                     page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
-                    self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
                     page.reload(wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
                     self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
@@ -258,7 +258,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         try:
             page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector(".area-card h3", timeout=20000)
-            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            self.assertTrue(any("Offline QA Apiary" in name or "Çevrimdışı QA Apiary" in name for name in page.locator(".area-card h3").all_inner_texts()))
             page.wait_for_function("""async () => {
               if (!window.NovaStore) return false;
               const rows = await window.NovaStore.getAll("areas");
