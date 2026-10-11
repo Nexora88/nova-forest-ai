@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from app.api.routes import router as general_router
 from app.api.risk_routes import router as risk_router
 from app.api.satellite_routes import router as satellite_router
 from app.api.weather_routes import router as weather_router
@@ -47,6 +48,7 @@ app.add_middleware(
 )
 
 
+app.include_router(general_router)
 app.include_router(risk_router)
 app.include_router(satellite_router)
 app.include_router(weather_router)
