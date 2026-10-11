@@ -1006,6 +1006,8 @@
     // data-tr/data-en is authoritative for simple labels. Do not immediately
     // reverse-translate the value just written from those attributes.
     const owner = node.parentElement;
+    // Names and text supplied by users are content, not interface copy.
+    if (owner?.closest?.("[data-no-translate],[data-user-content]")) return;
     if (owner?.matches?.("[data-tr][data-en]") && (owner.children.length === 0 || owner.dataset.nxExplicitTranslation === "true")) return;
     const current = node.nodeValue;
     let record = originals.get(node);
@@ -1050,6 +1052,7 @@
     if (root.nodeType === Node.ELEMENT_NODE && root.matches?.("[data-tr][data-en]")) nodes.push(root);
     root.querySelectorAll?.("[data-tr][data-en]").forEach(el => nodes.push(el));
     nodes.forEach(el => {
+      if (el.closest?.("[data-no-translate],[data-user-content]")) return;
       const value = lang === "en" ? el.dataset.en : el.dataset.tr;
       if (!value) return;
       if (el.children.length === 0) {
