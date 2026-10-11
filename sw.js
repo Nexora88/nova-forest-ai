@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v30";
+const CACHE_NAME = "nexorawildfire-shell-v31";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -22,7 +22,7 @@ const APP_SHELL = [
   "./css/field-ui.css",
   "./css/evacuation-sim.css?v=20261011b",
   "./js/map.js",
-  "./js/evacuation-sim.js?v=20261011c",
+  "./js/evacuation-sim.js?v=20261011d",
   "./js/global-nav.js?v=20261011c",
   "./js/mobile-nav.js?v=20261011b",
   "./js/pwa.js?v=20261011b",
@@ -33,12 +33,12 @@ const APP_SHELL = [
   "./js/notification-ui.js",
   "./js/onboarding.js",
   "./js/dashboard.js",
-  "./js/role-dashboard.js?v=20261011b",
+  "./js/role-dashboard.js?v=20261011c",
   "./js/map.js?v=20261011b",
   "./js/i18n.js?v=20261011i",
   "./js/i18n-extra.js?v=20261011c",
   "./js/asset-guard.js?v=20261011b",
-  "./js/auth.js?v=20261011d",
+  "./js/auth.js?v=20261011e",
   "./js/global-demo.js?v=20261011g",
   "./js/nova-storage.js",
   "./js/nova-offline-engine.js",
