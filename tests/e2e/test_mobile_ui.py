@@ -25,6 +25,10 @@ PAGES = [
     "/pages/enterprise.html",
     "/pages/account.html",
     "/pages/auth.html",
+    "/pages/legal.html",
+    "/pages/events.html",
+    "/pages/feedback.html",
+    "/pages/vision.html",
 ]
 
 
