@@ -9,7 +9,8 @@
     queensland: {name:"Queensland, Australia", lat:-27.4698, lon:153.0251},
     california: {name:"California, USA", lat:36.7783, lon:-119.4179}
   };
-  let weather = null, cameraStream = null, testVideoUrl = null, weatherRequestId = 0;\n  const ARCHIVE_VIDEO_URL = "https://eoimages.gsfc.nasa.gov/images/imagerecords/154000/154641/namblackcarbon_geos5_20250803.mp4";
+  let weather = null, cameraStream = null, testVideoUrl = null, weatherRequestId = 0;
+  const ARCHIVE_VIDEO_URL = "https://eoimages.gsfc.nasa.gov/images/imagerecords/154000/154641/namblackcarbon_geos5_20250803.mp4";
   const number = (v, digits=1) => Number.isFinite(Number(v)) ? Number(v).toFixed(digits) : "—";
   const setText = (id, value) => { const el=$(id); if(el) el.textContent=value; };
   const clip = (v,min,max) => Math.min(max,Math.max(min,v));
@@ -29,48 +30,64 @@
     el.style.color=kind==="error"?"#ff9999":kind==="warn"?"#ffd47a":"#9affb8";
   }
   async function loadWeather() {
-    const loc=LOCATIONS[$("atmo-region").value] || LOCATIONS.edirne;
-    setStatus("Open-Meteo verisi isteniyor","Requesting Open-Meteo data","warn");
-    setText("atmo-updated",T("Veri isteği sürüyor…","Request in progress…"));
-    const url=new URL("https://api.open-meteo.com/v1/forecast");
-    url.search=new URLSearchParams({
-      latitude:String(loc.lat),longitude:String(loc.lon),
-      current:"temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,precipitation",
-      hourly:"relative_humidity_2m,temperature_2m,wind_speed_10m",
-      past_days:"3",forecast_days:"1",timezone:"auto"
+    const requestId = ++weatherRequestId;
+    const loc = LOCATIONS[$("atmo-region").value] || LOCATIONS.edirne;
+    weather = null;
+    ["atmo-temp","atmo-humidity","atmo-wind","atmo-direction","atmo-score"].forEach(id => setText(id, "—"));
+    setText("atmo-risk-label", T("Veri bekleniyor", "Waiting for data"));
+    setText("atmo-model-status", T("GÖZLEM BEKLENİYOR", "AWAITING OBSERVATIONS"));
+    setText("atmo-contributions", T("Geçerli gözlem geldiğinde katkılar hesaplanır.", "Contributions will be calculated when valid observations arrive."));
+    setText("atmo-explanation", T("Model açıklaması burada görünecek.", "Model explanation will appear here."));
+    const ring = $("atmo-score-ring");
+    if (ring) ring.style.borderColor = "#254632";
+    setStatus("Open-Meteo verisi isteniyor", "Requesting Open-Meteo data", "warn");
+    setText("atmo-updated", T("Veri isteği sürüyor…", "Request in progress…"));
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.search = new URLSearchParams({
+      latitude: String(loc.lat), longitude: String(loc.lon),
+      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,precipitation",
+      hourly: "relative_humidity_2m,temperature_2m,wind_speed_10m",
+      past_days: "3", forecast_days: "1", timezone: "auto"
     }).toString();
     try {
-      const response=await fetch(url,{headers:{Accept:"application/json"}});
-      if(!response.ok) throw new Error("HTTP "+response.status);
-      const payload=await response.json();
-      const c=payload.current||{};
-      const required=[c.temperature_2m,c.relative_humidity_2m,c.wind_speed_10m,c.wind_direction_10m];
-      if(!required.every(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v)))) throw new Error("Incomplete current observation");
-      weather={location:loc,current:c,hourly:payload.hourly||{},units:payload.current_units||{},retrievedAt:new Date().toISOString()};
-      setText("atmo-temp",number(c.temperature_2m)+" °C");
-      setText("atmo-humidity",number(c.relative_humidity_2m,0)+" %");
-      setText("atmo-wind",number(c.wind_speed_10m)+" "+T("km/sa","km/h"));
-      setText("atmo-direction",number(c.wind_direction_10m,0)+"° · "+dirName(c.wind_direction_10m));
-      setText("atmo-temp-meta","Open-Meteo · "+(payload.current_units?.temperature_2m||"°C"));
-      setText("atmo-humidity-meta",T("Gözlem: ","Observed: ")+(c.time||"—"));
-      setText("atmo-wind-meta",T("Kaynak: Open-Meteo","Source: Open-Meteo"));
-      setText("atmo-updated",T("Son gözlem zamanı: ","Observation time: ")+(c.time||"—")+" · "+loc.name);
-      setStatus("GÜNCEL METEOROLOJİ ALINDI","CURRENT WEATHER RECEIVED","ok");
-      calculateRisk();
-      if($("atmo-origin-lat").value.trim()==="" && $("atmo-origin-lon").value.trim()==="") {
-        $("atmo-origin-lat").value=loc.lat; $("atmo-origin-lon").value=loc.lon;
+      const response = await fetch(url, {headers: {Accept: "application/json"}});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const payload = await response.json();
+      if (requestId !== weatherRequestId) return;
+      const c = payload.current || {};
+      const required = [c.temperature_2m, c.relative_humidity_2m, c.wind_speed_10m, c.wind_direction_10m];
+      if (!required.every(v => v !== null && v !== undefined && Number.isFinite(Number(v)))) {
+        throw new Error("Incomplete current observation");
       }
-      const originLat=Number($("atmo-origin-lat").value),originLon=Number($("atmo-origin-lon").value);
-      if(Number.isFinite(originLat)&&Number.isFinite(originLon)) updateWindArrow(c.wind_direction_10m);
+      weather = {location: loc, current: c, hourly: payload.hourly || {}, units: payload.current_units || {}, retrievedAt: new Date().toISOString()};
+      setText("atmo-temp", number(c.temperature_2m) + " °C");
+      setText("atmo-humidity", number(c.relative_humidity_2m, 0) + " %");
+      setText("atmo-wind", number(c.wind_speed_10m) + " " + T("km/sa", "km/h"));
+      setText("atmo-direction", number(c.wind_direction_10m, 0) + "° · " + dirName(c.wind_direction_10m));
+      setText("atmo-temp-meta", "Open-Meteo · " + (payload.current_units?.temperature_2m || "°C"));
+      setText("atmo-humidity-meta", T("Gözlem: ", "Observed: ") + (c.time || "—"));
+      setText("atmo-wind-meta", T("Kaynak: Open-Meteo", "Source: Open-Meteo"));
+      setText("atmo-updated", T("Son gözlem zamanı: ", "Observation time: ") + (c.time || "—") + " · " + loc.name);
+      setStatus("GÜNCEL METEOROLOJİ ALINDI", "CURRENT WEATHER RECEIVED", "ok");
+      calculateRisk();
+      if ($("atmo-origin-lat").value.trim() === "" && $("atmo-origin-lon").value.trim() === "") {
+        $("atmo-origin-lat").value = loc.lat;
+        $("atmo-origin-lon").value = loc.lon;
+      }
+      const originLat = Number($("atmo-origin-lat").value), originLon = Number($("atmo-origin-lon").value);
+      if (Number.isFinite(originLat) && Number.isFinite(originLon)) updateWindArrow(c.wind_direction_10m);
       updateHumidityTrend(payload.hourly);
-    } catch(error) {
-      weather=null;
-      ["atmo-temp","atmo-humidity","atmo-wind","atmo-direction"].forEach(id=>setText(id,"—"));
-      setText("atmo-model-status",T("GÖZLEM YOK","NO OBSERVATION"));
-      setText("atmo-contributions",T("Canlı meteoroloji alınamadı. Risk puanı hesaplanmadı.","Live weather unavailable. No risk score was calculated."));
-      setText("atmo-explanation",T("Bağlantı veya sağlayıcı sorunu: ","Connection/provider issue: ")+(error?.message||"unknown"));
-      setText("atmo-updated",T("Güncel veri alınamadı; sayısal değerler gösterilmiyor.","Current data unavailable; numeric values are not shown."));
-      setStatus("VERİ SAĞLAYICISI KULLANILAMIYOR","PROVIDER UNAVAILABLE","error");
+    } catch (error) {
+      if (requestId !== weatherRequestId) return;
+      weather = null;
+      ["atmo-temp","atmo-humidity","atmo-wind","atmo-direction","atmo-score"].forEach(id => setText(id, "—"));
+      setText("atmo-risk-label", T("Veri gerekli", "Data required"));
+      setText("atmo-model-status", T("GÖZLEM YOK", "NO OBSERVATION"));
+      setText("atmo-contributions", T("Canlı meteoroloji alınamadı. Risk puanı hesaplanmadı.", "Live weather unavailable. No risk score was calculated."));
+      setText("atmo-explanation", T("Bağlantı veya sağlayıcı sorunu: ", "Connection/provider issue: ") + (error?.message || "unknown"));
+      setText("atmo-updated", T("Güncel veri alınamadı; sayısal değerler gösterilmiyor.", "Current data unavailable; numeric values are not shown."));
+      if (ring) ring.style.borderColor = "#254632";
+      setStatus("VERİ SAĞLAYICISI KULLANILAMIYOR", "PROVIDER UNAVAILABLE", "error");
     }
   }
   function updateHumidityTrend(hourly) {
@@ -161,23 +178,40 @@
     const origin=$("atmo-map-origin");origin.title=T("Senaryo merkezi: ","Scenario origin: ")+lat+", "+lon;
   }
   async function startCamera() {
-    const status=$("atmo-camera-status");
-    if(!navigator.mediaDevices?.getUserMedia) {status.textContent=T("Bu tarayıcı güvenli kamera erişimini desteklemiyor. HTTPS üzerinden dene.","This browser does not support secure camera access. Try HTTPS.");return;}
+    const status = $("atmo-camera-status");
+    if (!navigator.mediaDevices?.getUserMedia) {
+      status.textContent = T("Bu tarayıcı güvenli kamera erişimini desteklemiyor. HTTPS üzerinden dene.", "This browser does not support secure camera access. Try HTTPS.");
+      return;
+    }
     try {
-      cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
-      $("atmo-camera-video").removeAttribute("src");$("atmo-camera-video").load();$("atmo-camera-video").controls=false;
-      $("atmo-camera-video").srcObject=cameraStream;
-      $("atmo-camera-start").disabled=true;$("atmo-camera-stop").disabled=false;
-      status.textContent=T("Yerel kamera açık. YOLOv8 algılaması bağlı değil; nesne tespiti yapılmıyor.","Local camera active. YOLOv8 is not connected; no object detection is running.");
-    } catch(error) {
-      status.textContent=T("Kamera açılamadı: ","Camera could not start: ")+(error?.name||error?.message||"permission unavailable");
+      cameraStream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}, audio: false});
+      const video = $("atmo-camera-video");
+      video.pause();
+      video.controls = false;
+      video.srcObject = cameraStream;
+      $("atmo-camera-start").disabled = true;
+      $("atmo-camera-stop").disabled = false;
+      status.textContent = T("Yerel kamera açık. YOLOv8 algılaması bağlı değil; nesne tespiti yapılmıyor.", "Local camera active. YOLOv8 is not connected; no object detection is running.");
+    } catch (error) {
+      status.textContent = T("Kamera açılamadı: ", "Camera could not start: ") + (error?.name || error?.message || "permission unavailable");
     }
   }
   function stopCamera() {
-    if(cameraStream) cameraStream.getTracks().forEach(track=>track.stop());
-    cameraStream=null;$("atmo-camera-video").srcObject=null;
-    $("atmo-camera-start").disabled=false;$("atmo-camera-stop").disabled=true;
-    setText("atmo-camera-status",T("Kamera kapalı","Camera is off"));
+    const wasCameraActive = Boolean(cameraStream);
+    if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+    const video = $("atmo-camera-video");
+    if (video) {
+      video.srcObject = null;
+      if (wasCameraActive && !testVideoUrl) {
+        video.src = ARCHIVE_VIDEO_URL;
+        video.controls = true;
+        video.load();
+      }
+    }
+    $("atmo-camera-start").disabled = false;
+    $("atmo-camera-stop").disabled = true;
+    setText("atmo-camera-status", T("Kamera kapalı", "Camera is off"));
   }
   function chooseVideo(file) {
     if(testVideoUrl) URL.revokeObjectURL(testVideoUrl);
