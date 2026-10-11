@@ -95,4 +95,4 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.3.1"}
+    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.4.0"}
