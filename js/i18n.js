@@ -483,14 +483,14 @@
     for (const [from,to] of entries) {
       if (!from) continue;
       let cursor = 0, result = "", found = -1;
-      const startsWord = /[\\p{L}\\p{N}_]/u.test(from[0]);
-      const endsWord = /[\\p{L}\\p{N}_]/u.test(from[from.length - 1]);
+      const startsWord = /[\p{L}\p{N}_]/u.test(from[0]);
+      const endsWord = /[\p{L}\p{N}_]/u.test(from[from.length - 1]);
       while ((found = out.indexOf(from, cursor)) !== -1) {
         const before = found > 0 ? out[found - 1] : "";
         const afterIndex = found + from.length;
         const after = afterIndex < out.length ? out[afterIndex] : "";
-        const leftOk = !startsWord || !before || !/[\\p{L}\\p{N}_]/u.test(before);
-        const rightOk = !endsWord || !after || !/[\\p{L}\\p{N}_]/u.test(after);
+        const leftOk = !startsWord || !before || !/[\p{L}\p{N}_]/u.test(before);
+        const rightOk = !endsWord || !after || !/[\p{L}\p{N}_]/u.test(after);
         if (leftOk && rightOk) {
           result += out.slice(cursor, found) + to;
           cursor = afterIndex;
