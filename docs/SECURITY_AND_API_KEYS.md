@@ -38,6 +38,14 @@
 - Provider diagnostics return credential status and error type, not secret values.
 - Heavy satellite/GIS jobs are intended to run on a separately authenticated worker, not in a public synchronous request.
 
+## Supabase audit notes — 2026-10-11
+
+- The `public.nexora_is_dm_participant(uuid)` function checks that `auth.uid()` is present and that the caller is a participant. It is referenced by existing row-level security policies; blindly removing authenticated execution could break those policies.
+- The `public.nexora_start_dm(text)` function checks authentication, validates the recipient handle, prevents self-messaging, and creates or reuses a conversation. It is a privileged RPC, so its exposure should remain intentional and be re-tested with two test accounts and unauthorized inputs.
+- Both functions remain flagged by Supabase Security Advisor because authenticated users can execute SECURITY DEFINER functions. This is not marked resolved; consider moving the participant helper into a non-exposed schema and designing grants/policies carefully before changing the public RPC.
+- Leaked-password protection remains disabled according to Security Advisor. Enable it in **Supabase Dashboard → Authentication → Settings / Password Security** if the project's plan supports it. Official guide: https://supabase.com/docs/guides/auth/password-security
+- Added and verified indexes on `nexora_dm_conversations(created_by)` and `nexora_dm_messages(sender_id)` to address the missing foreign-key index findings. Advisor usage counters may still report them unused until relevant queries run.
+
 ## Known limitations — do not mistake these controls for a guarantee
 
 - The Python in-process rate limiter is a burst guard only. Serverless instances do not share counters, and it is not a DDoS/WAF replacement. Enable hosting-edge attack protection/WAF and shared rate limiting for production.
