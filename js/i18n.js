@@ -574,6 +574,26 @@
     ["Veri kaynağı:","Data source:"],["Bu göstergeler resmî yangın uyarısı değildir.","These indicators are not official wildfire warnings."],
     ["Veri eksikliği, NDVI/NDMI değerinin sıfır olduğu anlamına gelmez.","Missing data does not mean NDVI/NDMI equals zero."]
 
+
+    ["İHA / Gerçek YOLOv8 · NexoraWildfire AI","UAV / Real YOLOv8 · NexoraWildfire AI"],
+    ["NexoraWildfire AI gerçek YOLOv8 yangın ve duman görüntü çıkarımı laboratuvarı.","NexoraWildfire AI real YOLOv8 fire and smoke image-inference lab."],
+    ["Gerçek YOLOv8 yangın/duman çıkarım laboratuvarı.","Real YOLOv8 fire/smoke inference lab."],
+    ["1 · Model servisine bağlan","1 · Connect to model service"],["API taban adresi","API base URL"],["Bağlantıyı doğrula","Verify connection"],
+    ["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."],["Model servisi kontrol ediliyor…","Checking model service…"],
+    ["2 · Video seç ve gerçek çıkarımı çalıştır","2 · Select a video and run real inference"],["Cihazından video seç:","Choose a video from your device:"],
+    ["Güven eşiği","Confidence threshold"],["Gerçek algılamayı başlat","Start real detection"],["Durdur","Stop"],
+    ["3 · Gerçek API telemetrisi","3 · Real API telemetry"],["Model durumu","Model status"],["Son çıkarım süresi","Last inference time"],
+    ["Son karedeki algılamalar","Detections in last frame"],["Son kare çözünürlüğü","Last frame resolution"],
+    ["Bağlantı doğrulaması bekleniyor.","Waiting for connection verification."],
+    ["Model çalışma ortamı kurulu değil. ML container içinde backend/requirements-ml.txt dosyasını yükleyin.","The YOLO runtime is not installed. Install backend/requirements-ml.txt in the ML container."],
+    ["Araştırma modeli Türkiye'deki saha koşulları için bağımsız olarak doğrulanmamıştır; resmi yangın alarmı değildir.","This research model has not been independently validated for field conditions in Türkiye; it is not an official fire alarm."],
+    ["Model kaynağı ayarlı; ağırlıklar ilk gerçek çıkarım isteğinde yüklenecek.","Model source is configured; weights will load on the first real inference request."],
+    ["Gerçek model çıkarımıdır; GPS konumu üretmez ve Türkiye saha koşullarında bağımsız doğrulanmamıştır. Resmi uyarı sistemi değildir.","This is real model inference; it does not produce GPS coordinates and has not been independently validated in Türkiye. It is not an official warning system."],
+    ["Bu analiz edilen karede model fire/smoke kutusu döndürmedi; bu, yangın olmadığını kanıtlamaz.","The model returned no fire/smoke boxes for this frame; that does not prove there is no fire."],
+    ["Kare JPEG olarak hazırlanamadı.","Could not prepare the frame as JPEG."],["Video oynatılamadı:","Could not play video:"],
+    ["Yerel video hazır. Kareler yalnızca gerçek algılama başlatıldığında API adresine gönderilir.","Local video is ready. Frames are sent to the API only when real detection starts."],
+    ["Yerel video","Local video"],["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."]
+
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
