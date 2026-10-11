@@ -22,6 +22,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for JavaScript syntax checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check changed JavaScript syntax
+        run: |
+          node --check js/field-events.js
+          node --check js/i18n.js
+          node --check js/mobile-nav.js
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
