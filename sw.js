@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v39";
+const CACHE_NAME = "nexorawildfire-shell-v40";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -23,8 +23,8 @@ const APP_SHELL = [
   "./css/evacuation-sim.css?v=20261011c",
   "./js/map.js",
   "./js/evacuation-sim.js?v=20261011e",
-  "./js/global-nav.js?v=20261011d",
-  "./js/mobile-nav.js?v=20261011c",
+  "./js/global-nav.js?v=20261011e",
+  "./js/mobile-nav.js?v=20261011d",
   "./js/pwa.js?v=20261011b",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js",
@@ -37,11 +37,11 @@ const APP_SHELL = [
   "./js/dashboard.js",
   "./js/role-dashboard.js?v=20261011c",
   "./js/map.js?v=20261011c",
-  "./js/i18n.js?v=20261011m",
-  "./js/i18n-extra.js?v=20261011d",
+  "./js/i18n.js?v=20261011n",
+  "./js/i18n-extra.js?v=20261011e",
   "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011f",
-  "./js/global-demo.js?v=20261011h",
+  "./js/global-demo.js?v=20261011i",
   "./js/nova-storage.js?v=20261011b",
   "./js/nova-offline-engine.js?v=20261011b",
   "./js/install-update.js?v=20261011b",
