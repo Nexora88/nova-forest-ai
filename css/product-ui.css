@@ -3,3 +3,6 @@
 /* saved fields are deliberately distinct from environmental layers */
 .leaflet-overlay-pane .nova-saved-field{stroke:#8a6cff!important;fill:#8a6cff!important;fill-opacity:.18!important;stroke-width:3!important}.saved-field-label{background:#0b0618!important;color:#c9bfff!important;border:1px solid #8a6cff!important;box-shadow:0 0 12px rgba(138,108,255,.35)}
 @media(max-width:900px){.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nav-brand{display:none}.brand-lockup img{width:40px;height:40px}.logo p{font-size:11px}}@media(max-width:600px){.product-center{padding:22px}.product-grid{grid-template-columns:1fr}.product-center h2{font-size:27px}.brand-lockup{gap:9px}.brand-parent{font-size:8px}.logo h1{font-size:22px!important;letter-spacing:2px!important}}
+
+/* Compact shared brand lockup on narrow phones. */
+@media(max-width:600px){header{min-width:0;flex-wrap:wrap;align-items:flex-start;gap:8px}.brand-lockup{min-width:0;max-width:100%;flex:1 1 100%;gap:8px}.brand-lockup img{width:34px;height:34px;flex:0 0 34px}.brand-lockup .logo{min-width:0;max-width:100%}.brand-lockup .logo h1,.logo h1{font-size:clamp(15px,4.2vw,18px)!important;letter-spacing:0!important;overflow-wrap:anywhere}.brand-lockup .logo p{max-width:100%;white-space:normal;overflow-wrap:anywhere}.status{max-width:100%;white-space:normal;overflow-wrap:anywhere}}
