@@ -52,13 +52,31 @@
   document.getElementById("ndvi-clear").addEventListener("click",()=>{points.length=0;redraw();resultEl.replaceChildren();const h=document.createElement("strong");h.textContent=t("resultTitle");const p=document.createElement("p");p.textContent=t("resultHint");resultEl.append(h,p)});
   document.getElementById("ndvi-analyze").addEventListener("click",async()=>{
     if(points.length<3){statusEl.textContent=t("needPoints");return}
+    const session=window.NovaAuth?.session?.();
+    if(!session?.access_token){statusEl.textContent=isTr()?"Kuyruklu uydu analizi için lütfen hesabınıza giriş yapın.":"Please sign in to run queued satellite analysis.";return}
     const ring=points.map(p=>[p[1],p[0]]);ring.push([...ring[0]]);
     statusEl.textContent=t("working");
     const button=document.getElementById("ndvi-analyze");button.disabled=true;
     try{
-      const response=await fetch(API_BASE+"/ndvi/area-analysis",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({geometry:{type:"Polygon",coordinates:[ring]},days:180,interval:"P30D"})});
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok)throw new Error("HTTP "+response.status+(data.detail?": "+(typeof data.detail==="string"?data.detail:JSON.stringify(data.detail)):""));
+      const headers={"Content-Type":"application/json","Authorization":"Bearer "+session.access_token};
+      const response=await fetch(API_BASE+"/jobs/ndvi-timeseries",{method:"POST",headers,body:JSON.stringify({geometry:{type:"Polygon",coordinates:[ring]},days:180,interval:"P30D"})});
+      const queued=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error("HTTP "+response.status+(queued.detail?": "+(typeof queued.detail==="string"?queued.detail:JSON.stringify(queued.detail)):""));
+      if(!queued.job_id)throw new Error("Worker did not return a job ID.");
+      let data=null;
+      for(let attempt=0;attempt<90;attempt++){
+        await new Promise(resolve=>setTimeout(resolve,2500));
+        const poll=await fetch(API_BASE+"/jobs/"+encodeURIComponent(queued.job_id),{headers:{"Authorization":"Bearer "+session.access_token}});
+        const job=await poll.json().catch(()=>({}));
+        if(!poll.ok)throw new Error("HTTP "+poll.status+(job.detail?": "+(typeof job.detail==="string"?job.detail:JSON.stringify(job.detail)):""));
+        if(job.status==="failed")throw new Error(job.message||"Background NDVI job failed.");
+        if(job.status==="completed"){
+          if(job.kind!=="ndvi-timeseries")throw new Error("Worker returned an unexpected job type.");
+          data=job.analysis||null;break;
+        }
+        statusEl.textContent=(isTr()?"Uydu analizi sırada/çalışıyor · ":"Satellite analysis queued/running · ")+(attempt+1)+"/90";
+      }
+      if(!data)throw new Error(isTr()?"Analiz zaman aşımına uğradı. Daha sonra tekrar deneyin.":"Analysis timed out. Please try again later.");
       resultEl.replaceChildren();
       const title=document.createElement("strong");title.textContent=t("resultTitle");resultEl.appendChild(title);
       const summary=document.createElement("p");summary.textContent="Status: "+(data.status||"unknown")+" · "+(data.source||"Copernicus Sentinel-2");resultEl.appendChild(summary);
