@@ -546,7 +546,7 @@
     // data-tr/data-en is authoritative for simple labels. Do not immediately
     // reverse-translate the value just written from those attributes.
     const owner = node.parentElement;
-    if (owner?.matches?.("[data-tr][data-en]") && owner.children.length === 0) return;
+    if (owner?.matches?.("[data-tr][data-en]") && (owner.children.length === 0 || owner.dataset.nxExplicitTranslation === "true")) return;
     const current = node.nodeValue;
     let record = originals.get(node);
     if (!record) {
@@ -597,6 +597,7 @@
         !child.textContent.trim()
       );
       if (directText.length === 1 && decorativeChildren) {
+        el.dataset.nxExplicitTranslation = "true";
         if (directText[0].nodeValue !== value) directText[0].nodeValue = value;
       } else {
         el.childNodes.forEach(node => {
