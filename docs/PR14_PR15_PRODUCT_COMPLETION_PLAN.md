@@ -100,6 +100,17 @@ Then rerun diagnostics and prove all of the following with response metadata, no
 
 If any owner-only configuration or legal review is unavailable, keep the release in preview/beta and list the blocker clearly. Do not waive a gate by changing a failing test into a skip.
 
+## PR #15 security audit snapshot (2026-10-11)
+
+Read-only inspection of the connected Supabase project found:
+- `public.nexora_is_dm_participant(uuid)` and `public.nexora_start_dm(text)` are `SECURITY DEFINER` functions executable by `authenticated`, but not by `anon`.
+- Both function bodies check `auth.uid()`; the DM starter validates the handle and schema-qualifies table references. Their prior `search_path` was `public, pg_temp`.
+- Existing DM RLS policies depend on the participant helper. Blindly revoking authenticated execution or switching the helper to `SECURITY INVOKER` could break the membership checks.
+- PR #15 pins the search path to `pg_catalog, public, pg_temp`, explicitly revokes execution from `PUBLIC` and `anon`, and preserves `authenticated` execution. Re-run Supabase security advisors and verify member/non-member behavior after applying the migration.
+- Supabase security advisor also reports leaked-password protection disabled. Enable it in the Supabase Auth dashboard; the SQL migration does not change this setting.
+
+Vercel environment-variable inventory for project `nova-forest-ai` returned no listed variables at the time of this check. Provider setup remains outstanding until the owner adds server-side secrets and live diagnostics verify them. Required names: `FIRMS_MAP_KEY`, `CDSE_CLIENT_ID`, and `CDSE_CLIENT_SECRET`. For pre-production testing only, the provider workflow uses GitHub Actions variable `NEXORA_PROVIDER_TEST_API_BASE` (the current Vercel preview API base ending in `/api`) and, only if preview SSO protection requires it, secret `VERCEL_AUTOMATION_BYPASS_SECRET`. Keep actual provider credentials only in Vercel Preview settings; do not duplicate them into GitHub Actions.
+
 ## Explicit non-goals for these two PRs
 - No new feature just to increase feature count.
 - No claims of accurate fire prediction, worldwide validation, official emergency alerts, or guaranteed safety.
