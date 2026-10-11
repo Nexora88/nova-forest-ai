@@ -94,7 +94,30 @@
     window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{reason:"deleted",id:key,pendingCloudDelete:!!session&&!navigator.onLine}}));
   }
   function requireAccount(next){if(session)return true;location.href=accountHref()+"?next="+encodeURIComponent(next||location.pathname+location.search);return false}
-  async function start(){if(!init()){window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session:null,profile:null,available:false}}));return}const {data}=await client.auth.getSession();session=data.session;if(session){profile=cachedProfile(session.user.id);if(profile){renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile,cached:true}}))}try{await ensureProfile();renderBadge();window.dispatchEvent(new CustomEvent("nova:profile-updated",{detail:profile}));syncAreas().catch(e=>console.warn("Nexora area sync",e))}catch(e){console.warn("Nexora account sync",e)}}renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile}}));client.auth.onAuthStateChange((_event,s)=>{session=s;setTimeout(async()=>{try{if(s){profile=cachedProfile(s.user.id);renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile,cached:!!profile}}));await ensureProfile();syncAreas().catch(e=>console.warn("Nexora area sync",e))}else{profile=null;try{localStorage.removeItem(PROFILE_CACHE_KEY)}catch{}}}catch(e){console.warn("Nexora auth",e)}renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile}}))},0)});}
+  async function syncLegalAcceptance(){
+    if(!client||!session?.user)return;
+    let saved=null;
+    try{saved=JSON.parse(localStorage.getItem("nexora-legal-acceptance-v1")||"null")}catch{}
+    if(!saved?.acceptedAt||!saved?.safetyAcceptedAt)return;
+    const marker="nexorawildfire-legal-synced:"+session.user.id+":"+String(saved.version||"draft")+":"+saved.acceptedAt;
+    try{if(localStorage.getItem(marker)==="1")return}catch{}
+    const row={
+      user_id:session.user.id,
+      notice_version:String(saved.version||"draft"),
+      terms_version:String(saved.termsVersion||saved.version||"draft"),
+      disclaimer_version:String(saved.disclaimerVersion||saved.version||"draft"),
+      language:saved.language==="en"?"en":"tr",
+      accepted_at:saved.acceptedAt,
+      safety_accepted_at:saved.safetyAcceptedAt
+    };
+    const {error}=await client.from("nexorawildfire_legal_acceptances").insert(row);
+    if(!error||error.code==="23505"){
+      try{localStorage.setItem(marker,"1")}catch{}
+    }else{
+      console.warn("Nexora legal acceptance could not be synced to the user's private record",error.message||error.code||"unknown error");
+    }
+  }
+  async function start(){if(!init()){window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session:null,profile:null,available:false}}));return}const {data}=await client.auth.getSession();session=data.session;if(session){await syncLegalAcceptance().catch(e=>console.warn("Nexora legal acceptance sync",e));profile=cachedProfile(session.user.id);if(profile){renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile,cached:true}}))}try{await ensureProfile();renderBadge();window.dispatchEvent(new CustomEvent("nova:profile-updated",{detail:profile}));syncAreas().catch(e=>console.warn("Nexora area sync",e))}catch(e){console.warn("Nexora account sync",e)}}renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile}}));client.auth.onAuthStateChange((_event,s)=>{session=s;setTimeout(async()=>{try{if(s){await syncLegalAcceptance().catch(e=>console.warn("Nexora legal acceptance sync",e));profile=cachedProfile(s.user.id);renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile,cached:!!profile}}));await ensureProfile();syncAreas().catch(e=>console.warn("Nexora area sync",e))}else{profile=null;try{localStorage.removeItem(PROFILE_CACHE_KEY)}catch{}}}catch(e){console.warn("Nexora auth",e)}renderBadge();window.dispatchEvent(new CustomEvent("nova:auth-ready",{detail:{session,profile}}))},0)});}
   async function awardSeed(action,eventKey){if(!client||!session)throw new Error("not_authenticated");const {data,error}=await client.rpc("award_nexorawildfire_seed",{p_action:action,p_event_key:eventKey});if(error)throw error;return data} async function getSeedWallet(){if(!client||!session)return {points:0,history:[]};const {data,error}=await client.rpc("get_nexorawildfire_seed_wallet");if(error)throw error;return data||{points:0,history:[]}}
   window.NovaAuth={client:()=>client,session:()=>session,profile:()=>profile,displayName,signOut:()=>client?.auth.signOut(),saveProfile,syncAreas,saveArea,deleteArea,requireAccount,isLoggedIn:()=>!!session,awardSeed,getSeedWallet};
   // A sync attempt can fail while offline; retry once connectivity returns without discarding local copies.
