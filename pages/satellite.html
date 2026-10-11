@@ -75,7 +75,7 @@
   updateLabels();
   setTimeout(()=>map.invalidateSize(),100);
  }
- const leafletScript=Array.from(document.scripts).find(s=>/leaflet\\.js/.test(s.src));
+ const leafletScript=Array.from(document.scripts).find(s=>/leaflet\.js/.test(s.src));
  if(typeof L==="undefined"&&leafletScript)leafletScript.addEventListener("load",init,{once:true});else init();
 })();
 </script>
