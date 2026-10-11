@@ -20,7 +20,7 @@
   function renderBadge(){
     document.querySelector(".nova-account-dock")?.remove();
     const dock=document.createElement("a");dock.className="nova-account-dock";dock.href=accountHref();dock.title=session?"Profil ve saha merkezi":"Hesap oluştur / giriş yap";
-    const img=avatar();dock.innerHTML=img?'<img src="'+esc(img)+'" alt="Profil">':'<span class="nova-avatar-fallback">'+esc(initials())+'</span>';
+    const img=avatar();dock.innerHTML=img?'<img src="'+esc(img)+'" alt="Profil" loading="lazy" referrerpolicy="no-referrer">':'<span class="nova-avatar-fallback">'+esc(initials())+'</span>';const avatarImg=dock.querySelector("img");if(avatarImg)avatarImg.addEventListener("error",()=>{const fallback=document.createElement("span");fallback.className="nova-avatar-fallback";fallback.textContent=initials();avatarImg.replaceWith(fallback)},{once:true});
     dock.insertAdjacentHTML("beforeend",'<span><b>'+(session?esc(displayName()):"HESAP")+'</b><small>'+(session?"Saha profili":"Giriş / kayıt")+'</small></span>');
     document.body.appendChild(dock);
   }
