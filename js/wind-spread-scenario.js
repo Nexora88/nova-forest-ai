@@ -51,7 +51,7 @@
     cards.replaceChildren();
     [30,60,120].forEach(minutes=>{
       const hours=minutes/60, distance=baseRate*hours*factor, point=destination(lat,lon,bearing,distance);
-      const article=document.createElement("article");article.className="atmo-scenario-card";
+      const article=document.createElement("article");article.className="atmo-wind-card";
       const title=document.createElement("span");title.textContent=minutes+" "+text("dakika","minutes");
       const strong=document.createElement("strong");strong.textContent=num(distance,2)+" km";
       const direction=document.createElement("small");direction.textContent=text("Rüzgâr yönünde yaklaşık mesafe","Approximate downwind distance")+" · "+num(bearing,0)+"° "+compass(bearing);
