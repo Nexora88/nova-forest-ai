@@ -8,6 +8,6 @@ def test_live_regions_endpoint_is_registered():
 
 
 def test_health_and_satellite_diagnostics_remain_registered():
-    paths = {route.path for route in app.routes}
+    paths = set(app.openapi()['paths'])
     assert "/health" in paths
     assert any(path.endswith("/live-check") for path in paths)
