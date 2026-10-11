@@ -54,7 +54,12 @@ async function removeArea(id){
   if(isUuid && window.NovaAuth?.isLoggedIn()) await window.NovaAuth.deleteArea(key);
   areaCache=areaCache.filter(a=>String(a.id)!==key);
   localStorage.setItem(KEY,JSON.stringify(areaCache));
-  try{await window.NovaStore.remove("areas",key)}catch(e){console.warn("Local area cleanup",e)}
+  try {
+    await Promise.race([
+      window.NovaStore.remove("areas",key),
+      new Promise(resolve=>setTimeout(resolve,500))
+    ]);
+  } catch(e){console.warn("Local area cleanup",e)}
   window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{reason:"deleted",id:key}}));
 }
 
@@ -152,6 +157,17 @@ function bindAreaDeleteButtons(){
 }
 async function render(){
   const renderVersion=++areaRenderVersion;
+  // Paint the synchronous cache before awaiting IndexedDB. This keeps saved
+  // names and delete controls available even if the storage layer stalls.
+  let cached=[];
+  try{cached=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
+  if(Array.isArray(cached)&&cached.length){
+    areaCache=cached.filter(a=>a&&a.id!=null);
+    countEl.textContent=areaCache.length+" alan";
+    emptyEl.style.display="none";
+    areasEl.innerHTML=areaCache.map(a=>'<article class="area-card area-card-loading"><div class="area-card-head"><div><div class="eyebrow">'+esc(a.type||"ALAN")+'</div><h3>'+esc(a.name)+'</h3><p>'+[a.province,a.district].filter(Boolean).map(esc).join(" · ")+'</p></div><button data-delete="'+esc(a.id)+'">Sil</button></div><p role="status">Alan kaydı yüklendi; çevresel göstergeler kontrol ediliyor…</p></article>').join("");
+    bindAreaDeleteButtons();
+  }
   const areas=await loadAreas();
   if(renderVersion!==areaRenderVersion)return;
   countEl.textContent=areas.length+" alan";
