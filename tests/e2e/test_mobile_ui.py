@@ -182,10 +182,10 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.wait_for_selector("[data-global-form]", timeout=20000)
-            page.locator("[data-lat]").fill("38.375")
-            page.locator("[data-lon]").fill("-122.375")
+            page.locator("[data-lat]").fill("-27.4698")
+            page.locator("[data-lon]").fill("153.0251")
             page.locator("[data-global-form] button[type=submit]").click()
-            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates 38.375, -122.375')", timeout=10000)
+            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates -27.4698, 153.0251')", timeout=10000)
             self.assertIn("Open-Meteo unavailable", page.locator("[data-global-demo-status]").inner_text())
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
         finally:
