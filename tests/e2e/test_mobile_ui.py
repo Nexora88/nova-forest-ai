@@ -26,6 +26,7 @@ PAGES = [
     "/pages/account.html",
     "/pages/auth.html",
 ]
+ALL_UI_PAGES = PAGES + ["/pages/feedback.html", "/pages/vision.html", "/pages/uav-demo.html"]
 
 
 class MobileUiSmokeTests(unittest.TestCase):
@@ -79,6 +80,22 @@ class MobileUiSmokeTests(unittest.TestCase):
                         self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
                         self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
                         self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
+                finally:
+                    context.close()
+
+    def test_all_public_pages_support_bilingual_ui_and_mobile_widths(self):
+        for path in ALL_UI_PAGES:
+            with self.subTest(path=path):
+                context, page = self.new_page()
+                try:
+                    page.goto(BASE + path, wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector("#nexora-language-toggle", timeout=10000)
+                    page.wait_for_function("document.documentElement.lang === 'en'", timeout=10000)
+                    page.locator("#nexora-language-toggle").click()
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"Turkish toggle failed on {path}")
+                    page.locator("#nexora-language-toggle").click()
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"English toggle failed on {path}")
+                    self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 391, f"horizontal overflow on mobile page {path}")
                 finally:
                     context.close()
 
