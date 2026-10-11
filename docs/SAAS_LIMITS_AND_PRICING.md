@@ -29,6 +29,26 @@ If the worker rejects or cannot accept a job, the API attempts to release that r
 - Payment collection and automatic plan upgrades are disabled. The prices shown in the product are intentionally marked as undecided; do not advertise Pro or Enterprise as purchasable yet.
 - This metering is not a universal request quota. It limits the expensive queued analysis endpoints above, not every public data endpoint.
 
+## Cost-based price calculation
+
+Do not set public prices from competitor guesses or round numbers alone. Collect measurements from a controlled pilot first. Keep this worksheet updated with dated invoices, usage exports, and successful/failed job counts.
+
+| Cost input | How to measure it | Pricing treatment |
+| --- | --- | --- |
+| Hosting and backend baseline | Monthly invoice divided by active paying accounts, with a conservative low-user scenario | Shared fixed cost |
+| Database, storage, and egress | Actual provider usage and billing export | Allocate by measured usage |
+| NDVI / raster / enterprise report jobs | Worker runtime, memory, storage, retries, and successful jobs per feature | Feature-level variable cost |
+| External data providers | Contract, API plan, quota, and any per-request or processing fee | Direct cost of the feature that uses it |
+| Email, SMS, and push delivery | Real provider price and measured send volume | Separate notification cost where applicable |
+| Payment processing, taxes, refunds, and chargebacks | Confirm with the payment provider and qualified adult support before launch | Include before finalizing the net price |
+| Support, monitoring, backups, and security | Monthly invoices plus a reasonable maintenance reserve | Shared operating cost and contingency |
+
+For each plan, estimate **monthly cost per account** as allocated shared costs + measured feature usage + provider fees + notification/payment costs + a documented contingency. Set a price only after deciding a target gross margin and checking a realistic low-volume scenario. A simple starting formula is:
+
+`minimum net revenue per account = expected monthly cost per account / (1 - target gross margin)`
+
+This is a planning formula, not a price recommendation. Taxes, payment fees, refunds, currency conversion, and local commercial obligations can change the required public price. Do not advertise a plan as purchasable until measured costs, limits, terms, cancellation, and adult-supported commercial requirements have been reviewed.
+
 ## Before public paid launch
 
 1. Measure compute/worker cost and external data-provider cost per successful job.
