@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v24";
+const CACHE_NAME = "nexorawildfire-shell-v25";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -21,7 +21,7 @@ const APP_SHELL = [
   "./css/field-ui.css",
   "./css/evacuation-sim.css?v=20261011b",
   "./js/map.js",
-  "./js/evacuation-sim.js?v=20261011b",
+  "./js/evacuation-sim.js?v=20261011c",
   "./js/global-nav.js?v=20261011b",
   "./js/mobile-nav.js?v=20261011b",
   "./js/pwa.js?v=20261011b",
@@ -51,7 +51,7 @@ const APP_SHELL = [
   "./css/legal.css?v=20261011b",
   "./css/field-events.css?v=20261011b",
   "./js/special-days.js",
-  "./js/legal.js?v=20261011d",
+  "./js/legal.js?v=20261011e",
   "./js/field-events.js?v=20261011d",
   "./js/ataturk-quotes.js?v=20261010f",
   "./assets/nexora-wildfire-logo.png",
