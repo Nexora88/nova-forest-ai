@@ -959,18 +959,29 @@
     record.translated = translated;
   }
   function translateAttributes(root=document) {
-    const selector = "[placeholder],[title],[aria-label],[content]";
+    const selector = "[placeholder],[title],[aria-label],[content],[data-tr-placeholder],[data-en-placeholder],[data-tr-title],[data-en-title],[data-tr-aria-label],[data-en-aria-label],[data-tr-content],[data-en-content]";
     if (root.nodeType === Node.ELEMENT_NODE && root.matches?.(selector)) translateElement(root);
     root.querySelectorAll?.(selector).forEach(translateElement);
   }
   const attributeOriginals = new WeakMap();
   function translateElement(el) {
     for (const attr of ["placeholder","title","aria-label","content"]) {
+      const trValue = el.getAttribute("data-tr-" + attr);
+      const enValue = el.getAttribute("data-en-" + attr);
+      if (trValue !== null && enValue !== null) {
+        el.setAttribute(attr, lang === "en" ? enValue : trValue);
+        continue;
+      }
       if (!el.hasAttribute(attr)) continue;
       let saved = attributeOriginals.get(el);
       if (!saved) { saved = {}; attributeOriginals.set(el,saved); }
       if (!(attr in saved)) saved[attr] = el.getAttribute(attr);
       el.setAttribute(attr, replace(saved[attr], lang));
+    }
+    const trPlaceholder = el.getAttribute("data-tr-placeholder");
+    const enPlaceholder = el.getAttribute("data-en-placeholder");
+    if (trPlaceholder !== null && enPlaceholder !== null) {
+      el.setAttribute("placeholder", lang === "en" ? enPlaceholder : trPlaceholder);
     }
   }
   function translateDataContent(root=document) {
