@@ -25,7 +25,7 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.
 - **Responsive, installable web app** with an offline-first shell and local saved-area experience.
-- **Real YOLOv8 inference interface:** [UAV / AI lab](pages/uav-demo.html). It sends selected video frames to a configured model API and draws only returned detections. Availability depends on a separately deployed ML service; no live detection is claimed until that service is reachable.
+- **Experimental image-analysis page:** [UAV / image lab](pages/uav-demo.html). Fire/smoke inference is intentionally disabled after removing the AGPL-licensed runtime and checkpoint. It will only be re-enabled after selecting a license-compatible model and validating it with labelled regional data.
 - **Experimental weather-risk index:** [methodology and limitations](docs/NEXORA_RISK_INDEX.md). The current index is rule-based and has not been calibrated or validated for operational fire prediction.
 - **Turkish and English interface**; the initial language follows the browser locale (Turkish for Turkish locales, English otherwise).
 
