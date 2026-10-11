@@ -44,7 +44,7 @@
       status.textContent = messages[lastLevel][tr ? "tr" : "en"];
       detail.textContent = tr
         ? `Girdi: ${lastInputs.people} kişi · temsili genişlik ${lastInputs.widthLabel} · engel ${lastInputs.blockLabel}. Sonuç yalnızca basit bir karşılaştırma göstergesidir; gerçek rota verisi veya saha ölçümü kullanılmadı.`
-        : `Inputs: ${lastInputs.people} people · illustrative width ${lastInputs.widthLabel} · obstruction ${lastInputs.blockLabel}. This is only a simple comparison indicator; no real route data or field measurements were used.`;
+        : `Inputs: ${lastInputs.people} people · illustrative width ${width.options[width.selectedIndex].textContent} · obstruction ${block.options[block.selectedIndex].textContent}. This is only a simple comparison indicator; no real route data or field measurements were used.`;
     }
   }
   function run() {
@@ -56,8 +56,8 @@
     lastLevel = load > 220 ? "high" : load > 100 ? "medium" : "low";
     lastInputs = {
       people:n,
-      widthLabel:width.options[width.selectedIndex].textContent,
-      blockLabel:block.options[block.selectedIndex].textContent
+      widthValue:width.value,
+      blockValue:block.value
     };
     applyLanguage();
     panel.classList.remove("is-running");
