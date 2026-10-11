@@ -50,6 +50,7 @@ By the end of PR #15, a first-time user should be able to open NexoraWildfire AI
 - Reads current Open-Meteo temperature, humidity, wind speed and direction; missing/incomplete data leaves metrics blank and shows an unavailable state.
 - Calculates an explicitly uncalibrated, rule-based 0–100 indicator with visible weighted contributions. It is not a fire probability, SHAP/LIME output, or a validated ML model.
 - Adds 30/60/120-minute illustrative spread rings and editable CO₂/economic assumptions. These are geometry/scenario estimates, not operational forecasts or official damage figures.
+- Adds a wind-direction overlay based on current Open-Meteo wind speed/direction, converting meteorological wind-from bearing to downwind bearing and showing 30/60/120-minute illustrative endpoint coordinates. The wind multiplier is a transparent capped heuristic applied to the user-entered base rate; it is explicitly not a validated fire-behaviour forecast. Mobile E2E checks verify the direction-aware cards and caveat.
 - Adds optional browser-camera preview, local video selection, and an attributed NASA Earth Observatory archival smoke video. This is not a live drone stream; YOLOv8 is not connected and no bounding-box detections are fabricated.
 - Adds an alert-message draft preview only. No Supabase trigger, Twilio, SMS, WhatsApp or Telegram delivery is claimed.
 - E2E coverage checks live-data state rendering with deterministic fixtures, indicator contributions, scenario calculation, draft-not-sent behavior, and mobile horizontal overflow.
