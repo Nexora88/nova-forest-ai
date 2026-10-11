@@ -79,3 +79,8 @@ NexoraWildfire AI geliştirilmekte olan bir araştırma ve karar destek projesid
 ## Araştırma amaçlı makine öğrenmesi prototipi
 
 UCI Algerian Forest Fires veri setiyle yeniden üretilebilir bir Random Forest araştırma modeli eğitilmiştir. Coğrafi ayırımlı test metrikleri ve sınırlamalar [model kartında](docs/ML_MODEL_CARD.md) belgelenmiştir. 2012 tarihli küçük Cezayir veri seti **Trakya/Türkiye için doğrulanmamıştır** ve operasyonel yangın tahmini değildir. Dokuz özellikli, yedi günlük ayrı model; uygun etiketli geçmiş veri toplanana kadar tahmin üretmez.
+
+
+- **Thrace dataset research workflow:** [docs/THRACE_DATASET.md](docs/THRACE_DATASET.md)
+- **Offline sync acceptance test:** [docs/OFFLINE_SYNC_ACCEPTANCE.md](docs/OFFLINE_SYNC_ACCEPTANCE.md)
+- **Enterprise report worker flow:** [docs/ENTERPRISE_REPORT_WORKFLOW.md](docs/ENTERPRISE_REPORT_WORKFLOW.md)
