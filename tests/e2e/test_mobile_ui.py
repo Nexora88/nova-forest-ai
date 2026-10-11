@@ -98,7 +98,6 @@ class MobileUiSmokeTests(unittest.TestCase):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
-            page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.evaluate("""() => {
                 const node = document.createElement('p');
@@ -127,13 +126,12 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertGreater(page.locator("nav.nx-nav > a:visible").count(), 0)
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
             page.wait_for_selector("#nexora-language-toggle", timeout=10000)
+            self.assertEqual(page.locator("html").get_attribute("lang"), "en")
+            page.locator("#nexora-language-toggle").click()
+            page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
             self.assertEqual(page.locator("html").get_attribute("lang"), "tr")
             page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
-            self.assertEqual(page.locator("html").get_attribute("lang"), "en")
-            page.locator("#nexora-language-toggle").click()
-            self.assertEqual(page.locator("html").get_attribute("lang"), "tr")
-            page.locator("#nexora-language-toggle").click()
             self.assertEqual(page.locator("html").get_attribute("lang"), "en")
             page.evaluate("window.dispatchEvent(new Event('appinstalled'))")
             page.wait_for_selector("#nexora-install", state="detached", timeout=3000)
@@ -146,6 +144,8 @@ class MobileUiSmokeTests(unittest.TestCase):
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector("#evac-sim", timeout=15000)
+            page.locator("#nexora-language-toggle").click()
+            page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
             self.assertTrue(page.locator("#evac-sim [data-run]").is_visible())
             self.assertTrue(page.locator("#evac-sim [data-meter]").is_visible())
             page.locator("#evac-sim [data-run]").click()
@@ -179,7 +179,6 @@ class MobileUiSmokeTests(unittest.TestCase):
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector("#nexora-language-toggle", timeout=10000)
-            page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.wait_for_selector("[data-global-form]", timeout=20000)
             page.locator("[data-lat]").fill("38.375")
