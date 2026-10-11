@@ -59,28 +59,39 @@ jobs:
           python-version: "3.11"
       - name: Install HTTP client
         run: python -m pip install --upgrade requests
-      - name: Probe current production provider credentials without exposing secrets
+      - name: Probe preview provider credentials without exposing secrets
+        env:
+          NEXORA_PROVIDER_TEST_API_BASE: ${{ vars.NEXORA_PROVIDER_TEST_API_BASE }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           python - <<'PY'
           import json
+          import os
           import requests
 
-          base = "https://nova-forest-ai.vercel.app/api"
+          base = os.getenv("NEXORA_PROVIDER_TEST_API_BASE", "").strip().rstrip("/")
+          bypass_secret = os.getenv("VERCEL_AUTOMATION_BYPASS_SECRET", "").strip()
+          if not base.startswith("https://"):
+              print("Provider preview API base is missing. Set the GitHub Actions variable NEXORA_PROVIDER_TEST_API_BASE to the preview API URL ending in /api.")
+              raise SystemExit(1)
+          session = requests.Session()
+          if bypass_secret:
+              session.headers.update({"x-vercel-protection-bypass": bypass_secret})
           provider_failures = []
 
           try:
-              health = requests.get(base + "/health", timeout=20)
-              print("Production backend health HTTP:", health.status_code)
+              health = session.get(base + "/health", timeout=20)
+              print("Preview backend health HTTP:", health.status_code)
               if not health.ok:
                   print("Backend health endpoint did not return success; provider results are unverified.")
-                  raise SystemExit(0)
+                  raise SystemExit(1)
           except requests.RequestException as exc:
-              print("Production backend unavailable:", type(exc).__name__)
+              print("Preview backend unavailable:", type(exc).__name__)
               raise SystemExit(1)
 
           try:
-              live_response = requests.get(base + "/satellite/live-check", timeout=75)
-              print("Live provider diagnostic HTTP:", live_response.status_code)
+              live_response = session.get(base + "/satellite/live-check", timeout=75)
+              print("Preview live provider diagnostic HTTP:", live_response.status_code)
               if live_response.ok:
                   live = live_response.json()
                   firms = live.get("nasa_firms", {})
@@ -111,7 +122,7 @@ jobs:
           for region, ring in probes.items():
               geometry = {"type": "Polygon", "coordinates": [ring]}
               try:
-                  response = requests.post(
+                  response = session.post(
                       base + "/ndvi/area-timeseries",
                       json={"geometry": geometry, "days": 90, "interval": "P30D"},
                       timeout=90,
