@@ -388,7 +388,11 @@
     const secondary = document.createElement("span");
     secondary.dataset.attributionSecondary = "true";
     secondary.textContent = languageIsTurkish() ? "NexoraWildfire AI · Bağımsız çevresel istihbarat projesi · © 2026" : "NexoraWildfire AI · Independent environmental intelligence · © 2026";
-    line.append(primary, secondary);
+    const legal = document.createElement("a");
+    legal.href = document.location.pathname.includes("/pages/") ? "legal.html" : "pages/legal.html";
+    legal.textContent = languageIsTurkish() ? "KVKK · Gizlilik · Kullanım Koşulları" : "Privacy · Terms · Data Protection";
+    legal.style.cssText = "color:#a8e7b7;text-decoration:none;font-size:11px;border-bottom:1px solid #326441;padding-bottom:3px";
+    line.append(primary, secondary, legal);
   }
   function boot() {
     renderAttribution();
