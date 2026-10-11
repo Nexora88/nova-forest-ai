@@ -247,6 +247,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                     }
                 """)
                 page = context.new_page()
+                page.on("pageerror", lambda error: print("SAVED_AREA_PAGEERROR", str(error)))
+                page.on("console", lambda message: print("SAVED_AREA_CONSOLE", message.text) if message.type == "error" else None)
 
                 def route_request(route):
                     url = route.request.url
@@ -265,8 +267,19 @@ class MobileUiSmokeTests(unittest.TestCase):
                     # Assert the fixture is present before diagnosing app rendering.
                     self.assertTrue(page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1') || '[]').some(a => a.name === 'QA Saved Area')"),
                                     page.evaluate("window.__qaAreaFixtureError || 'saved-area fixture was not seeded'"))
-                    page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
-                      .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
+                    try:
+                        page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
+                          .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
+                    except Exception:
+                        print("SAVED_AREA_DIAGNOSTIC", page.evaluate("""() => ({
+                          title: document.title,
+                          count: document.querySelector('#count')?.textContent,
+                          areaHtml: document.querySelector('#areas')?.innerHTML?.slice(0, 1600),
+                          areasScript: Array.from(document.scripts).map(s => s.src).filter(src => src.includes('areas.js')),
+                          localAreas: localStorage.getItem('nexorawildfire-my-areas-v1'),
+                          hasNovaStore: !!window.NovaStore
+                        })"""))
+                        raise
                     self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
                     page.reload(wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
