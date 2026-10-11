@@ -9,3 +9,5 @@ scikit-learn
 joblib
 pandas
 reportlab>=4.2,<5
+
+celery[redis]>=5.4,<6
