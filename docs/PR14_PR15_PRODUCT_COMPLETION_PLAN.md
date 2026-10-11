@@ -100,7 +100,7 @@ If any owner-only configuration or legal review is unavailable, keep the release
 - NASA FIRMS is reported as `not_configured`.
 - Copernicus STAC scene discovery works, but processing credentials are `not_configured`.
 - NDVI diagnostics returned HTTP 200 but status `not_configured` and zero samples in Thrace, California, and Queensland.
-- Chromium found an E2E selector mismatch in the enterprise demo form; the selector has been corrected in the test and must be rerun.
+- The enterprise demo test was made language-independent; PR #13's latest Chromium browser-smoke run passed. PR #14 and PR #15 still require their own latest-head browser runs to pass.
 - The verified project contact/privacy email has not been provided; legal documents remain drafts.
 - Supabase leaked-password protection and the focused SECURITY DEFINER/RLS review remain release blockers.
 - Vercel reported its deployment rate limit; a ready preview must be verified after the limit resets.
