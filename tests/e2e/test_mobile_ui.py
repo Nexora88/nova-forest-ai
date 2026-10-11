@@ -76,19 +76,19 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_selector("#nexora-install", timeout=10000)
                     self.assertTrue(page.locator("#nexora-install").is_visible(), f"install control missing on {path}")
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
-                    self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"English should be the first-visit language on {path}")
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"Turkish should be the first-visit language on {path}")
                     page.locator("#nexora-language-toggle").click()
                     page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
-                    self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"language toggle did not switch to Turkish on {path}")
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"language toggle did not switch to English on {path}")
                     page.locator("#nexora-language-toggle").click()
                     page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
-                    self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"language toggle did not return to English on {path}")
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"language toggle did not return to Turkish on {path}")
                     if page.locator("nav.nx-nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
                         nav_text = page.locator("nav.nx-nav").evaluate("(el) => el.textContent")
-                        self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
-                        self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
-                        self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
+                        self.assertIn("Ana Panel", nav_text, f"navigation was not Turkish on {path}")
+                        self.assertIn("Risk Haritası", nav_text, f"risk-map navigation was not Turkish on {path}")
+                        self.assertNotIn("Dashboard", nav_text, f"English dashboard label remains in Turkish mode on {path}")
                         nav_items = page.locator("nav.nx-nav a").evaluate_all("(els) => els.map(a => new URL(a.href).pathname.split('/').pop())")
                         self.assertEqual(nav_items, ["index.html", "map.html", "areas.html", "weather.html", "events.html", "satellite.html", "account.html", "about.html", "vision.html", "feedback.html", "legal.html"], f"navigation differs on {path}")
                 finally:
@@ -98,6 +98,8 @@ class MobileUiSmokeTests(unittest.TestCase):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
+            page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.evaluate("""() => {
                 const node = document.createElement('p');
@@ -246,11 +248,15 @@ class MobileUiSmokeTests(unittest.TestCase):
                 """)
                 page = context.new_page()
 
+        fail_weather = {"value": False}
                 def route_request(route):
                     url = route.request.url
                     if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
+                if fail_weather["value"]:
+                    route.fulfill(status=503, content_type="application/json", body="{}")
+                    return
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
                     elif "air-quality-api.open-meteo.com" in url:
                         route.fulfill(json={"current":{"alder_pollen":0,"birch_pollen":0,"grass_pollen":0,"mugwort_pollen":0,"olive_pollen":0,"ragweed_pollen":0}})
@@ -345,10 +351,13 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.wait_for_function("document.querySelector('#atmo-score')?.textContent !== '—'", timeout=15000)
             self.assertEqual(page.locator("#atmo-temp").inner_text(), "30.0 °C")
             self.assertEqual(page.locator("#atmo-humidity").inner_text(), "35 %")
-            self.assertEqual(page.locator("#atmo-wind").inner_text(), "24.0 km/h")
+            self.assertEqual(page.locator("#atmo-wind").inner_text(), "24.0 km/sa")
             self.assertIn("/ 100", page.locator(".atmo-score-ring").inner_text())
             self.assertRegex(page.locator("#atmo-contributions").inner_text(), r"Sıcaklık|Temperature")
             self.assertIn("15", page.locator("#atmo-humidity-meta").inner_text())
+            page.locator("#atmo-region").select_option("canakkale")
+            self.assertEqual(page.locator("#atmo-origin-lat").input_value(), "40.1553")
+            self.assertEqual(page.locator("#atmo-origin-lon").input_value(), "26.4142")
             page.locator("#atmo-origin-lat").fill("41.67")
             page.locator("#atmo-origin-lon").fill("26.55")
             page.locator("#atmo-run-spread").click()
@@ -363,6 +372,10 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.locator("#atmo-preview-alert").click()
             self.assertRegex(page.locator("#atmo-alert-preview").input_value(), r"gönderilmedi|not sent")
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+            fail_weather["value"] = True
+            page.locator("#atmo-refresh").click()
+            page.wait_for_function("document.querySelector('#atmo-provider-status')?.textContent.includes('PROVIDER UNAVAILABLE')", timeout=5000)
+            self.assertEqual(page.locator("#atmo-score").inner_text(), "—", "stale risk score must clear after a failed refresh")
         finally:
             context.close()
 
