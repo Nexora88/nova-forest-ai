@@ -91,6 +91,28 @@ class MobileUiSmokeTests(unittest.TestCase):
                 finally:
                     context.close()
 
+    def test_mixed_dynamic_text_translates_phrase_by_phrase(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
+            page.locator("#nexora-language-toggle").click()
+            page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
+            page.evaluate("""() => {
+                const node = document.createElement('p');
+                node.id = 'translation-regression';
+                node.textContent = 'Konuma git ve analiz et · Open-Meteo canlı veri: nem 23';
+                document.body.appendChild(node);
+            }""")
+            page.wait_for_function("document.querySelector('#translation-regression')?.textContent.includes('Go to location') && document.querySelector('#translation-regression')?.textContent.includes('humidity 23')", timeout=5000)
+            translated = page.locator("#translation-regression").inner_text()
+            self.assertIn("Go to location & analyze", translated)
+            self.assertIn("Open-Meteo live:", translated)
+            self.assertIn("humidity 23", translated)
+            self.assertNotIn("Konuma git", translated)
+            self.assertNotIn("canlı veri", translated)
+        finally:
+            context.close()
+
     def test_mobile_menu_language_toggle_and_install_lifecycle(self):
         context, page = self.new_page()
         try:
