@@ -520,8 +520,8 @@
       const alternatives = entries.map(([from]) => {
         const first = from.charAt(0);
         const last = from.slice(-1);
-        const left = /[\p{L}\p{N}_]/u.test(first) ? "(?<![\p{L}\p{N}_])" : "";
-        const right = /[\p{L}\p{N}_]/u.test(last) ? "(?![\p{L}\p{N}_])" : "";
+        const left = /[\p{L}\p{N}_]/u.test(first) ? "(?<![\\p{L}\\p{N}_])" : "";
+        const right = /[\p{L}\p{N}_]/u.test(last) ? "(?![\\p{L}\\p{N}_])" : "";
         return left + escapeRegex(from) + right;
       });
       const lookup = new Map(entries.map(([from, to]) => [from.toLocaleLowerCase(locale), to]));
