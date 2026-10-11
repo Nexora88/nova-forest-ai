@@ -86,6 +86,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                         self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
                         self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
                         self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
+                        nav_items = page.locator("nav a").evaluate_all("(els) => els.map(a => new URL(a.href).pathname.split('/').pop())")
+                        self.assertEqual(nav_items, ["index.html", "map.html", "areas.html", "weather.html", "events.html", "satellite.html", "account.html", "about.html", "vision.html", "feedback.html", "legal.html"], f"navigation differs on {path}")
                 finally:
                     context.close()
 
