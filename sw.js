@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v31";
+const CACHE_NAME = "nexorawildfire-shell-v32";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -35,7 +35,7 @@ const APP_SHELL = [
   "./js/dashboard.js",
   "./js/role-dashboard.js?v=20261011c",
   "./js/map.js?v=20261011b",
-  "./js/i18n.js?v=20261011i",
+  "./js/i18n.js?v=20261011j",
   "./js/i18n-extra.js?v=20261011c",
   "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011e",
