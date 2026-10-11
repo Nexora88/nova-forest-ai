@@ -24,3 +24,48 @@ def test_pdf_generator_returns_pdf_bytes_and_marks_missing_data():
     )
     assert pdf.startswith(b"%PDF")
     assert len(pdf) > 1000
+
+
+def test_ndvi_token_provider_failure_returns_explicit_error(monkeypatch):
+    import requests
+    from app.services import ndvi_service
+
+    def fail_token_request(*args, **kwargs):
+        raise requests.Timeout("provider timed out")
+
+    monkeypatch.setattr(ndvi_service, "_token", fail_token_request)
+    result = ndvi_service.get_area_ndvi_timeseries(
+        {"type": "Point", "coordinates": [26.55, 41.68]}
+    )
+    assert result["status"] == "error"
+    assert result["error_type"] == "Timeout"
+    assert result["series"] == []
+
+
+def test_weather_missing_fields_are_not_replaced_with_zero(monkeypatch):
+    from app.services import ndvi_service
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "current": {
+                    "temperature_2m": 25,
+                    "relative_humidity_2m": 30,
+                    "wind_speed_10m": None,
+                    "precipitation": 0,
+                    "vapour_pressure_deficit": 2,
+                    "time": "2026-10-11T12:00",
+                },
+                "daily": {"et0_fao_evapotranspiration": [4]},
+            }
+
+    monkeypatch.setattr(ndvi_service.requests, "get", lambda *args, **kwargs: Response())
+    try:
+        ndvi_service._raster_weather([26.4, 41.5, 26.6, 41.7])
+    except ValueError as exc:
+        assert "wind" in str(exc)
+    else:
+        raise AssertionError("Missing provider measurements must not become zero-valued observations")
