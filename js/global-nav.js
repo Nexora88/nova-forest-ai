@@ -24,7 +24,7 @@
     nav.replaceChildren();
     for (const [path,tr,en] of links) {
       const a = document.createElement("a");
-      a.href = inPages ? path.replace(/^pages\//,"") : path;
+      a.href = inPages ? (path === "index.html" ? "../index.html" : path.replace(/^pages\//,"")) : path;
       const destination = path.split("/").pop();
       if (destination === current || (current === "" && destination === "index.html")) a.className = "active";
       a.dataset.tr = tr;
