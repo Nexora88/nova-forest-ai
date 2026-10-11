@@ -51,6 +51,8 @@ By the end of PR #15, a first-time user should be able to open NexoraWildfire AI
 Configure secrets directly in the hosting provider's environment-variable settings; never commit keys or paste them into chat:
 - `FIRMS_MAP_KEY` (NASA FIRMS)
 - `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` (Copernicus Data Space Ecosystem processing credentials; server-side only).
+
+For pre-production testing, the provider workflow uses the GitHub Actions variable `NEXORA_PROVIDER_TEST_API_BASE` (the current Vercel preview API base ending in `/api`) and, only if preview SSO protection requires it, the GitHub Actions secret `VERCEL_AUTOMATION_BYPASS_SECRET`. Keep the actual provider credentials only in Vercel's Preview environment; do not duplicate them into GitHub Actions.
 - Any required production-only backend settings, service tokens, and allowed origins, stored as server-side secrets.
 
 Then rerun diagnostics and prove all of the following with response metadata, not just HTTP 200:
