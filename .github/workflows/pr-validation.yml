@@ -32,6 +32,10 @@ jobs:
           node --check js/field-events.js
           node --check js/i18n.js
           node --check js/mobile-nav.js
+          node --check js/global-nav.js
+          node --check js/evacuation-sim.js
+          node --check js/asset-guard.js
+          node --check js/legal.js
 
       - name: Set up Python
         uses: actions/setup-python@v5
