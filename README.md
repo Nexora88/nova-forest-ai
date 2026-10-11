@@ -15,6 +15,14 @@ The product is inspired by a simple idea associated with Mustafa Kemal Atatürk'
 - **Installable, responsive web app** with an offline-first shell and local saved-area experience.
 - **Turkish and English interface**, with English as the default for this public-facing version.
 
+## Vision and mission
+
+**Vision:** Make trustworthy environmental intelligence easier to access for communities, farmers, beekeepers, researchers, and environmental teams—starting in Thrace and expanding only as data coverage and validation justify it.
+
+**Mission:** Connect real observations and clearly labelled indicators in a useful, accessible workspace; protect saved-area data; disclose uncertainty and provider failures; and avoid presenting experimental outputs as official warnings.
+
+**Product principles:** Evidence before appearance, privacy by default, transparent limitations, mobile accessibility, and features that solve real field problems.
+
 ## Why it matters
 
 Environmental information is often scattered across separate tools. NexoraWildfire AI aims to make relevant observations more accessible to local communities, farmers, beekeepers, nature observers, and environmental teams—without pretending that every data source is always available or that an indicator is a guaranteed prediction.
@@ -42,6 +50,11 @@ Provider access and production behavior must be verified independently; code for
 - **Turkish documentation:** [README.tr.md](README.tr.md)
 - **Contributing:** [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)
 - **Global architecture notes:** [docs/GLOBAL_SCALABILITY.md](docs/GLOBAL_SCALABILITY.md)
+- **Thrace dataset research workflow:** [docs/THRACE_DATASET.md](docs/THRACE_DATASET.md)
+- **Offline sync acceptance test:** [docs/OFFLINE_SYNC_ACCEPTANCE.md](docs/OFFLINE_SYNC_ACCEPTANCE.md)
+- **Enterprise report worker flow:** [docs/ENTERPRISE_REPORT_WORKFLOW.md](docs/ENTERPRISE_REPORT_WORKFLOW.md)
+- **NASA FIRMS live hotspots setup:** [docs/FIRMS_PROVIDER_SETUP.md](docs/FIRMS_PROVIDER_SETUP.md)
+- **Enterprise worker implementation:** [backend/worker/README.md](backend/worker/README.md)
 - **AI-assisted development disclosure:** [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md)
 
 ## Project direction

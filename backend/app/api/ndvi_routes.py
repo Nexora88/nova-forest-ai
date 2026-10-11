@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Any, Dict
 from app.services.ndvi_service import get_region_satellite_status, get_area_ndvi_timeseries
+from app.services.copernicus_service import analyze_area
 
 router = APIRouter(prefix="/ndvi", tags=["NDVI"])
 
@@ -41,3 +42,13 @@ def risk_raster(west: float, south: float, east: float, north: float, width: int
             "message": "Raster üretimi kuyruklu worker'a taşındı. POST /jobs/risk-raster uç noktasını kullanın.",
         },
     )
+
+
+
+@router.post("/area-analysis")
+def area_analysis(request: AreaNDVIRequest):
+    """Discover the newest Sentinel-2 scene and return real NDVI/NDMI statistics when configured."""
+    try:
+        return analyze_area(request.geometry, request.days, request.interval)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

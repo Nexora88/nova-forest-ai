@@ -1,0 +1,3 @@
+-- Superseded by 20261010133000_nexorawildfire_daily_environment_snapshots.sql.
+-- Kept as a no-op migration so existing installations preserve their migration history.
+-- The canonical migration creates the table with UUID area ownership and RLS.

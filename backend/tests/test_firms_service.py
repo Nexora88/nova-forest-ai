@@ -76,3 +76,39 @@ def test_invalid_coordinate_rows_are_skipped_not_mapped_to_zero(monkeypatch):
     assert result["invalid_rows_skipped"] == 1
     assert result["alerts"][0]["latitude"] == 41.5
     assert result["alerts"][0]["longitude"] == 27.1
+
+
+
+def test_invalid_firms_response_is_not_misreported_as_zero(monkeypatch):
+    monkeypatch.setenv("FIRMS_MAP_KEY", "test-key")
+
+    class FakeResponse:
+        text = "Invalid MAP_KEY"
+
+        def raise_for_status(self):
+            return None
+
+    monkeypatch.setattr("app.services.firms_service.requests.get", lambda *args, **kwargs: FakeResponse())
+    result = get_firms_alerts(days=1)
+
+    assert result["status"] == "error"
+    assert result["alert_count"] is None
+    assert result["error_type"] == "InvalidProviderResponse"
+    assert "zero detections cannot be confirmed" in result["note"]
+
+
+def test_empty_firms_response_is_not_misreported_as_zero(monkeypatch):
+    monkeypatch.setenv("FIRMS_MAP_KEY", "test-key")
+
+    class FakeResponse:
+        text = "  "
+
+        def raise_for_status(self):
+            return None
+
+    monkeypatch.setattr("app.services.firms_service.requests.get", lambda *args, **kwargs: FakeResponse())
+    result = get_firms_alerts(days=1)
+
+    assert result["status"] == "error"
+    assert result["alert_count"] is None
+    assert result["error_type"] == "EmptyProviderResponse"

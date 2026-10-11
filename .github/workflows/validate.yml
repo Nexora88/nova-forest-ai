@@ -25,7 +25,7 @@ jobs:
       - name: Train research model from the official UCI dataset
         run: python backend/scripts/train_uci_research_model.py
       - name: Compile backend Python sources
-        run: python -m compileall -q backend/app backend/scripts
+        run: python -m compileall -q backend/app backend/scripts backend/worker
       - name: Run backend tests
         env:
           PYTHONPATH: backend

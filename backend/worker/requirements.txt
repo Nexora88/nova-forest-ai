@@ -1,0 +1,7 @@
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+celery[redis]>=5.4,<6
+requests>=2.31,<3
+pydantic>=2,<3
+reportlab>=4.2,<5
+python-dotenv>=1,<2

@@ -6,6 +6,14 @@ NexoraWildfire AI; orman yangını farkındalığı, tarım, su ve toprak, arıc
 
 [English README](README.md) · [AI destekli geliştirme beyanı](AI_ASSISTED_DEVELOPMENT.md) · [Küresel ölçeklenebilirlik](docs/GLOBAL_SCALABILITY.md) · [Katkı rehberi](.github/CONTRIBUTING.md)
 
+## Vizyon ve misyon
+
+**Vizyon:** Güvenilir çevresel istihbaratı topluluklar, çiftçiler, arıcılar, araştırmacılar ve çevre ekipleri için erişilebilir kılmak; Trakya'dan başlayıp yalnızca veri kapsamı ve doğrulama yeterli olduğunda genişlemek.
+
+**Misyon:** Gerçek gözlemleri ve açıkça etiketlenmiş göstergeleri kullanışlı, erişilebilir bir çalışma alanında birleştirmek; kayıtlı alan verilerini korumak; belirsizliği ve veri sağlayıcı hatalarını açıkça göstermek; deneysel çıktıları resmî uyarı gibi sunmamak.
+
+**Ürün ilkeleri:** Görünüşten önce kanıt, varsayılan gizlilik, şeffaf sınırlamalar, mobil erişilebilirlik ve sahada gerçek bir işi kolaylaştıran özellikler.
+
 ## Mevcut yetenekler
 
 - PWA desteği ve çevrimdışı öncelikli uygulama kabuğu.
@@ -71,3 +79,10 @@ NexoraWildfire AI geliştirilmekte olan bir araştırma ve karar destek projesid
 ## Araştırma amaçlı makine öğrenmesi prototipi
 
 UCI Algerian Forest Fires veri setiyle yeniden üretilebilir bir Random Forest araştırma modeli eğitilmiştir. Coğrafi ayırımlı test metrikleri ve sınırlamalar [model kartında](docs/ML_MODEL_CARD.md) belgelenmiştir. 2012 tarihli küçük Cezayir veri seti **Trakya/Türkiye için doğrulanmamıştır** ve operasyonel yangın tahmini değildir. Dokuz özellikli, yedi günlük ayrı model; uygun etiketli geçmiş veri toplanana kadar tahmin üretmez.
+
+
+- **Thrace dataset research workflow:** [docs/THRACE_DATASET.md](docs/THRACE_DATASET.md)
+- **Offline sync acceptance test:** [docs/OFFLINE_SYNC_ACCEPTANCE.md](docs/OFFLINE_SYNC_ACCEPTANCE.md)
+- **Enterprise report worker flow:** [docs/ENTERPRISE_REPORT_WORKFLOW.md](docs/ENTERPRISE_REPORT_WORKFLOW.md)
+- **NASA FIRMS live hotspots setup:** [docs/FIRMS_PROVIDER_SETUP.md](docs/FIRMS_PROVIDER_SETUP.md)
+- **Enterprise worker implementation:** [backend/worker/README.md](backend/worker/README.md)

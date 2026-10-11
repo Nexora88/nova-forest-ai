@@ -58,7 +58,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         context = self.browser.new_context(viewport={"width": width, "height": height}, locale="en-US")
         context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         return context, page
 
@@ -105,20 +105,44 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
 
-    def test_global_napa_demo_renders_geojson_and_reports_missing_live_sources_honestly(self):
+    def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
         page.route("https://unpkg.com/**", lambda route: route.continue_())
         page.route("https://api.open-meteo.com/**", lambda route: route.abort())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
-            page.wait_for_selector("[data-global-demo]", timeout=20000)
-            page.locator("[data-global-demo]").click()
-            page.wait_for_function("Boolean(window.nexoraGlobalLayer && window.nexoraGlobalLayer.getBounds)", timeout=10000)
-            self.assertIn("Napa", page.locator("[data-global-demo-status]").inner_text())
-            self.assertIn("GeoJSON: PASS", page.locator("[data-global-demo-status]").inner_text())
+            page.wait_for_selector("[data-global-form]", timeout=20000)
+            page.locator("[data-lat]").fill("38.375")
+            page.locator("[data-lon]").fill("-122.375")
+            page.locator("[data-global-form] button[type=submit]").click()
+            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates 38.375, -122.375')", timeout=10000)
+            self.assertIn("Open-Meteo unavailable", page.locator("[data-global-demo-status]").inner_text())
+            self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
+    def test_map_planning_overlays_are_available_and_saved_as_drafts(self):
+        context, page = self.new_page()
+        try:
+            page.route("https://unpkg.com/**", lambda route: route.continue_())
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#nx-planning-tools", timeout=20000)
+            self.assertTrue(page.locator('[data-plan="zone"]').is_visible())
+            self.assertTrue(page.locator('[data-plan="line"]').is_visible())
+            page.locator('[data-plan="zone"]').click()
+            page.evaluate("""() => {
+              for (const [lat, lng] of [[41,27],[41.01,27.01],[41.02,27]]) {
+                window.map.fire('click', {latlng: L.latLng(lat,lng)});
+              }
+            }""")
+            page.locator('[data-plan="finish"]').click()
+            saved = page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-planning-overlays-v1') || JSON.stringify({features:[]}))")
+            self.assertEqual(len(saved["features"]), 1)
+            self.assertEqual(saved["features"][0]["properties"]["official"], False)
+            self.assertEqual(saved["features"][0]["properties"]["kind"], "zone")
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
         finally:
             context.close()
@@ -158,7 +182,7 @@ class MobileUiSmokeTests(unittest.TestCase):
 
                 def route_request(route):
                     url = route.request.url
-                    if url.startswith(BASE):
+                    if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
@@ -181,6 +205,38 @@ class MobileUiSmokeTests(unittest.TestCase):
                     self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
                 finally:
                     context.close()
+
+
+    def test_offline_saved_area_survives_reload_and_is_present_in_indexeddb(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR")
+        context.add_init_script("""
+            Object.defineProperty(Navigator.prototype, "onLine", {
+              configurable: true, get: () => false
+            });
+            localStorage.setItem("nexorawildfire-my-areas-v1", JSON.stringify([{
+              id:"offline-qa-area", name:"Offline QA Apiary", type:"arıcı",
+              province:"Edirne", district:"Keşan",
+              coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+              createdAt:"2026-10-11T00:00:00.000Z", updatedAt:Date.now()
+            }]));
+        """)
+        page = context.new_page()
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
+        try:
+            page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".area-card h3", timeout=20000)
+            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            page.wait_for_function("""async () => {
+              if (!window.NovaStore) return false;
+              const rows = await window.NovaStore.getAll("areas");
+              return rows.some(row => row.name === "Offline QA Apiary");
+            }""", timeout=10000)
+            page.reload(wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".area-card h3", timeout=20000)
+            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            self.assertFalse(page.evaluate("navigator.onLine"))
+        finally:
+            context.close()
 
 
 if __name__ == "__main__":

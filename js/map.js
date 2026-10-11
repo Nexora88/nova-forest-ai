@@ -5,7 +5,7 @@ const edirneSettlementPath=document.location.pathname.includes("/pages/")?"../da
 const ACTIVE_PROVINCES=new Set(["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"].map(x=>norm(x)));
 const TARGET=new Set(["adana","adiyaman","afyonkarahisar","agri","amasya","ankara","antalya","artvin","aydin","balikesir","bilecik","bingol","bitlis","bolu","burdur","bursa","canakkale","cankiri","corum","denizli","diyarbakir","edirne","elazig","erzincan","erzurum","eskisehir","gaziantep","giresun","gumushane","hakkari","hatay","isparta","istanbul","izmir","kahramanmaras","karabuk","karaman","kars","kastamonu","kayseri","kirikkale","kirklareli","kirsehir","kilis","kocaeli","konya","kutahya","malatya","manisa","mardin","mersin","mugla","mus","nevsehir","nigde","ordu","osmaniye","rize","sakarya","samsun","siirt","sinop","sivas","sirnak","tekirdag","tokat","trabzon","tunceli","sanliurfa","usak","van","yalova","yozgat","zonguldak","duzce"]);
 function norm(s){return Array.from(String(s||"").normalize("NFD")).filter(c=>c.charCodeAt(0)<768).join("").toLocaleLowerCase("tr-TR").replaceAll("ı","i")}
-const isMobile=matchMedia("(max-width: 700px)").matches; const map=L.map("map",{zoomControl:true,doubleClickZoom:!isMobile,dragging:!isMobile,scrollWheelZoom:!isMobile,touchZoom:true,gestureHandling:isMobile}).setView([41.15,27.1],8); if(isMobile){map.touchZoom.enable();map.doubleClickZoom.disable();map.scrollWheelZoom.disable();if(!map.gestureHandling)map.dragging.disable();}
+const isMobile=matchMedia("(max-width: 700px)").matches; const map=window.map=L.map("map",{zoomControl:true,doubleClickZoom:!isMobile,dragging:!isMobile,scrollWheelZoom:!isMobile,touchZoom:true,gestureHandling:isMobile}).setView([41.15,27.1],8); if(isMobile){map.touchZoom.enable();map.doubleClickZoom.disable();map.scrollWheelZoom.disable();if(!map.gestureHandling)map.dragging.disable();}
 const base=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap katkıda bulunanlar"}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri"});
 const dark=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:"© OpenStreetMap © CARTO"});
@@ -17,6 +17,54 @@ const scan=document.createElement("div");scan.className="nova-satellite-scan";sc
 map.on("baselayerchange",e=>scan.classList.toggle("active",e.name==="Uydu"));
 
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);
+
+const firmsHotspotLayer=L.layerGroup();
+let firmsHotspotsLoading=false;
+function firmsText(value){return String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function firmsState(message){const node=document.getElementById("nova-firms-state");if(node)node.textContent=message}
+async function refreshFirmsHotspots(){
+ if(firmsHotspotsLoading)return;
+ firmsHotspotsLoading=true;firmsState("NASA FIRMS verisi sorgulanıyor…");
+ try{
+  const response=await fetch(API_BASE+"/satellite/firms?days=1",{headers:{Accept:"application/json"},cache:"no-store"});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error("http_"+response.status);
+  if(payload.status!=="available"){
+   const message=payload.status==="not_configured"?"API anahtarı yapılandırılmamış. Sıcak nokta sayısı bilinmiyor.":payload.status==="error"?"NASA FIRMS sağlayıcı hatası. Sıcak nokta sayısı bilinmiyor.":"NASA FIRMS verisi şu an doğrulanamadı.";
+   firmsState(message);return;
+  }
+  firmsHotspotLayer.clearLayers();
+  (payload.alerts||[]).forEach(point=>{
+   const lat=Number(point.latitude),lon=Number(point.longitude);
+   if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+   const marker=L.circleMarker([lat,lon],{radius:7,color:"#ff3d4f",weight:2,fillColor:"#ff233f",fillOpacity:.82});
+   marker.bindPopup('<div class="risk-popup"><div class="popup-kicker">NASA FIRMS · VIIRS SNPP NRT</div><h3>Uydu sıcak noktası</h3><p>Tarih: '+firmsText(point.acq_date)+' '+firmsText(point.acq_time)+'</p><p>Güven: '+firmsText(point.confidence)+'</p><p>FRP: '+firmsText(point.frp)+'</p><small>Termal anomali algılamasıdır; tek başına doğrulanmış yangın demek değildir.</small></div>');
+   firmsHotspotLayer.addLayer(marker);
+  });
+  const checked=payload.checked_at_utc?new Date(payload.checked_at_utc).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"—";
+  firmsState((payload.alert_count===0?"Son 24 saatte hotspot algılanmadı.":String(payload.alert_count)+" sıcak nokta") +" · "+checked+" · Algılama yokluğu sıfır risk kanıtı değildir.");
+ }catch(error){firmsState("NASA FIRMS verisine ulaşılamadı. Bu, yangın olmadığı anlamına gelmez.");}
+ finally{firmsHotspotsLoading=false;}
+}
+const firmsControl=L.control({position:"topright"});
+firmsControl.onAdd=function(){
+ const box=L.DomUtil.create("div","leaflet-bar nova-firms-control");
+ box.style.cssText="background:#07110c;color:#eaffef;padding:8px 10px;border:1px solid #23643b;border-radius:8px;max-width:245px;font:12px/1.4 system-ui";
+ const button=L.DomUtil.create("button","",box);
+ button.type="button";button.textContent="🔥 NASA FIRMS · Sıcak noktalar";
+ button.style.cssText="background:transparent;color:#baffce;border:0;font-weight:700;cursor:pointer;text-align:left;padding:2px";
+ button.setAttribute("aria-pressed","false");
+ const state=L.DomUtil.create("div","",box);state.id="nova-firms-state";state.setAttribute("role","status");state.setAttribute("aria-live","polite");state.style.cssText="margin-top:4px;color:#c3d6c9;max-width:220px";
+ button.addEventListener("click",async()=>{
+  if(map.hasLayer(firmsHotspotLayer)){map.removeLayer(firmsHotspotLayer);button.setAttribute("aria-pressed","false");button.textContent="🔥 NASA FIRMS · Sıcak noktalar";firmsState("Katman kapalı.");return;}
+  firmsHotspotLayer.addTo(map);button.setAttribute("aria-pressed","true");button.textContent="✕ NASA FIRMS katmanını kapat";await refreshFirmsHotspots();
+ });
+ L.DomEvent.disableClickPropagation(box);L.DomEvent.disableScrollPropagation(box);
+ return box;
+};
+firmsControl.addTo(map);
+setInterval(()=>{if(map.hasLayer(firmsHotspotLayer))refreshFirmsHotspots()},10*60*1000);
+
 const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
 const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
 let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;

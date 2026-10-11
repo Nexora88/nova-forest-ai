@@ -1,6 +1,7 @@
 const KEY="nexorawildfire-my-areas-v1";
 const areasEl=document.getElementById("areas"),emptyEl=document.getElementById("empty"),countEl=document.getElementById("count");
 let areaCache=[];
+const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function getAreas(){return areaCache.length?areaCache:JSON.parse(localStorage.getItem(KEY)||"[]")}
 async function loadAreas(){
   let indexed=[];
@@ -20,7 +21,16 @@ async function loadAreas(){
   for(const area of areaCache){try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()})}catch{}}
   return areaCache;
 }
-async function removeArea(id){if(window.NovaAuth?.isLoggedIn()){try{await window.NovaAuth.deleteArea(String(id))}catch(e){console.warn("Cloud area delete",e)}}areaCache=areaCache.filter(a=>String(a.id)!==String(id));localStorage.setItem(KEY,JSON.stringify(areaCache));try{await window.NovaStore.remove("areas",String(id))}catch{}}
+async function removeArea(id){
+  const key=String(id);
+  const isUuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key);
+  // Preserve local state if an authenticated cloud deletion fails.
+  if(isUuid && window.NovaAuth?.isLoggedIn()) await window.NovaAuth.deleteArea(key);
+  areaCache=areaCache.filter(a=>String(a.id)!==key);
+  localStorage.setItem(KEY,JSON.stringify(areaCache));
+  try{await window.NovaStore.remove("areas",key)}catch(e){console.warn("Local area cleanup",e)}
+  window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{reason:"deleted",id:key}}));
+}
 
 const AREA_ALERT_PREFS_KEY="nexorawildfire-area-alert-prefs-v1";
 function getAreaAlertPrefs(){try{return JSON.parse(localStorage.getItem(AREA_ALERT_PREFS_KEY)||"{}")}catch{return {}}}
@@ -79,7 +89,7 @@ async function render(){
   if(!areas.length){areasEl.innerHTML="";emptyEl.style.display="grid";return}
   emptyEl.style.display="none";areasEl.innerHTML='<div class="loading-area">NEXORAWILDFIRE EDGE alan verilerini hazırlıyor…</div>';
   const html=await Promise.all(areas.map(cardEdge));areasEl.innerHTML=html.join("");
-  areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{await removeArea(b.dataset.delete);render()});
+  areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{const status=document.querySelector("[data-area-operation-status]");b.disabled=true;if(status)status.textContent="Alan silme işlemi sürüyor…";try{await removeArea(b.dataset.delete);if(status)status.textContent="Alan silindi ve yerel kayıt yenilendi.";await render()}catch(e){b.disabled=false;if(status)status.textContent="Alan silinemedi; yerel kayıt korundu. Bağlantını ve hesap izinlerini kontrol et.";console.error("Area deletion failed",e)}});
   renderAreaMiniMaps();
   areasEl.querySelectorAll("[data-area-alert-toggle]").forEach(input=>input.onchange=()=>{
     const prefs=getAreaAlertPrefs();prefs[String(input.dataset.areaAlertToggle)]=input.checked;

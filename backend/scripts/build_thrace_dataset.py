@@ -81,6 +81,36 @@ def fetch_firms(start, end, map_key, session):
     return list(records.values())
 
 
+def load_firms_archives(paths, start, end):
+    """Read downloaded NASA FIRMS archive CSVs; labels remain hotspot proxies."""
+    records = {}
+    for path in paths:
+        with open(path, newline="", encoding="utf-8-sig") as stream:
+            reader = csv.DictReader(stream)
+            if not reader.fieldnames:
+                raise RuntimeError(f"FIRMS archive has no CSV header: {path}")
+            names = {name.strip().lower(): name for name in reader.fieldnames}
+            lat_key = next((names[k] for k in ("latitude", "lat") if k in names), None)
+            lon_key = next((names[k] for k in ("longitude", "lon", "long") if k in names), None)
+            date_key = next((names[k] for k in ("acq_date", "date", "acquisition_date") if k in names), None)
+            if not (lat_key and lon_key and date_key):
+                raise RuntimeError(f"FIRMS archive {path} needs latitude/longitude/acq_date (or lat/lon/date) columns.")
+            for original in reader:
+                try:
+                    lat, lon = float(original[lat_key]), float(original[lon_key])
+                    day = parse_date(str(original[date_key]).strip()[:10])
+                except (TypeError, ValueError, KeyError):
+                    continue
+                if not math.isfinite(lat) or not math.isfinite(lon) or not inside_bbox(lat, lon):
+                    continue
+                if not start <= day <= end:
+                    continue
+                row = dict(original)
+                row["_lat"], row["_lon"], row["_date"] = lat, lon, day
+                row["satellite"] = row.get("satellite") or row.get("instrument") or "NASA FIRMS archive"
+                records[(day.isoformat(), round(lat, 2), round(lon, 2))] = row
+    return list(records.values())
+
 def weather_for(lat, lon, day, session):
     first = day - dt.timedelta(days=6)
     params = {
@@ -216,6 +246,7 @@ def main():
     parser.add_argument("--start-date", required=True, help="YYYY-MM-DD")
     parser.add_argument("--end-date", required=True, help="YYYY-MM-DD")
     parser.add_argument("--output", default="data/thrace_fire_dataset.csv")
+    parser.add_argument("--firms-csv", action="append", default=[], help="Downloaded NASA FIRMS archive CSV; repeat for multiple files. Bypasses recent-data API.")
     parser.add_argument("--negatives-per-positive", type=int, default=1)
     parser.add_argument("--max-positive", type=int, default=500,
                         help="Limit weather API requests; samples are selected reproducibly across returned detections.")
@@ -225,12 +256,16 @@ def main():
     if end < start or args.negatives_per_positive < 1 or args.max_positive < 1:
         parser.error("Date range must be ordered; sample limits must be positive.")
     key = os.getenv("FIRMS_MAP_KEY")
-    if not key:
-        raise SystemExit("Set FIRMS_MAP_KEY in the environment. Never commit the key to Git.")
+    if not args.firms_csv and not key:
+        raise SystemExit("For recent data set FIRMS_MAP_KEY; for older years pass one or more --firms-csv archive files.")
     session = requests.Session()
     session.headers["User-Agent"] = "NexoraWildfireAI-research/1.0"
-    print(f"Fetching NASA FIRMS standard products for {start} to {end}...")
-    firms = fetch_firms(start, end, key, session)
+    if args.firms_csv:
+        print(f"Reading {len(args.firms_csv)} downloaded NASA FIRMS archive CSV file(s)...")
+        firms = load_firms_archives(args.firms_csv, start, end)
+    else:
+        print(f"Fetching NASA FIRMS recent standard products for {start} to {end}...")
+        firms = fetch_firms(start, end, key, session)
     if len(firms) > args.max_positive:
         firms = sorted(random.Random(args.seed).sample(firms, args.max_positive), key=lambda row: row["_date"])
     print(f"Using {len(firms)} candidate hotspot cells; enriching with historical weather...")
