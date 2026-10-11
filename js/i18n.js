@@ -927,7 +927,7 @@
   const enToTr = new Map();
   for (const [tr,en] of pairs) {
     if (!trToEn.has(tr)) trToEn.set(tr,en);
-    if (!enToTr.has(en)) enToTr.set(en,tr);
+    if (!enToTr.has(en)) enToTr.set(en, tr);
   }
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
