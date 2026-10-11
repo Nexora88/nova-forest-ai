@@ -555,6 +555,10 @@
     ["Veri sağlayıcıları","Data providers"],
     ["Supabase hesap profili","Supabase account profile"],
     ["Kontrol ediliyor","Checking"],
+    ["NEXORA / ÇEVRESEL İSTİHBARAT","NEXORA / ENVIRONMENTAL INTELLIGENCE"],
+    ["Operasyonlar","Operations"],
+    ["SAHA İSTİHBARAT KONTROLÜ","FIELD INTELLIGENCE CONTROL"],
+    ["Kullanılamıyor","Unavailable"],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
