@@ -89,7 +89,13 @@ async function render(){const areas=await loadAreas();countEl.textContent=areas.
 async function liveEdge(lat,lon){
   try{
     const d=await live(lat,lon);
-    try{await window.NovaStore.put("observations",{id:"weather:"+lat.toFixed(4)+":"+lon.toFixed(4),lat,lon,data:d,updatedAt:Date.now()})}catch{}
+    // Do not delay visible live metrics if the local persistence layer stalls.
+    try {
+      await Promise.race([
+        window.NovaStore.put("observations",{id:"weather:"+lat.toFixed(4)+":"+lon.toFixed(4),lat,lon,data:d,updatedAt:Date.now()}),
+        new Promise(resolve=>setTimeout(resolve,500))
+      ]);
+    } catch {}
     return {...d,mode:"live"};
   }catch{
     try{
