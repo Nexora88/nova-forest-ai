@@ -10,6 +10,14 @@
     button.className = "nexora-install-button";
     button.setAttribute("aria-label", "Install NexoraWildfire AI");
     button.innerHTML = '<span class="nexora-install-icon" aria-hidden="true">↓</span><span class="nexora-install-label">Install app</span>';
+    const installLabel = () => {
+      const en = /^en(?:-|$)/i.test(document.documentElement.dataset.language || document.documentElement.lang || "tr");
+      const label = button.querySelector(".nexora-install-label");
+      if (label) label.textContent = en ? "Install app" : "Uygulamayı yükle";
+      button.setAttribute("aria-label", en ? "Install NexoraWildfire AI" : "NexoraWildfire AI uygulamasını yükle");
+    };
+    installLabel();
+    window.addEventListener("nexora:languagechange", installLabel);
     button.hidden = false;
     document.body.appendChild(button);
 
@@ -26,7 +34,10 @@
     });
     button.addEventListener("click", async () => {
       if (!deferred) {
-        button.querySelector(".nexora-install-label").textContent = /iphone|ipad|ipod/i.test(navigator.userAgent) ? "Share → Add to Home Screen" : "Use your browser menu to install";
+        const en = /^en(?:-|$)/i.test(document.documentElement.dataset.language || document.documentElement.lang || "tr");
+        button.querySelector(".nexora-install-label").textContent = /iphone|ipad|ipod/i.test(navigator.userAgent)
+          ? (en ? "Share → Add to Home Screen" : "Paylaş → Ana Ekrana Ekle")
+          : (en ? "Use your browser menu to install" : "Yüklemek için tarayıcı menüsünü kullan");
         return;
       }
       const promptEvent = deferred;
