@@ -18,6 +18,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'"></script>
 <script>
 (function(){
+ function init(){
   const mapEl=document.getElementById("ndvi-draw-map");
   if(!mapEl||typeof L==="undefined")return;
   const API_BASE=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api")).replace(/\/$/,"");
@@ -73,6 +74,9 @@
   const langObserver=new MutationObserver(updateLabels);langObserver.observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
   updateLabels();
   setTimeout(()=>map.invalidateSize(),100);
+ }
+ const leafletScript=Array.from(document.scripts).find(s=>/leaflet\\.js/.test(s.src));
+ if(typeof L==="undefined"&&leafletScript)leafletScript.addEventListener("load",init,{once:true});else init();
 })();
 </script>
 </body></html>
