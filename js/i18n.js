@@ -1018,6 +1018,7 @@
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
+    window.dispatchEvent(new CustomEvent("nexora:languagechange", { detail: { lang } }));
   }
   function ensureLegalFooter() {
     if (document.querySelector(".nx-legal-footer")) return;
