@@ -428,8 +428,48 @@
     ["Güvenli nokta katmanı temizlendi.","Emergency-point layer cleared."],
     ["Güvenli nokta verisi alınamadı.","Could not retrieve emergency-point data."],
   ];
-  const trToEn = new Map(pairs);
-  const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
+  // Additional phrases used by dynamic panels and status messages.
+  pairs.push(
+    ["saat bilgisi yok", "time unavailable"],
+    ["nem ", "humidity "],
+    ["rüzgâr ", "wind "],
+    ["yağış ", "precipitation "],
+    ["Hava değeri uydurulmadı.", "No weather values were fabricated."],
+    ["Open-Meteo kullanılamıyor:", "Open-Meteo unavailable:"],
+    ["ağ hatası", "network error"],
+    ["güven düzeyi yok", "confidence unavailable"],
+    ["tarih bilgisi yok", "date unavailable"],
+    ["sıcak nokta gözlemi", "hotspot observations"],
+    ["Sıcak nokta verisi olduğu iddia edilmez.", "No hotspot data is claimed."],
+    ["Gözlem olmaması riskin sıfır olduğunu kanıtlamaz.", "No observations do not prove zero risk."],
+    ["Bu, kaynak bağlantı kontrolüdür; resmî uyarı veya doğrulanmış küresel tahmin değildir.", "This is a provider connectivity check, not an official warning or a validated global prediction."],
+    ["Küresel canlı veri kontrolü", "Global live-data check"],
+    ["Alanların, saha rolün ve Nova-Alert tercihlerin hesabına bağlanır. Harita ve acil durum bilgileri hesap açmadan da kullanılabilir.", "Your areas, field role, and Nova-Alert preferences are linked to your account. Maps and emergency information can be used without creating an account."],
+    ["Verin seninle gelsin.", "Keep your field data with you."],
+    ["Güvenli saha hesabı", "Secure field account"],
+    ["Giriş yap", "Sign in"],
+    ["Kayıt ol", "Create account"],
+    ["E-posta", "Email"],
+    ["Telefon", "Phone"],
+    ["Parola", "Password"],
+    ["Parolanı unuttun mu?", "Forgot password?"],
+    ["Yasal bilgilendirme ve kullanım koşulları", "Legal notice and terms of use"],
+    ["Deneysel sistem ve saha güvenliği uyarısını anladım", "I understand the experimental-system and field-safety notice"],
+    ["KVKK, gizlilik, kullanım koşulları ve sorumluluk reddi metinlerini oku ↗", "Read privacy notice, terms, and safety disclaimer ↗"],
+    ["Profil yükleniyor…", "Loading profile…"],
+    ["Profil kaydedilemedi:", "Could not save profile:"],
+    ["Profil ve bölge tercihleri kaydedildi.", "Profile and region preferences saved."],
+    ["Akıllı Tahliye ve Kaçış Koridoru", "Smart Evacuation and Escape Corridor"],
+    ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını simülasyon olarak gösterir.", "In a real emergency, follow official authorities. This module only illustrates a fire-avoidance scenario for a selected area."],
+    ["Bu bölüm yalnızca kullanıcı girdileriyle çalışan görsel bir senaryodur. Haritadan gerçek kaçış rotası hesaplamaz ve güvenli toplanma alanı önermez.", "This is a visual scenario driven by user inputs only. It does not calculate real evacuation routes or recommend safe assembly points."],
+  );
+  // Preserve first-declared mappings instead of silently overwriting duplicate translations.
+  const trToEn = new Map();
+  const enToTr = new Map();
+  for (const [tr, en] of pairs) {
+    if (!trToEn.has(tr)) trToEn.set(tr, en);
+    if (!enToTr.has(en)) enToTr.set(en, tr);
+  }
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
   const documentLang = /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
@@ -463,13 +503,22 @@
     }
     return out;
   }
+  // Dynamic widgets can replace text in an existing node. Keep the original
+  // source when the last value was our translation; accept genuinely new app text.
   const originals = new WeakMap();
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
-    if (!originals.has(node)) originals.set(node, node.nodeValue);
-    const original = originals.get(node);
-    const translated = replace(original, lang);
-    if (translated !== node.nodeValue) node.nodeValue = translated;
+    const current = node.nodeValue;
+    let record = originals.get(node);
+    if (!record) {
+      record = { source: current, translated: current };
+      originals.set(node, record);
+    } else if (current !== record.translated) {
+      record.source = current;
+    }
+    const translated = replace(record.source, lang);
+    if (translated !== current) node.nodeValue = translated;
+    record.translated = translated;
   }
   function translateAttributes(root=document) {
     const selector = "[placeholder],[title],[aria-label],[content]";
