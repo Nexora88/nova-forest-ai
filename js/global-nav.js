@@ -14,26 +14,43 @@
     ["pages/legal.html","Yasal Bilgiler","Legal & Privacy"]
   ];
   const isEnglish = () => /^en(?:-|$)/i.test(document.documentElement.dataset.language || document.documentElement.lang || "tr");
-  const base = location.pathname.includes("/pages/") ? "" : "pages/";
-  const normalPath = location.pathname.replace(/\\/g,"/");
+  const pathFor = (path, inPages) => inPages ? (path === "index.html" ? "../index.html" : path.replace(/^pages\//,"")) : path;
   function render() {
     const nav = document.querySelector("body > nav");
     if (!nav) return;
-    const current = normalPath.split("/").pop() || "index.html";
-    const inPages = normalPath.includes("/pages/");
-    nav.replaceChildren();
-    for (const [path,tr,en] of links) {
-      const a = document.createElement("a");
-      a.href = inPages ? (path === "index.html" ? "../index.html" : path.replace(/^pages\//,"")) : path;
-      const destination = path.split("/").pop();
-      if (destination === current || (current === "" && destination === "index.html")) a.className = "active";
-      a.dataset.tr = tr;
-      a.dataset.en = en;
-      a.textContent = isEnglish() ? en : tr;
-      nav.appendChild(a);
+    const pathname = location.pathname.replace(/\\/g,"/");
+    const current = pathname.split("/").pop() || "index.html";
+    const inPages = pathname.includes("/pages/");
+    const english = isEnglish();
+    const existing = nav.dataset.nxReady === "true";
+    if (existing) {
+      // mobile-nav has already moved overflow links into its More menu. Update
+      // those anchors in place; replacing nav children here breaks mobile UX.
+      nav.querySelectorAll("a").forEach(a => {
+        const item = links.find(([path]) => path.split("/").pop() === a.pathname.split("/").pop());
+        if (!item) return;
+        const [path,tr,en] = item;
+        a.href = pathFor(path,inPages);
+        a.dataset.tr = tr;
+        a.dataset.en = en;
+        a.textContent = english ? en : tr;
+        a.classList.toggle("active",path.split("/").pop() === current);
+      });
+    } else {
+      nav.replaceChildren();
+      for (const [path,tr,en] of links) {
+        const a = document.createElement("a");
+        a.href = pathFor(path,inPages);
+        a.dataset.tr = tr;
+        a.dataset.en = en;
+        a.textContent = english ? en : tr;
+        if (path.split("/").pop() === current) a.className = "active";
+        nav.appendChild(a);
+      }
     }
-    nav.setAttribute("aria-label", isEnglish() ? "Main navigation" : "Ana gezinme");
+    nav.setAttribute("aria-label", english ? "Main navigation" : "Ana gezinme");
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render, {once:true}); else render();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render, {once:true});
+  else render();
   window.addEventListener("nexora:languagechange", render);
 })();
