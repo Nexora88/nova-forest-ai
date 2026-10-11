@@ -1,30 +1,6 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
-    ["Köylü milletin efendisidir.","The farmer is the master of the nation."],
-    ["CANLI TELEMETRİ","LIVE TELEMETRY"],
-    ["MODEL KANITLARI","MODEL EVIDENCE"],
-    ["SAHA GÜVENLİĞİ / SİMÜLASYON","FIELD SAFETY / SIMULATION"],
-    ["YANGIN SONRASI / REHABİLİTASYON İSTİHBARATI","POST-FIRE / RESTORATION INTELLIGENCE"],
-    ["NOVA-ALERT / ERKEN UYARI","NOVA-ALERT / EARLY WARNING"],
-    ["Kırsal Erken Uyarı Durumu","Rural Early Warning Status"],
-    ["Yapay Zeka Model Kanıtı","AI Model Evidence"],
-    ["Akıllı Tahliye ve Kaçış Koridoru","Smart Evacuation and Escape Corridor"],
-    ["KÖY / ALAN","VILLAGE / AREA"],
-    ["GÜVENLİ TOPLANMA","SAFE ASSEMBLY"],
-    ["Risk Haritasında alan seç →","Select an area on the risk map →"],
-    ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını simülasyon olarak gösterir.","In a real emergency, follow official authorities. This module only illustrates a fire-avoidance scenario for a selected area."],
-    ["SENARYO AKIŞ SİMÜLASYONU","SCENARIO FLOW SIMULATION"],
-    ["Kişisel saha çalışma alanı","Personal field workspace"],
-    ["Yasal Bilgiler","Legal"],
-    ["Geri Bildirim","Feedback"],
-    ["Yangın Sonrası Rehabilitasyon ve Ağaçlandırma Öngörüsü","Post-Fire Restoration and Reforestation Outlook"],
-    ["DOĞAL YENİLENME","NATURAL REGENERATION"],
-    ["TÜR PLANLAMA","SPECIES PLANNING"],
-    ["Analiz altyapısı hazır, tarihsel veri bağlantısı bekleniyor.","Analysis infrastructure is ready; historical data connection is pending."],
-    ["Ormansız ve ağaçsız toprak vatan değildir.","Land without forests and trees is not a homeland."],
-    ["“Ormanları korumak, geleceği korumaktır.”","“Protecting forests means protecting the future.”"],
-    ["NexoraWildfire AI · Proje ilkesi","NexoraWildfire AI · Project principle"],
     ["Bilim, üretim ve toplumsal fayda için ilham.","Inspired by science, production, and public benefit."],
     ["Atatürk’ün bilim ve üretim vizyonuna ayrılan tarihî arşivi ve sözleri ayrı sayfada keşfet.","Explore the historical archive and quotations about Atatürk’s vision for science and production on a dedicated page."],
     ["Bilim ve üretim vizyonundan ilham alan bir çevresel gelecek.","An environmental future inspired by science and production."],
@@ -33,14 +9,649 @@
     ["Bilim, tarım ve üretim vizyonu","A vision for science, agriculture, and production"],
     ["Skor eşitse önce daha düşük bağıl nem, ardından daha yüksek sıcaklık ve rüzgâr karşılaştırılır. Bu, meteorolojik önceliklendirmedir; doğrulanmış yangın bildirimi değildir.","When scores tie, lower relative humidity is considered first, followed by higher temperature and wind speed. This is meteorological prioritization, not a confirmed wildfire report."],
     ["Risk skoru nasıl oluşuyor?","How is the risk score calculated?"],
+    ["EN YÜKSEK RİSKLİ BÖLGE","HIGHEST-RISK REGION"],["SON GÜNCELLEME","LAST UPDATED"],["BİLİMSEL ŞEFFAFLIK","SCIENTIFIC TRANSPARENCY"],
+    ["Hava / atmosfer","Weather / atmosphere"],["Uydu NDVI","Satellite NDVI"],["TRAKYA · PİLOT","THRACE · PILOT"],
+    ["Cumhuriyet Vizyonu / Bilim • Üretim • Toplum","Republic Vision / Science • Production • Society"],
+    ["Ana panele dön →","Back to dashboard →"],["Sistem hakkında","About the system"],["Atatürk’ten tarihî kareler","Historical photographs of Atatürk"],
+    ["TARİHİ ARŞİV / ÜRETİM • TOPLUM • YAŞAM","HISTORICAL ARCHIVE / PRODUCTION • SOCIETY • LIFE"],
+    ["Fotoğraf kaynağını açarak tarihî bağlamını ve arşiv bilgisini inceleyebilirsin.","Open the photo source to explore its historical context and archive information."],
+    ["Arşiv kaynağını aç ↗","Open archive source ↗"],["Türk Tarih Kurumu arşiv kaydını görüntüle","View the Turkish Historical Society archive record"],
+    ["Menü","Menu"],["Kapat","Close"],["Daha fazla","More"],["Uygulamayı yükle","Install app"],
+    ["Yüklemek için tarayıcı menüsünü kullan","Use your browser menu to install"],["Paylaş → Ana Ekrana Ekle","Share → Add to Home Screen"],
+    ["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."],
+    ["NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri daha anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin gerçekten yardımcı olacağını bize anlat.","NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field."],
+    ["Hata bildir veya özellik öner →","Report a bug or suggest a feature →"],["Ürünü keşfet","Explore the product"],["Hangi geri bildirimler daha yararlı?","What feedback is most useful?"],
+    ["Tekrarlanabilir hata: hangi sayfayı açtığın, ne beklediğin ve ne olduğu.","A reproducible bug: what page you opened, what you expected, and what happened."],
+    ["Veri sorunu: seçili alan, katman, zaman ve kaynağın hata mı yoksa gözlem yokluğu mu gösterdiği.","A data issue: the selected area, the layer, the time, and whether the source showed an error or no observations."],
+    ["Pratik özellik önerisi: kime yardımcı olacağı ve hangi işi kolaylaştıracağı.","A practical feature request: who it helps and what task it would make easier."],
+    ["Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol.","Mobile usability: device/browser type and the control that was difficult to use."],
+    ["Herkese açık bir bildirime parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Herkese açık bildirimler başkaları tarafından görülebilir.","Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors."],
+    ["Geri Bildirim","Feedback"],["Cumhuriyet Vizyonu","Republic Vision"],["İlham Kaynağımız","Our Inspiration"],
+    ["Ana panele dön","Back to dashboard"],["Ana Panel","Dashboard"],["Risk Haritası","Risk Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],["Feedback","Feedback"],["Sistem","About the System"],
+    ["Çevresel Harita","Environmental Map"],["Çevresel İstihbarat","Environmental Intelligence"],["Çevresel istihbarat ve karar destek sistemi","Environmental intelligence and decision-support system"],
+    ["CANLI KARAR MERKEZİ","LIVE DECISION CENTER"],["SİSTEM ÇEVRİMİÇİ","SYSTEM ONLINE"],["YETKİLİ ÇALIŞMA ALANI","AUTHORIZED WORKSPACE"],
+    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle","Monitor Thrace's forests, fields, and ecosystems in one decision workspace"],
+    ["Türkiye'yi il → ilçe → alan seviyesinde katman katman izle.","Explore Türkiye from province to district to field."],
+    ["Haritadaki renk tek bir “güzel/çirkin” göstergesi değildir.","Map colors do not represent a single good-or-bad score."],
+    ["Seçtiğin veri katmanına göre değişir: yangın/çevre riski, orman sağlığı, su-toprak durumu, tarım koşulu veya polen.","Colors depend on the selected layer: wildfire/environmental risk, forest health, water and soil, agriculture, or pollen."],
+    ["VERİLER YÜKLENİYOR…","LOADING DATA…"],["VERİ AKIŞI BEKLENİYOR","WAITING FOR DATA"],["Katmanlar","Layers"],["Katmanlar","Layers"],["Katmanlar","Layers"],
+    ["Tarla İzleme","Field Monitoring"],["Biyoçeşitlilik","Biodiversity"],["İl → İlçe → Alan","Province → District → Field"],
+    ["Bir ile tıkla, ilçelere in.","Select a province to explore its districts."],
+    ["Alan Ekle","Add Area"],["Alanlarım","My Areas"],["Haritada görüntüle","View on map"],["Alan adı","Area name"],["Alan türü","Area type"],
+    ["Tarım Karar Motoru","Agriculture Decision Engine"],["Enerji altyapısı için varlık bazlı risk raporu","Asset-based risk report for energy infrastructure"],
+    ["Kurumsal varlık güzergâhı ve risk raporu","Enterprise asset mapping and risk reporting"],
+    ["Kurumsal altyapı analizi","Enterprise infrastructure analysis"],["Kurumsal analiz alanı","Enterprise analysis workspace"],
+    ["Kurumsal varlık çizim haritası","Enterprise asset drawing map"],["Varlık güzergâhını haritada çiz","Draw an asset route on the map"],
+    ["Harita yüklenince çizim araçlarını kullanabilir veya GeoJSON yükleyebilirsin.","When the map loads, use the drawing tools or upload a GeoJSON file."],
+    ["Şirket adı","Company name"],["Varlık adı","Asset name"],["Varlık türü","Asset type"],["Tampon mesafesi","Buffer distance"],
+    ["Varlık GeoJSON dosyası (isteğe bağlı)","Asset GeoJSON file (optional)"],["Kurumsal PDF raporu oluştur","Generate enterprise PDF report"],
+    ["Rapor oluşturmak için giriş ve kurumsal yetki gerekir.","Sign-in and enterprise authorization are required to generate a report."],
+    ["Erişim notu:","Access note:"],["Giriş","Sign in"],["Hesap oluştur","Create account"],["Çıkış yap","Sign out"],["Kaydet","Save"],["İptal","Cancel"],["Kapat","Close"],
+    ["Geleceğe yön veren düşünceler","Ideas that shape the future"],["Hayatta en hakiki mürşit ilimdir.","The truest guide in life is science."],
+    ["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
+    ["Sonraki söz","Next quote"],["Önceki söz","Previous quote"],["SİSTEM MANTIĞI","HOW THE SYSTEM WORKS"],
+    ["Tek uygulama, farklı kullanıcılar.","One platform, different users."],
+    ["Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir.","Farmers can assess irrigation, beekeepers can check flight conditions, forest managers can review risk areas, and nature observers can monitor pollen."],
+    ["Sistemin amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.","The goal is not to overwhelm users with data, but to turn it into understandable decisions."],
+    ["Sıcaklık","Temperature"],["Nem","Humidity"],["Rüzgar","Wind"],["Toprak nemi","Soil moisture"],["Kaynak","Source"],["Geçmiş","History"],
+    ["Düşük","Low"],["Orta","Moderate"],["Yüksek","High"],["Kritik","Critical"],["VERİ YOK","NO DATA"],["HAZIRLANIYOR","IN PREPARATION"],
+    ["Sahne bulundu","Scene found"],["Sahne bekleniyor","Waiting for scene"],["BAĞLANIYOR","CONNECTING"],["Harita katmanları","Map layers"],
+    ["Sistemin amacı","The system's purpose"],["Ürün hedefi","Product vision"],["Geliştirici","Developer"],["Saha","Field"],["Orman sağlığı","Forest health"],
+    ["Tarım koşulları","Agricultural conditions"],["Sulama ihtiyacı","Irrigation needs"],["Yangın riski","Wildfire risk"],["Yangın / çevre riski","Wildfire / environmental risk"],
+    ["Ana sayfa","Home"],["Canlı veri","Live data"],["Çevrimdışı","Offline"],["ÇEVRİMDIŞI","OFFLINE"],["Son yerel veri","Last cached data"],
+    ["Varlık bazlı analiz","Asset-based analysis"],["Uydu ve meteoroloji","Satellite and weather"],["Yüksek gerilim hattı","Transmission line"],
+    ["Trafo merkezi","Substation"],["Rüzgâr türbini (RES)","Wind turbine"],["Diğer","Other"],["100 metre","100 metres"],["1 kilometre","1 kilometre"],
+    ["Giriş ve kurumsal yetki","Sign-in and enterprise authorization"],["Nexora çatısı altında geliştirilen","Developed under the Nexora umbrella"],
+    ["Ürün sayfası","Product page"],["Geri","Back"],["İleri","Next"],["Güncelle","Refresh"],["Yenile","Reload"],["Orman, tarım ve ekosistem","Forests, agriculture, and ecosystems"],["Uydu • Tarla • Ekosistem İstihbaratı","Satellite • Field • Ecosystem Intelligence"],
+    ["Trakya + İstanbul Çevresel İstihbarat","Thrace + Istanbul Environmental Intelligence"],["Türkiye • 81 İL • 973 İLÇE • OFFLINE VECTOR","TÜRKIYE • 81 PROVINCES • 973 DISTRICTS • OFFLINE VECTOR"],
+    ["İl geometrileri ve 973 ilçe sınırı yerel GeoJSON olarak uygulamaya gömülüdür.","Province geometries and 973 district boundaries are bundled as local GeoJSON."],
+    ["Harita bağlantı kesildiğinde bile idari vektör sınırlar çalışır; canlı hava ve yerleşim verisi ağ varsa güncellenir.","Administrative vector boundaries remain available offline; live weather and settlement data update when a network is available."],
+    ["İdari sınırlar resmi mülkiyet/parsel sınırı değildir.","Administrative boundaries are not official property or parcel boundaries."],
+    ["Harita üzerindeki filtrelerden hangi çevresel göstergenin renkleri belirlediğini seç.","Use the map filters to choose which environmental indicator controls the colors."],
+    ["Toprak nemi, ET₀ ve sıcaklık; sulama ve tarla çalışması için erken sinyal üretir.","Soil moisture, ET₀, and temperature provide early signals for irrigation and field work."],
+    ["Polen verisi atmosferik bir sinyaldir.","Pollen data is an atmospheric signal."],
+    ["Bitki çeşitliliğinin kesin tespiti için Sentinel-2 spektral sınıflandırma katmanı ayrıca kurulacaktır.","A Sentinel-2 spectral classification layer is needed to assess plant diversity."],
+    ["NEXORAWILDFIRE / GEOSPATIAL COMMAND","NEXORAWILDFIRE / GEOSPATIAL COMMAND"],["VERİ KATMANI","DATA LAYER"],
+    ["ALAN ÇİZİMİ","DRAW AREA"],["ALAN KAYDEDİLDİ","AREA SAVED"],["ALAN CİHAZA KAYDEDİLDİ","AREA SAVED ON DEVICE"],
+    ["SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR","SELECTED AREA SHOWN ON MAP"],["YEREL VERİ","LOCAL DATA"],["SON YEREL VERİ","LAST CACHED DATA"],
+    ["KÜRESEL ÖLÇEK TESTİ","GLOBAL SCALE TEST"],["Küresel Ölçek Testi · Napa Vadisi","Demo: Global Scale Test · Napa Valley"],
+    ["Kaliforniya Napa Vadisi yakınında örnek GeoJSON poligonu yükle ve temsilî koordinat için güncel hava durumunu iste. Uydu ve eğitilmiş ML kullanılabilirliği ayrı raporlanır.","Load a sample GeoJSON polygon near Napa Valley, California, and request current weather for its representative coordinate. Satellite and trained-ML availability are reported separately."],
+    ["GeoJSON haritada gösterildi. Open-Meteo isteği şu anda kullanılamıyor; hiçbir hava değeri uydurulmadı. Uydu ve eğitilmiş ML durumu doğrulanmadı.","GeoJSON: PASS · Open-Meteo request unavailable. No weather values were fabricated. Satellite and trained-ML status remain unverified."],
+    ["GeoJSON: BAŞARILI","GeoJSON: PASS"],["Güncel hava durumu isteniyor…","Requesting current weather…"],
+    ["NASA FIRMS, Copernicus işleme ve eğitilmiş ML bu demodan çıkarılamaz; yapılandırılmış durumları ayrı kontrol edilmelidir.","NASA FIRMS, Copernicus processing, and trained ML are not implied by this demo; their configured status must be checked separately."],
+    ["Kaliforniya Napa Vadisi","Napa Valley, California"],["Henüz küresel demo çalıştırılmadı.","No global demo has been run yet."],
+    ["Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Güncel hava durumu isteniyor…","GeoJSON rendered at Napa Valley, California. Requesting current weather…"],
+    ["Rapor oluşturmak için giriş ve kurumsal yetki gerekir.","Sign-in and enterprise authorization are required to generate a report."],
+    ["Model eğitimi için doğrulanmış, etiketli geçmiş veri ve model artefaktı gerekli.","A verified labelled historical dataset and model artifact are required for training."],
+    ["Eksik özellikler:","Missing features:"],["Tüm model girdileri sonlu sayısal değer olmalıdır.","All model inputs must be finite numeric values."],
+    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle.","Monitor Thrace's forests, fields, and ecosystems in one decision workspace."],
+    ["Alan Ekle ile kendi tarla, arılık veya orman poligonunu kaydet ve Alanlarım ekranında canlı durumunu izle.","Use Add Area to save your own field, apiary, or forest polygon and monitor it in My Areas."],
+    ["Bu konumu seçili saha seviyesinde açarak çevresel sinyalleri incele.","Open this location as a selected field to inspect environmental signals."],
+    ["Bu seviye seçili bir coğrafi gözlem noktasıdır; resmî parsel veya mülkiyet sınırı değildir.","This is a geographic observation point, not an official parcel or property boundary."],
+    ["Sistem şu anda bir pilot bölgede","The system is currently being tested in a pilot region"],["Geliştirilmekte olan bir araştırma ve karar destek projesidir.","A developing research and decision-support project."],
+    ["Bu deneysel olasılık, yalnızca eğitim verisinin temsil ettiği koşullarda karar desteğidir; resmi yangın alarmı veya kesin tahmin değildir.","This experimental probability is decision support only for conditions represented by the training data; it is not an official fire alert or a guaranteed forecast."],
+    ["Bir sonraki işleme katmanında","In the next processing layer"],["Gerçek piksel hesabı backend işleme katmanına bağlanacak.","Real pixel calculations will be connected to the backend processing layer."],
+    ["Polen ≠ biyoçeşitlilik.","Pollen ≠ biodiversity."],["Bitki çeşitliliği için Sentinel-2'nin çok bantlı yansımaları, red-edge bantları, zaman serisi ve arazi örtüsü sınıfları birlikte değerlendirilmelidir.","Plant diversity assessment should combine Sentinel-2 multispectral reflectance, red-edge bands, time series, and land-cover classes."],
+    ["NexoraWildfire AI yalnızca yangın alarmı veren bir harita değil; orman sağlığı, tarımsal koşullar, toprak nemi, sulama ihtiyacı, polen, hava kalitesi, arıcılık uçuş koşulları ve çevresel riskleri aynı veri katmanında birleştiren bölgesel karar destek sistemidir.","NexoraWildfire AI is more than a wildfire alert map: it brings forest health, agricultural conditions, soil moisture, irrigation needs, pollen, air quality, beekeeping flight conditions, and environmental risk into one regional decision-support system."],
+    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle.","Monitor Thrace's forests, fields, and ecosystems in one decision workspace."],
+    ["Bitki stresi, kuraklık sinyali, sıcaklık ve yangın koşullarını tek göstergede birleştirir.","Combines plant stress, drought signals, temperature, and fire conditions in one indicator."],
+    ["Toprak nemi, ET₀, yağış ve sıcaklık üzerinden sulama ve tarla çalışması için erken sinyaller üretir.","Provides early signals for irrigation and field work using soil moisture, ET₀, rainfall, and temperature."],
+    ["Arıcılık için sıcaklık, rüzgar, yağış ve polen koşullarını yorumlayan bölgesel uçuş koşulu göstergesi.","A regional flight-conditions indicator for beekeeping, using temperature, wind, rainfall, and pollen."],
+    ["Avrupa CAMS hava kalitesi modeli üzerinden polen ve hava kalitesi sinyallerini izler.","Tracks pollen and air-quality signals using the European CAMS air-quality model."],
+    ["İl sınırları gerçek geometrileriyle; hava, tarım ve ekosistem göstergeleriyle birlikte.","Province boundaries are shown with their geometries alongside weather, agriculture, and ecosystem indicators."],
+    ["NexoraWildfire AI; uydu verileri, meteorolojik bilgiler ve yapay zeka destekli analiz yöntemlerini kullanarak çevresel risklerin izlenmesi amacıyla geliştirilen bir karar destek platformudur.","NexoraWildfire AI is a decision-support platform being developed to monitor environmental risks using satellite data, meteorological information, and AI-assisted analysis methods."],
+    ["Doğayı korumak, üreticinin emeğini korumaktır.","Protecting nature also protects the work of producers."],
+    ["Orman yangınları yalnızca ağaçları değil; köyleri, tarım alanlarını ve kırsal yaşamı da etkiler.","Wildfires affect not only trees, but also villages, agricultural land, and rural livelihoods."],
+    ["NexoraWildfire AI, çevresel verileri anlaşılır karar destek sinyallerine dönüştürerek üreticinin yaşam alanlarını ve doğal kaynakları daha erken fark etmeye yardımcı olmayı amaçlar.","NexoraWildfire AI aims to turn environmental data into understandable decision-support signals that help people recognize risks to rural communities and natural resources earlier."],
+    ["Bu bölüm, Atatürk'ün üretim, tarım ve çevreye ilişkin Cumhuriyet vizyonunu günümüz çevresel karar destek yaklaşımıyla ilişkilendiren proje anlatısıdır.","This section connects Atatürk's Republic-era vision for production, agriculture, and the environment with today's approach to environmental decision support."],
+    ["Gerçek meteoroloji akışı + mevcut çevresel risk mantığı + açıklanabilir karar desteği.","Real meteorological feeds + current environmental risk logic + explainable decision support."],
+    ["Isı yüzeyi: mevcut meteorolojik risk sinyalinin görsel temsili. Uydu katmanı için Risk Haritası'nı aç.","Heat surface: a visual representation of the current meteorological risk signal. Open Risk Map for satellite layers."],
+    ["Alanlarını tek ekrandan izle.","Monitor your areas in one place."],
+    ["Tarla, arılık, orman veya seçtiğin alanı haritada kaydet.","Save a field, apiary, forest, or other selected area on the map."],
+    ["NexoraWildfire hava, toprak nemi, ET₀, VPD ve polen sinyallerini otomatik olaylara dönüştürür.","NexoraWildfire turns weather, soil moisture, ET₀, VPD, and pollen signals into automated events."],
+    ["Backend bağlandığında alan poligonunun gerçek Sentinel-2 NDVI zaman serisi de burada görünür.","When the backend is connected, the area's real Sentinel-2 NDVI time series will also appear here."],
+    ["Risk yükseldiğinde NexoraWildfire haber versin.","Let NexoraWildfire notify you when risk increases."],
+    ["Harici SMS, e-posta veya bot kullanmadan çalışır.","Works without external SMS, email, or bot services."],
+    ["Sistem riski kendi backend'inde değerlendirir, uyarıyı Alanlarım'a kaydeder ve izin verilirse tarayıcı bildirimi gösterir.","The backend evaluates risk, saves the alert to My Areas, and displays a browser notification when permission is granted."],
+    ["İlk alanını oluştur.","Create your first area."],["Harita → Alan Ekle. En az üç köşe seç, alan adını ve kullanım türünü yaz.","Go to Map → Add Area. Select at least three corners, then enter the area's name and type."],
+    ["Bu ekran alanın canlı durumunu ve otomatik olaylarını gösterecek.","This screen will show your area's live status and automated events."],
+    ["Tarla, orman ve bitki örtüsünü uydu verisiyle okumaya hazırlan.","Prepare to interpret fields, forests, and vegetation with satellite data."],
+    ["Sentinel-2 sahne keşfi mevcut. Bir sonraki işleme katmanında B02/B03/B04/B08 ve red-edge bantlarıyla bitki örtüsü, stres ve habitat sınıfları üretilecek. Sistem veri yokken değer uydurmaz.","Sentinel-2 scene discovery is available. A future processing layer will use B02/B03/B04/B08 and red-edge bands to derive vegetation, stress, and habitat classes. The system does not invent values when data is missing."],
+    ["Uygun Level-2A sahne keşfi.","Discovery of suitable Level-2A scenes."],
+    ["Polen sayısını bitki çeşitliliği sanmak yerine uydu spektral imzalarıyla tür/habitat grupları sınıflandırılacak.","Rather than treating pollen counts as plant diversity, species or habitat groups will be classified from satellite spectral signatures."],
+    ["Tarla sınırı + zaman serisi + bitki stresi + sulama sinyali.","Field boundary + time series + plant stress + irrigation signal."],
+    ["Bölge sahneleri taranıyor...","Scanning scenes for the region..."],
+    ["Polen modeli atmosferdeki polen yükünü gösterir. Bitki çeşitliliği için Sentinel-2'nin çok bantlı yansımaları, red-edge bantları, zaman serisi ve arazi örtüsü sınıfları birlikte değerlendirilmelidir. NexoraWildfire bu ayrımı sistem mimarisinde korur.","The pollen model indicates atmospheric pollen load. Plant diversity assessment should combine Sentinel-2 multispectral reflectance, red-edge bands, time series, and land-cover classes. NexoraWildfire preserves this distinction in its system design."],
+    ["Open-Meteo meteorolojik verileri kullanılarak bölgesel sıcaklık, nem ve rüzgar koşulları analiz edilir.","Regional temperature, humidity, and wind conditions are analysed using Open-Meteo weather data."],
+    ["Bitki kuruluğu için analiz edilir","Analysed as an indicator of plant dryness"],["Yangın yayılım risk faktörü","A factor in wildfire spread risk"],
+    ["Meteorolojik risk işleme aktif","Meteorological risk processing is active"],["Veri Akışı","Data Stream"],["Bölgesel koordinat analizi","Regional coordinate analysis"],
+    ["Bilim, üretim ve toplumsal fayda","Science, production, and public benefit"],["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
+    
+    
+    ["Herkese açık kullanıcı adı","Public username"],["Kullanıcı adı","Username"],["Görünen ad","Display name"],["Kimliğimi kaydet","Save my identity"],
+    ["Ara","Search"],
+    
+    ["Saygılı ve saha odaklı iletişim kur. Kişisel bilgileri paylaşırken dikkatli ol.","Communicate respectfully and stay focused on field work. Be careful when sharing personal information."],
+    
+    ["Acil durumlarda 112 ve yetkili kurumların talimatları önceliklidir.","In emergencies, call 112 and follow instructions from the relevant authorities."],
+    ["Kurumsal varlık güzergâhı ve risk raporu","Enterprise asset mapping and risk reporting"],
+    ["Bu ayrı çalışma alanı; enerji hatları, trafo merkezleri ve rüzgâr türbinleri için coğrafi varlık geometrisi hazırlamak ve çevresel risk raporu istemek üzere tasarlanmıştır. Ana paneldeki harita deneyimini bölmez.","This dedicated workspace lets users prepare geographic asset geometries and request environmental risk reports for power lines, substations, and wind turbines without cluttering the main map."],
+    ["Yüksek gerilim hatları, trafo merkezleri ve rüzgâr türbinleri için GeoJSON varlığını seçin; tampon alanı, uydu NDVI/NDMI, erişilebilir sıcak nokta akışı ve yol erişimi tek bir PDF raporunda toplansın.","Select a GeoJSON asset for power lines, substations, or wind turbines to compile the buffer area, satellite NDVI/NDMI, available hotspot feed, and road access into one PDF report."],
+    ["Kurumsal yetki gerekir. Bu ilk sürümde ödeme/abonelik sağlayıcısı bağlı değildir; erişim sunucu tarafında yetkili hesap listesiyle yönetilir. 5 yıllık FIRMS arşivi ve 3 aylık hava tahmini hazır değilse rapor bunları açıkça “veri yok” olarak işaretler; uydurma değer üretmez.","Enterprise authorization is required. No payment or subscription provider is connected in this first version; access is controlled by a server-side allowlist. If five-year FIRMS history or a three-month forecast is unavailable, the report marks it as unavailable instead of inventing values."],
+    ["Çizgi: elektrik hattı · Çokgen: RES/trafo etki alanı · Nokta: tek türbin","Line: power line · Polygon: wind-farm/substation impact area · Point: individual turbine"],
+    ["NexoraWildfire AI · Uydu Tabanlı Çevresel Risk Analiz Platformu","NexoraWildfire AI · Satellite-Based Environmental Risk Analysis Platform"],
+    ["Sistem şu anda bir pilot bölgede","The system is currently being tested in a pilot region"],
+    ["Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Hava durumu ve NASA FIRMS durumu isteniyor…","GeoJSON rendered at Napa Valley, California. Requesting weather and NASA FIRMS status…"],
+    ["Open-Meteo: kullanılamıyor","Open-Meteo: unavailable"],["Hava değerleri uydurulmadı.","No weather values were fabricated."],
+    ["NASA FIRMS: KULLANILABİLİR","NASA FIRMS: AVAILABLE"],["NASA FIRMS: YAPILANDIRILMAMIŞ","NASA FIRMS: NOT CONFIGURED"],
+    ["NASA FIRMS: backend uç noktası kullanılamıyor","NASA FIRMS: backend endpoint unavailable"],
+    ["FIRMS_MAP_KEY anahtarını backend ortam değişkenlerinde tanımlayarak gerçek sıcak nokta sorgularını etkinleştir.","set FIRMS_MAP_KEY in the backend environment to enable real hotspot queries."],
+    ["Son bir gün için","for the last day"],["Sıfır gözlem, yangın riskinin sıfır olduğunu kanıtlamaz.","Zero observations do not prove zero fire risk."],
+    ["Bu demo yalnızca harita geometrisini, güncel hava durumunu ve sağlayıcı yanıtını kontrol eder; eğitilmiş bir Kaliforniya yangın-risk modeli veya resmî uyarı değildir.","This demo checks map geometry, current weather, and the provider response only; it is not a trained California fire-risk model or an official alert."],
+    ["NASA FIRMS:","NASA FIRMS:"],["sıcak nokta gözlemi","hotspot observations"],["nem","humidity"],["rüzgâr","wind"],
+    ["Uydu ve eğitilmiş ML durumu doğrulanmadı.","Satellite and trained-ML status remain unverified."],
+    ["YANGIN RİSKİ","WILDFIRE RISK"],["RİSK HARİTASI","RISK MAP"],["VERİ AKIŞI BEKLENİYOR","WAITING FOR DATA STREAM"],
+    ["KÖY / MAHALLE","VILLAGE / NEIGHBOURHOOD"],["SEÇİLİ SAHA","SELECTED AREA"],["ALANIM","MY AREA"],["ALANLARIM","MY AREAS"],
+    ["VERİLER YÜKLENİYOR…","LOADING DATA…"],["RİSK HESAPLANIYOR","CALCULATING RISK"],["ÇEVRİMDIŞI","OFFLINE"],
+    ["KATMANLAR","LAYERS"],["VERİ KATMANI","DATA LAYER"],["UYDU","SATELLITE"],["ORMAN","FOREST"],["TARIM","AGRICULTURE"],
+    ["POLEN","POLLEN"],["SU / TOPRAK","WATER / SOIL"],["KARANLIK","DARK"],["AÇIK","LIGHT"],["TOPOĞRAFYA","TOPOGRAPHY"],
+    ["İNSANİ HARİTA","HUMANITARIAN MAP"],["STANDART","STANDARD"],["CANLI","LIVE"],["SİSTEM ÇALIŞIYOR","SYSTEM OPERATIONAL"],
+    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],
+    ["SİSTEM KAPSAMI","SYSTEM COVERAGE"],["OPERASYON MERKEZİ","OPERATIONS CENTER"],["TARIM / SULAMA","AGRICULTURE / IRRIGATION"],
+    ["Sıcaklık Analizi","Temperature Analysis"],["Nem Seviyesi","Humidity Level"],["Rüzgar Hızı","Wind Speed"],["AI Değerlendirme","AI Assessment"],
+    ["Uydu katmanı","Satellite layer"],["Orman katmanı","Forest layer"],["Tarım katmanı","Agriculture layer"],["Arıcılık katmanı","Beekeeping layer"],["Atmosfer katmanı","Atmosphere layer"],
+    ["Haritada alan ekle","Add an area on the map"],["Alan ekle","Add area"],["Alanı kaydet","Save area"],["Bildirim ayarları","Notification settings"],
+    ["Risk eşiği","Risk threshold"],["Nova-Alert'i etkinleştir","Enable Nova-Alert"],["Kaydet ve tarayıcı izni ver","Save and grant browser permission"],
+    ["İlk alanını oluştur.","Create your first area."],["Henüz geçmiş yok.","No history yet."],["Veri yok","No data"],["Veri bekleniyor…","Waiting for data…"],
+    ["KURUMSAL YETKİLİ ÇALIŞMA ALANI","AUTHORIZED ENTERPRISE WORKSPACE"],["Canlı hava verisi","Live weather data"],
+    ["Menü","Menu"],["Kapat","Close"],["Diğer","More"],["Uygulamayı yükle","Install app"],["Yüklemek için tarayıcı menüsünü kullan","Use your browser menu to install"],["Paylaş → Ana Ekrana Ekle","Share → Add to Home Screen"],
+    ["Belgelenmiş yangın-hava durumu modeli","Documented fire-weather model"],["Backend model dosyası ve değerlendirme kaydı kontrol ediliyor…","Checking the backend model artifact and evaluation record…"],
+    ["Araştırma modeli durumu:","Research model status:"],["Geçerli model dosyası hazır olana kadar tahmin gösterilmez.","No prediction is presented until a valid model artifact is available."],
+    ["Canlı model durumu bu sayfadan doğrulanamadı. Arayüz eğitim metrikleri uydurmaz.","Live model status could not be verified from this page. The UI will not invent training metrics."],
+    ["ARAŞTIRMA PROTOTİPİ","RESEARCH PROTOTYPE"],["etiketli günlük gözlem","labelled daily observations"],["dönem belirtilmemiş","period not reported"],
+    ["Doğruluk","Accuracy"],["Dengeli doğruluk","Balanced accuracy"],["Kesinlik","Precision"],["Duyarlılık","Recall"],["F1","F1"],["ROC AUC","ROC AUC"],
+    ["Bu model 2012 tarihli Cezayir meteoroloji gözlemlerini kullanır. Trakya/Türkiye için doğrulanmamıştır, yedi günlük tahmin değildir ve resmî uyarı olarak kullanılmamalıdır.","This model uses historical Algerian weather observations from 2012. It is not validated for Thrace/Türkiye, is not a seven-day forecast, and must not be used as an official warning."],
+    ["Canlı model durumu bu sayfadan doğrulanamadı.","Live model status could not be verified from this page."],
+    ["Hava Koşulları ve Çevresel Sinyaller","Weather Conditions and Environmental Signals"],
+    ["CANLI HAVA VERİSİ","LIVE WEATHER DATA"],
+    ["Hava Koşulları","Weather Conditions"],
+    ["Sıcaklık Analizi","Temperature Analysis"],
+    ["Nem Seviyesi","Humidity Level"],
+    ["Rüzgar Hızı","Wind Speed"],
+    ["Bitki kuruluğu için analiz edilir","Used to assess vegetation dryness"],
+    ["Yangın yayılım risk faktörü","A factor in wildfire spread"],
+    ["Meteorolojik risk işleme aktif","Weather-risk processing active"],
+    ["Veri Akışı","Data Stream"],
+    ["Bölgesel koordinat analizi","Regional coordinate analysis"],
+    ["Uydu Tabanlı Çevresel Risk Analiz Platformu","Satellite-Based Environmental Risk Analysis Platform"],
+    ["NexoraWildfire AI Hakkında","About NexoraWildfire AI"],
+    ["Doğayı korumak, üreticinin emeğini korumaktır.","Protecting nature means protecting producers' work."],
+    ["Orman yangınları yalnızca ağaçları değil; köyleri, tarım alanlarını ve kırsal yaşamı da etkiler.","Wildfires affect not only trees, but also villages, farmland, and rural life."],
+    ["NexoraWildfire AI, çevresel verileri anlaşılır karar destek sinyallerine dönüştürerek üreticinin yaşam alanlarını ve doğal kaynakları daha erken fark etmeye yardımcı olmayı amaçlar.","NexoraWildfire AI aims to turn environmental data into understandable decision-support signals that help people notice changes affecting producers and natural resources earlier."],
+    ["Bu bölüm, Atatürk'ün üretim, tarım ve çevreye ilişkin Cumhuriyet vizyonunu günümüz çevresel karar destek yaklaşımıyla ilişkilendiren proje anlatısıdır.","This section connects the project's approach to environmental decision support with Atatürk's Republic-era vision for production, agriculture, and the environment."],
+    ["Research Platform","Araştırma Platformu"],
+    ["Canlı veri","Live data"],
+    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],
+    ["Hesap ve saha merkezi","Account and field center"],
+    ["Profil ve saha merkezi","Profile and field center"],
+    ["Hesap oluştur / giriş yap","Create account / sign in"],
+    ["Operasyonel Kontrol Merkezi","Operational Control Center"],
+    ["Operasyonel karar destek alanı","Operational decision-support workspace"],
+    ["Plan ve analiz kotası","Plan and analysis quota"],
+    ["Plan ve kullanım","Plan and usage"],
+    ["Plan ve kullanım bilgileri yükleniyor…","Loading plan and usage information…"],
+    ["Plan bilgisi alınamadı.","Could not load plan information."],
+    ["Kullanım bilgisi alınamadı.","Could not load usage information."],
+    ["Ödeme alma şu anda etkin değil.","Payment collection is currently disabled."],
+    ["Fiyatlar henüz belirlenmedi.","Prices have not been decided yet."],
+    ["Önerilen plan","Proposed plan"],
+    ["Ücretsiz","Free"],
+    ["Kurumsal","Enterprise"],
+    ["Kullanım","Usage"],
+    ["Kalan analiz","Analyses remaining"],
+    ["Aylık limit","Monthly limit"],
+    ["Kullanılan analiz","Analyses used"],
+    ["Sistem Tanılama","System Diagnostics"],
+    ["Sistem tanılaması","System diagnostics"],
+    ["Son kontrol","Last check"],
+    ["Yenile","Refresh"],
+    ["Destekleniyor","Supported"],
+    ["Desteklenmiyor","Not supported"],
+    ["Ölçülemedi","Could not be measured"],
+    ["Bilinmiyor","Unknown"],
+    ["Belirtilmedi","Not specified"],
+    ["Çevrimdışı","Offline"],
+    ["Çevrimiçi","Online"],
+    ["Giriş yap","Sign in"],
+    ["Çıkış yap","Sign out"],
+    ["Oturum kapatılıyor…","Signing out…"],
+    ["Oturum kapatılamadı:","Could not sign out:"],
+    ["Hesap oluştur","Create account"],
+    ["Şifre","Password"],
+    ["E-posta adresi","Email address"],
+    ["Giriş yap veya hesap oluştur","Sign in or create an account"],
+    ["Veri kaynağı","Data source"],
+    ["Kaynak durumu","Source status"],
+    ["Veri sağlayıcısı","Data provider"],
+    ["Sağlayıcı yanıtı","Provider response"],
+    ["Veri bulunamadı","No data found"],
+    ["Gözlem bulunamadı","No observations found"],
+    ["Kaynak erişilemiyor","Source unavailable"],
+    ["Bağlantı kurulamadı","Connection failed"],
+    ["Veri henüz doğrulanmadı","Data has not been verified yet"],
+    ["Bu gösterge deneysel karar desteğidir; resmî uyarı değildir.","This indicator is experimental decision support, not an official warning."],
+    ["İl sınırları","Province boundaries"],
+    ["İlçe sınırları","District boundaries"],
+    ["Seçili alan","Selected area"],
+    ["Alanı düzenle","Edit area"],
+    ["Alanı sil","Delete area"],
+    ["Alanı hesapla","Analyse area"],
+    ["Hesapla","Analyse"],
+    ["Hesaplanıyor…","Calculating…"],
+    ["Alan kaydedildi","Area saved"],
+    ["Alan kaydedilemedi","Could not save area"],
+    ["Alan silindi","Area deleted"],
+    ["Alan silinemedi","Could not delete area"],
+    ["Değişiklikler kaydedildi","Changes saved"],
+    ["Değişiklikler kaydedilemedi","Could not save changes"],
+    ["Bildirimler","Notifications"],
+    ["Bildirim izni","Notification permission"],
+    ["Bildirim izni verilmedi","Notification permission not granted"],
+    ["Tarayıcı bildirimi desteklenmiyor","Browser notifications are not supported"],
+    ["API anahtarı","API key"],
+    ["API anahtarları","API keys"],
+    ["Entegrasyonlar","Integrations"],
+    ["Gerçek sağlayıcı bağlantısı","Live provider connection"],
+    ["Henüz yapılandırılmadı","Not configured yet"],
+    ["Yapılandırıldı","Configured"],
+    ["Doğrulanamadı","Could not be verified"],
+    ["İşlem başarısız","Operation failed"],
+    ["İşlem tamamlandı","Operation completed"],
+    ["Hata ayrıntısı","Error details"],
+    ["Tekrar dene","Try again"],
+    ["Veri kapsamı","Data coverage"],
+    ["Son güncelleme","Last update"],
+    ["Zaman damgası","Timestamp"],
+    ["Kaynak ve sınırlamalar","Sources and limitations"],
+    ["Kullanım kotası","Usage quota"],
+    ["Abonelik ve faturalandırma","Subscription and billing"],
+    ["Abonelik henüz etkin değil","Subscriptions are not enabled yet"],
+    ["Ödeme altyapısı kurulmadı","Payment infrastructure has not been configured"],
+    ["Ücretli planlar satın alınamaz","Paid plans are not available for purchase"],
+    ["Fiyatlandırma maliyet ölçümünden sonra belirlenecek","Pricing will be decided after cost measurement"],
+    ["Veri dürüstlüğü","Data integrity"],
+    ["Gerçek kaynaklar, zaman damgaları ve belirsizlik.","Real sources, timestamps, and uncertainty."],
+    ["Gözlem ≠ doğrulanmış yangın","Observation ≠ confirmed wildfire"],
+    ["Uydu sahnesi keşfi","Satellite scene discovery"],
+    ["Gerçek piksel hesabı","Actual pixel calculation"],
+    ["Sahne bulundu","Scene found"],
+    ["Sahne bekleniyor","Waiting for a scene"],
+    ["Uygun sahne yok veya backend bağlı değil.","No suitable scene found or the backend is not connected."],
+    ["Backend bekleniyor","Waiting for backend"],
+    ["Backend uç noktası kullanılamıyor","Backend endpoint unavailable"],
+    ["Uydu verisi","Satellite data"],
+    ["Bitki stresi","Vegetation stress"],
+    ["Sulama ihtiyacı","Irrigation needs"],
+    ["Toprak nemi","Soil moisture"],
+    ["Arı uçuş koşulları","Bee flight conditions"],
+    ["Polen ve hava kalitesi","Pollen and air quality"],
+    ["Hata bildir veya özellik öner →","Report a bug or suggest a feature →"],
+    ["Hangi geri bildirimler daha yararlı?","What feedback is most useful?"],
+    ["Geri Bildirim","Feedback"],
+    ["Cumhuriyet Vizyonu","Republic Vision"],
+    ["Bilim · Üretim · Toplumsal Fayda","Science · Production · Public Benefit"],
+    ["Ana panele dön →","Back to dashboard →"],
+    ["Sistem hakkında","About the system"],
+    ["Bilim ve üretim vizyonundan ilham alan bir çevresel gelecek.","An environmental future inspired by a vision for science and production."],
+    ["Bilim, tarım ve üretim vizyonu","A vision for science, agriculture, and production"],
+    ["Kanıt · Üretim · Sorumluluk","Evidence · Production · Responsibility"],
+    ["Doğaya ve üreticiye saygı","Respect for nature and producers"],
+    ["Menü","Menu"],
+    ["Kapat","Close"],
+    ["Daha fazla","More"],
+    ["Diğer","More"],
+    ["Uygulamayı yükle","Install app"],
+    ["Yüklemek için tarayıcı menüsünü kullan","Use your browser menu to install"],
+    ["Paylaş → Ana Ekrana Ekle","Share → Add to Home Screen"],
+    ["Veri yok","No data"],
+    ["Veri bekleniyor…","Waiting for data…"],
+    ["Veriler yükleniyor…","Loading data…"],
+    ["Hava / atmosfer","Weather / atmosphere"],
+    ["Tarım Karar Motoru","Agriculture Decision Engine"],
+    ["Orman Sağlığı","Forest Health"],
+    ["Toprak & Su","Soil & Water"],
+    ["Arıcılık","Beekeeping"],
+    ["Araştırma Platformu","Research Platform"],
+    ["Sistem mantığı","System logic"],
+    ["Çevresel risk","Environmental risk"],
+    ["Sıcak nokta gözlemi","Hotspot observation"],
+    ["Doğrulanmış yangın kaydı","Confirmed wildfire record"],
+    ["Çevrimdışı öncelikli","Offline-first"],
+    ["İngilizce","English"],
+    ["Türkçe","Turkish"],
+    ["Trakya çevresel istihbarat • tarım • orman • ekosistem","Thrace environmental intelligence • agriculture • forests • ecosystems"],
+    ["NEXORAWILDFIRE / TRAKYA ENVIRONMENTAL INTELLIGENCE","NEXORAWILDFIRE / THRACE ENVIRONMENTAL INTELLIGENCE"],
+    ["Canlı çevre haritasını aç →","Open the live environmental map →"],
+    ["Uydu merkezine git","Go to Satellite Hub"],
+    ["AKTİF PİLOT ALANI","ACTIVE PILOT AREA"],
+    ["Edirne · Kırklareli · Tekirdağ","Edirne · Kırklareli · Tekirdağ"],
+    ["GÖZLEM","OBSERVATION"],
+    ["Sahne keşfi","Scene discovery"],
+    ["Hava ve polen","Weather and pollen"],
+    ["Nasıl çalışır? →","How does it work? →"],
+    ["CUMHURİYET VİZYONU / BİLİM • ÜRETİM • TOPLUM","REPUBLIC VISION / SCIENCE • PRODUCTION • SOCIETY"],
+    ["Sağlık + yangın","Health + wildfire"],
+    ["Nova-Bee","Nova-Bee"],
+    ["Polen + hava","Pollen + air"],
+    ["Orman Durumu","Forest Status"],
+    ["HEALTH","HEALTH"],
+    ["Tarım İstihbaratı","Agricultural Intelligence"],
+    ["FIELD","FIELD"],
+    ["Polen & Hava","Pollen & Air"],
+    ["Trakya Çevresel Risk Alanı","Thrace Environmental Risk Area"],
+    ["EDİRNE • KIRKLARELİ • TEKİRDAĞ","EDIRNE • KIRKLARELI • TEKIRDAG"],
+    ["NOVA-BEE / ARICILIK","NOVA-BEE / BEEKEEPING"],
+    ["Uçuş koşulu hazırlanıyor","Preparing flight conditions"],
+    ["Uçuş skoru","Flight score"],
+    ["Polen sinyali","Pollen signal"],
+    ["Çevresel durum hesaplanıyor","Calculating environmental status"],
+    ["Uyarı","Alert"],
+    ["0 alan","0 areas"],
+    ["NOVA-ALERT / YERLEŞİK UYARI SİSTEMİ","NOVA-ALERT / LOCAL ALERT SYSTEM"],
+    ["BAŞLANGIÇ","OVERVIEW"],
+    ["Bitki Çeşitliliği","Plant Diversity"],
+    ["SPEKTRAL MODEL","SPECTRAL MODEL"],
+    ["Gözlem merkezi","Observation Center"],
+    ["Bitki çeşitliliği motoru","Plant Diversity Engine"],
+    ["1925 · çevre ve üretim vizyonu","1925 · vision for the environment and production"],
+    ["NEXORA / TOPLUMSAL VİZYON","NEXORA / PUBLIC BENEFIT VISION"],
+    ["“Köylü milletin efendisidir.”","“The peasant is the master of the nation.”"],
+    ["Canlı Risk Analiz Odası","Live Risk Analysis Room"],
+    ["TRAKYA + İSTANBUL / OPERASYONEL RİSK YÜZEYİ","THRACE + ISTANBUL / OPERATIONAL RISK SURFACE"],
+    ["Seçili pilot merkez","Selected pilot center"],
+    ["HAVA SICAKLIĞI","AIR TEMPERATURE"],
+    ["NİSPİ NEM","RELATIVE HUMIDITY"],
+    ["RÜZGAR","WIND"],
+    ["yayılım sinyali","spread signal"],
+    ["atmosferik kuruluk","atmospheric dryness"],
+    ["MİLLETİN EFENDİSİNE / EARLY WARNING","EARLY WARNING FOR RURAL COMMUNITIES"],
+    ["Kırsal Erken Uyarı Durumu","Rural Early Warning Status"],
+    ["Risk sinyali yüksek olduğunda sistem köy/mahalle düzeyindeki kayıtları öne çıkarır. Aşağıdaki bildirimler","When risk signals are elevated, the system prioritizes village/neighbourhood records. The notifications below are"],
+    ["simülasyon/karar desteğidir","simulations and decision-support indicators"],
+    ["; gerçek SMS veya muhtarlık bildirimi gönderildiği iddia edilmez.","; they do not mean that an actual SMS or local-authority notification has been sent."],
+    ["MODEL EVIDENCE","MODEL EVIDENCE"],
+    ["Yapay Zeka Model Kanıtı","AI Model Evidence"],
+    ["Akademik güven için yalnızca ölçülmüş sonuçlar gösterilir; doğrulanmamış başarı oranları uydurulmaz.","Only measured results are shown for scientific integrity; unverified performance figures are never invented."],
+    ["MODEL DOĞRULAMA","MODEL VALIDATION"],
+    ["VERİ SETİ BEKLENİYOR","WAITING FOR DATASET"],
+    ["AKTİF ANALİZ","ACTIVE ANALYSIS"],
+    ["Kurala dayalı risk motoru","Rule-based risk engine"],
+    ["Environmental intelligence for real-world needs","Gerçek dünya ihtiyaçları için çevresel istihbarat"],
+    ["PRODUCT FEEDBACK","ÜRÜN GERİ BİLDİRİMİ"],
+    ["NEXORA / BUILT WITH FEEDBACK","NEXORA / GERİ BİLDİRİMLE GELİŞİYOR"],
+    ["SCIENCE · SERVICE · RESPONSIBILITY","BİLİM · HİZMET · SORUMLULUK"],
+    ["Science should help people solve real problems.","Bilim, insanların gerçek sorunlarını çözmesine yardımcı olmalıdır."],
+    ["That principle guides the product direction: build carefully, be honest about evidence, and make technology useful to the people and ecosystems it serves.","Bu ilke ürünün yönünü belirler: özenle geliştirmek, kanıtlar konusunda dürüst olmak ve teknolojiyi hizmet ettiği insanlara ve ekosistemlere faydalı kılmak."],
+    ["NexoraWildfire AI · Independent project by Ahmet Eymen Bakraç · Nexora","NexoraWildfire AI · Ahmet Eymen Bakraç tarafından geliştirilen bağımsız proje · Nexora"],
+    ["NEXORA / SCIENCE · PRODUCTION · PUBLIC BENEFIT","NEXORA / BİLİM · ÜRETİM · TOPLUMSAL FAYDA"],
+    ["İLKE","PRINCIPLE"],
+    ["NexoraWildfire AI, ormanları, tarlaları ve kırsal yaşamı etkileyen çevresel koşulları daha anlaşılır kılmayı amaçlayan bağımsız bir karar destek projesidir. Tarihî ilham, gerçek veri ve şeffaf sınırlarla çalışan bir ürün geliştirme sorumluluğunun yerine geçmez.","NexoraWildfire AI is an independent decision-support project that aims to make environmental conditions affecting forests, farms, and rural life easier to understand. Historical inspiration does not replace the responsibility to build a product grounded in real data and transparent limitations."],
+    ["NexoraWildfire AI · Bağımsız proje · Nexora88 © 2026","NexoraWildfire AI · Independent project · Nexora88 © 2026"],
+    ["NexoraWildfire AI · Ahmet Eymen Bakraç · Nexora88 © 2026","NexoraWildfire AI · Ahmet Eymen Bakraç · Nexora88 © 2026"],
+    ["-- °C","-- °C"],
+    ["-- km/h","-- km/h"],
+    ["🌦 Open-Meteo API","🌦 Open-Meteo API"],
+    ["🤖 NexoraWildfire Risk Engine","🤖 NexoraWildfire Risk Engine"],
+    ["Ekran okuyucu","Screen reader"],
+    ["Hesap ayarları","Account settings"],
+    ["Hesap bilgileri","Account information"],
+    ["Alanlar ve uyarılar","Areas and alerts"],
+    ["Veri kaynakları ve tanılamalar","Data sources and diagnostics"],
+    ["Bu alan henüz hazır değil","This section is not ready yet"],
+    ["Veri sağlayıcısı yanıt vermedi","The data provider did not respond"],
+    ["Sunucu yanıt vermedi","The server did not respond"],
+    ["İstek başarısız oldu","The request failed"],
+    ["Kayıt bulunamadı","No record found"],
+    ["İçerik yüklenemedi","Content could not be loaded"],
+    ["Bağlantı hatası","Connection error"],
+    ["Erişim reddedildi","Access denied"],
+    ["Bu özellik pilot aşamasındadır","This feature is in the pilot stage"],
+    ["Henüz canlıya alınmadı","Not live yet"],
+    ["Bu değer mevcut değil","This value is unavailable"],
+    ["Gerçek zamanlı veri","Real-time data"],
+    ["Kaynak doğrulama","Source verification"],
+    ["Çalışma durumu","Operational status"],
+    ["İşlem geçmişi","Activity history"],
+    ["Kullanım özeti","Usage summary"],
+    ["Aylık kullanım","Monthly usage"],
+    ["Kota doldu","Quota reached"],
+    ["Kota bilgisi alınamadı","Could not load quota information"],
+    ["Kurumsal Plan · Demo ve Teklif Talebi","Enterprise Plan · Request a Demo or Quote"],
+    ["Kuruluşunuzun ihtiyaçlarını konuşalım. Bu form ödeme almaz ve abonelik başlatmaz; talep e-posta taslağı olarak hazırlanır.","Let's discuss your organization's needs. This form does not accept payment or start a subscription; it prepares an email draft."],
+    ["ÖN GÖRÜŞME","INITIAL CONSULTATION"],
+    ["Ad soyad","Full name"],
+    ["Şirket / kurum","Company / organization"],
+    ["İş e-postası","Business email"],
+    ["İlgilendiğiniz alan","Area of interest"],
+    ["Bir seçenek belirleyin","Choose an option"],
+    ["Enerji altyapısı ve varlık risk raporu","Energy infrastructure and asset risk reports"],
+    ["Kurumsal yangın ve çevre risk takibi","Enterprise wildfire and environmental risk monitoring"],
+    ["Tarım, arazi ve uydu analizi","Agriculture, land, and satellite analysis"],
+    ["Kurumsal iş birliği","Enterprise collaboration"],
+    ["İhtiyacınız (isteğe bağlı)","Your needs (optional)"],
+    ["Hangi iş akışını değerlendirmek istiyorsunuz? Hassas koordinat veya gizli şirket verisi yazmayın.","What workflow would you like to evaluate? Do not enter sensitive coordinates or confidential company data."],
+    ["Bu formun ödeme veya abonelik başlatmadığını ve iletişim kanalının yapılandırılmamış olabileceğini anladım.","I understand that this form does not start a payment or subscription and that the contact channel may not be configured."],
+    ["Demo / teklif al","Request a demo / quote"],
+    ["Demo / Teklif Talebi Oluştur","Create demo / quote request"],
+    ["Gönderim için doğrulanmış kurumsal iletişim e-postası yapılandırılmalıdır.","A verified enterprise contact email must be configured for sending."],
+    ["Talep taslağı","Request draft"],
+    ["Talep metnini kopyala","Copy request text"],
+    ["Gizlilik: Bu sayfa form bilgilerini kendiliğinden bir sunucuya göndermez. İletişim adresi yapılandırılmamışsa yalnızca yerel talep taslağı oluşturulur; gerçek gönderim yapılmış gibi gösterilmez.","Privacy: This page does not automatically send form data to a server. If no contact address is configured, it only creates a local request draft and never pretends that a request was sent."],
+    ["E-posta uygulaman açılıyorsa talep taslağı hazır. Gönderimi e-posta uygulamanda onaylamalısın.","If your email app opens, the request draft is ready. You must confirm sending in your email app."],
+    ["İletişim e-postası henüz yapılandırılmadığı için talep gönderilmedi. Taslağı kopyalayabilir; adres tanımlandığında form e-posta uygulamasını açacaktır.","The request was not sent because the contact email is not configured. You can copy the draft; once an address is configured, the form will open your email app."],
+    ["Talep taslağı panoya kopyalandı; gönderilmedi.","The request draft was copied to the clipboard; it was not sent."],
+    ["Otomatik kopyalama kullanılamıyor. Metni seçip cihazının Kopyala komutunu kullan.","Automatic copying is unavailable. Select the text and use your device's Copy command."],
+    ["Fiyatlandırma henüz belirlenmedi","Pricing has not been finalized"],
+    ["Ödeme devre dışı","Payments disabled"],
+    ["Plan karşılaştırması","Plan comparison"],
+    ["Ürün vizyonu","Product vision"],
+    ["Misyonumuz","Our mission"],
+    ["Vizyonumuz","Our vision"],
+    ["Risk haritası","Risk map"],
+    ["ATMOSFER","ATMOSPHERE"],
+    ["Sentinel-2 sahne altyapısı, bitki stresi ve risk sinyalleri. Gerçek NDVI pixel hesabı ayrıca yapılandırılacak.","Sentinel-2 scene discovery, vegetation stress, and risk signals. Actual NDVI pixel processing must be configured separately."],
+    ["03 / ARICILIK","03 / BEEKEEPING"],
+    ["04 / İNSAN","04 / PEOPLE"],
+    ["CAMS tabanlı polen ve hava kalitesi göstergeleriyle günlük çevre farkındalığı.","Daily environmental awareness using CAMS-based pollen and air-quality indicators."],
+    ["05 / SICAK NOKTA","05 / HOTSPOT"],
+    ["06 / GEÇMİŞ","06 / HISTORY"],
+    ["Zaman Serisi","Time Series"],
+    ["Yerel gözlem geçmişi şimdilik tarayıcıda tutulur; kalıcı sunucu geçmişi sonraki veri katmanıdır.","Local observation history is currently stored in the browser; persistent server-side history is a future data layer."],
+    ["NexoraWildfire AI | Proje Hakkında","NexoraWildfire AI | About the Project"],
+    ["Çanakkale","Çanakkale"],
+    ["İstanbul Avrupa","Istanbul European Side"],
+    ["Risk heuristics","Risk heuristics"],
+    ["Satellite-ready","Satellite-ready"],
+    ["Mevcut üretim sistemi açıklanabilir çevresel sinyaller kullanır.","The current production system uses explainable environmental signals."],
+    ["SONRAKİ DOĞRULAMA","NEXT VALIDATION"],
+    ["Confusion Matrix + ROC","Confusion Matrix + ROC"],
+    ["METRİKLER ÖLÇÜM SONRASI","METRICS AFTER EVALUATION"],
+    ["Gerçek etiketli yangın geçmişi ile değerlendirildiğinde bu panel sayısal metrikleri gösterecek.","This panel will display numerical metrics after evaluation against real labelled wildfire history."],
+    ["Akıllı Tahliye ve Kaçış Koridoru","Evacuation and Escape Corridor"],
+    ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını","In a real emergency, follow official instructions. This module shows a conceptual approach to moving away from a wildfire for the selected area"],
+    ["KÖY / ALAN","VILLAGE / AREA"],
+    ["GÜVENLİ TOPLANMA","SAFE ASSEMBLY"],
+    ["POST-FIRE / RESTORATION INTELLIGENCE","POST-FIRE / RESTORATION INTELLIGENCE"],
+    ["Yangın Sonrası Rehabilitasyon ve Ağaçlandırma Öngörüsü","Post-Fire Restoration and Reforestation Outlook"],
+    ["“Ormansız ve ağaçsız toprak vatan değildir.”","“A land without forests and trees is not a homeland.”"],
+    ["DOĞAL YENİLENME","NATURAL REGENERATION"],
+    ["Analiz altyapısı hazır, tarihsel veri bağlantısı bekleniyor.","The analysis infrastructure is ready; historical data connection is pending."],
+    ["20 yıllık yangın/orman serisi bağlandığında doğal yenilenme potansiyeli için karşılaştırmalı rapor üretilecek.","A comparative report on natural regeneration potential will be produced once a 20-year wildfire/forest time series is connected."],
+    ["TÜR PLANLAMA","SPECIES PLANNING"],
+    ["“Tek tür dikimi” yerine saha uyumlu seçim","Choose species suited to the site instead of single-species planting"],
+    ["↗ Uydu merkezi","↗ Satellite Hub"],
+    ["HESAP KONTROLÜ","ACCOUNT CONTROL"],
+    ["Profil yükleniyor…","Loading profile…"],
+    ["Kimlik doğrulaması bekleniyor","Waiting for authentication"],
+    ["Kayıtlı saha","Saved area"],
+    ["Bu cihazdaki kayıtlar","Records on this device"],
+    ["Alarm eşiği","Alert threshold"],
+    ["Kullanıcı tercihi","User preference"],
+    ["Yerel depolama","Local storage"],
+    ["Ölçülüyor","Measuring"],
+    ["Tarayıcı kotası","Browser quota"],
+    ["Tarayıcı bağlantı sinyali","Browser connectivity signal"],
+    ["PLAN & METERING / 02","PLAN & METERING / 02"],
+    ["Yoğun uydu/GIS işleri için sunucu tarafında ölçülen aylık kullanım. Bu hesapta henüz ödeme alınmıyor.","Monthly server-measured usage for intensive satellite/GIS jobs. This account is not being charged."],
+    ["BU AYKİ ANALİZ KULLANIMI","ANALYSIS USAGE THIS MONTH"],
+    ["Kota, ağır uydu/GIS görevlerinde sunucu tarafında uygulanır.","The quota is enforced server-side for intensive satellite/GIS jobs."],
+    ["FATURALANDIRMA","BILLING"],
+    ["Ödeme kapalı","Payments disabled"],
+    ["Şimdilik hiçbir ücret alınmaz. Plan fiyatları ve ödeme sağlayıcısı, limitleri pilot kullanıcılarla doğruladıktan sonra belirlenecek.","No charges are collected at this time. Plan prices and the payment provider will be decided after limits are validated with pilot users."],
+    ["PLAN TASLAKLARI · FİYATLAR HENÜZ BELİRLENMEDİ","DRAFT PLANS · PRICES NOT YET DECIDED"],
+    ["Plan bilgileri yükleniyor…","Loading plan information…"],
+    ["Genel profil","General profile"],
+    ["Plan & kullanım","Plan & usage"],
+    ["AI alarm ayarları","AI alert settings"],
+    ["API & entegrasyon","API & integrations"],
+    ["Etki & rozetler","Impact & badges"],
+    ["IDENTITY / 01","IDENTITY / 01"],
+    ["İşlevsel saha kimliğin ve kullanım rolün.","Your operational field identity and usage role."],
+    ["Ad soyad","Full name"],
+    ["Operasyon rolü","Operational role"],
+    ["GÜVENLİ HESAP","SECURE ACCOUNT"],
+    ["NEXORA / SAHA HESABI","NEXORA / FIELD ACCOUNT"],
+    ["Verin seninle gelsin.","Take your data with you."],
+    ["E-posta ile giriş yap →","Sign in with email →"],
+    ["Parolamı unuttum","Forgot password"],
+    ["Google hesabınla devam et","Continue with Google"],
+    ["Tek tıklamayla güvenli giriş. Google sağlayıcısı Supabase panelinde etkin değilse önce OAuth kurulumu gerekir.","Secure sign-in in one click. If the Google provider is not enabled in the Supabase dashboard, OAuth must be configured first."],
+    ["Google ile devam et ↗","Continue with Google ↗"],
+    ["Telefon numarası","Phone number"],
+    ["SMS kodu gönder →","Send SMS code →"],
+    ["SMS doğrulama kodu","SMS verification code"],
+    ["Kodu doğrula","Verify code"],
+    ["SMS girişinin çalışması için Supabase Phone Auth ve bir SMS sağlayıcısı etkin olmalıdır. Sağlayıcı ücretleri olabilir.","SMS sign-in requires Supabase Phone Auth and an SMS provider to be enabled. Provider charges may apply."],
+    ["HESAP GÜVENLİĞİ","ACCOUNT SECURITY"],
+    ["Yeni parola belirle","Set a new password"],
+    ["E-posta bağlantısıyla doğrulandıktan sonra yeni parolanı iki kez gir.","After verifying through the email link, enter your new password twice."],
+    ["Yeni parola","New password"],
+    ["Yeni parola (tekrar)","New password (again)"],
+    ["Parolayı güncelle","Update password"],
+    ["Hesabıma dön →","Back to my account →"],
+    ["● Supabase Auth","● Supabase Auth"],
+    ["● Oturum güvenliği","● Session security"],
+    ["● Acil harita açık","● Emergency map available"],
+    ["NEXORA / ENTERPRISE INTELLIGENCE","NEXORA / KURUMSAL İSTİHBARAT"],
+    ["Hat, trafo veya türbin koordinatları ve 100–5.000 m etki tamponu.","Coordinates for lines, substations, or turbines with a 100–5,000 m impact buffer."],
+    ["Sentinel-2 zaman serisi, erişilebilen NASA FIRMS akışı ve mevcut hava tahmini.","Sentinel-2 time series, available NASA FIRMS feed, and current weather forecast."],
+    ["250 metre","250 metres"],
+    ["500 metre","500 metres"],
+    ["2,5 kilometre","2.5 kilometres"],
+    ["5 kilometre","5 kilometres"],
+    ["WGS84 GeoJSON: FeatureCollection, LineString, Point veya Polygon. En fazla 1 MB.","WGS84 GeoJSON: FeatureCollection, LineString, Point, or Polygon. Maximum 1 MB."],
+    ["Çiftçi / Tarım","Farmer / Agriculture"],
+    ["Orman yönetimi","Forest management"],
+    ["Çevre gözlemi","Environmental observation"],
+    ["Profili kaydet","Save profile"],
+    ["ASSET MANAGEMENT / 02","ASSET MANAGEMENT / 02"],
+    ["NDVI yüzdesi yalnızca gerçek uydu analiz sonucu mevcut olduğunda gösterilmelidir. Şu anda doğrulanmamış sağlık yüzdeleri üretilmez. PDF raporu, tarayıcının yazdırma / PDF olarak kaydetme özelliğini kullanır.","An NDVI percentage should only be shown when an actual satellite analysis result is available. Unverified health percentages are not generated. PDF reports use the browser's print / save-as-PDF feature."],
+    ["NOVA-ALERT / 03","NOVA-ALERT / 03"],
+    ["AI alarm ve bildirim eşikleri","AI alert and notification thresholds"],
+    ["İzlenecek olayları ve uygulama içi risk eşiğini kişiselleştir.","Customize the events to monitor and the in-app risk threshold."],
+    ["TERCİHLER","PREFERENCES"],
+    ["Yangın / NASA FIRMS anomali sinyallerini izle","Monitor wildfire / NASA FIRMS anomaly signals"],
+    ["E-posta alarm tercihini kaydet","Save email alert preference"],
+    ["(gönderim için servis entegrasyonu gerekir)","(a service integration is required to send messages)"],
+    ["Risk uyarı eşiği","Risk alert threshold"],
+    ["25 · Daha hassas","25 · More sensitive"],
+    ["100 · Daha seçici","100 · More selective"],
+    ["Alarm tercihlerini kaydet","Save alert preferences"],
+    ["Bu panel tercihleri saklar; tek başına SMS veya e-posta göndermez. Gerçek push için tarayıcı izni, sunucu tarafı olay işleyici ve güvenli bildirim servisi gerekir. NASA FIRMS gözlemi de tek başına doğrulanmış yangın anlamına gelmez.","This panel stores preferences; it does not send SMS or email by itself. Real push notifications require browser permission, a server-side event handler, and a secure notification service. A NASA FIRMS observation alone is not a confirmed wildfire."],
+    ["DEVELOPER PLATFORM / 04","DEVELOPER PLATFORM / 04"],
+    ["API ve entegrasyonlar","APIs and integrations"],
+    ["B2B READY UI","B2B-READY UI"],
+    ["NEXORA ENVIRONMENT API","NEXORA ENVIRONMENT API"],
+    ["Sunucu tarafında anahtar yönetimi doğrulanmadı.","Server-side key management has not been verified."],
+    ["Henüz bağlı değil","Not connected yet"],
+    ["Göster","Show"],
+    ["Anahtar oluştur","Create key"],
+    ["BAĞLANTI KATALOĞU","INTEGRATION CATALOG"],
+    ["Veri sağlayıcıları","Data providers"],
+    ["Supabase hesap profili","Supabase account profile"],
+    ["Kontrol ediliyor","Checking"],
+
+    ["Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.","Developed by independent developer Ahmet Eymen Bakraç."],
+    ["Bağımsız proje","Independent project"],
+    ["Hukuki belgeler","Legal documents"],
+    ["Hukuki belgeler (taslak)","Legal documents (draft)"],
+    ["KVKK Aydınlatma Metni","KVKK Privacy Notice"],
+    ["Gizlilik Politikası","Privacy Policy"],
+    ["Kullanım Koşulları ve Sorumluluk Reddi","Terms of Use and Disclaimer"],
+    ["Belgeler taslak aşamasındadır; hukuki inceleme ve iletişim kanalı tamamlanmadan nihai belge olarak değerlendirilmemelidir.","These documents are drafts and must not be treated as final until legal review and a privacy contact channel are in place."],
+    ["Bu sayfa, NexoraWildfire AI için hazırlanan hukuki belge taslaklarına erişim sağlar. Veri sorumlusunun iletişim bilgisi henüz yayımlanmamıştır; bu nedenle kişisel veri başvuruları için etkin bir iletişim kanalı henüz bulunmamaktadır.","This page provides access to draft legal documents for NexoraWildfire AI. The data controller's contact details have not been published, so a working channel for personal-data requests is not yet available."],
+    ["Veri sorumlusu olarak belirtilen kişi","Person identified as the proposed data controller"],
+    ["Ahmet Eymen Bakraç · bireysel proje sahibi · Türkiye","Ahmet Eymen Bakraç · individual project owner · Türkiye"],
+    ["Açık adres yayımlanmamıştır. İletişim ve gizlilik e-postası, sahibi tarafından doğrulanıp sağlanana kadar eklenmeyecektir.","No public address is shown. Contact details and a privacy email will not be added until verified and supplied by the owner."],
+    ["Yayın durumu","Publication status"],
+    ["YAYINA HAZIR DEĞİL","NOT READY FOR PUBLICATION"],
+    ["Taslak belgeleri GitHub'da görüntüle","View draft documents on GitHub"],
+    ["KVKK Aydınlatma Metni taslağını aç","Open the KVKK Privacy Notice draft"],
+    ["Gizlilik Politikası taslağını aç","Open the Privacy Policy draft"],
+    ["Kullanım Koşulları taslağını aç","Open the Terms of Use draft"],
+    ["Bu proje resmî bir yangın uyarı sistemi değildir. Acil durumlarda yetkili kurumların yönlendirmelerini izleyin.","This project is not an official wildfire warning system. Follow the guidance of the relevant authorities in emergencies."],
+    ["Kayıt işlemi geçici olarak duraklatıldı","Registration is temporarily paused"],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor. Mevcut kullanıcılar giriş yapabilir.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured. Existing users can still sign in."],
+    ["Kullanım Koşulları","Terms of Use"],
+    ["Gizlilik","Privacy"],
+    ["Hakkında","About"],
+    ["Son kontrol","Last checked"],
+    ["Hukuki bilgilendirme · Taslak v0.1","Legal notice · Draft v0.1"],
+    ["Belgeler son hukuki incelemeden geçmemiştir. Kayıt sırasında hangi sürümü gördüğünüz kaydedilir.","The documents have not received final legal review. The versions shown during registration are recorded."],
+    ["taslağını okudum.","I have read the draft."],
+    ["taslağını okudum ve beta kullanım sınırlarını anladım.","I have read the draft and understand the beta-use limitations."],
+    ["Bu kutular hukuki incelemenin veya veri sorumlusu iletişim kanalının yerine geçmez. Kişisel veri iletişim adresi henüz tanımlı değildir.","These checkboxes do not replace legal review or a data-controller contact channel. A privacy contact address has not been configured yet."],
+    ["Devam etmek için iki hukuki bilgilendirme kutusunu da işaretle.","Please tick both legal information checkboxes to continue."],
+    ["Hukuki Belgeler","Legal Documents"],
+    ["Şeffaflık · Gizlilik · Güven","Transparency · Privacy · Trust"],
+    ["BELGE MERKEZİ","DOCUMENT HUB"],
+    ["Hukuki belgeler ve gizlilik","Legal documents and privacy"],
+    ["Veri sorumlusu bilgileri","Data controller information"],
+    ["Veri sorumlusu olarak belirtilen kişi:","Person identified as the proposed data controller:"],
+    ["Ülke:","Country:"],
+    ["Açık adres:","Public address:"],
+    ["İletişim / gizlilik e-postası:","Contact / privacy email:"],
+    ["Belge taslakları","Document drafts"],
+    ["Yayın öncesi açık kalan işler","Outstanding pre-publication tasks"],
+    ["Ahmet Eymen Bakraç — bireysel proje sahibi.","Ahmet Eymen Bakraç — individual project owner."],
+    ["Doğrulanmış bir açık adres yayımlanmamıştır.","No verified public address is published."],
+    ["Henüz verilmedi; doğrulanana kadar yayımlanmayacaktır.","Not provided yet; it will not be published until verified."],
+    ["Bu sayfa NexoraWildfire AI için hazırlanan hukuki belge taslaklarını bir araya getirir.","This page brings together legal document drafts prepared for NexoraWildfire AI."],
+    ["Taslaklar gerçek uygulama veri akışları, sağlayıcılar ve saklama süreleri doğrulanıp hukuk uzmanı tarafından incelenmeden nihai hukuki belge veya uygunluk garantisi olarak değerlendirilmemelidir.","The drafts must not be treated as final legal documents or a compliance guarantee until actual application data flows, providers, and retention periods are verified and reviewed by a legal professional."],
+    ["Eksik kimlik ve iletişim bilgileri uydurulmamıştır.","Missing identity and contact details have not been invented."],
+    ["Gizlilik e-postası ve veri sorumlusuna ulaşılabilecek başvuru kanalı henüz belirlenmediğinden, bu sayfa şu an kişisel veri başvuruları için etkin bir iletişim kanalı sunmaz.","Because a privacy email and a channel for contacting the data controller have not yet been established, this page does not currently provide an active channel for personal-data requests."],
+    ["Yeni hesap oluşturma, hukuki belgeler son incelemeden geçirilip gizlilik iletişim kanalı tanımlanana kadar geçici olarak kullanılamıyor.","New account creation is temporarily unavailable until the legal documents receive final review and a privacy contact channel is configured."],
+    ["Geliştirici imzası","Developer attribution"]
+
+    ["Köylü milletin efendisidir.","The farmer is the master of the nation."],
+    ["CANLI TELEMETRİ","LIVE TELEMETRY"],
+    ["MODEL KANITLARI","MODEL EVIDENCE"],
+    ["SAHA GÜVENLİĞİ / SİMÜLASYON","FIELD SAFETY / SIMULATION"],
+    ["YANGIN SONRASI / REHABİLİTASYON İSTİHBARATI","POST-FIRE / RESTORATION INTELLIGENCE"],
+    ["NOVA-ALERT / ERKEN UYARI","NOVA-ALERT / EARLY WARNING"],
+    ["Risk Haritasında alan seç →","Select an area on the risk map →"],
+    ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını simülasyon olarak gösterir.","In a real emergency, follow official authorities. This module only illustrates a fire-avoidance scenario for a selected area."],
+    ["SENARYO AKIŞ SİMÜLASYONU","SCENARIO FLOW SIMULATION"],
+    ["Kişisel saha çalışma alanı","Personal field workspace"],
+    ["Yasal Bilgiler","Legal"],
+    ["Ormansız ve ağaçsız toprak vatan değildir.","Land without forests and trees is not a homeland."],
+    ["“Ormanları korumak, geleceği korumaktır.”","“Protecting forests means protecting the future.”"],
+    ["NexoraWildfire AI · Proje ilkesi","NexoraWildfire AI · Project principle"],
     ["EN YÜKSEK RİSKLİ BÖLGE","HIGHEST-RISK REGION"],
     ["SON GÜNCELLEME","LAST UPDATED"],
     ["BİLİMSEL ŞEFFAFLIK","SCIENTIFIC TRANSPARENCY"],
-    ["Hava / atmosfer","Weather / atmosphere"],
     ["Uydu NDVI","Satellite NDVI"],
     ["TRAKYA · PİLOT","THRACE · PILOT"],
-    ["Cumhuriyet Vizyonu / Bilim • Üretim • Toplum","Republic Vision / Science • Production • Society"],
-    ["Ana panele dön →","Back to dashboard →"],
     ["KÜRESEL KONUM / KOORDİNATLAR","GLOBAL LOCATION / COORDINATES"],
     ["Dünyanın herhangi bir yerini ara veya enlem-boylam gir. Seçilen alan için güncel hava ve NASA FIRMS kapsamı kontrol edilir; eğitilmiş küresel yangın modeli olduğu iddia edilmez.","Search a place anywhere in the world or enter latitude and longitude. This checks real current weather and NASA FIRMS coverage for the selected area; it does not claim a trained global fire model."],
     ["Yer adı","Place name"],
@@ -83,29 +694,10 @@
     ["NASA FIRMS: MEVCUT ·","NASA FIRMS: AVAILABLE ·"],
     ["NASA FIRMS uç noktası kullanılamıyor:","NASA FIRMS endpoint unavailable:"],
     ["Bu bir sağlayıcı bağlantı kontrolüdür; resmî uyarı veya doğrulanmış küresel tahmin değildir.","This is a provider connectivity check, not an official warning or a validated global prediction."],
-    ["Sistem hakkında","About the system"],
     ["Atatürk’ten tarihî kareler","Historical photographs of Atatürk"],
-    ["TARİHİ ARŞİV / ÜRETİM • TOPLUM • YAŞAM","HISTORICAL ARCHIVE / PRODUCTION • SOCIETY • LIFE"],
-    ["Fotoğraf kaynağını açarak tarihî bağlamını ve arşiv bilgisini inceleyebilirsin.","Open the photo source to explore its historical context and archive information."],
     ["Arşiv kaynağını aç ↗","Open archive source ↗"],
     ["Türk Tarih Kurumu arşiv kaydını görüntüle","View the Turkish Historical Society archive record"],
-    ["Menü","Menu"],
-    ["Kapat","Close"],
-    ["Daha fazla","More"],
-    ["Uygulamayı yükle","Install app"],
-    ["Yüklemek için tarayıcı menüsünü kullan","Use your browser menu to install"],
-    ["Paylaş → Ana Ekrana Ekle","Share → Add to Home Screen"],
-    ["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."],
-    ["NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri daha anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin gerçekten yardımcı olacağını bize anlat.","NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field."],
-    ["Hata bildir veya özellik öner →","Report a bug or suggest a feature →"],
     ["Ürünü keşfet","Explore the product"],
-    ["Hangi geri bildirimler daha yararlı?","What feedback is most useful?"],
-    ["Tekrarlanabilir hata: hangi sayfayı açtığın, ne beklediğin ve ne olduğu.","A reproducible bug: what page you opened, what you expected, and what happened."],
-    ["Veri sorunu: seçili alan, katman, zaman ve kaynağın hata mı yoksa gözlem yokluğu mu gösterdiği.","A data issue: the selected area, the layer, the time, and whether the source showed an error or no observations."],
-    ["Pratik özellik önerisi: kime yardımcı olacağı ve hangi işi kolaylaştıracağı.","A practical feature request: who it helps and what task it would make easier."],
-    ["Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol.","Mobile usability: device/browser type and the control that was difficult to use."],
-    ["Herkese açık bir bildirime parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Herkese açık bildirimler başkaları tarafından görülebilir.","Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors."],
-    ["Cumhuriyet Vizyonu","Republic Vision"],
     ["İlham Kaynağımız","Our Inspiration"],
     ["Ana panele dön","Back to dashboard"],
     ["Ana Panel","Dashboard"],
@@ -121,54 +713,38 @@
     ["CANLI KARAR MERKEZİ","LIVE DECISION CENTER"],
     ["SİSTEM ÇEVRİMİÇİ","SYSTEM ONLINE"],
     ["YETKİLİ ÇALIŞMA ALANI","AUTHORIZED WORKSPACE"],
-    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle","Monitor Thrace's forests, fields, and ecosystems in one decision workspace"],
-    ["Türkiye'yi il → ilçe → alan seviyesinde katman katman izle.","Explore Türkiye from province to district to field."],
-    ["Haritadaki renk tek bir “güzel/çirkin” göstergesi değildir.","Map colors do not represent a single good-or-bad score."],
-    ["Seçtiğin veri katmanına göre değişir: yangın/çevre riski, orman sağlığı, su-toprak durumu, tarım koşulu veya polen.","Colors depend on the selected layer: wildfire/environmental risk, forest health, water and soil, agriculture, or pollen."],
     ["VERİLER YÜKLENİYOR…","LOADING DATA…"],
     ["Katmanlar","Layers"],
     ["Tarla İzleme","Field Monitoring"],
     ["Biyoçeşitlilik","Biodiversity"],
     ["İl → İlçe → Alan","Province → District → Field"],
-    ["Bir ile tıkla, ilçelere in.","Select a province to explore its districts."],
     ["Alan Ekle","Add Area"],
     ["Haritada görüntüle","View on map"],
     ["Alan adı","Area name"],
     ["Alan türü","Area type"],
-    ["Tarım Karar Motoru","Agriculture Decision Engine"],
     ["Enerji altyapısı için varlık bazlı risk raporu","Asset-based risk report for energy infrastructure"],
-    ["Kurumsal varlık güzergâhı ve risk raporu","Enterprise asset mapping and risk reporting"],
     ["Kurumsal altyapı analizi","Enterprise infrastructure analysis"],
     ["Kurumsal analiz alanı","Enterprise analysis workspace"],
     ["Kurumsal varlık çizim haritası","Enterprise asset drawing map"],
     ["Varlık güzergâhını haritada çiz","Draw an asset route on the map"],
-    ["Harita yüklenince çizim araçlarını kullanabilir veya GeoJSON yükleyebilirsin.","When the map loads, use the drawing tools or upload a GeoJSON file."],
     ["Şirket adı","Company name"],
     ["Varlık adı","Asset name"],
     ["Varlık türü","Asset type"],
     ["Tampon mesafesi","Buffer distance"],
     ["Varlık GeoJSON dosyası (isteğe bağlı)","Asset GeoJSON file (optional)"],
     ["Kurumsal PDF raporu oluştur","Generate enterprise PDF report"],
-    ["Rapor oluşturmak için giriş ve kurumsal yetki gerekir.","Sign-in and enterprise authorization are required to generate a report."],
     ["Erişim notu:","Access note:"],
     ["Giriş","Sign in"],
-    ["Hesap oluştur","Create account"],
-    ["Çıkış yap","Sign out"],
     ["Kaydet","Save"],
     ["İptal","Cancel"],
     ["Geleceğe yön veren düşünceler","Ideas that shape the future"],
     ["Hayatta en hakiki mürşit ilimdir.","The truest guide in life is science."],
-    ["Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.","Let science, evidence, and continuous learning guide the way."],
     ["Sonraki söz","Next quote"],
     ["Önceki söz","Previous quote"],
     ["SİSTEM MANTIĞI","HOW THE SYSTEM WORKS"],
-    ["Tek uygulama, farklı kullanıcılar.","One platform, different users."],
-    ["Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir.","Farmers can assess irrigation, beekeepers can check flight conditions, forest managers can review risk areas, and nature observers can monitor pollen."],
-    ["Sistemin amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.","The goal is not to overwhelm users with data, but to turn it into understandable decisions."],
     ["Sıcaklık","Temperature"],
     ["Nem","Humidity"],
     ["Rüzgar","Wind"],
-    ["Toprak nemi","Soil moisture"],
     ["Kaynak","Source"],
     ["Geçmiş","History"],
     ["Düşük","Low"],
@@ -177,8 +753,6 @@
     ["Kritik","Critical"],
     ["VERİ YOK","NO DATA"],
     ["HAZIRLANIYOR","IN PREPARATION"],
-    ["Sahne bulundu","Scene found"],
-    ["Sahne bekleniyor","Waiting for scene"],
     ["BAĞLANIYOR","CONNECTING"],
     ["Harita katmanları","Map layers"],
     ["Sistemin amacı","The system's purpose"],
@@ -187,12 +761,9 @@
     ["Saha","Field"],
     ["Orman sağlığı","Forest health"],
     ["Tarım koşulları","Agricultural conditions"],
-    ["Sulama ihtiyacı","Irrigation needs"],
     ["Yangın riski","Wildfire risk"],
     ["Yangın / çevre riski","Wildfire / environmental risk"],
     ["Ana sayfa","Home"],
-    ["Canlı veri","Live data"],
-    ["Çevrimdışı","Offline"],
     ["ÇEVRİMDIŞI","OFFLINE"],
     ["Son yerel veri","Last cached data"],
     ["Varlık bazlı analiz","Asset-based analysis"],
@@ -200,7 +771,6 @@
     ["Yüksek gerilim hattı","Transmission line"],
     ["Trafo merkezi","Substation"],
     ["Rüzgâr türbini (RES)","Wind turbine"],
-    ["Diğer","Other"],
     ["100 metre","100 metres"],
     ["1 kilometre","1 kilometre"],
     ["Giriş ve kurumsal yetki","Sign-in and enterprise authorization"],
@@ -209,18 +779,10 @@
     ["Geri","Back"],
     ["İleri","Next"],
     ["Güncelle","Refresh"],
-    ["Yenile","Reload"],
     ["Orman, tarım ve ekosistem","Forests, agriculture, and ecosystems"],
     ["Uydu • Tarla • Ekosistem İstihbaratı","Satellite • Field • Ecosystem Intelligence"],
     ["Trakya + İstanbul Çevresel İstihbarat","Thrace + Istanbul Environmental Intelligence"],
     ["Türkiye • 81 İL • 973 İLÇE • OFFLINE VECTOR","TÜRKIYE • 81 PROVINCES • 973 DISTRICTS • OFFLINE VECTOR"],
-    ["İl geometrileri ve 973 ilçe sınırı yerel GeoJSON olarak uygulamaya gömülüdür.","Province geometries and 973 district boundaries are bundled as local GeoJSON."],
-    ["Harita bağlantı kesildiğinde bile idari vektör sınırlar çalışır; canlı hava ve yerleşim verisi ağ varsa güncellenir.","Administrative vector boundaries remain available offline; live weather and settlement data update when a network is available."],
-    ["İdari sınırlar resmi mülkiyet/parsel sınırı değildir.","Administrative boundaries are not official property or parcel boundaries."],
-    ["Harita üzerindeki filtrelerden hangi çevresel göstergenin renkleri belirlediğini seç.","Use the map filters to choose which environmental indicator controls the colors."],
-    ["Toprak nemi, ET₀ ve sıcaklık; sulama ve tarla çalışması için erken sinyal üretir.","Soil moisture, ET₀, and temperature provide early signals for irrigation and field work."],
-    ["Polen verisi atmosferik bir sinyaldir.","Pollen data is an atmospheric signal."],
-    ["Bitki çeşitliliğinin kesin tespiti için Sentinel-2 spektral sınıflandırma katmanı ayrıca kurulacaktır.","A Sentinel-2 spectral classification layer is needed to assess plant diversity."],
     ["NEXORAWILDFIRE / GEOSPATIAL COMMAND","NEXORAWILDFIRE / GEOSPATIAL COMMAND"],
     ["VERİ KATMANI","DATA LAYER"],
     ["ALAN ÇİZİMİ","DRAW AREA"],
@@ -231,91 +793,34 @@
     ["SON YEREL VERİ","LAST CACHED DATA"],
     ["KÜRESEL ÖLÇEK TESTİ","GLOBAL SCALE TEST"],
     ["Küresel Ölçek Testi · Napa Vadisi","Demo: Global Scale Test · Napa Valley"],
-    ["Kaliforniya Napa Vadisi yakınında örnek GeoJSON poligonu yükle ve temsilî koordinat için güncel hava durumunu iste. Uydu ve eğitilmiş ML kullanılabilirliği ayrı raporlanır.","Load a sample GeoJSON polygon near Napa Valley, California, and request current weather for its representative coordinate. Satellite and trained-ML availability are reported separately."],
-    ["GeoJSON haritada gösterildi. Open-Meteo isteği şu anda kullanılamıyor; hiçbir hava değeri uydurulmadı. Uydu ve eğitilmiş ML durumu doğrulanmadı.","GeoJSON: PASS · Open-Meteo request unavailable. No weather values were fabricated. Satellite and trained-ML status remain unverified."],
     ["GeoJSON: BAŞARILI","GeoJSON: PASS"],
     ["Güncel hava durumu isteniyor…","Requesting current weather…"],
-    ["NASA FIRMS, Copernicus işleme ve eğitilmiş ML bu demodan çıkarılamaz; yapılandırılmış durumları ayrı kontrol edilmelidir.","NASA FIRMS, Copernicus processing, and trained ML are not implied by this demo; their configured status must be checked separately."],
     ["Kaliforniya Napa Vadisi","Napa Valley, California"],
     ["Henüz küresel demo çalıştırılmadı.","No global demo has been run yet."],
-    ["Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Güncel hava durumu isteniyor…","GeoJSON rendered at Napa Valley, California. Requesting current weather…"],
-    ["Model eğitimi için doğrulanmış, etiketli geçmiş veri ve model artefaktı gerekli.","A verified labelled historical dataset and model artifact are required for training."],
     ["Eksik özellikler:","Missing features:"],
     ["Tüm model girdileri sonlu sayısal değer olmalıdır.","All model inputs must be finite numeric values."],
-    ["Trakya'nın doğasını, tarlasını ve ekosistemini tek karar ekranında izle.","Monitor Thrace's forests, fields, and ecosystems in one decision workspace."],
-    ["Alan Ekle ile kendi tarla, arılık veya orman poligonunu kaydet ve Alanlarım ekranında canlı durumunu izle.","Use Add Area to save your own field, apiary, or forest polygon and monitor it in My Areas."],
-    ["Bu konumu seçili saha seviyesinde açarak çevresel sinyalleri incele.","Open this location as a selected field to inspect environmental signals."],
-    ["Bu seviye seçili bir coğrafi gözlem noktasıdır; resmî parsel veya mülkiyet sınırı değildir.","This is a geographic observation point, not an official parcel or property boundary."],
-    ["Sistem şu anda bir pilot bölgede","The system is currently being tested in a pilot region"],
     ["Geliştirilmekte olan bir araştırma ve karar destek projesidir.","A developing research and decision-support project."],
-    ["Bu deneysel olasılık, yalnızca eğitim verisinin temsil ettiği koşullarda karar desteğidir; resmi yangın alarmı veya kesin tahmin değildir.","This experimental probability is decision support only for conditions represented by the training data; it is not an official fire alert or a guaranteed forecast."],
     ["Bir sonraki işleme katmanında","In the next processing layer"],
     ["Gerçek piksel hesabı backend işleme katmanına bağlanacak.","Real pixel calculations will be connected to the backend processing layer."],
     ["Polen ≠ biyoçeşitlilik.","Pollen ≠ biodiversity."],
     ["Bitki çeşitliliği için Sentinel-2'nin çok bantlı yansımaları, red-edge bantları, zaman serisi ve arazi örtüsü sınıfları birlikte değerlendirilmelidir.","Plant diversity assessment should combine Sentinel-2 multispectral reflectance, red-edge bands, time series, and land-cover classes."],
-    ["NexoraWildfire AI yalnızca yangın alarmı veren bir harita değil; orman sağlığı, tarımsal koşullar, toprak nemi, sulama ihtiyacı, polen, hava kalitesi, arıcılık uçuş koşulları ve çevresel riskleri aynı veri katmanında birleştiren bölgesel karar destek sistemidir.","NexoraWildfire AI is more than a wildfire alert map: it brings forest health, agricultural conditions, soil moisture, irrigation needs, pollen, air quality, beekeeping flight conditions, and environmental risk into one regional decision-support system."],
-    ["Bitki stresi, kuraklık sinyali, sıcaklık ve yangın koşullarını tek göstergede birleştirir.","Combines plant stress, drought signals, temperature, and fire conditions in one indicator."],
-    ["Toprak nemi, ET₀, yağış ve sıcaklık üzerinden sulama ve tarla çalışması için erken sinyaller üretir.","Provides early signals for irrigation and field work using soil moisture, ET₀, rainfall, and temperature."],
-    ["Arıcılık için sıcaklık, rüzgar, yağış ve polen koşullarını yorumlayan bölgesel uçuş koşulu göstergesi.","A regional flight-conditions indicator for beekeeping, using temperature, wind, rainfall, and pollen."],
-    ["Avrupa CAMS hava kalitesi modeli üzerinden polen ve hava kalitesi sinyallerini izler.","Tracks pollen and air-quality signals using the European CAMS air-quality model."],
-    ["İl sınırları gerçek geometrileriyle; hava, tarım ve ekosistem göstergeleriyle birlikte.","Province boundaries are shown with their geometries alongside weather, agriculture, and ecosystem indicators."],
-    ["NexoraWildfire AI; uydu verileri, meteorolojik bilgiler ve yapay zeka destekli analiz yöntemlerini kullanarak çevresel risklerin izlenmesi amacıyla geliştirilen bir karar destek platformudur.","NexoraWildfire AI is a decision-support platform being developed to monitor environmental risks using satellite data, meteorological information, and AI-assisted analysis methods."],
-    ["Orman yangınları yalnızca ağaçları değil; köyleri, tarım alanlarını ve kırsal yaşamı da etkiler.","Wildfires affect not only trees, but also villages, agricultural land, and rural livelihoods."],
-    ["NexoraWildfire AI, çevresel verileri anlaşılır karar destek sinyallerine dönüştürerek üreticinin yaşam alanlarını ve doğal kaynakları daha erken fark etmeye yardımcı olmayı amaçlar.","NexoraWildfire AI aims to turn environmental data into understandable decision-support signals that help people recognize risks to rural communities and natural resources earlier."],
-    ["Bu bölüm, Atatürk'ün üretim, tarım ve çevreye ilişkin Cumhuriyet vizyonunu günümüz çevresel karar destek yaklaşımıyla ilişkilendiren proje anlatısıdır.","This section connects Atatürk's Republic-era vision for production, agriculture, and the environment with today's approach to environmental decision support."],
-    ["Gerçek meteoroloji akışı + mevcut çevresel risk mantığı + açıklanabilir karar desteği.","Real meteorological feeds + current environmental risk logic + explainable decision support."],
-    ["Isı yüzeyi: mevcut meteorolojik risk sinyalinin görsel temsili. Uydu katmanı için Risk Haritası'nı aç.","Heat surface: a visual representation of the current meteorological risk signal. Open Risk Map for satellite layers."],
-    ["Alanlarını tek ekrandan izle.","Monitor your areas in one place."],
-    ["Tarla, arılık, orman veya seçtiğin alanı haritada kaydet.","Save a field, apiary, forest, or other selected area on the map."],
-    ["NexoraWildfire hava, toprak nemi, ET₀, VPD ve polen sinyallerini otomatik olaylara dönüştürür.","NexoraWildfire turns weather, soil moisture, ET₀, VPD, and pollen signals into automated events."],
-    ["Backend bağlandığında alan poligonunun gerçek Sentinel-2 NDVI zaman serisi de burada görünür.","When the backend is connected, the area's real Sentinel-2 NDVI time series will also appear here."],
-    ["Risk yükseldiğinde NexoraWildfire haber versin.","Let NexoraWildfire notify you when risk increases."],
-    ["Harici SMS, e-posta veya bot kullanmadan çalışır.","Works without external SMS, email, or bot services."],
-    ["Sistem riski kendi backend'inde değerlendirir, uyarıyı Alanlarım'a kaydeder ve izin verilirse tarayıcı bildirimi gösterir.","The backend evaluates risk, saves the alert to My Areas, and displays a browser notification when permission is granted."],
     ["İlk alanını oluştur.","Create your first area."],
     ["Harita → Alan Ekle. En az üç köşe seç, alan adını ve kullanım türünü yaz.","Go to Map → Add Area. Select at least three corners, then enter the area's name and type."],
-    ["Bu ekran alanın canlı durumunu ve otomatik olaylarını gösterecek.","This screen will show your area's live status and automated events."],
-    ["Tarla, orman ve bitki örtüsünü uydu verisiyle okumaya hazırlan.","Prepare to interpret fields, forests, and vegetation with satellite data."],
-    ["Sentinel-2 sahne keşfi mevcut. Bir sonraki işleme katmanında B02/B03/B04/B08 ve red-edge bantlarıyla bitki örtüsü, stres ve habitat sınıfları üretilecek. Sistem veri yokken değer uydurmaz.","Sentinel-2 scene discovery is available. A future processing layer will use B02/B03/B04/B08 and red-edge bands to derive vegetation, stress, and habitat classes. The system does not invent values when data is missing."],
-    ["Uygun Level-2A sahne keşfi.","Discovery of suitable Level-2A scenes."],
-    ["Polen sayısını bitki çeşitliliği sanmak yerine uydu spektral imzalarıyla tür/habitat grupları sınıflandırılacak.","Rather than treating pollen counts as plant diversity, species or habitat groups will be classified from satellite spectral signatures."],
-    ["Tarla sınırı + zaman serisi + bitki stresi + sulama sinyali.","Field boundary + time series + plant stress + irrigation signal."],
-    ["Bölge sahneleri taranıyor...","Scanning scenes for the region..."],
-    ["Polen modeli atmosferdeki polen yükünü gösterir. Bitki çeşitliliği için Sentinel-2'nin çok bantlı yansımaları, red-edge bantları, zaman serisi ve arazi örtüsü sınıfları birlikte değerlendirilmelidir. NexoraWildfire bu ayrımı sistem mimarisinde korur.","The pollen model indicates atmospheric pollen load. Plant diversity assessment should combine Sentinel-2 multispectral reflectance, red-edge bands, time series, and land-cover classes. NexoraWildfire preserves this distinction in its system design."],
-    ["Open-Meteo meteorolojik verileri kullanılarak bölgesel sıcaklık, nem ve rüzgar koşulları analiz edilir.","Regional temperature, humidity, and wind conditions are analysed using Open-Meteo weather data."],
-    ["Bitki kuruluğu için analiz edilir","Analysed as an indicator of plant dryness"],
-    ["Yangın yayılım risk faktörü","A factor in wildfire spread risk"],
-    ["Meteorolojik risk işleme aktif","Meteorological risk processing is active"],
-    ["Veri Akışı","Data Stream"],
-    ["Bölgesel koordinat analizi","Regional coordinate analysis"],
     ["Bilim, üretim ve toplumsal fayda","Science, production, and public benefit"],
     ["Herkese açık kullanıcı adı","Public username"],
     ["Kullanıcı adı","Username"],
     ["Görünen ad","Display name"],
     ["Kimliğimi kaydet","Save my identity"],
-    ["Ara","Search"],
-    ["Saygılı ve saha odaklı iletişim kur. Kişisel bilgileri paylaşırken dikkatli ol.","Communicate respectfully and stay focused on field work. Be careful when sharing personal information."],
-    ["Acil durumlarda 112 ve yetkili kurumların talimatları önceliklidir.","In emergencies, call 112 and follow instructions from the relevant authorities."],
-    ["Bu ayrı çalışma alanı; enerji hatları, trafo merkezleri ve rüzgâr türbinleri için coğrafi varlık geometrisi hazırlamak ve çevresel risk raporu istemek üzere tasarlanmıştır. Ana paneldeki harita deneyimini bölmez.","This dedicated workspace lets users prepare geographic asset geometries and request environmental risk reports for power lines, substations, and wind turbines without cluttering the main map."],
-    ["Yüksek gerilim hatları, trafo merkezleri ve rüzgâr türbinleri için GeoJSON varlığını seçin; tampon alanı, uydu NDVI/NDMI, erişilebilir sıcak nokta akışı ve yol erişimi tek bir PDF raporunda toplansın.","Select a GeoJSON asset for power lines, substations, or wind turbines to compile the buffer area, satellite NDVI/NDMI, available hotspot feed, and road access into one PDF report."],
-    ["Kurumsal yetki gerekir. Bu ilk sürümde ödeme/abonelik sağlayıcısı bağlı değildir; erişim sunucu tarafında yetkili hesap listesiyle yönetilir. 5 yıllık FIRMS arşivi ve 3 aylık hava tahmini hazır değilse rapor bunları açıkça “veri yok” olarak işaretler; uydurma değer üretmez.","Enterprise authorization is required. No payment or subscription provider is connected in this first version; access is controlled by a server-side allowlist. If five-year FIRMS history or a three-month forecast is unavailable, the report marks it as unavailable instead of inventing values."],
-    ["Çizgi: elektrik hattı · Çokgen: RES/trafo etki alanı · Nokta: tek türbin","Line: power line · Polygon: wind-farm/substation impact area · Point: individual turbine"],
-    ["NexoraWildfire AI · Uydu Tabanlı Çevresel Risk Analiz Platformu","NexoraWildfire AI · Satellite-Based Environmental Risk Analysis Platform"],
-    ["Napa Vadisi, Kaliforniya GeoJSON haritada gösterildi. Hava durumu ve NASA FIRMS durumu isteniyor…","GeoJSON rendered at Napa Valley, California. Requesting weather and NASA FIRMS status…"],
     ["Open-Meteo: kullanılamıyor","Open-Meteo: unavailable"],
     ["Hava değerleri uydurulmadı.","No weather values were fabricated."],
     ["NASA FIRMS: KULLANILABİLİR","NASA FIRMS: AVAILABLE"],
     ["NASA FIRMS: YAPILANDIRILMAMIŞ","NASA FIRMS: NOT CONFIGURED"],
-    ["NASA FIRMS: backend uç noktası kullanılamıyor","NASA FIRMS: backend endpoint unavailable"],
-    ["FIRMS_MAP_KEY anahtarını backend ortam değişkenlerinde tanımlayarak gerçek sıcak nokta sorgularını etkinleştir.","set FIRMS_MAP_KEY in the backend environment to enable real hotspot queries."],
     ["Son bir gün için","for the last day"],
     ["Sıfır gözlem, yangın riskinin sıfır olduğunu kanıtlamaz.","Zero observations do not prove zero fire risk."],
-    ["Bu demo yalnızca harita geometrisini, güncel hava durumunu ve sağlayıcı yanıtını kontrol eder; eğitilmiş bir Kaliforniya yangın-risk modeli veya resmî uyarı değildir.","This demo checks map geometry, current weather, and the provider response only; it is not a trained California fire-risk model or an official alert."],
     ["NASA FIRMS:","NASA FIRMS:"],
     ["sıcak nokta gözlemi","hotspot observations"],
     ["nem","humidity"],
     ["rüzgâr","wind"],
-    ["Uydu ve eğitilmiş ML durumu doğrulanmadı.","Satellite and trained-ML status remain unverified."],
     ["YANGIN RİSKİ","WILDFIRE RISK"],
     ["RİSK HARİTASI","RISK MAP"],
     ["VERİ AKIŞI BEKLENİYOR","WAITING FOR DATA STREAM"],
@@ -337,13 +842,9 @@
     ["STANDART","STANDARD"],
     ["CANLI","LIVE"],
     ["SİSTEM ÇALIŞIYOR","SYSTEM OPERATIONAL"],
-    ["Kişisel Alan İstihbaratı","Personal Area Intelligence"],
     ["SİSTEM KAPSAMI","SYSTEM COVERAGE"],
     ["OPERASYON MERKEZİ","OPERATIONS CENTER"],
     ["TARIM / SULAMA","AGRICULTURE / IRRIGATION"],
-    ["Sıcaklık Analizi","Temperature Analysis"],
-    ["Nem Seviyesi","Humidity Level"],
-    ["Rüzgar Hızı","Wind Speed"],
     ["AI Değerlendirme","AI Assessment"],
     ["Uydu katmanı","Satellite layer"],
     ["Orman katmanı","Forest layer"],
@@ -358,15 +859,12 @@
     ["Nova-Alert'i etkinleştir","Enable Nova-Alert"],
     ["Kaydet ve tarayıcı izni ver","Save and grant browser permission"],
     ["Henüz geçmiş yok.","No history yet."],
-    ["Veri yok","No data"],
-    ["Veri bekleniyor…","Waiting for data…"],
     ["KURUMSAL YETKİLİ ÇALIŞMA ALANI","AUTHORIZED ENTERPRISE WORKSPACE"],
     ["Canlı hava verisi","Live weather data"],
     ["Belgelenmiş yangın-hava durumu modeli","Documented fire-weather model"],
     ["Backend model dosyası ve değerlendirme kaydı kontrol ediliyor…","Checking the backend model artifact and evaluation record…"],
     ["Araştırma modeli durumu:","Research model status:"],
     ["Geçerli model dosyası hazır olana kadar tahmin gösterilmez.","No prediction is presented until a valid model artifact is available."],
-    ["Canlı model durumu bu sayfadan doğrulanamadı. Arayüz eğitim metrikleri uydurmaz.","Live model status could not be verified from this page. The UI will not invent training metrics."],
     ["ARAŞTIRMA PROTOTİPİ","RESEARCH PROTOTYPE"],
     ["etiketli günlük gözlem","labelled daily observations"],
     ["dönem belirtilmemiş","period not reported"],
@@ -376,8 +874,6 @@
     ["Duyarlılık","Recall"],
     ["F1","F1"],
     ["ROC AUC","ROC AUC"],
-    ["Bu model 2012 tarihli Cezayir meteoroloji gözlemlerini kullanır. Trakya/Türkiye için doğrulanmamıştır, yedi günlük tahmin değildir ve resmî uyarı olarak kullanılmamalıdır.","This model uses historical Algerian weather observations from 2012. It is not validated for Thrace/Türkiye, is not a seven-day forecast, and must not be used as an official warning."],
-    ["Canlı model durumu bu sayfadan doğrulanamadı.","Live model status could not be verified from this page."],
     ["örn. Kaliforniya, Napa Vadisi","e.g. Napa Valley, California"],
     ["Yer araması kullanılamıyor (HTTP ","Place search unavailable (HTTP "],
     ["Bunun yerine koordinat girebilirsin.","You can enter coordinates instead."],
@@ -428,136 +924,25 @@
     ["Güvenli nokta katmanı temizlendi.","Emergency-point layer cleared."],
     ["Güvenli nokta verisi alınamadı.","Could not retrieve emergency-point data."],
   ];
-  // Additional phrases used by dynamic panels and status messages.
-  pairs.push(
-    ["saat bilgisi yok", "time unavailable"],
-    ["nem ", "humidity "],
-    ["rüzgâr ", "wind "],
-    ["yağış ", "precipitation "],
-    ["Hava değeri uydurulmadı.", "No weather values were fabricated."],
-    ["Open-Meteo kullanılamıyor:", "Open-Meteo unavailable:"],
-    ["ağ hatası", "network error"],
-    ["güven düzeyi yok", "confidence unavailable"],
-    ["tarih bilgisi yok", "date unavailable"],
-    ["sıcak nokta gözlemi", "hotspot observations"],
-    ["Sıcak nokta verisi olduğu iddia edilmez.", "No hotspot data is claimed."],
-    ["Gözlem olmaması riskin sıfır olduğunu kanıtlamaz.", "No observations do not prove zero risk."],
-    ["Bu, kaynak bağlantı kontrolüdür; resmî uyarı veya doğrulanmış küresel tahmin değildir.", "This is a provider connectivity check, not an official warning or a validated global prediction."],
-    ["Küresel canlı veri kontrolü", "Global live-data check"],
-    ["Alanların, saha rolün ve Nova-Alert tercihlerin hesabına bağlanır. Harita ve acil durum bilgileri hesap açmadan da kullanılabilir.", "Your areas, field role, and Nova-Alert preferences are linked to your account. Maps and emergency information can be used without creating an account."],
-    ["Verin seninle gelsin.", "Keep your field data with you."],
-    ["Güvenli saha hesabı", "Secure field account"],
-    ["Giriş yap", "Sign in"],
-    ["Kayıt ol", "Create account"],
-    ["E-posta", "Email"],
-    ["Telefon", "Phone"],
-    ["Parola", "Password"],
-    ["Parolanı unuttun mu?", "Forgot password?"],
-    ["Yasal bilgilendirme ve kullanım koşulları", "Legal notice and terms of use"],
-    ["Deneysel sistem ve saha güvenliği uyarısını anladım", "I understand the experimental-system and field-safety notice"],
-    ["KVKK, gizlilik, kullanım koşulları ve sorumluluk reddi metinlerini oku ↗", "Read privacy notice, terms, and safety disclaimer ↗"],
-    ["Profil yükleniyor…", "Loading profile…"],
-    ["Profil kaydedilemedi:", "Could not save profile:"],
-    ["Profil ve bölge tercihleri kaydedildi.", "Profile and region preferences saved."],
-    ["Akıllı Tahliye ve Kaçış Koridoru", "Smart Evacuation and Escape Corridor"],
-    ["Saha kimliği · tarım · arıcılık · orman", "Field identity · agriculture · beekeeping · forestry"],
-    ["GÜVENLİ HESAP", "SECURE ACCOUNT"],
-    ["E-posta adresi", "Email address"],
-    ["Telefon numarası", "Phone number"],
-    ["En az 8 karakter", "At least 8 characters"],
-    ["E-posta ile giriş yap →", "Sign in with email →"],
-    ["Ücretsiz hesap oluştur →", "Create a free account →"],
-    ["Parolamı unuttum", "Forgot password"],
-    ["SMS kodu gönder →", "Send SMS code →"],
-    ["Kodu doğrula", "Verify code"],
-    ["Yeni parola belirle", "Set a new password"],
-    ["Parolayı güncelle", "Update password"],
-    ["İşlem yapılıyor…", "Processing…"],
-    ["Önce e-posta adresini yaz.", "Enter your email address first."],
-    ["Hesap isteği alındı. E-posta doğrulama bağlantısını kontrol et.", "Account request received. Check your email for the verification link."],
-    ["Giriş için e-posta doğrulaması gerekiyorsa gelen kutunu kontrol et.", "If email verification is required, check your inbox to finish signing in."],
-    ["Saha kimliği", "Field identity"],
-    ["Güvenli saha hesabı", "Secure field account"],
-    ["Sahadaki verin, senin kontrolünde.", "Your field data stays under your control."],
-    ["Giriş yöntemi", "Sign-in method"],
-    ["Hesap güvenliği", "Account security"],
-    ["Hesabıma dön →", "Return to my account →"],
-    ["Google hesabınla devam et", "Continue with your Google account"],
-    ["Google ile devam et ↗", "Continue with Google ↗"],
-    ["SMS doğrulama kodu", "SMS verification code"],
-    ["6 haneli kod", "6-digit code"],
-    ["Gizlilik · KVKK · Kullanım koşulları", "Privacy · data protection · terms"],
-
-    ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını simülasyon olarak gösterir.", "In a real emergency, follow official authorities. This module only illustrates a fire-avoidance scenario for a selected area."],
-    ["Bu bölüm yalnızca kullanıcı girdileriyle çalışan görsel bir senaryodur. Haritadan gerçek kaçış rotası hesaplamaz ve güvenli toplanma alanı önermez.", "This is a visual scenario driven by user inputs only. It does not calculate real evacuation routes or recommend safe assembly points."],
-  );
-  // Preserve first-declared mappings instead of silently overwriting duplicate translations.
-  const trToEn = new Map();
-  const enToTr = new Map();
-  for (const [tr, en] of pairs) {
-    if (!trToEn.has(tr)) trToEn.set(tr, en);
-    if (!enToTr.has(en)) enToTr.set(en, tr);
-  }
+  const trToEn = new Map(pairs);
+  const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
-  const documentLang = /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
-  let lang = stored === "en" || stored === "tr" ? stored : documentLang;
-  // Translate longest known phrases inside complete and dynamic text nodes.
-  // Unicode-aware boundaries prevent replacing fragments inside unrelated words.
-  // A single alternation means newly inserted translations are never translated twice.
-  const phraseCache = new Map();
+  let lang = stored === "en" || stored === "tr" ? stored : "en";
+  const ordered = (map) => [...map.entries()].sort((a,b) => b[0].length-a[0].length);
   function replace(text, target) {
-    const source = String(text);
-    if (!source.trim()) return source;
-    const dictionary = target === "en" ? trToEn : enToTr;
-    let compiled = phraseCache.get(target);
-    if (!compiled) {
-      const locale = target === "en" ? "en" : "tr";
-      const entries = Array.from(dictionary.entries())
-        .filter(([from, to]) => from.trim() && to !== undefined)
-        .sort((a, b) => b[0].length - a[0].length);
-      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const alternatives = entries.map(([from]) => {
-        const first = from.charAt(0);
-        const last = from.slice(-1);
-        const left = /[\p{L}\p{N}_]/u.test(first) ? "(?<![\\p{L}\\p{N}_])" : "";
-        const right = /[\p{L}\p{N}_]/u.test(last) ? "(?![\\p{L}\\p{N}_])" : "";
-        return left + escapeRegex(from) + right;
-      });
-      const lookup = new Map(entries.map(([from, to]) => [from.toLocaleLowerCase(locale), to]));
-      compiled = { regex: new RegExp(alternatives.join("|"), "giu"), lookup, locale };
-      phraseCache.set(target, compiled);
-    }
-    return source.replace(compiled.regex, match => {
-      const translated = compiled.lookup.get(match.toLocaleLowerCase(compiled.locale));
-      if (translated === undefined) return match;
-      if (match === match.toLocaleUpperCase(compiled.locale)) return translated.toLocaleUpperCase(compiled.locale);
-      if (match[0] === match[0].toLocaleLowerCase(compiled.locale) && match[0] !== match[0].toLocaleUpperCase(compiled.locale)) {
-        return translated[0].toLocaleLowerCase(compiled.locale) + translated.slice(1);
-      }
-      return translated;
-    });
+    const entries = ordered(target === "en" ? trToEn : enToTr);
+    let out = text;
+    for (const [from,to] of entries) if (out.includes(from)) out = out.split(from).join(to);
+    return out;
   }
-  // Dynamic widgets can replace text in an existing node. Keep the original
-  // source when the last value was our translation; accept genuinely new app text.
   const originals = new WeakMap();
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
-    // data-tr/data-en is authoritative for simple labels. Do not immediately
-    // reverse-translate the value just written from those attributes.
-    const owner = node.parentElement;
-    if (owner?.matches?.("[data-tr][data-en]") && (owner.children.length === 0 || owner.dataset.nxExplicitTranslation === "true")) return;
+    if (!originals.has(node)) originals.set(node, node.nodeValue);
     const current = node.nodeValue;
-    let record = originals.get(node);
-    if (!record) {
-      record = { source: current, translated: current };
-      originals.set(node, record);
-    } else if (current !== record.translated) {
-      record.source = current;
-    }
-    const translated = replace(record.source, lang);
+    const translated = replace(current, lang);
     if (translated !== current) node.nodeValue = translated;
-    record.translated = translated;
   }
   function translateAttributes(root=document) {
     const selector = "[placeholder],[title],[aria-label],[content]";
@@ -574,42 +959,7 @@
       el.setAttribute(attr, replace(saved[attr], lang));
     }
   }
-  function translateDataContent(root=document) {
-    const nodes = [];
-    if (root.nodeType === Node.ELEMENT_NODE && root.matches?.("[data-tr][data-en]")) nodes.push(root);
-    root.querySelectorAll?.("[data-tr][data-en]").forEach(el => nodes.push(el));
-    nodes.forEach(el => {
-      const value = lang === "en" ? el.dataset.en : el.dataset.tr;
-      if (!value) return;
-      if (el.children.length === 0) {
-        if (el.textContent !== value) el.textContent = value;
-        return;
-      }
-      // Keep inline icons/decoration intact. For a mixed-content label, use
-      // the explicit translation on its sole direct text node only when child
-      // elements are decorative; otherwise translate each text node normally.
-      const directText = Array.from(el.childNodes).filter(node =>
-        node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()
-      );
-      const decorativeChildren = Array.from(el.children).every(child =>
-        ["SVG", "IMG", "I"].includes(child.tagName) ||
-        child.getAttribute("aria-hidden") === "true" ||
-        !child.textContent.trim()
-      );
-      if (directText.length === 1 && decorativeChildren) {
-        el.dataset.nxExplicitTranslation = "true";
-        if (directText[0].nodeValue !== value) directText[0].nodeValue = value;
-      } else {
-        el.childNodes.forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE) translateNode(node);
-        });
-      }
-    });
-  }
   function applyLanguage() {
-    document.querySelectorAll("[data-tr-placeholder][data-en-placeholder]").forEach(el => {
-      el.placeholder = lang === "en" ? el.dataset.enPlaceholder : el.dataset.trPlaceholder;
-    });
     document.documentElement.lang = lang;
     document.title = replace(document.title, lang);
     document.querySelectorAll("body *").forEach(el => {
@@ -617,13 +967,29 @@
       el.childNodes.forEach(translateNode);
     });
     translateAttributes();
-    // Apply explicit bilingual copy last so it always wins over generic text handling.
-    translateDataContent();
     const btn = document.getElementById("nexora-language-toggle");
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
-    window.dispatchEvent(new CustomEvent("nexora:languagechange", { detail: { lang } }));
+  }
+  function ensureLegalFooter() {
+    if (document.querySelector(".nx-legal-footer")) return;
+    const inPages = /\/pages\//.test(location.pathname);
+    const prefix = inPages ? "" : "pages/";
+    const footer = document.createElement("footer");
+    footer.className = "nx-legal-footer";
+    footer.innerHTML = '<div class="nx-legal-footer-inner">' +
+      '<div class="nx-legal-brand"><strong>NexoraWildfire AI</strong><span data-nx-attribution>Bağımsız geliştirici Ahmet Eymen Bakraç tarafından geliştirilmiştir.</span></div>' +
+      '<div class="nx-legal-links" role="group" aria-label="Hukuki bağlantılar">' +
+      '<a href="' + prefix + 'legal.html">Hukuki belgeler (taslak)</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KVKK_AYDINLATMA_METNI_TASLAK.md" target="_blank" rel="noopener noreferrer">KVKK Aydınlatma Metni</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/PRIVACY_POLICY_DRAFT.md" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a>' +
+      '<a href="https://github.com/Nexora88/nova-forest-ai/blob/main/docs/legal/KULLANIM_KOSULLARI_VE_SORUMLULUK_REDdi_TASLAK.md" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</a>' +
+      '</div><p class="nx-legal-disclaimer">NexoraWildfire AI resmî bir yangın uyarı sistemi değildir. Kaynak erişimi ve veri kapsamı değişebilir.</p></div>';
+    document.body.appendChild(footer);
+    const style = document.createElement("style");
+    style.textContent = ".nx-legal-footer{margin-top:42px;padding:24px clamp(16px,4vw,48px);border-top:1px solid #193c27;background:rgba(2,7,4,.96);color:#aebbb0;font:13px/1.6 system-ui,sans-serif}.nx-legal-footer-inner{max-width:1200px;margin:auto;display:grid;gap:14px}.nx-legal-brand{display:grid;gap:4px}.nx-legal-brand strong{color:#e9fff0;font-size:15px;letter-spacing:.02em}.nx-legal-brand span{color:#9aac9f}.nx-legal-links{display:flex;flex-wrap:wrap;gap:8px 18px}.nx-legal-links a{color:#bce9c7;text-decoration:none;text-underline-offset:4px}.nx-legal-links a:hover,.nx-legal-links a:focus-visible{text-decoration:underline;color:#fff}.nx-legal-disclaimer{margin:0;color:#7e9183;font-size:12px}.nx-legal-footer a:focus-visible{outline:2px solid #00ff66;outline-offset:3px;border-radius:3px}@media(max-width:600px){.nx-legal-footer{padding:20px 16px}.nx-legal-links{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.nx-legal-links a{overflow-wrap:anywhere}}";
+    document.head.appendChild(style);
   }
   function init() {
     const button = document.createElement("button");
@@ -637,6 +1003,7 @@
     const style = document.createElement("style");
     style.textContent = ".nexora-language-toggle{position:fixed;right:14px;bottom:14px;z-index:99999;min-height:44px;padding:10px 14px;border:1px solid #00ff66;border-radius:999px;background:#06110a;color:#eaffef;font:700 12px system-ui;box-shadow:0 6px 24px #0009;cursor:pointer}.nexora-language-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}";
     document.head.appendChild(style);
+    ensureLegalFooter();
     applyLanguage();
     const observer = new MutationObserver(records => {
       for (const record of records) {
@@ -646,75 +1013,11 @@
             node.querySelectorAll?.("*").forEach(el => el.childNodes.forEach(translateNode));
             node.childNodes?.forEach(translateNode);
             translateAttributes(node);
-            // Keep data-tr/data-en widgets in the selected language after insertion.
-            translateDataContent(node);
           }
         });
       }
     });
-    observer.observe(document.body,{childList:true,characterData:true,subtree:true});
+    observer.observe(document.body,{childList:true,subtree:true});
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();
-})();
-
-/* NexoraWildfire AI — project attribution footer. */
-(() => {
-  const styleId = "nexora-attribution-style";
-  function languageIsTurkish() {
-    return /^tr(?:-|$)/i.test(document.documentElement.lang || "tr");
-  }
-  function installStyle() {
-    if (document.getElementById(styleId)) return;
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.textContent = `
-      .nexora-attribution { display:flex; flex-direction:column; align-items:center; gap:5px; margin:0; padding:18px 16px; text-align:center; color:#9db3a4; font-size:12px; line-height:1.65; }
-      .nexora-attribution [data-attribution-primary] { color:#d8e7dc; font-weight:600; letter-spacing:.01em; }
-      .nexora-attribution [data-attribution-secondary] { color:#819889; font-size:11px; }
-      footer.nexora-attribution-footer { margin-top:28px; border-top:1px solid rgba(0,255,102,.18); background:#050906; }
-      @media(prefers-reduced-motion:reduce) { .nexora-attribution { scroll-behavior:auto; } }
-    `;
-    document.head.appendChild(style);
-  }
-  function renderAttribution() {
-    if (!document.body || !document.head) return;
-    installStyle();
-    let footer = document.querySelector("footer");
-    if (!footer) {
-      footer = document.createElement("footer");
-      footer.className = "nexora-attribution-footer";
-      document.body.appendChild(footer);
-    }
-    let line = footer.querySelector("[data-nexora-attribution]");
-    if (!line) {
-      line = Array.from(footer.querySelectorAll("p")).find(p => /Ahmet Eymen Bakraç/i.test(p.textContent || ""));
-    }
-    if (!line) {
-      line = document.createElement("p");
-      footer.appendChild(line);
-    }
-    line.dataset.nexoraAttribution = "true";
-    line.classList.add("nexora-attribution");
-    line.replaceChildren();
-    const primary = document.createElement("span");
-    primary.dataset.attributionPrimary = "true";
-    primary.textContent = languageIsTurkish()
-      ? "Proje fikri ve geliştirme: Ahmet Eymen Bakraç"
-      : "Project concept and development: Ahmet Eymen Bakraç";
-    const secondary = document.createElement("span");
-    secondary.dataset.attributionSecondary = "true";
-    secondary.textContent = languageIsTurkish() ? "NexoraWildfire AI · Bağımsız çevresel istihbarat projesi · © 2026" : "NexoraWildfire AI · Independent environmental intelligence · © 2026";
-    const legal = document.createElement("a");
-    legal.href = document.location.pathname.includes("/pages/") ? "legal.html" : "pages/legal.html";
-    legal.textContent = languageIsTurkish() ? "KVKK · Gizlilik · Kullanım Koşulları" : "Privacy · Terms · Data Protection";
-    legal.style.cssText = "color:#a8e7b7;text-decoration:none;font-size:11px;border-bottom:1px solid #326441;padding-bottom:3px";
-    line.append(primary, secondary, legal);
-  }
-  function boot() {
-    renderAttribution();
-    const observer = new MutationObserver(() => renderAttribution());
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
-  else boot();
 })();
