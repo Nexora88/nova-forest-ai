@@ -261,7 +261,23 @@ class MobileUiSmokeTests(unittest.TestCase):
                 page.route("**/*", route_request)
                 try:
                     page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_selector(".area-card h3", timeout=20000)
+                    # Seed on the real origin after navigation as well: init scripts can run
+                    # on about:blank before localStorage is available in some Chromium builds.
+                    page.evaluate("""() => {
+                      const key = 'nexorawildfire-my-areas-v1';
+                      const rows = JSON.parse(localStorage.getItem(key) || '[]');
+                      if (!rows.some(area => String(area.id) === 'qa-area-1')) {
+                        rows.push({
+                          id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
+                          district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                          createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                        });
+                        localStorage.setItem(key, JSON.stringify(rows));
+                      }
+                      window.dispatchEvent(new CustomEvent('nova:areas-updated'));
+                    }""")
+                    page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
+                      .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
                     self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
                     page.reload(wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
