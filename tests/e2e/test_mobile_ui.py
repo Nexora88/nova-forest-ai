@@ -114,6 +114,25 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
 
+    def test_evacuation_simulation_runs_and_stays_bilingual(self):
+        context, page = self.new_page(width=1280, height=900)
+        try:
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#evac-sim", timeout=15000)
+            page.locator("#evac-sim [data-run]").click()
+            page.wait_for_function("document.querySelector('#evac-sim [data-sim-status]').textContent.includes('yük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('düşük') || document.querySelector('#evac-sim [data-sim-status]').textContent.includes('orta')", timeout=5000)
+            page.locator("#nexora-language-toggle").click()
+            page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
+            status = page.locator("#evac-sim [data-sim-status]").inner_text()
+            detail = page.locator("#evac-sim [data-sim-detail]").inner_text()
+            self.assertTrue(any(word in status.lower() for word in ("low", "moderate", "high")), status)
+            self.assertIn("Inputs:", detail)
+            self.assertNotIn("temsilî genişlik", detail)
+            # A language switch must not remove or break the mobile-nav structure.
+            self.assertTrue(page.locator("nav .nx-nav-toggle").count() == 1)
+        finally:
+            context.close()
+
     def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
