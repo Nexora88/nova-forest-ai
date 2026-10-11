@@ -69,3 +69,14 @@ def test_weather_missing_fields_are_not_replaced_with_zero(monkeypatch):
         assert "wind" in str(exc)
     else:
         raise AssertionError("Missing provider measurements must not become zero-valued observations")
+
+
+def test_pdf_generator_escapes_user_supplied_markup():
+    pdf = generate_environment_report(
+        title="Area <script>bad</script> report",
+        area_name="Field <north>",
+        provider_status={"Provider <x>": "available"},
+        notes=["User note with <b>untrusted</b> markup."],
+    )
+    assert pdf.startswith(b"%PDF")
+    assert len(pdf) > 1000
