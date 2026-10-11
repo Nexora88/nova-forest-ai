@@ -1,7 +1,7 @@
 const NOVA_ALERT_SETTINGS_KEY="nexorawildfire-alert-settings-v3";
 const NOVA_ALERTS_KEY="nexorawildfire-alerts-v1";
 const PUSH_AREA_KEY="nexorawildfire-push-area-v1";
-const PUSH_API=(window.NOVA_API_BASE||"").replace(/\/$/,"");
+const PUSH_API=(window.NOVA_API_BASE||"https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/,"");
 
 function getNovaAlertSettings(){return JSON.parse(localStorage.getItem(NOVA_ALERT_SETTINGS_KEY)||'{"enabled":true,"threshold":70}')}
 function saveNovaAlert(alert){const alerts=JSON.parse(localStorage.getItem(NOVA_ALERTS_KEY)||"[]");const fingerprint=[alert.area,alert.risk,alert.level,alert.message].join("|");if(!alerts.find(a=>a.fingerprint===fingerprint&&Date.now()-a.createdAt<21600000)){alerts.unshift({...alert,fingerprint,createdAt:Date.now(),read:false});localStorage.setItem(NOVA_ALERTS_KEY,JSON.stringify(alerts.slice(0,50)))}}
