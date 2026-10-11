@@ -105,12 +105,12 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
  provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.bindTooltip(r.name+' · Yakında',{permanent:true,direction:"center",className:"region-label region-label-muted"});l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
- breadcrumb("İL SEVİYESİ");setStatus(weatherLive?"CANLI • "+provinceRows.filter(r=>r.score!=null).length+" GÖZLEM • "+mode.toUpperCase():"ÇEVRİMDIŞI / VERİ EKSİK • "+mode.toUpperCase());
+ breadcrumb("İL SEVİYESİ");const validProvinceObservations=provinceRows.filter(r=>r.score!=null).length;setStatus(validProvinceObservations>0?"HAVA VERİSİ • "+validProvinceObservations+" GÖZLEM • "+mode.toUpperCase():"HAVA VERİSİ YOK • "+mode.toUpperCase());
 }
 function drawDistricts(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
  districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r,true),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
- breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
+ breadcrumb(selectedProvince+" → İLÇELER");const validDistrictObservations=districtRows.filter(r=>r.score!=null).length;setStatus(validDistrictObservations>0?"HAVA VERİSİ • "+validDistrictObservations+"/"+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase():"HAVA VERİSİ YOK • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
 }
 function chooseDistrict(r){
  selectedDistrict=null;
