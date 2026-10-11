@@ -4,11 +4,28 @@ let areaCache=[];
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function getAreas(){return areaCache.length?areaCache:JSON.parse(localStorage.getItem(KEY)||"[]")}
 async function loadAreas(){
-  let indexed=[];
-  try{indexed=await window.NovaStore.getAll("areas")}catch{}
+  // Read the synchronous local cache first so saved areas remain visible even
+  // if IndexedDB is slow, blocked, or unavailable in a browser context.
   let local=[];
   try{local=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
-  const merged=new Map(indexed.map(a=>[String(a.id),a]));
+  let indexed=[];
+  // IndexedDB is an enhancement, not a prerequisite for showing saved areas.
+  // Some mobile/private/test contexts can leave an IDB request pending; bound
+  // the wait and keep the synchronous localStorage cache usable.
+  try {
+    indexed=await Promise.race([
+      window.NovaStore.getAll("areas"),
+      new Promise(resolve=>setTimeout(()=>resolve([]),1200))
+    ]);
+  } catch {}
+  // Re-read after IndexedDB resolves: another tab or the user may save/delete
+  // an area while this async read is in flight. A pre-await snapshot can erase
+  // a just-added local area when this function writes the merged cache back.
+  try {
+    const latest=JSON.parse(localStorage.getItem(KEY)||"[]");
+    if(Array.isArray(latest)) local=latest;
+  } catch {}
+  const merged=new Map(indexed.filter(a=>a&&a.id!=null).map(a=>[String(a.id),a]));
   // localStorage is written first by the map save flow; it must win on id collisions
   // so an older IndexedDB copy cannot hide a newly drawn or edited polygon.
   for(const area of local){
@@ -18,7 +35,16 @@ async function loadAreas(){
   }
   areaCache=Array.from(merged.values()).filter(a=>a&&a.id!=null);
   localStorage.setItem(KEY,JSON.stringify(areaCache));
-  for(const area of areaCache){try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()})}catch{}}
+  // Never block initial rendering on a stalled IndexedDB write. The
+  // localStorage copy is already committed and will be merged on next load.
+  for(const area of areaCache){
+    try {
+      await Promise.race([
+        window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()}),
+        new Promise(resolve=>setTimeout(resolve,800))
+      ]);
+    } catch {}
+  }
   return areaCache;
 }
 async function removeArea(id){
@@ -28,7 +54,12 @@ async function removeArea(id){
   if(isUuid && window.NovaAuth?.isLoggedIn()) await window.NovaAuth.deleteArea(key);
   areaCache=areaCache.filter(a=>String(a.id)!==key);
   localStorage.setItem(KEY,JSON.stringify(areaCache));
-  try{await window.NovaStore.remove("areas",key)}catch(e){console.warn("Local area cleanup",e)}
+  try {
+    await Promise.race([
+      window.NovaStore.remove("areas",key),
+      new Promise(resolve=>setTimeout(resolve,500))
+    ]);
+  } catch(e){console.warn("Local area cleanup",e)}
   window.dispatchEvent(new CustomEvent("nova:areas-updated",{detail:{reason:"deleted",id:key}}));
 }
 
@@ -43,7 +74,7 @@ async function live(lat,lon){const u=new URL("https://api.open-meteo.com/v1/fore
 async function satellite(a){try{const base=(window.NOVA_API_BASE||"https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/,"");if(!base)return{status:"backend_bekleniyor",series:[]};const ring=a.coordinates.map(p=>[p[1],p[0]]);ring.push(ring[0]);const r=await fetch(base+"/ndvi/area-timeseries",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({geometry:{type:"Polygon",coordinates:[ring]},days:180,interval:"P30D"})});return await r.json()}catch{return{status:"error",series:[]}}}
 function alerts(a,d,sat){const out=[];if(d.w.soil<.15)out.push(["SU STRESİ","Toprak nemi çok düşük. Sulama kontrolü gerekli.","warn"]);else if(d.w.soil<.20)out.push(["NEM DÜŞÜYOR","Toprak nemi izleme eşiğinin altında.","info"]);if(d.w.vpd>2)out.push(["HAVA / SU KAYBI","VPD yüksek; bitkinin su kaybı baskısı artıyor.","warn"]);if(d.w.wind>25)out.push(["RÜZGAR","Rüzgar yüksek; arıcılık uçuş koşulu zayıflayabilir.","warn"]);if(d.w.precip>5)out.push(["YAĞIŞ","Yağış yüksek; tarla operasyonunu kontrol et.","info"]);if(a.type.includes("arı")&&d.bee<50)out.push(["ARICILIK UYARISI","Uçuş koşulu şu anda elverişli görünmüyor.","warn"]);if(a.type.includes("çift")&&d.crop<45)out.push(["TARIM UYARISI","Koşullar bitki stresi yönünde; uyduyla teyit edilmeli.","warn"]);if(sat?.status==="available"&&sat.latest?.ndmi!=null&&sat.latest.ndmi<0.05)out.push(["UYDU SU STRESİ","NDMI düşük; bitki su durumu zayıflıyor olabilir. Hava/toprak verisiyle birlikte kontrol et.","warn"]);if(sat?.status==="available"&&sat.delta?.ndmi!=null&&sat.delta.ndmi<-0.05)out.push(["UYDU TRENDİ","NDMI son dönemde düşmüş; alanı yakından izle.","info"]);if(!out.length)out.push(["SİSTEM NORMAL","Belirgin otomatik olay eşiği aşılmadı.","ok"]);return out}
 function satelliteBox(sat){if(sat.status==="available"&&sat.series?.length){const last=sat.series[sat.series.length-1],prev=sat.series.length>1?sat.series[sat.series.length-2]:null;const delta=prev?(last.ndvi-prev.ndvi):null;const ndmi=last.ndmi;const ndmiDelta=prev&&ndmi!=null&&prev.ndmi!=null?(ndmi-prev.ndmi):null;return '<div class="sat-mini"><div><span>UYDU ZAMAN SERİSİ</span><b>'+last.ndvi.toFixed(2)+' NDVI · '+(ndmi==null?"—":ndmi.toFixed(2)+" NDMI")+"</b></div><small>"+last.classification+(delta===null?"":" · NDVI "+(delta>=0?"+":"")+delta.toFixed(2))+(ndmiDelta===null?"":" · NDMI "+(ndmiDelta>=0?"+":"")+ndmiDelta.toFixed(2))+'</small></div>'}if(sat.status==="not_configured")return '<div class="sat-mini muted"><span>UYDU</span><b>CDSE bağlantısı bekleniyor</b><small>Backend’e Sentinel Hub OAuth bilgileri tanımlanınca gerçek NDVI zaman serisi çalışır.</small></div>';return '<div class="sat-mini muted"><span>UYDU</span><b>Sahne/işleme bekleniyor</b><small>Alan bazlı Sentinel-2 istatistiği hazırlanıyor.</small></div>'}
-async function card(a){const [lat,lon]=center(a.coordinates);const [d,sat]=await Promise.all([live(lat,lon),satellite(a)]);const alertsHtml=alerts(a,d,sat).map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3>'+a.name+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>CANLI DURUM</span><strong>'+d.risk+'/100 risk</strong><small>Güncelleme: '+new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Otomatik olaylar</h4>'+alertsHtml+'</div><div class="area-footer">Koordinat merkezi: '+lat.toFixed(4)+', '+lon.toFixed(4)+' · Hava/toprak modeli canlıdır. Uydu zaman serisi Sentinel-2 sahneleri geldikçe güncellenir.</div></article>'}
+async function card(a){const [lat,lon]=center(a.coordinates);const [d,sat]=await Promise.all([live(lat,lon),satellite(a)]);const alertsHtml=alerts(a,d,sat).map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3 data-no-translate>'+esc(a.name)+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>CANLI DURUM</span><strong>'+d.risk+'/100 risk</strong><small>Güncelleme: '+new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Otomatik olaylar</h4>'+alertsHtml+'</div><div class="area-footer">Koordinat merkezi: '+lat.toFixed(4)+', '+lon.toFixed(4)+' · Hava/toprak modeli canlıdır. Uydu zaman serisi Sentinel-2 sahneleri geldikçe güncellenir.</div></article>'}
 function renderAreaMiniMaps(){
   if(!window.L)return;
   const areas=getAreas();
@@ -63,11 +94,22 @@ async function render(){const areas=await loadAreas();countEl.textContent=areas.
 async function liveEdge(lat,lon){
   try{
     const d=await live(lat,lon);
-    try{await window.NovaStore.put("observations",{id:"weather:"+lat.toFixed(4)+":"+lon.toFixed(4),lat,lon,data:d,updatedAt:Date.now()})}catch{}
+    // Do not delay visible live metrics if the local persistence layer stalls.
+    try {
+      await Promise.race([
+        window.NovaStore.put("observations",{id:"weather:"+lat.toFixed(4)+":"+lon.toFixed(4),lat,lon,data:d,updatedAt:Date.now()}),
+        new Promise(resolve=>setTimeout(resolve,500))
+      ]);
+    } catch {}
     return {...d,mode:"live"};
   }catch{
     try{
-      const rows=await window.NovaStore.getAll("observations");
+      // Offline cache lookup is best-effort too; a stalled IndexedDB read must
+      // not prevent the saved-area card from rendering its honest fallback.
+      const rows=await Promise.race([
+        window.NovaStore.getAll("observations"),
+        new Promise(resolve=>setTimeout(()=>resolve([]),500))
+      ]);
       const hit=rows.find(x=>Math.abs(x.lat-lat)<.02&&Math.abs(x.lon-lon)<.02);
       if(hit?.data){const e=window.NovaOfflineEngine.evaluate(hit.data.w,hit.data);return {...hit.data,risk:e.risk,offline:true,mode:"offline",offlineAlerts:e.alerts,updatedAt:hit.updatedAt}}
     }catch{}
@@ -80,16 +122,75 @@ async function cardEdge(a){
   const baseAlerts=alerts(a,d,sat);
   const edgeAlerts=d.offlineAlerts||[];
   const all=edgeAlerts.length?edgeAlerts.map(x=>[x.title,x.message,"warn"]):baseAlerts;
-  try{for(const x of all.filter(a=>a[2]!=="ok"))await window.NovaStore.put("alerts",{id:"local:"+a.id+":"+x[0]+":"+new Date().toISOString().slice(0,13),areaId:a.id,area:a.name,title:x[0],message:x[1],level:x[2],createdAt:Date.now(),source:d.offline?"offline-engine":"live-data"})}catch{}
+  // Alerts must not hold the entire card hostage when IndexedDB is slow.
+  // Risk status is rendered immediately; durable alert persistence is best-effort.
+  for(const x of all.filter(item=>item[2]!=="ok")){
+    try {
+      await Promise.race([
+        window.NovaStore.put("alerts",{id:"local:"+a.id+":"+x[0]+":"+new Date().toISOString().slice(0,13),areaId:a.id,area:a.name,title:x[0],message:x[1],level:x[2],createdAt:Date.now(),source:d.offline?"offline-engine":"live-data"}),
+        new Promise(resolve=>setTimeout(resolve,500))
+      ]);
+    } catch {}
+  }
   const alertsHtml=all.map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
-  return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3>'+a.name+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>'+(d.offline?"ÇEVRİMDIŞI / SON VERİ":"CANLI DURUM")+'</span><strong>'+d.risk+'/100 risk</strong><small>'+(d.updatedAt?"Son kayıt: "+new Date(d.updatedAt).toLocaleString("tr-TR"):"Yeni veri yok")+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Yerel olay merkezi</h4>'+alertsHtml+'</div><div class="area-footer">'+(d.offline?"NEXORAWILDFIRE EDGE: internet yok. Son kayıt üzerinden yerel karar motoru çalıştı.":"Canlı hava/toprak verisi. Yeni kayıtlar yerel veri deposuna alınır.")+'</div></article>';
+  return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3 data-no-translate>'+esc(a.name)+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>'+(d.offline?"ÇEVRİMDIŞI / SON VERİ":"CANLI DURUM")+'</span><strong>'+d.risk+'/100 risk</strong><small>'+(d.updatedAt?"Son kayıt: "+new Date(d.updatedAt).toLocaleString("tr-TR"):"Yeni veri yok")+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Yerel olay merkezi</h4>'+alertsHtml+'</div><div class="area-footer">'+(d.offline?"NEXORAWILDFIRE EDGE: internet yok. Son kayıt üzerinden yerel karar motoru çalıştı.":"Canlı hava/toprak verisi. Yeni kayıtlar yerel veri deposuna alınır.")+'</div></article>';
+}
+let areaRenderVersion=0;
+function areaFallbackCard(a){
+  const location=[a.province,a.district].filter(Boolean).map(esc).join(" · ");
+  return '<article class="area-card area-card-degraded"><div class="area-card-head"><div><div class="eyebrow">'+esc(a.type||"ALAN")+'</div><h3 data-no-translate>'+esc(a.name)+'</h3><p>'+location+'</p></div><button data-delete="'+esc(a.id)+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a></div><p class="notice-panel" role="status">Alan kaydı korunuyor. Çevresel veriler şu anda yüklenemedi; veri alınmadan risk skoru gösterilmiyor.</p></article>';
+}
+function bindAreaDeleteButtons(){
+  areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{
+    const status=document.querySelector("[data-area-operation-status]");
+    b.disabled=true;if(status)status.textContent="Alan silme işlemi sürüyor…";
+    try{
+      await removeArea(b.dataset.delete);
+      if(status)status.textContent="Alan silindi ve yerel kayıt yenilendi.";
+      await render();
+    }catch(error){
+      b.disabled=false;
+      if(status)status.textContent="Alan silinemedi; yerel kayıt korundu. Bağlantını ve hesap izinlerini kontrol et.";
+      console.error("Area deletion failed",error);
+    }
+  });
 }
 async function render(){
-  const areas=await loadAreas();countEl.textContent=areas.length+" alan";
+  const renderVersion=++areaRenderVersion;
+  // Paint the synchronous cache before awaiting IndexedDB. This keeps saved
+  // names and delete controls available even if the storage layer stalls.
+  let cached=[];
+  try{cached=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
+  if(Array.isArray(cached)&&cached.length){
+    areaCache=cached.filter(a=>a&&a.id!=null);
+    countEl.textContent=areaCache.length+" alan";
+    emptyEl.style.display="none";
+    areasEl.innerHTML=areaCache.map(a=>'<article class="area-card area-card-loading"><div class="area-card-head"><div><div class="eyebrow">'+esc(a.type||"ALAN")+'</div><h3 data-no-translate>'+esc(a.name)+'</h3><p>'+[a.province,a.district].filter(Boolean).map(esc).join(" · ")+'</p></div><button data-delete="'+esc(a.id)+'">Sil</button></div><p role="status">Alan kaydı yüklendi; çevresel göstergeler kontrol ediliyor…</p></article>').join("");
+    bindAreaDeleteButtons();
+  }
+  const areas=await loadAreas();
+  if(renderVersion!==areaRenderVersion)return;
+  countEl.textContent=areas.length+" alan";
   if(!areas.length){areasEl.innerHTML="";emptyEl.style.display="grid";return}
-  emptyEl.style.display="none";areasEl.innerHTML='<div class="loading-area">NEXORAWILDFIRE EDGE alan verilerini hazırlıyor…</div>';
-  const html=await Promise.all(areas.map(cardEdge));areasEl.innerHTML=html.join("");
-  areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{const status=document.querySelector("[data-area-operation-status]");b.disabled=true;if(status)status.textContent="Alan silme işlemi sürüyor…";try{await removeArea(b.dataset.delete);if(status)status.textContent="Alan silindi ve yerel kayıt yenilendi.";await render()}catch(e){b.disabled=false;if(status)status.textContent="Alan silinemedi; yerel kayıt korundu. Bağlantını ve hesap izinlerini kontrol et.";console.error("Area deletion failed",e)}});
+  emptyEl.style.display="none";
+  // Render the saved identity immediately. Network, provider, or IndexedDB
+  // latency must never hide the user's saved area or its delete action.
+  areasEl.innerHTML=areas.map(a=>'<article class="area-card area-card-loading"><div class="area-card-head"><div><div class="eyebrow">'+esc(a.type||"ALAN")+'</div><h3 data-no-translate>'+esc(a.name)+'</h3><p>'+[a.province,a.district].filter(Boolean).map(esc).join(" · ")+'</p></div><button data-delete="'+esc(a.id)+'">Sil</button></div><p role="status">Alan kaydı yüklendi; çevresel göstergeler kontrol ediliyor…</p></article>').join("");
+  bindAreaDeleteButtons();
+  const html=await Promise.all(areas.map(async a=>{
+    try{
+      return await Promise.race([
+        cardEdge(a),
+        new Promise(resolve=>setTimeout(()=>resolve(areaFallbackCard(a)),8000))
+      ]);
+    }catch(error){
+      console.error("Area metrics failed",error);
+      return areaFallbackCard(a);
+    }
+  }));
+  if(renderVersion!==areaRenderVersion)return;
+  areasEl.innerHTML=html.join("");
+  bindAreaDeleteButtons();
   renderAreaMiniMaps();
   areasEl.querySelectorAll("[data-area-alert-toggle]").forEach(input=>input.onchange=()=>{
     const prefs=getAreaAlertPrefs();prefs[String(input.dataset.areaAlertToggle)]=input.checked;

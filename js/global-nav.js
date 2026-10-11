@@ -9,7 +9,7 @@
     ["pages/satellite.html", "Uydu Merkezi", "Satellite Hub"],
     ["pages/account.html", "Profil", "Profile"],
     ["pages/about.html", "Sistem", "About"],
-    ["pages/vision.html", "Vizyon", "Vision"],
+    ["pages/vision.html", "Cumhuriyet Vizyonu", "Republic Vision"],
     ["pages/feedback.html", "Geri Bildirim", "Feedback"],
     ["pages/legal.html", "Yasal Bilgiler", "Legal & Privacy"]
   ];

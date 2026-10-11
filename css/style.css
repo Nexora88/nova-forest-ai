@@ -911,3 +911,11 @@ main{padding-bottom:76px}
 @keyframes nxHistoryEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes nxHistoryDraw{to{stroke-dashoffset:0}}@keyframes nxHistoryPulse{0%,100%{opacity:1}50%{opacity:.35}}
 @media(prefers-reduced-motion:reduce){.nx-daily-history,.nx-history-live:before,.nx-history-line{animation:none!important}.nx-history-line{stroke-dashoffset:0}}
 @media(max-width:560px){.nx-history-heading{display:block}.nx-history-live{margin-top:10px}.nx-history-chart{padding:3px}}
+
+
+/* Subtle, accessible pulse for NASA FIRMS thermal-anomaly observations. */
+.nova-hotspot-marker{animation:nova-hotspot-pulse 1.8s ease-in-out infinite;transform-origin:center;}
+@keyframes nova-hotspot-pulse{0%,100%{stroke-opacity:.95;fill-opacity:.78;stroke-width:2}50%{stroke-opacity:.62;fill-opacity:.5;stroke-width:4}}
+.fire-region-note{display:block;margin-top:8px;color:#ffb3bd;font-weight:600;line-height:1.5}
+.map-unavailable{font:600 14px/1.6 system-ui,sans-serif}
+@media(prefers-reduced-motion:reduce){.nova-hotspot-marker{animation:none}}

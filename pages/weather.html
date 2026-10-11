@@ -1,295 +1,102 @@
-
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-NexoraWildfire AI | Atmosfer Analizi
-</title>
-
-
-<link rel="stylesheet" href="../css/style.css?v=20261010c">
-
-
-<link rel="stylesheet" href="../css/product-ui.css?v=20261007d"><link rel="stylesheet" href="../css/forecast-history.css?v=20261007a"><link rel="icon" type="image/png" href="../assets/nexora-wildfire-logo.png"><link rel="apple-touch-icon" href="../assets/nexora-wildfire-logo.png"><link rel="stylesheet" href="../css/special-days.css?v=20261008a"><link rel="stylesheet" href="../css/auth.css?v=20261008a"></head>
-
-
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#041008">
+<meta name="description" content="NexoraWildfire AI atmosfer verileri, açıklanabilir risk göstergeleri ve senaryo laboratuvarı.">
+<title>NexoraWildfire AI | Atmosfer ve Risk Laboratuvarı</title>
+<link rel="stylesheet" href="../css/style.css?v=20261011r">
+<link rel="stylesheet" href="../css/product-ui.css?v=20261011r">
+<link rel="stylesheet" href="../css/forecast-history.css?v=20261011r">
+<link rel="stylesheet" href="../css/atmosphere-lab.css?v=20261011a">
+<link rel="icon" type="image/png" href="../assets/nexora-wildfire-logo.png">
+<link rel="apple-touch-icon" href="../assets/nexora-wildfire-logo.png">
+</head>
 <body>
-
-
-
-
 <header>
-
-
-<div class="logo">
-
-
-<h1>
-🌲 NexoraWildfire AI
-</h1>
-
-
-<p>
-Hava Koşulları ve Çevresel Sinyaller
-</p>
-
-
-</div>
-
-
-
-<div class="status">
-
-<span></span>
-
-CANLI HAVA VERİSİ
-
-</div>
-
-
+  <div class="logo"><h1>🌲 NexoraWildfire AI</h1><p data-tr="Atmosfer, sensör füzyonu ve açıklanabilir risk laboratuvarı" data-en="Atmosphere, sensor fusion and explainable risk lab">Atmosfer, sensör füzyonu ve açıklanabilir risk laboratuvarı</p></div>
+  <div class="status" id="atmo-provider-status" role="status" aria-live="polite"><span></span><b data-tr="VERİ BEKLENİYOR" data-en="WAITING FOR DATA">VERİ BEKLENİYOR</b></div>
 </header>
-
-
-
-
-
-
-
-<nav><a href="../index.html">Ana Panel</a><a href="map.html">Risk Haritası</a><a href="areas.html">Alanlarım</a><a class="active" href="weather.html">Atmosfer</a><a href="events.html">Etkinlikler</a><a href="satellite.html">Uydu Merkezi</a><a href="about.html">Sistem</a><a href="feedback.html">Geri Bildirim</a><a href="vision.html">Cumhuriyet Vizyonu</a><a href="legal.html" data-tr="Yasal Bilgiler" data-en="Legal">Yasal Bilgiler</a></nav>
-
-
-
-
-
-
-
-<main>
-
-
-
-
-<section class="hero">
-
-
-<h2>
-🌦 Hava Koşulları
-</h2>
-
-
-<p>
-
-Open-Meteo meteorolojik verileri kullanılarak
-bölgesel sıcaklık, nem ve rüzgar koşulları
-analiz edilir.
-
-</p>
-
-
+<nav>
+<a href="../index.html" data-tr="Ana Panel" data-en="Dashboard">Ana Panel</a>
+<a href="map.html" data-tr="Risk Haritası" data-en="Risk Map">Risk Haritası</a>
+<a href="areas.html" data-tr="Alanlarım" data-en="My Areas">Alanlarım</a>
+<a class="active" href="weather.html" data-tr="Atmosfer" data-en="Atmosphere">Atmosfer</a>
+<a href="events.html" data-tr="Etkinlikler" data-en="Events">Etkinlikler</a>
+<a href="satellite.html" data-tr="Uydu Merkezi" data-en="Satellite Center">Uydu Merkezi</a>
+<a href="account.html" data-tr="Hesap" data-en="Account">Hesap</a>
+<a href="about.html" data-tr="Sistem" data-en="System">Sistem</a>
+<a href="vision.html" data-tr="Cumhuriyet Vizyonu" data-en="Vision">Cumhuriyet Vizyonu</a>
+<a href="legal.html" data-tr="Yasal Bilgiler" data-en="Legal">Yasal Bilgiler</a>
+</nav>
+<main class="atmo-shell">
+<section class="atmo-hero">
+  <div class="atmo-eyebrow" data-tr="NEXORA / ARAŞTIRMA MODÜLÜ 01" data-en="NEXORA / RESEARCH MODULE 01">NEXORA / ARAŞTIRMA MODÜLÜ 01</div>
+  <h2 data-tr="Atmosfer ve Yangın Risk Laboratuvarı" data-en="Atmosphere & Wildfire Risk Lab">Atmosfer ve Yangın Risk Laboratuvarı</h2>
+  <p data-tr="Gerçek meteoroloji gözlemlerini şeffaf bir kural tabanlı göstergeyle birleştir. Senaryolar araştırma amaçlıdır; resmî yangın uyarısı veya doğrulanmış yangın yayılım tahmini değildir." data-en="Combine real meteorological observations with a transparent rule-based indicator. Scenarios are for research; they are not official fire warnings or validated fire-spread forecasts.">Gerçek meteoroloji gözlemlerini şeffaf bir kural tabanlı göstergeyle birleştir. Senaryolar araştırma amaçlıdır; resmî yangın uyarısı veya doğrulanmış yangın yayılım tahmini değildir.</p>
+  <div class="atmo-toolbar">
+    <label for="atmo-region"><span data-tr="Analiz noktası" data-en="Analysis location">Analiz noktası</span>
+      <select id="atmo-region"><option value="edirne" data-tr="Edirne / Türkiye" data-en="Edirne / Türkiye">Edirne / Türkiye</option><option value="canakkale" data-tr="Çanakkale / Türkiye" data-en="Çanakkale / Türkiye">Çanakkale / Türkiye</option><option value="queensland" data-tr="Queensland / Avustralya" data-en="Queensland / Australia">Queensland / Avustralya</option><option value="california" data-tr="Kaliforniya / ABD" data-en="California / USA">Kaliforniya / ABD</option></select>
+    </label>
+    <button id="atmo-refresh" type="button" data-tr="Veriyi yenile" data-en="Refresh data">Veriyi yenile</button>
+    <span id="atmo-updated" data-tr="Henüz veri alınmadı" data-en="No data retrieved yet">Henüz veri alınmadı</span>
+  </div>
 </section>
-
-
-
-
-
-
-
-<section class="cards">
-
-
-
-<div class="card">
-
-
-<h3>
-🌡 Sıcaklık Analizi
-</h3>
-
-
-<strong>
--- °C
-</strong>
-
-
-<p>
-
-Kaynak: Open-Meteo
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-💧 Nem Seviyesi
-</h3>
-
-
-<strong>
--- %
-</strong>
-
-
-<p>
-
-Bitki kuruluğu için analiz edilir
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-🌬 Rüzgar Hızı
-</h3>
-
-
-<strong>
--- km/h
-</strong>
-
-
-<p>
-
-Yangın yayılım risk faktörü
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h3>
-🧠 AI Değerlendirme
-</h3>
-
-
-<strong>
-ONLINE
-</strong>
-
-
-<p>
-
-Meteorolojik risk işleme aktif
-
-</p>
-
-
-</div>
-
-
-
+<section class="atmo-metrics" aria-label="Meteoroloji ölçümleri" data-tr-aria-label="Meteoroloji ölçümleri" data-en-aria-label="Weather metrics">
+  <article class="atmo-card"><span data-tr="SICAKLIK" data-en="TEMPERATURE">SICAKLIK</span><strong id="atmo-temp">—</strong><small id="atmo-temp-meta">Open-Meteo</small></article>
+  <article class="atmo-card"><span data-tr="BAĞIL NEM" data-en="RELATIVE HUMIDITY">BAĞIL NEM</span><strong id="atmo-humidity">—</strong><small id="atmo-humidity-meta">Open-Meteo</small></article>
+  <article class="atmo-card"><span data-tr="RÜZGÂR HIZI" data-en="WIND SPEED">RÜZGÂR HIZI</span><strong id="atmo-wind">—</strong><small id="atmo-wind-meta">Open-Meteo</small></article>
+  <article class="atmo-card"><span data-tr="RÜZGÂR YÖNÜ" data-en="WIND DIRECTION">RÜZGÂR YÖNÜ</span><strong id="atmo-direction">—</strong><small data-tr="meteorolojik yön" data-en="meteorological direction">meteorolojik yön</small></article>
 </section>
-
-
-
-
-
-
-
-<section class="forecast-center" data-forecast-center></section><section class="sources">
-
-
-<h2>
-Veri Akışı
-</h2>
-
-
-
-<p>
-
-🌦 Open-Meteo API
-
-<br><br>
-
-📍 Bölgesel koordinat analizi
-
-<br><br>
-
-🤖 NexoraWildfire Risk Engine
-
-</p>
-
-
+<section class="atmo-panel">
+  <div class="atmo-panel-head"><div><div class="atmo-eyebrow" data-tr="01 / VERİ FÜZYONU" data-en="01 / SENSOR FUSION">01 / VERİ FÜZYONU</div><h3 data-tr="Nexora Yangın Risk İndikatörü" data-en="Nexora Fire Risk Indicator">Nexora Yangın Risk İndikatörü</h3></div><span class="atmo-badge" id="atmo-model-status" data-tr="GÖZLEM BEKLENİYOR" data-en="AWAITING OBSERVATIONS">GÖZLEM BEKLENİYOR</span></div>
+  <p data-tr="Sıcaklık, rüzgâr ve kuru hava bileşenleri 0–100 aralığına normalize edilir. Ağırlıklı sonuç olasılık değildir; katsayılar araştırma prototipi içindir ve saha verisiyle kalibre edilmemiştir." data-en="Temperature, wind and dry-air components are normalized to 0–100. The weighted score is not a probability; coefficients are a research prototype and have not been calibrated against field data.">Sıcaklık, rüzgâr ve kuru hava bileşenleri 0–100 aralığına normalize edilir. Ağırlıklı sonuç olasılık değildir; katsayılar araştırma prototipi içindir ve saha verisiyle kalibre edilmemiştir.</p>
+  <div class="atmo-risk-layout">
+    <div class="atmo-score"><div class="atmo-score-ring" id="atmo-score-ring"><strong id="atmo-score">—</strong><span>/ 100</span></div><b id="atmo-risk-label" data-tr="Veri gerekli" data-en="Data required">Veri gerekli</b><small data-tr="Prototip gösterge · olasılık değil" data-en="Prototype indicator · not probability">Prototip gösterge · olasılık değil</small></div>
+    <div class="atmo-explain"><h4 data-tr="Karara katkılar (XAI tarzı)" data-en="Decision contributions (XAI-style)">Karara katkılar (XAI tarzı)</h4><div id="atmo-contributions" class="atmo-empty" data-tr="Geçerli gözlem geldiğinde katkılar hesaplanır." data-en="Contributions will be calculated when valid observations arrive.">Geçerli gözlem geldiğinde katkılar hesaplanır.</div><p id="atmo-explanation" aria-live="polite" data-tr="Model açıklaması burada görünecek." data-en="Model explanation will appear here.">Model açıklaması burada görünecek.</p></div>
+  </div>
+  <details class="atmo-details"><summary data-tr="Formül ve sınırlar" data-en="Formula and limitations">Formül ve sınırlar</summary><p><code>score = 0.4 × (T / 45 × 100) + 0.3 × (wind / 60 × 100) + 0.3 × (100 − RH)</code></p><p data-tr="Girdiler fiziksel aralıklarda sınırlandırılır. Model, geçmiş yangın kayıtlarıyla eğitilmiş ML modeli değildir; SHAP/LIME çıktısı da değildir. Katkı çubukları doğrudan formülün matematiksel katkısını gösterir." data-en="Inputs are clipped to physical ranges. This is not an ML model trained on historical fire records and is not SHAP/LIME output. Contribution bars show the formula's direct mathematical contributions.">Girdiler fiziksel aralıklarda sınırlandırılır. Model, geçmiş yangın kayıtlarıyla eğitilmiş ML modeli değildir; SHAP/LIME çıktısı da değildir. Katkı çubukları doğrudan formülün matematiksel katkısını gösterir.</p></details>
 </section>
-
-
-
-
-
-
-
+<section class="atmo-panel">
+  <div class="atmo-panel-head"><div><div class="atmo-eyebrow" data-tr="02 / DİJİTAL İKİZ" data-en="02 / DIGITAL TWIN">02 / DİJİTAL İKİZ</div><h3 data-tr="Rüzgâr yönlü yayılım senaryosu" data-en="Wind-directed spread scenario">Rüzgâr yönlü yayılım senaryosu</h3></div><span class="atmo-badge atmo-badge-warn" data-tr="TEMSİLÎ SİMÜLASYON" data-en="ILLUSTRATIVE SIMULATION">TEMSİLÎ SİMÜLASYON</span></div>
+  <p data-tr="Bir aktif yangın koordinatı girilirse merkez noktası oluşturulur. Buradaki yayılım hızı varsayımsal bir parametredir; topoğrafya, yakıt nemi ve yangın davranışı modeli içermez. NASA FIRMS noktası otomatik olarak yangın doğrulaması anlamına gelmez." data-en="Enter a suspected fire coordinate to set a scenario origin. The spread rate here is an assumed parameter; it does not model terrain, fuel moisture or fire behaviour. A NASA FIRMS hotspot alone is not confirmation of a fire.">Bir aktif yangın koordinatı girilirse merkez noktası oluşturulur. Buradaki yayılım hızı varsayımsal bir parametredir; topoğrafya, yakıt nemi ve yangın davranışı modeli içermez. NASA FIRMS noktası otomatik olarak yangın doğrulaması anlamına gelmez.</p>
+  <div class="atmo-form-grid">
+    <label><span data-tr="Enlem" data-en="Latitude">Enlem</span><input id="atmo-origin-lat" type="number" step="any" min="-90" max="90" placeholder="41.6771"></label>
+    <label><span data-tr="Boylam" data-en="Longitude">Boylam</span><input id="atmo-origin-lon" type="number" step="any" min="-180" max="180" placeholder="26.5557"></label>
+    <label><span data-tr="Varsayımsal ilerleme hızı (km/sa)" data-en="Assumed spread rate (km/h)">Varsayımsal ilerleme hızı (km/sa)</span><input id="atmo-spread-rate" type="number" min="0.1" max="10" step="0.1" value="1"></label>
+    <label><span data-tr="Bitki örtüsü senaryosu" data-en="Vegetation scenario">Bitki örtüsü senaryosu</span><select id="atmo-vegetation"><option value="pine" data-tr="Kızılçam (varsayımsal)" data-en="Turkish pine (assumed)">Kızılçam (varsayımsal)</option><option value="mixed" data-tr="Karışık orman (varsayımsal)" data-en="Mixed forest (assumed)">Karışık orman (varsayımsal)</option><option value="grass" data-tr="Otlak/çalılık (varsayımsal)" data-en="Grassland/shrubland (assumed)">Otlak/çalılık (varsayımsal)</option></select></label>
+  </div>
+  <button id="atmo-run-spread" type="button" data-tr="Senaryoyu hesapla" data-en="Calculate scenario">Senaryoyu hesapla</button>
+  <div id="atmo-spread-results" class="atmo-scenario-grid"><div class="atmo-empty" data-tr="Henüz senaryo hesaplanmadı." data-en="No scenario calculated yet.">Henüz senaryo hesaplanmadı.</div></div>
+  <div class="atmo-map-frame"><div id="atmo-scenario-map" role="img" aria-label="Illustrative spread direction diagram"><div class="atmo-map-center" data-tr="K" data-en="N">K</div><div class="atmo-wind-arrow" id="atmo-wind-arrow">➤</div><div class="atmo-map-origin" id="atmo-map-origin">●</div><div class="atmo-map-ring ring-30" id="atmo-ring-30"></div><div class="atmo-map-ring ring-60" id="atmo-ring-60"></div><div class="atmo-map-ring ring-120" id="atmo-ring-120"></div><div class="atmo-map-legend" data-tr="Halka: 30 / 60 / 120 dk senaryosu · harita koordinat projeksiyonu değildir" data-en="Rings: 30 / 60 / 120 min scenarios · not a map-coordinate projection">Halka: 30 / 60 / 120 dk senaryosu · harita koordinat projeksiyonu değildir</div></div></div>
+  <div class="atmo-carbon" id="atmo-carbon"><h4 data-tr="Karbon ve ekonomik etki senaryosu" data-en="Carbon and economic impact scenario">Karbon ve ekonomik etki senaryosu</h4><p data-tr="Önce yayılım senaryosunu hesapla. Emisyon ve ekonomik etki varsayımları açıkça etiketlenir; resmî hasar tahmini değildir." data-en="Calculate the spread scenario first. Emissions and economic assumptions are explicitly labelled; this is not an official damage estimate.">Önce yayılım senaryosunu hesapla. Emisyon ve ekonomik etki varsayımları açıkça etiketlenir; resmî hasar tahmini değildir.</p><div class="atmo-carbon-fields"><label><span data-tr="Varsayımsal CO₂ eşdeğeri (ton/ha)" data-en="Assumed CO₂ equivalent (tonnes/ha)">Varsayımsal CO₂ eşdeğeri (ton/ha)</span><input id="atmo-co2-factor" type="number" min="0" max="2000" step="1" value="50"></label><label><span data-tr="Varsayımsal ekonomik etki (EUR/ha)" data-en="Assumed economic impact (EUR/ha)">Varsayımsal ekonomik etki (EUR/ha)</span><input id="atmo-cost-factor" type="number" min="0" max="10000000" step="100" value="5000"></label></div><div id="atmo-carbon-values" class="atmo-carbon-values"></div></div>
+</section>
+<section class="atmo-panel">
+  <div class="atmo-panel-head"><div><div class="atmo-eyebrow" data-tr="03 / SAHA SİSTEMLERİ" data-en="03 / EDGE & DRONE">03 / EDGE & DRONE</div><h3 data-tr="İHA kamerası ve Edge AI test tezgâhı" data-en="Drone camera & Edge AI test bench">İHA kamerası ve Edge AI test tezgâhı</h3></div><span class="atmo-badge atmo-badge-warn" data-tr="MODEL BAĞLI DEĞİL" data-en="MODEL NOT CONNECTED">MODEL BAĞLI DEĞİL</span></div>
+  <p data-tr="Tarayıcı kamerası yerel önizleme içindir. Bu sürümde YOLOv8 ağırlıkları ve gerçek zamanlı nesne algılama servisi bağlı değildir; duman tespiti veya GPS eşlemesi uydurulmaz. Kamera izni isteğe bağlıdır." data-en="The browser camera is for local preview. YOLOv8 weights and a real-time detection service are not connected in this version; smoke detection and GPS matching are not fabricated. Camera permission is optional.">Tarayıcı kamerası yerel önizleme içindir. Bu sürümde YOLOv8 ağırlıkları ve gerçek zamanlı nesne algılama servisi bağlı değildir; duman tespiti veya GPS eşlemesi uydurulmaz. Kamera izni isteğe bağlıdır.</p>
+  <div class="atmo-camera-grid"><div class="atmo-camera"><video id="atmo-camera-video" controls preload="none" playsinline><source src="https://eoimages.gsfc.nasa.gov/images/imagerecords/154000/154641/namblackcarbon_geos5_20250803.mp4" type="video/mp4"></video><div class="atmo-camera-overlay" data-tr="YOLO ALGILAMASI BAĞLI DEĞİL" data-en="YOLO DETECTION NOT CONNECTED">YOLO ALGILAMASI BAĞLI DEĞİL</div><div id="atmo-camera-status" role="status" data-tr="Kamera kapalı" data-en="Camera is off">Kamera kapalı</div></div><div class="atmo-camera-controls"><p data-tr="Örnek görüntü: NASA Earth Observatory arşiv videosu · 5 Ağustos 2025. Canlı İHA akışı değildir; video üzerinde algılama yapılmaz." data-en="Sample footage: NASA Earth Observatory archival video · 5 August 2025. This is not a live drone feed; no detection runs on the video.">Örnek görüntü: NASA Earth Observatory arşiv videosu · 5 Ağustos 2025. Canlı İHA akışı değildir; video üzerinde algılama yapılmaz.</p><p><a href="https://earthobservatory.nasa.gov/images/154641" target="_blank" rel="noopener noreferrer" data-tr="NASA kaynak ve bağlamı" data-en="NASA source and context">NASA kaynak ve bağlamı</a></p><button id="atmo-camera-start" type="button" data-tr="Kamerayı aç" data-en="Start camera">Kamerayı aç</button><button id="atmo-camera-stop" type="button" disabled data-tr="Kamerayı kapat" data-en="Stop camera">Kamerayı kapat</button><label class="atmo-file-label"><span data-tr="Test videosu seç (cihazından)" data-en="Choose test video (from device)">Test videosu seç (cihazından)</span><input id="atmo-test-video" type="file" accept="video/*"></label><p id="atmo-video-status" data-tr="NASA arşiv duman görüntüsü hazır (canlı yayın değil). İstersen cihazından test videosu seçebilirsin." data-en="NASA archival smoke footage is available (not live). You can also choose a local test video.">NASA arşiv duman görüntüsü hazır (canlı yayın değil). İstersen cihazından test videosu seçebilirsin.</p></div></div>
+  <div class="atmo-edge-grid"><article><span data-tr="SAHA DONANIMI" data-en="EDGE PROFILE">SAHA DONANIMI</span><strong>Raspberry Pi / Jetson-class</strong><p data-tr="Donanım performansı bu tarayıcıda ölçülmedi." data-en="Hardware performance has not been measured in this browser.">Donanım performansı bu tarayıcıda ölçülmedi.</p></article><article><span data-tr="MODEL SIKIŞTIRMA" data-en="MODEL COMPRESSION">MODEL SIKIŞTIRMA</span><strong data-tr="Hazır değil" data-en="Not implemented">Hazır değil</strong><p data-tr="Quantization/pruning artefaktı veya benchmark raporu henüz yok." data-en="No quantization/pruning artifact or benchmark report is available yet.">Quantization/pruning artefaktı veya benchmark raporu henüz yok.</p></article><article><span data-tr="ÇIKARIM" data-en="INFERENCE">ÇIKARIM</span><strong data-tr="Bağlantı bekleniyor" data-en="Integration pending">Bağlantı bekleniyor</strong><p data-tr="Model ağırlıkları, FPS, gecikme ve doğruluk metrikleri bağlanmadan sonuç gösterilmez." data-en="No results are shown until model weights, FPS, latency and accuracy metrics are connected.">Model ağırlıkları, FPS, gecikme ve doğruluk metrikleri bağlanmadan sonuç gösterilmez.</p></article></div>
+</section>
+<section class="atmo-panel">
+  <div class="atmo-panel-head"><div><div class="atmo-eyebrow" data-tr="04 / ERKEN UYARI" data-en="04 / EARLY WARNING">04 / ERKEN UYARI</div><h3 data-tr="Alarm entegrasyonu test alanı" data-en="Alert integration test bench">Alarm entegrasyonu test alanı</h3></div><span class="atmo-badge atmo-badge-warn" data-tr="GÖNDERİM YAPILMAZ" data-en="NO MESSAGE SENT">GÖNDERİM YAPILMAZ</span></div>
+  <p data-tr="Bu arayüz sadece örnek bildirim metni üretir. Supabase trigger, Twilio, SMS, WhatsApp veya Telegram alıcısı yapılandırılmadı; gerçek bildirim gönderilmez." data-en="This interface only prepares a sample alert message. Supabase triggers, Twilio, SMS, WhatsApp or Telegram recipients are not configured; no real message is sent.">Bu arayüz sadece örnek bildirim metni üretir. Supabase trigger, Twilio, SMS, WhatsApp veya Telegram alıcısı yapılandırılmadı; gerçek bildirim gönderilmez.</p>
+  <div class="atmo-alert-actions"><label><span data-tr="Test olay açıklaması" data-en="Test event description">Test olay açıklaması</span><input id="atmo-alert-description" maxlength="180" value="Demo: provider event review required"></label><button id="atmo-preview-alert" type="button" data-tr="Örnek bildirimi oluştur" data-en="Prepare sample alert">Örnek bildirimi oluştur</button></div>
+  <textarea id="atmo-alert-preview" rows="4" readonly data-tr-placeholder="Örnek bildirim burada oluşturulur; gönderilmez." data-en-placeholder="Sample message appears here; it is not sent." placeholder="Örnek bildirim burada oluşturulur; gönderilmez."></textarea>
+</section>
+<section class="atmo-footnote"><strong data-tr="Bilimsel dürüstlük notu" data-en="Scientific integrity note">Bilimsel dürüstlük notu</strong><p data-tr="Bu laboratuvar, yarışma sunumu için tekrarlanabilir prototip arayüzü sağlar. Birincilik, saha doğrulaması, model başarımı, gerçek yangın yayılımı veya yetkili kuruma bildirim iddiası içermez. Sonraki aşama; etiketli geçmiş yangın verisi, eğitim/test ayrımı, bağımsız değerlendirme, saha sensörleri ve güvenlik incelemesidir." data-en="This lab provides a reproducible prototype interface for a competition demo. It does not claim a winning result, field validation, model performance, real fire spread or notifications to authorities. Next steps include labelled historical fire data, train/test separation, independent evaluation, field sensors and security review.">Bu laboratuvar, yarışma sunumu için tekrarlanabilir prototip arayüzü sağlar. Birincilik, saha doğrulaması, model başarımı, gerçek yangın yayılımı veya yetkili kuruma bildirim iddiası içermez. Sonraki aşama; etiketli geçmiş yangın verisi, eğitim/test ayrımı, bağımsız değerlendirme, saha sensörleri ve güvenlik incelemesidir.</p></section>
 </main>
-
-
-
-
-
-
-
-
-<footer>
-
-
-<p>
-
-NexoraWildfire AI
-
-<br>
-
-Geliştirici:
-<strong>
-Ahmet Eymen Bakraç 
-</strong>
-
-
-<br><br>
-
-Nexora88 © 2026
-
-</p>
-
-
-</footer>
-
-
-
-
-<script src="../js/weather.js"></script><script src="../js/forecast-history.js?v=20261007a"></script>
-
-
-<script src="../js/nova-storage.js?v=20261011b"></script><script src="../js/nova-offline-engine.js?v=20261011b"></script><script src="../js/install-update.js?v=20261011b"></script><script src="../js/edge-ui.js?v=20261011b"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script><script src="../js/auth.js?v=20261011f"></script><script src="../js/nexora-product.js?v=20261008b"></script><script src="../js/pwa.js?v=20261011b"></script><script src="../js/special-days.js?v=20261011b"></script><script src="../js/ataturk-quotes.js?v=20261011a"></script><script src="../js/global-nav.js?v=20261011e"></script><script src="../js/mobile-nav.js?v=20261011d"></script><script src="../js/i18n.js?v=20261011o"></script><script src="../js/i18n-extra.js?v=20261011e"></script><script src="../js/asset-guard.js?v=20261011b"></script></body>
-
-
-</html>
+<footer><p>NexoraWildfire AI · <span data-tr="Araştırma prototipi" data-en="Research prototype">Araştırma prototipi</span></p></footer>
+<script src="../js/atmosphere-lab.js?v=20261011a"></script>
+<script src="../js/wind-spread-scenario.js?v=20261011a"></script>
+<script src="../js/nova-storage.js?v=20261011b"></script>
+<script src="../js/nova-offline-engine.js?v=20261011b"></script>
+<script src="../js/install-update.js?v=20261011b"></script>
+<script src="../js/edge-ui.js?v=20261011b"></script>
+<script src="../js/pwa.js?v=20261011r"></script>
+<script src="../js/global-nav.js?v=20261011e"></script>
+<script src="../js/mobile-nav.js?v=20261011d"></script>
+<script src="../js/i18n.js?v=20261011r"></script>
+<script src="../js/i18n-extra.js?v=20261011e"></script>
+<script src="../js/asset-guard.js?v=20261011b"></script>
+</body></html>

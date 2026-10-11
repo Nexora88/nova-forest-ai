@@ -62,7 +62,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         context = self.browser.new_context(viewport={"width": width, "height": height}, locale="en-US")
         context.add_init_script("if (location.protocol.startsWith('http')) { try { localStorage.removeItem('nexorawildfire-installed-v1'); } catch (e) {} }")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://unpkg.com/leaflet/") or route.request.url.startswith("https://unpkg.com/leaflet-gesture-handling/") or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         return context, page
 
@@ -80,12 +80,15 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.locator("#nexora-language-toggle").click()
                     page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
                     self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"language toggle did not switch to English on {path}")
+                    page.locator("#nexora-language-toggle").click()
+                    page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
+                    self.assertEqual(page.locator("html").get_attribute("lang"), "tr", f"language toggle did not return to Turkish on {path}")
                     if page.locator("nav.nx-nav").count():
                         page.wait_for_selector("nav .nx-nav-toggle", timeout=5000)
                         nav_text = page.locator("nav.nx-nav").evaluate("(el) => el.textContent")
-                        self.assertIn("Dashboard", nav_text, f"navigation was not translated on {path}")
-                        self.assertIn("Risk Map", nav_text, f"risk-map navigation was not translated on {path}")
-                        self.assertNotIn("Ana Panel", nav_text, f"Turkish dashboard label remains in English mode on {path}")
+                        self.assertIn("Ana Panel", nav_text, f"navigation was not Turkish on {path}")
+                        self.assertIn("Risk Haritası", nav_text, f"risk-map navigation was not Turkish on {path}")
+                        self.assertNotIn("Dashboard", nav_text, f"English dashboard label remains in Turkish mode on {path}")
                         nav_items = page.locator("nav.nx-nav a").evaluate_all("(els) => els.map(a => new URL(a.href).pathname.split('/').pop())")
                         self.assertEqual(nav_items, ["index.html", "map.html", "areas.html", "weather.html", "events.html", "satellite.html", "account.html", "about.html", "vision.html", "feedback.html", "legal.html"], f"navigation differs on {path}")
                 finally:
@@ -95,6 +98,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
             page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.evaluate("""() => {
@@ -129,9 +133,8 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             self.assertEqual(page.locator("html").get_attribute("lang"), "en")
             page.locator("#nexora-language-toggle").click()
+            page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
             self.assertEqual(page.locator("html").get_attribute("lang"), "tr")
-            page.locator("#nexora-language-toggle").click()
-            self.assertEqual(page.locator("html").get_attribute("lang"), "en")
             page.evaluate("window.dispatchEvent(new Event('appinstalled'))")
             page.wait_for_selector("#nexora-install", state="detached", timeout=3000)
         finally:
@@ -163,11 +166,15 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
     def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
-        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US", service_workers="block")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
-        page.route("https://unpkg.com/**", lambda route: route.continue_())
-        page.route("https://api.open-meteo.com/**", lambda route: route.abort())
+        def route_global_request(route):
+            url = route.request.url
+            if url.startswith(BASE) or url.startswith("https://unpkg.com/") or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
+                route.continue_()
+            else:
+                route.abort()
+        page.route("**/*", route_global_request)
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
@@ -175,10 +182,10 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.locator("#nexora-language-toggle").click()
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
             page.wait_for_selector("[data-global-form]", timeout=20000)
-            page.locator("[data-lat]").fill("38.375")
-            page.locator("[data-lon]").fill("-122.375")
+            page.locator("[data-lat]").fill("-27.4698")
+            page.locator("[data-lon]").fill("153.0251")
             page.locator("[data-global-form] button[type=submit]").click()
-            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates 38.375, -122.375')", timeout=10000)
+            page.wait_for_function("document.querySelector('[data-global-demo-status]').innerText.includes('Coordinates -27.4698, 153.0251')", timeout=10000)
             self.assertIn("Open-Meteo unavailable", page.locator("[data-global-demo-status]").inner_text())
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
         finally:
@@ -229,20 +236,23 @@ class MobileUiSmokeTests(unittest.TestCase):
             with self.subTest(width=width):
                 context = self.browser.new_context(viewport={"width": width, "height": height}, locale="tr-TR")
                 context.add_init_script("""
-                    if (!sessionStorage.getItem('qa-area-fixture-seeded')) {
+                    try {
                       localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
                         id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
                         district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
                         createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
                       }]));
-                      sessionStorage.setItem('qa-area-fixture-seeded','1');
+                    } catch (error) {
+                      window.__qaAreaFixtureError = String(error);
                     }
                 """)
                 page = context.new_page()
+                page.on("pageerror", lambda error: print("SAVED_AREA_PAGEERROR", str(error)))
+                page.on("console", lambda message: print("SAVED_AREA_CONSOLE", message.text) if message.type == "error" else None)
 
                 def route_request(route):
                     url = route.request.url
-                    if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
+                    if url.startswith(BASE) or url.startswith("https://unpkg.com/leaflet/") or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
@@ -254,11 +264,35 @@ class MobileUiSmokeTests(unittest.TestCase):
                 page.route("**/*", route_request)
                 try:
                     page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_selector(".area-card h3", timeout=20000)
-                    self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
+                    # Assert the fixture is present before diagnosing app rendering.
+                    self.assertTrue(page.evaluate("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1') || '[]').some(a => a.name === 'QA Saved Area')"),
+                                    page.evaluate("window.__qaAreaFixtureError || 'saved-area fixture was not seeded'"))
+                    try:
+                        page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
+                          .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
+                    except Exception:
+                        print("SAVED_AREA_DIAGNOSTIC", page.evaluate("""() => ({
+                          title: document.title,
+                          count: document.querySelector('#count')?.textContent,
+                          areaHtml: document.querySelector('#areas')?.innerHTML?.slice(0, 1600),
+                          areasScript: Array.from(document.scripts).map(s => s.src).filter(src => src.includes('areas.js')),
+                          localAreas: localStorage.getItem('nexorawildfire-my-areas-v1'),
+                          hasNovaStore: !!window.NovaStore
+                        })"""))
+                        raise
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "user-entered area names must not be translated")
+                    page.locator("#nexora-language-toggle").click()
+                    page.wait_for_function("document.documentElement.lang === 'en'", timeout=5000)
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "area name changed after switching to English")
+                    page.locator("#nexora-language-toggle").click()
+                    page.wait_for_function("document.documentElement.lang === 'tr'", timeout=5000)
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area",
+                                     "area name changed after switching back to Turkish")
                     page.reload(wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".area-card h3", timeout=20000)
-                    self.assertIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    self.assertEqual(page.locator(".area-card h3").first.inner_text(), "QA Saved Area")
                     page.locator("[data-delete]").click()
                     page.wait_for_function("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]').every(a=>a.name!=='QA Saved Area')", timeout=10000)
                     page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
@@ -293,10 +327,94 @@ class MobileUiSmokeTests(unittest.TestCase):
             }""", timeout=10000)
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector(".area-card h3", timeout=20000)
-            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            self.assertTrue(any("Offline QA Apiary" in name or "Çevrimdışı QA Apiary" in name for name in page.locator(".area-card h3").all_inner_texts()))
             self.assertFalse(page.evaluate("navigator.onLine"))
         finally:
             context.close()
+
+
+
+    def test_atmosphere_lab_live_weather_risk_scenario_and_mobile_layout(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
+        page = context.new_page()
+
+        fail_weather = {"value": False}
+        def route_request(route):
+            url = route.request.url
+            if url.startswith(BASE):
+                route.continue_()
+            elif "api.open-meteo.com/v1/forecast" in url:
+                if fail_weather["value"]:
+                    route.fulfill(status=503, content_type="application/json", body="{}")
+                    return
+                from datetime import datetime, timedelta
+                now = datetime.now().replace(minute=0, second=0, microsecond=0)
+                recent = (now - timedelta(hours=24)).strftime("%Y-%m-%dT%H:00")
+                current_time = now.strftime("%Y-%m-%dT%H:00")
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({
+                    "current": {
+                        "time": current_time,
+                        "temperature_2m": 30,
+                        "relative_humidity_2m": 35,
+                        "wind_speed_10m": 24,
+                        "wind_direction_10m": 270,
+                        "precipitation": 0
+                    },
+                    "current_units": {"temperature_2m": "°C"},
+                    "hourly": {
+                        "time": [recent, current_time],
+                        "relative_humidity_2m": [50, 35],
+                        "temperature_2m": [25, 30],
+                        "wind_speed_10m": [12, 24]
+                    }
+                }))
+            else:
+                route.abort()
+
+        page.route("**/*", route_request)
+        try:
+            page.goto(BASE + "/pages/weather.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.querySelector('#atmo-score')?.textContent !== '—'", timeout=15000)
+            self.assertEqual(page.locator("#atmo-temp").inner_text(), "30.0 °C")
+            self.assertEqual(page.locator("#atmo-humidity").inner_text(), "35 %")
+            self.assertEqual(page.locator("#atmo-wind").inner_text(), "24.0 km/sa")
+            self.assertIn("/ 100", page.locator(".atmo-score-ring").inner_text())
+            self.assertRegex(page.locator("#atmo-contributions").inner_text(), r"Sıcaklık|Temperature")
+            self.assertIn("15", page.locator("#atmo-humidity-meta").inner_text())
+            page.locator("#atmo-region").select_option("canakkale")
+            page.wait_for_function("document.querySelector('#atmo-score')?.textContent !== '—'", timeout=5000)
+            self.assertEqual(page.locator("#atmo-origin-lat").input_value(), "40.1553")
+            self.assertEqual(page.locator("#atmo-origin-lon").input_value(), "26.4142")
+            page.locator("#atmo-origin-lat").fill("41.67")
+            page.locator("#atmo-origin-lon").fill("26.55")
+            page.locator("#atmo-run-spread").click()
+            self.assertEqual(page.locator("#atmo-spread-results .atmo-scenario-card").count(), 3)
+            self.assertIn("ha", page.locator("#atmo-spread-results .atmo-scenario-card").nth(2).inner_text())
+            page.wait_for_function("document.querySelectorAll('#atmo-wind-projection-cards .atmo-wind-card').length === 3", timeout=10000)
+            self.assertIn("90°", page.locator("#atmo-wind-projection-summary").inner_text())
+            self.assertRegex(page.locator("#atmo-wind-projection-summary").inner_text(), r"24\.0 km/(?:h|sa)")
+            self.assertIn("km", page.locator("#atmo-wind-projection-cards").inner_text())
+            self.assertRegex(page.locator("#atmo-wind-projection-caveat").inner_text(), r"gerçek yangın|operational fire-spread")
+            self.assertEqual(page.locator("#atmo-carbon-values article").count(), 3)
+            page.locator("#atmo-preview-alert").click()
+            self.assertRegex(page.locator("#atmo-alert-preview").input_value(), r"gönderilmedi|not sent")
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+            fail_weather["value"] = True
+            page.locator("#atmo-refresh").click()
+            page.wait_for_function("document.querySelector('#atmo-provider-status')?.dataset.state === 'error'", timeout=5000)
+            self.assertEqual(page.locator("#atmo-score").inner_text(), "—", "stale risk score must clear after a failed refresh")
+        finally:
+            context.close()
+
+    def test_map_status_never_uses_an_unconditional_live_label(self):
+        map_source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
+        map_page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
+        self.assertIn('validProvinceObservations>0?"HAVA VERİSİ • "', map_source)
+        self.assertIn('validDistrictObservations>0?"HAVA VERİSİ • "', map_source)
+        self.assertIn('"HAVA VERİSİ YOK • "', map_source)
+        self.assertNotIn('setStatus("CANLI • "+districtRows.length', map_source)
+        self.assertNotIn("CANLI KARAR MERKEZİ", map_page)
+        self.assertIn('data-en="ENVIRONMENTAL DECISION SUPPORT"', map_page)
 
 
 if __name__ == "__main__":
