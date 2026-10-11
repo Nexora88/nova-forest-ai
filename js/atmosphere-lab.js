@@ -17,9 +17,9 @@
   const dirName = deg => {
     if(!Number.isFinite(Number(deg))) return "—";
     const names = ["N","NE","E","SE","S","SW","W","NW"];
-    const english = T("K","N");
-    const localized = T("K, KD, D, GD, G, GB, B, KB","N, NE, E, SE, S, SW, W, NW").split(", ");
-    return localized[Math.round((Number(deg)%360)/45)%8] || names[Math.round((Number(deg)%360)/45)%8];
+    const localized = T("K, KD, D, GD, G, GB, B, GB","N, NE, E, SE, S, SW, W, NW").split(", ");
+    const index = Math.round(((Number(deg) % 360) + 360) % 360 / 45) % 8;
+    return localized[index] || names[index];
   };
   function setStatus(tr,en,kind="ok") {
     const el=$("atmo-provider-status");
