@@ -488,23 +488,12 @@
       const entries = Array.from(dictionary.entries())
         .filter(([from, to]) => from.trim() && to !== undefined)
         .sort((a, b) => b[0].length - a[0].length);
-      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\  // Translate complete text values only. Substring translation caused mixed-language
-  // sentences (one English word inside an otherwise Turkish sentence).
-  function replace(text, target) {
-    const source = String(text);
-    const trimmed = source.trim();
-    if (!trimmed) return source;
-    const dictionary = target === "en" ? trToEn : enToTr;
-    const translated = dictionary.get(trimmed);
-    if (translated === undefined) return source;
-    const start = source.indexOf(trimmed);
-    return source.slice(0, start) + translated + source.slice(start + trimmed.length);
-  }");
+      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const alternatives = entries.map(([from]) => {
         const first = from.trimStart().charAt(0);
         const last = from.trimEnd().slice(-1);
-        const left = /[\\p{L}\\p{N}_]/u.test(first) ? "(?<![\\p{L}\\p{N}_])" : "";
-        const right = /[\\p{L}\\p{N}_]/u.test(last) ? "(?![\\p{L}\\p{N}_])" : "";
+        const left = /[\p{L}\p{N}_]/u.test(first) ? "(?<![\p{L}\p{N}_])" : "";
+        const right = /[\p{L}\p{N}_]/u.test(last) ? "(?![\p{L}\p{N}_])" : "";
         return left + escapeRegex(from) + right;
       });
       const lookup = new Map(entries.map(([from, to]) => [from.toLocaleLowerCase(locale), to]));
