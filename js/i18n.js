@@ -579,9 +579,30 @@
     if (root.nodeType === Node.ELEMENT_NODE && root.matches?.("[data-tr][data-en]")) nodes.push(root);
     root.querySelectorAll?.("[data-tr][data-en]").forEach(el => nodes.push(el));
     nodes.forEach(el => {
-      if (el.children.length !== 0) return;
       const value = lang === "en" ? el.dataset.en : el.dataset.tr;
-      if (el.textContent !== value) el.textContent = value;
+      if (!value) return;
+      if (el.children.length === 0) {
+        if (el.textContent !== value) el.textContent = value;
+        return;
+      }
+      // Keep inline icons/decoration intact. For a mixed-content label, use
+      // the explicit translation on its sole direct text node only when child
+      // elements are decorative; otherwise translate each text node normally.
+      const directText = Array.from(el.childNodes).filter(node =>
+        node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()
+      );
+      const decorativeChildren = Array.from(el.children).every(child =>
+        ["SVG", "IMG", "I"].includes(child.tagName) ||
+        child.getAttribute("aria-hidden") === "true" ||
+        !child.textContent.trim()
+      );
+      if (directText.length === 1 && decorativeChildren) {
+        if (directText[0].nodeValue !== value) directText[0].nodeValue = value;
+      } else {
+        el.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) translateNode(node);
+        });
+      }
     });
   }
   function applyLanguage() {
@@ -630,7 +651,7 @@
         });
       }
     });
-    observer.observe(document.body,{childList:true,subtree:true});
+    observer.observe(document.body,{childList:true,characterData:true,subtree:true});
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",init,{once:true}); else init();
 })();
