@@ -86,11 +86,17 @@ async function cardEdge(a){
   const alertsHtml=all.map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
   return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3>'+a.name+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>'+(d.offline?"ÇEVRİMDIŞI / SON VERİ":"CANLI DURUM")+'</span><strong>'+d.risk+'/100 risk</strong><small>'+(d.updatedAt?"Son kayıt: "+new Date(d.updatedAt).toLocaleString("tr-TR"):"Yeni veri yok")+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Yerel olay merkezi</h4>'+alertsHtml+'</div><div class="area-footer">'+(d.offline?"NEXORAWILDFIRE EDGE: internet yok. Son kayıt üzerinden yerel karar motoru çalıştı.":"Canlı hava/toprak verisi. Yeni kayıtlar yerel veri deposuna alınır.")+'</div></article>';
 }
+let areaRenderVersion=0;
 async function render(){
-  const areas=await loadAreas();countEl.textContent=areas.length+" alan";
+  const renderVersion=++areaRenderVersion;
+  const areas=await loadAreas();
+  if(renderVersion!==areaRenderVersion)return;
+  countEl.textContent=areas.length+" alan";
   if(!areas.length){areasEl.innerHTML="";emptyEl.style.display="grid";return}
   emptyEl.style.display="none";areasEl.innerHTML='<div class="loading-area">NEXORAWILDFIRE EDGE alan verilerini hazırlıyor…</div>';
-  const html=await Promise.all(areas.map(cardEdge));areasEl.innerHTML=html.join("");
+  const html=await Promise.all(areas.map(cardEdge));
+  if(renderVersion!==areaRenderVersion)return;
+  areasEl.innerHTML=html.join("");
   areasEl.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{const status=document.querySelector("[data-area-operation-status]");b.disabled=true;if(status)status.textContent="Alan silme işlemi sürüyor…";try{await removeArea(b.dataset.delete);if(status)status.textContent="Alan silindi ve yerel kayıt yenilendi.";await render()}catch(e){b.disabled=false;if(status)status.textContent="Alan silinemedi; yerel kayıt korundu. Bağlantını ve hesap izinlerini kontrol et.";console.error("Area deletion failed",e)}});
   renderAreaMiniMaps();
   areasEl.querySelectorAll("[data-area-alert-toggle]").forEach(input=>input.onchange=()=>{
