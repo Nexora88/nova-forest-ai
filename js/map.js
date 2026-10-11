@@ -38,6 +38,9 @@ const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo
 const firmsHotspotLayer=L.layerGroup();
 let firmsHotspotsLoading=false;
 function firmsText(value){return String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function pointInRing(lon,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=Number(ring[i]?.[0]),yi=Number(ring[i]?.[1]),xj=Number(ring[j]?.[0]),yj=Number(ring[j]?.[1]);if(![xi,yi,xj,yj].every(Number.isFinite))continue;const crosses=((yi>lat)!==(yj>lat))&&(lon<(xj-xi)*(lat-yi)/((yj-yi)||Number.EPSILON)+xi);if(crosses)inside=!inside;}return inside}
+function pointInGeometry(lon,lat,geometry){if(!geometry)return false;const polygons=geometry.type==="Polygon"?[geometry.coordinates]:geometry.type==="MultiPolygon"?geometry.coordinates:[];return polygons.some(poly=>Array.isArray(poly?.[0])&&pointInRing(lon,lat,poly[0])&&!poly.slice(1).some(hole=>pointInRing(lon,lat,hole)))}
+function updateFireAffectedRegions(){fireAffectedProvinces.clear();fireAffectedDistricts.clear();if(!firmsHotspotPoints.length)return;provinceFeatures.forEach((feature,i)=>{const row=provinceRows[i];if(row&&firmsHotspotPoints.some(p=>pointInGeometry(Number(p.longitude),Number(p.latitude),feature.geometry)))fireAffectedProvinces.add(norm(row.name))});districtFeatures.forEach((feature,i)=>{const row=districtRows[i];if(row&&firmsHotspotPoints.some(p=>pointInGeometry(Number(p.longitude),Number(p.latitude),feature.geometry)))fireAffectedDistricts.add(norm(row.name))})}
 function firmsState(message){const node=document.getElementById("nova-firms-state");if(node)node.textContent=message}
 async function refreshFirmsHotspots(){
  if(firmsHotspotsLoading)return;
@@ -51,10 +54,13 @@ async function refreshFirmsHotspots(){
    firmsState(message);return;
   }
   firmsHotspotLayer.clearLayers();
-  (payload.alerts||[]).forEach(point=>{
+  firmsHotspotPoints=(Array.isArray(payload.alerts)?payload.alerts:[]).filter(point=>Number.isFinite(Number(point.latitude))&&Number.isFinite(Number(point.longitude)));
+  updateFireAffectedRegions();
+  if(provinceFeatures.length){if(selectedProvince)drawDistricts();else drawProvinces();}
+  firmsHotspotPoints.forEach(point=>{
    const lat=Number(point.latitude),lon=Number(point.longitude);
    if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
-   const marker=L.circleMarker([lat,lon],{radius:7,color:"#ff3d4f",weight:2,fillColor:"#ff233f",fillOpacity:.82});
+   const marker=L.circleMarker([lat,lon],{className:"nova-hotspot-marker",radius:7,color:"#ffb3bd",weight:2,fillColor:"#ff233f",fillOpacity:.82});
    marker.bindPopup('<div class="risk-popup"><div class="popup-kicker">NASA FIRMS · VIIRS SNPP NRT</div><h3>Uydu sıcak noktası</h3><p>Tarih: '+firmsText(point.acq_date)+' '+firmsText(point.acq_time)+'</p><p>Güven: '+firmsText(point.confidence)+'</p><p>FRP: '+firmsText(point.frp)+'</p><small>Termal anomali algılamasıdır; tek başına doğrulanmış yangın demek değildir.</small></div>');
    firmsHotspotLayer.addLayer(marker);
   });
@@ -83,26 +89,26 @@ firmsControl.addTo(map);
 setInterval(()=>{if(map.hasLayer(firmsHotspotLayer))refreshFirmsHotspots()},10*60*1000);
 
 const historyKey="nexorawildfire-region-history-v5", areaKey="nexorawildfire-my-areas-v1";
-const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"]};
-let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;let weatherLive=false;
+const palette={risk:["#00ff66","#ffe600","#ff7a00","#ff1744"],water:["#38bdf8","#00e5ff","#2563eb","#7c3aed"],crop:["#84cc16","#facc15","#fb923c","#f43f5e"],pollen:["#fef08a","#f59e0b","#ec4899","#a855f7"],forest:["#5cff8d","#38bdf8","#a78bfa","#ff4d6d"],wind:["#4ade80","#facc15","#fb923c","#ef4444"]};
+let mode="risk",provinceFeatures=[],districtFeatures=[],settlementRows=[],provinceRows=[],districtRows=[],selectedProvince=null,selectedDistrict=null,selectedField=null,drawMode=false,drawingPoints=[],drawingLine=null,drawingPolygon=null;let weatherLive=false;const fireAffectedProvinces=new Set(),fireAffectedDistricts=new Set();let firmsHotspotPoints=[];
 
 function el(q){return document.querySelector(q)}
 function setStatus(t){const x=el("[data-map-status]");if(x)x.textContent=t}
-function band(v,kind){if(v==null||!Number.isFinite(Number(v)))return -1;if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;return v<25?0:v<50?1:v<75?2:3}
+function band(v,kind){if(v==null||!Number.isFinite(Number(v)))return -1;if(kind==="risk")return v<25?0:v<50?1:v<75?2:3;if(kind==="water")return v<.12?0:v<.20?1:v<.30?2:3;if(kind==="crop")return v<25?0:v<45?1:v<70?2:3;if(kind==="pollen")return v<20?0:v<60?1:v<120?2:3;if(kind==="wind")return v<10?0:v<20?1:v<35?2:3;return v<25?0:v<50?1:v<75?2:3}
 function color(v){const b=band(v,mode);return b<0?"#64748b":palette[mode][b]}
-function label(v,kind){if(v==null||!Number.isFinite(Number(v)))return "VERİ YOK";if(kind==="water")return v<.12?"KRİTİK KURU":v<.20?"STRES":v<.30?"NORMAL":"İYİ";if(kind==="crop")return v<25?"STRES":v<45?"DÜŞÜK":v<70?"İYİ":"ÇOK İYİ";if(kind==="pollen")return v<20?"DÜŞÜK":v<60?"ORTA":v<120?"YÜKSEK":"ÇOK YÜKSEK";return v<25?"DÜŞÜK":v<50?"ORTA":v<75?"YÜKSEK":"KRİTİK"}
+function label(v,kind){if(v==null||!Number.isFinite(Number(v)))return "VERİ YOK";if(kind==="water")return v<.12?"KRİTİK KURU":v<.20?"STRES":v<.30?"NORMAL":"İYİ";if(kind==="crop")return v<25?"STRES":v<45?"DÜŞÜK":v<70?"İYİ":"ÇOK İYİ";if(kind==="pollen")return v<20?"DÜŞÜK":v<60?"ORTA":v<120?"YÜKSEK":"ÇOK YÜKSEK";if(kind==="wind")return v<10?"SAKİN":v<20?"ESİNTİLİ":v<35?"KUVVETLİ":"ÇOK KUVVETLİ";return v<25?"DÜŞÜK":v<50?"ORTA":v<75?"YÜKSEK":"KRİTİK"}
 function riskScore(w,h=0){if(![w.t,w.h,w.wind].every(v=>v!=null&&Number.isFinite(Number(v))))return null;let s=0;if(w.t>=40)s+=30;else if(w.t>=30)s+=15;else if(w.t>=25)s+=7;if(w.h<=20)s+=25;else if(w.h<=40)s+=10;else if(w.h<=55)s+=4;if(w.wind>=40)s+=25;else if(w.wind>=20)s+=10;else if(w.wind>=12)s+=4;if(w.soil!=null&&w.soil<.18)s+=10;if(h>0)s+=10;return Math.min(100,s)}
 function cropScore(w){if(![w.soil,w.et0,w.vpd].every(v=>v!=null&&Number.isFinite(Number(v))))return null;return Math.max(0,Math.min(100,100-(w.soil<.15?65:w.soil<.2?40:w.soil<.27?15:0)-(w.et0>5?20:w.et0>3?8:0)-(w.vpd>2?12:w.vpd>1.5?5:0)))}
 function forestScore(w){const risk=riskScore(w);return risk==null?null:Math.max(0,100-risk)}
 function beeScore(w,pollen=null){if(![w.t,w.wind,w.precip].every(v=>v!=null&&Number.isFinite(Number(v))))return null;let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=35;else if(w.wind>15)s-=15;if(w.precip>1)s-=35;if(pollen!=null&&pollen>120)s-=5;return Math.max(0,Math.min(100,s))}
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
-function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
+function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:mode==="wind"?r.w.wind:r.forest}
 function popup(r,level="province"){const s=scoreFor(r),scoreValid=s!=null&&Number.isFinite(Number(s));return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+(scoreValid?color(s):"#64748b")+'">'+(scoreValid?(mode==="water"?Math.round(s*100):Math.round(s)):"—")+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+(r.w.t??"—")+' °C</b><span>Nem</span><b>'+(r.w.h??"—")+' %</b><span>Rüzgar</span><b>'+(r.w.wind??"—")+' km/s</b><span>Toprak nemi</span><b>'+(r.w.soil==null?"—":Math.round(r.w.soil*100))+' %</b><span>ET₀</span><b>'+(r.w.et0==null?"—":r.w.et0.toFixed(1))+' mm</b><span>VPD</span><b>'+(r.w.vpd==null?"—":r.w.vpd.toFixed(2))+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
-function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
+function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":m==="wind"?"Renkler Open-Meteo rüzgâr hızını km/sa cinsinden gösterir; tek başına yangın yayılımı tahmini değildir.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
-function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name)),value=scoreFor(r);if(!supported)return{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"};if(value==null||!Number.isFinite(Number(value)))return{color:"#667085",weight:1.1,fillColor:"#667085",fillOpacity:.18,dashArray:"3 4"};return{color:"#102218",weight:1.3,fillColor:color(value),fillOpacity:.68}}
+function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name)),value=scoreFor(r);if(!supported)return{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"};if(mode==="risk"&&(fireAffectedProvinces.has(norm(r.name))||fireAffectedDistricts.has(norm(r.name))))return{color:"#ffb3bd",weight:2.6,fillColor:"#ff1744",fillOpacity:.78};if(value==null||!Number.isFinite(Number(value)))return{color:"#667085",weight:1.1,fillColor:"#667085",fillOpacity:.18,dashArray:"3 4"};return{color:"#102218",weight:1.3,fillColor:color(value),fillOpacity:.68}}
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
@@ -113,19 +119,19 @@ function enableMobileMapGesture(){
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
  const box=document.createElement("div");box.className="map-filters";
- box.innerHTML='<strong>VERİ KATMANI</strong><div class="filter-buttons"><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small>';
+ box.innerHTML='<strong>VERİ KATMANI</strong><div class="filter-buttons"><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="wind">🌬 Rüzgâr</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small><small class="fire-region-note">Kırmızı sınır: NASA FIRMS sıcak nokta gözlemi; doğrulanmış yangın değildir.</small>';
  el(".map-section").appendChild(box);
  box.onclick=e=>{const m=e.target.dataset.m,a=e.target.dataset.action;if(m){mode=m;box.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x.dataset.m===mode));refreshView();return}if(a==="back")goBack();if(a==="add")toggleDraw()};
 }
 function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
- provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
+ updateFireAffectedRegions();provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
  provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.bindTooltip(r.name+' · Yakında',{permanent:true,direction:"center",className:"region-label region-label-muted"});l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");const validProvinceObservations=provinceRows.filter(r=>r.score!=null).length;setStatus(validProvinceObservations>0?"HAVA VERİSİ • "+validProvinceObservations+" GÖZLEM • "+mode.toUpperCase():"HAVA VERİSİ YOK • "+mode.toUpperCase());
 }
 function drawDistricts(){
- provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
+ updateFireAffectedRegions();provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
  districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r,true),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
  breadcrumb(selectedProvince+" → İLÇELER");const validDistrictObservations=districtRows.filter(r=>r.score!=null).length;setStatus(validDistrictObservations>0?"HAVA VERİSİ • "+validDistrictObservations+"/"+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase():"HAVA VERİSİ YOK • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
 }
