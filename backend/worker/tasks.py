@@ -34,7 +34,7 @@ def extract_geometry(value: dict[str, Any]) -> dict[str, Any]:
         geometry = value.get("geometry")
         if not isinstance(geometry, dict): raise ValueError("Feature has no geometry.")
         return extract_geometry(geometry)
-    if kind in {"Point", "Polygon", "MultiPolygon"} and value.get("coordinates"):
+    if kind in {"Point", "Polygon", "MultiPolygon", "LineString", "MultiLineString", "MultiPoint"} and value.get("coordinates"):
         return {"type": kind, "coordinates": value["coordinates"]}
     raise ValueError("Supported geometry is Point, Polygon, MultiPolygon, Feature or FeatureCollection.")
 
@@ -71,6 +71,10 @@ def _fetch_firms(bbox):
     key = os.getenv("FIRMS_MAP_KEY")
     if not key: return "not_configured", None, None
     west, south, east, north = bbox
+    if east - west < 0.02:
+        west, east = max(-180.0, west - 0.01), min(180.0, east + 0.01)
+    if north - south < 0.02:
+        south, north = max(-90.0, south - 0.01), min(90.0, north + 0.01)
     area = f"{west},{south},{east},{north}"
     response = requests.get(f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/VIIRS_NOAA20_NRT/{area}/1", timeout=25)
     response.raise_for_status()
@@ -112,12 +116,13 @@ def _send_email(user_id: str, company_name: str, asset_name: str, download_url: 
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}, json=message, timeout=20)
     sent.raise_for_status()
 
-@celery_app.task(bind=True, name="worker.build_enterprise_report")
+@celery_app.task(bind=True, name="worker.build_enterprise_report", autoretry_for=(requests.RequestException,), retry_backoff=True, retry_kwargs={"max_retries": 3})
 def build_enterprise_report(self, job_id: str, payload: dict):
     user_id = str(payload["user_id"])
     self.update_state(state="PROGRESS", meta={"stage": "validating_geometry"})
     geometry = extract_geometry(payload["asset_geojson"])
-    summary, bbox = geometry_summary(geometry), geometry_summary(geometry)["bbox"]
+    summary = geometry_summary(geometry)
+    bbox = summary["bbox"]
     indicators = []
     provider_status = {"Open-Meteo": "error", "NASA FIRMS": "not_configured", "Copernicus Sentinel-2": "not_configured"}
     notes = ["Decision support only; this is not an official fire warning or a guarantee of safety.",
@@ -136,7 +141,8 @@ def build_enterprise_report(self, job_id: str, payload: dict):
             "source": "NASA FIRMS VIIRS NOAA-20 NRT", "observed_at": observed_at})
     except Exception as exc: provider_status["NASA FIRMS"] = "error:" + type(exc).__name__
     try:
-        satellite = analyze_area(geometry, days=180, interval="P30D")
+        satellite_geometry = geometry if geometry["type"] in {"Point", "Polygon", "MultiPolygon"} else {"type": "Point", "coordinates": [summary["longitude"], summary["latitude"]]}
+        satellite = analyze_area(satellite_geometry, days=180, interval="P30D")
         provider_status["Copernicus Sentinel-2"] = satellite.get("statistics_status", satellite.get("status", "unknown"))
         latest = (satellite.get("ndvi_ndmi") or {}).get("latest") or {}
         for name, key in (("NDVI", "ndvi"), ("NDMI", "ndmi")):
