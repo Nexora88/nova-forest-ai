@@ -64,10 +64,13 @@
     $("atmo-run-spread")?.addEventListener("click",()=>setTimeout(update,0));
     $("atmo-refresh")?.addEventListener("click",()=>setTimeout(update,500));
     $("atmo-region")?.addEventListener("change",()=>setTimeout(update,500));
-    ["atmo-origin-lat","atmo-origin-lon","atmo-spread-rate"].forEach(id=>$(id)?.addEventListener("change",update));
+    ["atmo-origin-lat","atmo-origin-lon","atmo-spread-rate"].forEach(id=>$(id)?.addEventListener("input",update));
     window.addEventListener("nexora:languagechange",update);
-    const originalText=$("atmo-wind-projection-summary");
-    if(originalText) update();
+    ["atmo-wind","atmo-direction","atmo-score"].forEach(id=>{
+      const target=$(id);
+      if(target && typeof MutationObserver!=="undefined") new MutationObserver(update).observe(target,{childList:true,characterData:true,subtree:true});
+    });
+    update();
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",bind,{once:true}); else bind();
 })();
