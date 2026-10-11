@@ -57,9 +57,9 @@
     let title,desc,links;
     if(data){title=data.title;desc=data.desc;links=data.links.map(([label,url])=>({label,url}))}
     else {title="Sana özel saha paneli";desc="Saha panelini görmek için giriş yap.";links=[{label:"Profili kişiselleştir ↗",url:"pages/auth.html"}]}
-    section.innerHTML='<div class="eyebrow">NOVA / PERSONAL WORKSPACE</div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p><nav aria-label="Personal workspace shortcuts">'+links.map(x=>'<a href="'+esc(x.url)+'">'+esc(x.label)+' ↗</a>').join("")+'</nav>';
+    section.innerHTML='<div class="eyebrow" data-tr="NOVA / KİŞİSEL SAHA PANELİ" data-en="NOVA / PERSONAL WORKSPACE">NOVA / PERSONAL WORKSPACE</div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p><nav aria-label="Personal workspace shortcuts">'+links.map(x=>'<a href="'+esc(x.url)+'">'+esc(x.label)+' ↗</a>').join("")+'</nav>';
     host.insertAdjacentElement("afterend",section);
-    const applyLanguage=()=>{if(/^en/i.test(document.documentElement.lang||"tr")){section.querySelectorAll("h2,p,a").forEach(el=>{const original=el.dataset.originalText||(el.dataset.originalText=el.textContent);el.textContent=english[original]||original});}else{section.querySelectorAll("h2,p,a").forEach(el=>{if(el.dataset.originalText)el.textContent=el.dataset.originalText})}};
+    const applyLanguage=()=>{const en=/^en/i.test(document.documentElement.dataset.language||document.documentElement.lang||"tr");if(en){section.querySelectorAll("h2,p,a").forEach(el=>{const original=el.dataset.originalText||(el.dataset.originalText=el.textContent);el.textContent=english[original]||original});}else{section.querySelectorAll("h2,p,a").forEach(el=>{if(el.dataset.originalText)el.textContent=el.dataset.originalText})}const nav=section.querySelector("nav");if(nav)nav.setAttribute("aria-label",en?"Personal workspace shortcuts":"Saha paneli kısayolları")};
     applyLanguage();
     window.addEventListener("nexora:languagechange",applyLanguage);
   }
