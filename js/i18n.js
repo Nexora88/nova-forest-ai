@@ -923,8 +923,12 @@
     ["Güvenli nokta katmanı temizlendi.","Emergency-point layer cleared."],
     ["Güvenli nokta verisi alınamadı.","Could not retrieve emergency-point data."],
   ];
-  const trToEn = new Map(pairs);
-  const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
+  const trToEn = new Map();
+  const enToTr = new Map();
+  for (const [tr,en] of pairs) {
+    if (!trToEn.has(tr)) trToEn.set(tr,en);
+    if (!enToTr.has(en)) enToTr.set(en,tr);
+  }
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
   let lang = stored === "en" || stored === "tr" ? stored : "en";
