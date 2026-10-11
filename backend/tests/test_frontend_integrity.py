@@ -22,7 +22,7 @@ def test_main_pages_share_navigation_translation_and_asset_fallback():
     required = [
         "global-nav.js?v=20261011c",
         "mobile-nav.js?v=20261011b",
-        "i18n.js?v=20261011h",
+        "i18n.js?v=20261011i",
         "i18n-extra.js?v=20261011c",
         "asset-guard.js?v=20261011b",
         "pwa.js?v=20261011b",
@@ -47,6 +47,7 @@ def test_evacuation_simulation_is_reachable_from_map_and_system_page():
 def test_translation_engine_handles_dynamic_text_updates():
     script = (ROOT / "js/i18n.js").read_text(encoding="utf-8")
     assert "record.source = current" in script
+    assert "function translateDataContent(root=document)" in script
     assert "record.translated = translated" in script
     assert "if (!enToTr.has(en)) enToTr.set(en, tr)" in script
 
