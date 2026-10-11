@@ -1,174 +1,235 @@
-# GLOBAL_SCALABILITY.md
-## Global Forest Monitoring Architecture — Google Cloud and Microsoft Azure
+# Global Forest Monitoring Architecture — GCP and Azure
 
-**Status: target architecture proposal.** This document describes a possible future design; it does not claim that global Kubernetes infrastructure, worldwide coverage, or million-hectare production throughput is currently deployed.
+**Status: proposed reference architecture, not a deployed production claim.** NexoraWildfire AI does not currently claim that it scans millions of hectares worldwide. This document describes a technically plausible path to that scale, with measurable gates before any coverage or throughput statement is published.
 
-## 1. Goal and design principles
+## Executive summary
 
-NexoraWildfire AI combines satellite observations, meteorological feeds, fire-hotspot detections, vegetation indices, and user-defined areas for environmental decision support. To process millions of hectares concurrently, the system should use geospatial tiling, asynchronous jobs, bounded concurrency, idempotent processing, object storage, and Kubernetes autoscaling—not one enormous synchronous request.
+The scaling unit is a **bounded geospatial work item**, not a whole continent or a giant synchronous API request. Each request is normalized, split into tile/scene/time jobs, queued durably, processed by isolated Kubernetes worker pools, validated, and published with lineage and quality status. The API serves already-computed summaries and map tiles; it never performs a large raster job in a user request.
 
-Recommended initial strategy: choose one primary cloud, prove data quality and cost with a single-region pilot, then add regions only when residency, resilience, and recovery requirements are defined. Running GCP and Azure active-active from day one increases complexity and cost.
+Start with one cloud and one region, benchmark representative data, and expand only when reliability, provider quotas, data residency, and costs are known. GCP and Azure can both support this design. Running both active-active from day one adds replication and operations complexity without proving the scientific product first.
 
-## 2. Cloud-neutral architecture
+## 1. System context and data flow
 
-\`\`\`mermaid
+~~~mermaid
 flowchart TD
-    A[Sentinel-2 / STAC catalogs] --> B[Catalog poller and scene deduplication]
-    C[NASA FIRMS observations] --> D[Feed adapter and provenance checks]
-    E[Weather providers] --> F[Weather adapter]
-    G[User areas and schedules] --> H[Area scheduler]
-    B --> Q[Durable work queue]
-    D --> Q
-    F --> Q
-    H --> Q
-    Q --> W[Geospatial dispatcher]
-    W --> T[Tile / polygon partitioner]
-    T --> K[Kubernetes worker pools]
-    K --> P[Object storage: raw and derived]
-    K --> V[Quality and CRS validation]
-    V --> I[NDVI / NDMI and environmental features]
-    I --> S[PostGIS and analytical store]
-    S --> API[Versioned API and alert evaluator]
-    API --> UI[Map, areas, dashboards]
-    API --> N[Consent-based notifications]
-    S --> O[Lineage, metrics and audit records]
-\`\`\`
+  SAT[Sentinel-2 / STAC catalog] --> ING[Scene discovery and deduplication]
+  FIRMS[NASA FIRMS observations] --> HOT[Hotspot feed adapter]
+  WX[Weather providers] --> MET[Weather adapter]
+  USER[Saved areas and schedules] --> SCHED[Area scheduler]
+  ING --> Q[Durable queue]
+  HOT --> Q
+  MET --> Q
+  SCHED --> Q
+  Q --> DISPATCH[Geospatial job dispatcher]
+  DISPATCH --> GRID[Polygon validation and tile partitioner]
+  GRID --> CPU[Kubernetes CPU worker pool]
+  GRID --> GPU[Optional inference worker pool]
+  CPU --> OBJ[Versioned object storage]
+  GPU --> OBJ
+  OBJ --> QA[Quality, CRS and provenance checks]
+  QA --> INDEX[NDVI / NDMI and zonal statistics]
+  INDEX --> DB[PostGIS operational store]
+  INDEX --> LAKE[Historical analytical store]
+  DB --> API[Versioned API and alert evaluator]
+  LAKE --> API
+  API --> MAP[Map, areas and dashboards]
+  API --> ALERT[Consent-based notifications]
+  QA --> AUDIT[Lineage, metrics and audit events]
+~~~
 
-### Regional resilience pattern
+### Design boundaries
 
-\`\`\`mermaid
+- **Ingestion** discovers and records source observations. It does not silently convert missing data into zero values.
+- **Processing** is asynchronous and idempotent. A retry cannot create a duplicate result for the same source, tile and algorithm version.
+- **Serving** returns precomputed features, status and provenance. Expensive raster processing is kept off the interactive request path.
+- **Scientific status** is explicit: available, partial, no_observation, not_configured, provider_error, or processing_error.
+- **Safety status** is equally explicit: a thermal anomaly is an observation, not by itself a confirmed wildfire or an official warning.
+
+## 2. Multi-region topology
+
+~~~mermaid
 flowchart LR
-    U[Web and mobile clients] --> G[Global DNS, CDN and WAF]
-    G --> A[Region A API]
-    G --> B[Region B API]
-    A --> K1[GKE or AKS cluster A]
-    B --> K2[GKE or AKS cluster B]
-    K1 --> Q1[Regional queue]
-    K2 --> Q2[Regional queue]
-    Q1 --> W1[CPU / optional GPU workers]
-    Q2 --> W2[CPU / optional GPU workers]
-    W1 --> D1[Regional object storage]
-    W2 --> D2[Regional object storage]
-    D1 --> C[Replicated metadata catalog]
-    D2 --> C
-\`\`\`
+  CLIENT[Web and mobile clients] --> EDGE[Global DNS, CDN and WAF]
+  EDGE --> R1[Region A API]
+  EDGE --> R2[Region B API]
+  R1 --> K1[GKE or AKS cluster A]
+  R2 --> K2[GKE or AKS cluster B]
+  K1 --> Q1[Regional durable queue]
+  K2 --> Q2[Regional durable queue]
+  Q1 --> W1[Regional workers]
+  Q2 --> W2[Regional workers]
+  W1 --> O1[Regional object storage]
+  W2 --> O2[Regional object storage]
+  O1 --> META[Replicated metadata and catalog]
+  O2 --> META
+  META --> READ[Read API and map tiles]
+~~~
 
-Use active-active APIs only after data replication, conflict resolution, residency, and incident-response rules are tested. A simpler pilot can use one primary processing region and a separately tested recovery region.
+Use a **single primary processing region plus a tested recovery region** for the first production release. Consider active-active APIs later, after conflict resolution, regional data residency, queue ownership, replication lag, failover, and recovery time objectives have been exercised in a failure test.
 
-## 3. Scanning millions of hectares concurrently
+## 3. How to scan millions of hectares concurrently
 
-### 3.1 Partition by geography and time
+### 3.1 Partition geography, source and time
 
-1. Normalize and validate each monitoring polygon, including its coordinate reference system.
-2. Intersect it with a documented global grid, such as an equal-area grid or H3/S2 index at a selected resolution.
-3. Create bounded work units by tile × scene × time window × algorithm version.
-4. Skip tiles without valid observations and record an explicit no-observation status; never substitute zero vegetation or zero fire risk.
-5. Deduplicate with a deterministic key such as source + scene ID + tile ID + algorithm version.
-6. Store raw imagery, intermediate rasters, and derived products as versioned objects. Store searchable metadata and zonal statistics separately.
-7. Retry transient failures with bounded exponential backoff and a dead-letter queue. Invalid input must not retry forever.
+1. Validate the polygon, coordinate reference system (CRS), coordinate ranges, geometry validity, and maximum allowed area.
+2. Intersect the polygon with a documented equal-area grid or a selected H3/S2 tiling level. Record the grid and resolution version.
+3. Generate bounded jobs keyed by provider, scene ID, tile ID, time window, and algorithm version.
+4. Discover source scenes once and deduplicate before fan-out. Avoid downloading the same source scene for every user area.
+5. Process each tile independently; persist checkpoints and outputs before acknowledging the queue message.
+6. Store immutable raw inputs and versioned derived products in object storage. Store searchable metadata, zonal statistics and current state in the operational database.
+7. Record no-data tiles as no_observation; do not replace them with zero NDVI, zero fire risk, or a green map colour.
 
-Tiling caps memory requirements, enables independent retries, and lets different continents be processed concurrently without one failed tile cancelling a whole region.
+This enables parallel work across continents while keeping memory bounded and allowing failed tiles to be retried without restarting a whole regional run.
 
-### 3.2 Backpressure and idempotency
+### 3.2 Queueing, backpressure and idempotency
 
-The queue is the control plane for workload volume. Producers publish compact job references, not raster payloads. Workers acknowledge jobs only after output and metadata are durable. Scale from queue depth and oldest-message age as well as CPU/memory. Apply per-provider and per-region concurrency caps to protect API quotas, databases, and egress budgets.
+The queue is the workload control plane. Producers publish small job references and metadata, not large raster payloads. Workers acknowledge only after durable output and metadata are committed. Retry transient errors with bounded exponential backoff; route poison messages to a dead-letter queue. Validate and reject malformed inputs rather than retrying forever.
 
-### 3.3 Separate worker pools
+Autoscale on multiple signals:
+- queue depth and oldest-message age;
+- worker CPU and memory;
+- raster processing latency and failure rate;
+- provider rate-limit responses and outstanding requests;
+- database connection pressure and object-storage throughput.
 
-| Pool | Workload | Scaling signal | Guardrail |
+Set hard concurrency caps per provider and region. A large backlog must not overload external providers or starve interactive APIs.
+
+### 3.3 Isolated worker pools
+
+| Pool | Typical work | Scaling signal | Guardrail |
 |---|---|---|---|
-| Ingestion | STAC discovery, FIRMS and weather adapters | queue age, latency | strict provider rate limits |
-| Raster / index | reprojection, cloud masks, NDVI/NDMI, zonal stats | queued tiles, memory | bounded concurrency |
-| ML inference | optional validated models | queue age, accelerator utilization | GPU only after benchmarks |
-| API | map features, area state, job status | p95 latency, concurrency | no full-scene work inline |
-| Notifications | consented browser/web-push delivery | pending delivery count | isolate provider failures and opt-outs |
+| Ingestion | STAC discovery, FIRMS and weather adapters | queue age, request latency | provider quotas and retry budget |
+| Geospatial CPU | reprojection, cloud masks, NDVI/NDMI, zonal stats | pending tiles, CPU and memory | bounded tile size and memory limit |
+| ML inference | optional validated models | queue age, accelerator utilization | GPU only after benchmarks justify it |
+| API and map serving | saved areas, job status, map features | p95 latency, concurrency | never run whole-scene processing inline |
+| Notifications | consented browser push | pending deliveries and failures | isolated provider failures and opt-outs |
 
-## 4. Google Cloud Platform reference
+Use Kubernetes requests/limits, readiness/startup probes, PodDisruptionBudgets, topology spread, namespace quotas and graceful shutdown. Only use preemptible/spot capacity for restartable, idempotent batch work.
 
-- **Global edge:** Cloud Load Balancing, Cloud CDN, Cloud Armor, managed DNS.
-- **Kubernetes:** regional GKE clusters; separate node pools for API, CPU geospatial jobs, and optional accelerators.
-- **Queue:** Pub/Sub subscriptions with retention and dead-letter topics.
-- **Object storage:** Cloud Storage with lifecycle rules, encryption, access controls, and versioning where appropriate.
-- **Geospatial data:** Cloud SQL for PostgreSQL with PostGIS for operational queries; BigQuery for historical analytics only where its workload and cost model fit.
-- **Secrets and identity:** Secret Manager and Workload Identity; never embed provider secrets in browser code or source control.
-- **Observability:** Cloud Monitoring, Logging, Error Reporting, distributed traces, and budget alerts.
+## 4. Google Cloud Platform reference deployment
 
-Use Horizontal Pod Autoscaler for resource metrics and queue-aware scaling (for example, KEDA where approved) for backlog and message age. Let cluster autoscaling add nodes only to the worker pool that needs them. Set resource requests and limits from representative raster benchmarks. Use preemptible capacity only for restartable, idempotent batch jobs.
+| Concern | Suggested GCP service | Design notes |
+|---|---|---|
+| Global edge | Cloud Load Balancing, Cloud CDN, Cloud Armor, Cloud DNS | TLS, WAF, routing and cacheable static/map assets |
+| Kubernetes | Regional Google Kubernetes Engine (GKE) | Separate node pools for API, geospatial CPU and optional accelerators |
+| Durable jobs | Pub/Sub | Acknowledgements, retention, dead-letter topics and subscription-level controls |
+| Object storage | Cloud Storage | Lifecycle rules, encryption, private access, retention and versioning policy |
+| Operational geospatial data | Cloud SQL for PostgreSQL with PostGIS | Keep transactions and interactive queries separate from batch raster work |
+| Historical analytics | BigQuery when benchmarked workloads justify it | Partition and cluster tables; apply cost controls |
+| Secrets and identity | Secret Manager and Workload Identity | No credentials in browser code, commits, logs or build output |
+| Observability | Cloud Monitoring, Cloud Logging, Error Reporting and traces | Correlate request, queue, tile and provider identifiers |
+| Cost controls | Budgets, alerts, quotas and labels | Separate cost attribution by environment, region and workload |
 
-## 5. Microsoft Azure reference
+### GKE scaling model
 
-- **Global edge:** Azure Front Door, Web Application Firewall, Azure DNS.
-- **Kubernetes:** AKS with isolated API, CPU geospatial, and optional GPU node pools.
-- **Queue:** Azure Service Bus for durable work commands and dead-letter handling; choose Event Hubs only when event-stream semantics are required.
-- **Object storage:** Blob Storage / ADLS Gen2 with lifecycle management, encryption, private endpoints, and access policies.
-- **Geospatial data:** Azure Database for PostgreSQL with PostGIS; add analytical services only when measured workloads justify them.
-- **Secrets and identity:** Key Vault, managed identities, and workload identity for AKS.
-- **Observability:** Azure Monitor, Log Analytics, Application Insights, traces, and cost-management budgets.
+Use Horizontal Pod Autoscaler for resource signals and queue-aware scaling (for example, KEDA where supported and approved) for backlog age/depth. Cluster autoscaling should add capacity to the worker pool that needs it, rather than scaling every service together. Tune resource requests from representative scene/tile benchmarks; do not guess node sizes from hectares alone.
 
-Use Horizontal Pod Autoscaler for resource metrics and KEDA or an equivalent queue-aware scaler for backlog-driven processing. Isolate batch pools so raster work cannot starve APIs. Configure zone-aware placement, pod disruption budgets, readiness/startup probes, and namespace resource quotas.
+Use zonal/region-aware placement for API reliability. For batch workers, prefer retryable jobs and checkpointed outputs over long-running stateful pods. Set per-tenant and per-provider concurrency budgets to avoid a single large area consuming all capacity.
 
-## 6. Data contracts and scientific integrity
+## 5. Microsoft Azure reference deployment
 
-Every derived record should retain, where applicable: provider and product, immutable source scene/observation ID, acquisition/ingestion/processing timestamps, tile ID and CRS, cloud/quality flags, valid-pixel count, algorithm/model version, configuration hash, uncertainty indicators, job/trace ID, and retry count.
+| Concern | Suggested Azure service | Design notes |
+|---|---|---|
+| Global edge | Azure Front Door, Web Application Firewall, Azure DNS | Global routing, TLS and edge security |
+| Kubernetes | Azure Kubernetes Service (AKS) | Separate node pools for API, geospatial CPU and optional GPU workloads |
+| Durable jobs | Azure Service Bus | Queues, dead-letter queues, lock renewal and controlled retries |
+| Event streams | Event Hubs only when streaming semantics are needed | Do not use a stream platform as a default replacement for a job queue |
+| Object storage | Blob Storage / ADLS Gen2 | Lifecycle policies, encryption, private endpoints and access controls |
+| Operational geospatial data | Azure Database for PostgreSQL with PostGIS | Apply connection pooling and query limits |
+| Secrets and identity | Key Vault, managed identities and AKS workload identity | No static credentials in application images or source control |
+| Observability | Azure Monitor, Log Analytics and Application Insights | Trace requests through queue, worker and API layers |
+| Cost controls | Cost Management budgets, alerts and resource tags | Attribute cost by region, environment and job family |
 
-Use explicit statuses: available, partial, no_observation, not_configured, provider_error, and processing_error. **No observation is not zero risk.** A NASA FIRMS thermal anomaly is an observation, not by itself a confirmed wildfire. Risk indicators must not be presented as official alerts unless an authorized authority has verified and approved that workflow.
+### AKS scaling model
 
-Keep raw inputs immutable and derived outputs reproducible. Validate geometry size, allowed CRS, file type, numeric ranges, authorization, and resource limits before scheduling expensive work.
+Use HPA for pod resource metrics and queue-aware scaling (for example, KEDA where appropriate) for queued work. Keep CPU-heavy raster processing in dedicated pools with resource quotas so it cannot starve the API. Configure zone-aware placement, disruption budgets, probes, and graceful worker termination. Store secrets in Key Vault and use workload identity rather than long-lived service-principal secrets wherever possible.
 
-## 7. Global map serving
+## 6. Throughput planning without unsupported claims
 
-- Serve static assets and cacheable vector tiles through a CDN.
-- Use zoom-dependent simplification and aggregation; never send all global polygons to every client.
-- Return compact feature properties; load detailed time series only after an area is selected.
-- Cache only data with explicit freshness and authorization semantics. Do not publicly cache private user polygons or account-specific data.
-- Add regional read replicas or materialized aggregates only when measurements identify database reads as the bottleneck.
-- Display observation timestamps and freshness state. Keep map interaction responsive while satellite processing runs asynchronously.
+“Hectares per hour” is not a reliable capacity promise by itself. Throughput depends on source-scene availability, cloud cover, pixel resolution, polygon fragmentation, reprojection, algorithm complexity, provider limits, and output resolution.
 
-## 8. Security, privacy, and governance
+Run a controlled benchmark:
+1. Select representative tiles and scenes from multiple climates and seasons.
+2. Measure p50/p95 processing time, valid-pixel fraction, memory, retries, bytes read/written, and cost per tile.
+3. Repeat at increasing worker counts to detect provider, storage, database and network bottlenecks.
+4. Estimate capacity only from successful, quality-checked output—not queue submissions or attempted hectares.
+5. Publish a range with workload assumptions and a date, and repeat the benchmark after material pipeline changes.
 
-- Use least-privilege workload identities and managed secret stores; rotate credentials with an auditable process.
-- Isolate public APIs, worker networks, databases, and private storage. Prefer private endpoints and controlled egress.
-- Enforce authentication, authorization, request and upload limits, rate limits, and per-tenant quotas.
-- Encrypt data in transit and at rest. Prevent tokens, personal data, and precise private-area geometry from leaking into logs.
-- Define retention and deletion policies for imagery, derived outputs, user areas, and audit records.
-- Review provider terms, attribution, licensing, jurisdiction, and data residency before global expansion.
-- Keep an approval gate for external alerts and public claims. This prototype is not a substitute for official emergency systems.
+A first-order estimate can be expressed as:
 
-## 9. Reliability and observability
+**completed tiles per hour ≈ active workers × 3600 / p95 seconds per tile × measured utilization**
 
-Measure ingestion delay/provider availability, queue depth and oldest job, tile processing time/success/retries, dead-letter count, valid-pixel coverage/cloud ratio, data freshness, API p50/p95/p99 latency, database saturation, storage growth, egress, notification outcomes, and cost per successful tile or square kilometre.
+Then convert tile throughput to hectares only when the grid resolution and valid coverage are known. This is a planning estimate, not a service-level guarantee.
 
-Create synthetic checks for every provider and processing stage. Provider outages must change the UI to unavailable or stale instead of leaving an old score appearing current. Runbooks should cover queue backlog, malformed source data, region failure, expired credentials, and runaway costs.
+## 7. Data contracts and scientific integrity
 
-## 10. Capacity and cost planning
+Every derived feature should retain, where applicable:
+- provider and product name;
+- immutable source scene/observation ID and acquisition time;
+- ingestion and processing timestamps;
+- tile ID, CRS, grid resolution and geometry version;
+- cloud/quality flags and valid-pixel count;
+- algorithm/model version and configuration hash;
+- uncertainty/quality indicators and missing-data reason;
+- job ID, trace ID, retry count and output object version.
 
-Do not promise a hectares-per-hour number before benchmarking real scenes, cloud cover, resolution, algorithms, and hardware. Measure bytes per scene and square kilometre, processing time and peak memory per tile, database writes, cache hit rate, client payload size, provider throttling, retries, and egress.
+Keep raw inputs immutable and derived outputs reproducible. Validate geometry size, CRS, file type, numeric ranges, access rights and resource limits before expensive processing.
 
-A first-order estimate is:
+Do not label an illustrative weighted indicator as a trained model, probability, or official warning. A thermal anomaly is not conclusive proof of a wildfire. Any alert workflow intended for operational emergency use needs independent validation, monitoring, human/authority review, and a clear responsibility model.
 
-**required workers ≈ queued tiles × measured average worker-seconds ÷ target processing-window seconds**
+## 8. Global map delivery and user experience
 
-Add headroom and account for provider quotas and database throughput; worker count alone does not guarantee throughput. Use cloud-optimized raster formats where appropriate, lifecycle policies for intermediates, bounded concurrency, queue backpressure, and budget alerts with circuit breakers.
+- Serve cacheable vector tiles and static assets from a CDN.
+- Use zoom-dependent generalization and aggregation; do not send entire national or global GeoJSON datasets to every browser.
+- Fetch fine-grained geometry only for the selected region and zoom level.
+- Use server-side spatial indexes and bounded viewport queries.
+- Cache by layer, zoom, tile, data timestamp and algorithm version. Invalidate when the underlying verified data changes.
+- On a provider failure, preserve the last known result with its timestamp and a clear stale badge; never present it as current.
+- On no observation, show a neutral/no-data style rather than implying low risk.
+- Respect reduced-motion preferences and provide a way to pause animated hotspot effects. Animation is an attention aid, not a severity metric.
 
-## 11. Delivery phases
+## 9. Security, privacy and governance
 
-### Phase 0 — Correctness and measurement
-Define data contracts, status vocabulary, geometry limits, and algorithm versioning. Test tiling, CRS handling, cloud masks, index calculations, and no-data cases. Publish reproducible benchmark results.
+- Use least-privilege service identities, private object buckets, encryption in transit/at rest, and secret rotation.
+- Never expose NASA, Copernicus or other provider credentials to the browser.
+- Apply authentication and authorization at the API; validate all geometry and query limits server-side.
+- Rate-limit expensive area submissions and isolate tenants.
+- Keep audit records for data access, configuration changes and alert actions while avoiding unnecessary personal data.
+- Define retention, deletion, regional residency and disaster-recovery policies before multi-region rollout.
+- Add budget alarms and maximum job budgets to avoid surprise compute and egress costs.
 
-### Phase 1 — Single-region pilot
-Deploy one managed Kubernetes cluster, durable queue, object store, PostGIS, secrets manager, and monitoring. Process a limited set of authorized polygons. Verify retries, freshness, costs, and security.
+## 10. Observability and acceptance gates
 
-### Phase 2 — Regional batch scale
-Add queue-aware autoscaling, isolated worker pools, tile deduplication, immutable intermediates, and provider rate limits. Load-test backlog recovery and provider outages.
+Track:
+- queue depth and oldest message age;
+- successful tiles per hour and end-to-end freshness;
+- p50/p95 processing duration and cost per successful tile;
+- provider availability, rate limits and quota exhaustion;
+- no-data/partial-data ratio and valid-pixel coverage;
+- job retry and dead-letter rate;
+- API p95 latency, error rate and database saturation;
+- alert delivery success and opt-out rate;
+- regional recovery time and replication lag.
 
-### Phase 3 — Multi-region resilience
-Define residency, replication, conflict resolution, regional failover, and disaster-recovery objectives. Add a second region only after recovery drills prove the objectives.
+Do not claim global coverage or production scale until all gates below are evidenced:
 
-### Phase 4 — Million-hectare concurrency target
-Use benchmarks to set workload budgets and processing windows. Ramp in measured stages (for example, 10k, 100k, then 1M hectares). Increase concurrency only while quality, freshness, provider quotas, database capacity, and budget remain within guardrails.
+1. Reproducible benchmark over representative scenes and regions.
+2. Provider entitlement, quota and data licensing verified.
+3. Scientific quality checks and missing-data behavior reviewed.
+4. Load test confirms bounded latency under a defined workload.
+5. Failure test covers provider outage, queue backlog, worker termination and regional loss.
+6. Cost model includes compute, storage, egress, observability and provider costs.
+7. Security review verifies secrets, identity, access and tenant isolation.
+8. User-facing coverage/status labels match regions with verified data.
 
-## 12. Acceptance gates for a global-scale claim
+## 11. Phased implementation roadmap
 
-A worldwide-coverage or million-hectare throughput claim requires evidence that representative regions and seasons were processed using real provider data; benchmark reports define area, scene count, resolution, time window, and valid-pixel coverage; retry and duplicate-delivery tests pass; backlog and region-failure drills meet recovery objectives; every result includes lineage, timestamps, quality flags, and honest no-data states; and privacy, licensing, security, and cost reviews are complete.
+**Phase A — Reliable pilot:** one cloud, one region, one durable queue, versioned object storage, PostGIS, bounded worker pool, provider diagnostics, truthful no-data states, and automated browser/API checks.
 
-**Bottom line:** Kubernetes provides orchestration and elastic worker capacity; it does not create global coverage or guarantee fast satellite processing. Scale comes from a durable geospatial queue, carefully partitioned tiles, validated source data, measured workloads, and transparent status reporting.
+**Phase B — Parallel processing:** geospatial tiling, deduplication, idempotent workers, queue-aware autoscaling, quality/lineage records, cost-per-tile metrics, and a benchmark report.
+
+**Phase C — Regional resilience:** recovery region, tested backups, replication-lag monitoring, runbooks, failover drills, and data-residency rules.
+
+**Phase D — Global rollout:** staged regions, region-specific quotas and observability, internationalized map/status UX, data coverage registry, and independently verified performance claims.
+
+**Current status:** this is a design proposal. Actual GKE/AKS clusters, global coverage, multi-region processing and million-hectare throughput must not be presented as deployed until the corresponding infrastructure and acceptance gates exist.
