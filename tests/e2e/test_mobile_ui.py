@@ -165,9 +165,13 @@ class MobileUiSmokeTests(unittest.TestCase):
     def test_global_coordinate_search_reports_live_provider_failures_honestly(self):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="en-US")
         page = context.new_page()
-        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(BASE) or route.request.url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/") else route.abort())
-        page.route("https://unpkg.com/**", lambda route: route.continue_())
-        page.route("https://api.open-meteo.com/**", lambda route: route.abort())
+        def route_global_request(route):
+            url = route.request.url
+            if url.startswith(BASE) or url.startswith("https://unpkg.com/") or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
+                route.continue_()
+            else:
+                route.abort()
+        page.route("**/*", route_global_request)
         page.on("pageerror", lambda error: print("PAGEERROR", page.url, str(error)))
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
@@ -293,7 +297,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             }""", timeout=10000)
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_selector(".area-card h3", timeout=20000)
-            self.assertIn("Offline QA Apiary", page.locator(".area-card h3").all_inner_texts())
+            self.assertTrue(any("Offline QA Apiary" in name or "Çevrimdışı QA Apiary" in name for name in page.locator(".area-card h3").all_inner_texts()))
             self.assertFalse(page.evaluate("navigator.onLine"))
         finally:
             context.close()
@@ -306,24 +310,26 @@ class MobileUiSmokeTests(unittest.TestCase):
 
         def route_request(route):
             url = route.request.url
-            if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"):
+            if url.startswith(BASE) or url.startswith("https://unpkg.com/") or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                 route.continue_()
             elif url.startswith("https://api.open-meteo.com/v1/forecast"):
-                route.fulfill(
-                    status=200,
-                    content_type="application/json",
-                    body=json.dumps({
-                        "current": {
-                            "temperature_2m": None,
-                            "relative_humidity_2m": None,
-                            "wind_speed_10m": None,
-                            "precipitation": None,
-                            "soil_moisture_0_to_7cm": None,
-                            "vapour_pressure_deficit": None,
-                        },
-                        "daily": {"et0_fao_evapotranspiration": [], "precipitation_sum": []},
-                    }),
-                )
+                from urllib.parse import parse_qs, urlparse
+                query = parse_qs(urlparse(url).query)
+                count = len(query.get("latitude", [""])[0].split(","))
+                empty = {
+                    "current": {
+                        "temperature_2m": None,
+                        "relative_humidity_2m": None,
+                        "wind_speed_10m": None,
+                        "precipitation": None,
+                        "soil_moisture_0_to_7cm": None,
+                        "vapour_pressure_deficit": None,
+                    },
+                    "daily": {"et0_fao_evapotranspiration": [], "precipitation_sum": []},
+                }
+                route.fulfill(status=200, content_type="application/json", body=json.dumps([empty for _ in range(count)]))
+            elif url.startswith("https://air-quality-api.open-meteo.com/"):
+                route.fulfill(status=200, content_type="application/json", body=json.dumps({"current": {}}))
             else:
                 route.abort()
 
@@ -340,6 +346,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
         finally:
             context.close()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
