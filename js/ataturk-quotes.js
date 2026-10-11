@@ -18,12 +18,6 @@
       quoteEn: "“The peasant is the master of the nation.”",
       context: "Üreticiyi, kırsal emeği ve doğal kaynakları korumak toplumsal refahın parçasıdır.",
       contextEn: "Protecting producers, rural work, and natural resources is part of public well-being."
-    },
-    {
-      quote: "“Milletin efendisi hakiki müstahsil olan köylüdür.”",
-      quoteEn: "“The true master of the nation is the peasant who produces.”",
-      context: "Üretim ve tarım, ekonomik bağımsızlığın temel unsurları arasında görülür.",
-      contextEn: "Production and agriculture are among the foundations of economic independence."
     }
   ];
   const photos = [
