@@ -138,6 +138,23 @@ class MobileUiSmokeTests(unittest.TestCase):
 
 
 
+    def test_saved_area_name_is_rendered_as_text_not_html(self):
+        context, page = self.new_page()
+        try:
+            page.add_init_script("""localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+              id:'qa-xss-area', name:'<img src=x onerror=window.__areaXss=1>', type:'orman',
+              province:'Edirne', district:'Merkez',
+              coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+              createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+            }]));""")
+            page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".area-card h3", timeout=20000)
+            self.assertIn("<img src=x onerror=window.__areaXss=1>", page.locator(".area-card h3").inner_text())
+            self.assertEqual(page.locator(".area-card h3 img").count(), 0)
+            self.assertFalse(page.evaluate("Boolean(window.__areaXss)"))
+        finally:
+            context.close()
+
     def test_saved_area_persistence_reload_delete_mobile_and_desktop(self):
         # Responsive browser E2E for persisted areas. The initial area is a fixture;
         # physical-device certification remains a separate manual check.
@@ -179,6 +196,24 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_function("JSON.parse(localStorage.getItem('nexorawildfire-my-areas-v1')||'[]').every(a=>a.name!=='QA Saved Area')", timeout=10000)
                     page.wait_for_function("!Array.from(document.querySelectorAll('.area-card h3')).some(el=>el.textContent==='QA Saved Area')", timeout=10000)
                     self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    # Simulate a stale IndexedDB copy surviving an interrupted delete.
+                    await page.evaluate("""async () => {
+                      const db = await new Promise((resolve, reject) => {
+                        const req = indexedDB.open('nexorawildfire-edge', 1);
+                        req.onsuccess = () => resolve(req.result);
+                        req.onerror = () => reject(req.error);
+                      });
+                      await new Promise((resolve, reject) => {
+                        const tx = db.transaction('areas', 'readwrite');
+                        tx.objectStore('areas').put({id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne', district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]], updatedAt:Date.now()});
+                        tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+                      });
+                      db.close();
+                    }""")
+                    await page.reload(wait_until="domcontentloaded", timeout=30000)
+                    await page.wait_for_selector("#empty", timeout=10000)
+                    self.assertNotIn("QA Saved Area", page.locator(".area-card h3").all_inner_texts())
+                    self.assertTrue(page.locator("#empty").is_visible(), "deleted area must not be restored from stale IndexedDB")
                 finally:
                     context.close()
 
