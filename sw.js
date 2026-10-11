@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v38";
+const CACHE_NAME = "nexorawildfire-shell-v39";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -30,21 +30,24 @@ const APP_SHELL = [
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js",
   "./js/map-intelligence.js",
   "./js/areas.js",
+  "./js/areas.js?v=20261010g",
   "./js/notification-ui.js",
+  "./js/notification-ui.js?v=20261010c",
   "./js/onboarding.js",
   "./js/dashboard.js",
   "./js/role-dashboard.js?v=20261011c",
-  "./js/map.js?v=20261011b",
+  "./js/map.js?v=20261011c",
   "./js/i18n.js?v=20261011m",
   "./js/i18n-extra.js?v=20261011d",
   "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011f",
-  "./js/global-demo.js?v=20261011g",
+  "./js/global-demo.js?v=20261011h",
   "./js/nova-storage.js?v=20261011b",
   "./js/nova-offline-engine.js?v=20261011b",
   "./js/install-update.js?v=20261011b",
   "./js/pwa.js",
   "./js/edge-ui.js?v=20261011b",
+  "./js/enterprise-reports.js?v=20261010e",
   "./js/live-risk-raster.js",
   "./js/nexora-product.js",
   "./css/product-ui.css",
