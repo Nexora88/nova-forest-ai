@@ -535,10 +535,18 @@
       el.setAttribute(attr, replace(saved[attr], lang));
     }
   }
-  function applyLanguage() {
-    document.querySelectorAll("[data-tr][data-en]").forEach(el => {
-      if (el.children.length === 0) el.textContent = lang === "en" ? el.dataset.en : el.dataset.tr;
+  function translateDataContent(root=document) {
+    const nodes = [];
+    if (root.nodeType === Node.ELEMENT_NODE && root.matches?.("[data-tr][data-en]")) nodes.push(root);
+    root.querySelectorAll?.("[data-tr][data-en]").forEach(el => nodes.push(el));
+    nodes.forEach(el => {
+      if (el.children.length !== 0) return;
+      const value = lang === "en" ? el.dataset.en : el.dataset.tr;
+      if (el.textContent !== value) el.textContent = value;
     });
+  }
+  function applyLanguage() {
+    translateDataContent();
     document.querySelectorAll("[data-tr-placeholder][data-en-placeholder]").forEach(el => {
       el.placeholder = lang === "en" ? el.dataset.enPlaceholder : el.dataset.trPlaceholder;
     });
@@ -573,6 +581,7 @@
         record.addedNodes.forEach(node => {
           if (node.nodeType === Node.TEXT_NODE) translateNode(node);
           else if (node.nodeType === Node.ELEMENT_NODE) {
+            translateDataContent(node);
             node.querySelectorAll?.("*").forEach(el => el.childNodes.forEach(translateNode));
             node.childNodes?.forEach(translateNode);
             translateAttributes(node);
