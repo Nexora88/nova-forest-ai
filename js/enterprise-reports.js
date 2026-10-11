@@ -1,7 +1,7 @@
 /* NexoraWildfire enterprise asset-risk PDF workflow. */
 (function () {
   const form = document.querySelector("[data-enterprise-report-form]");
-  const API_BASE = (window.NOVA_API_BASE || (location.hostname.endsWith("github.io") ? "https://nova-forest-ai-backend.vercel.app" : "/api")).replace(/\/$/, "");
+  const API_BASE = (window.NOVA_API_BASE || "https://nova-forest-ai-backend.vercel.app/api").replace(/\/$/, "");
   if (!form) return;
   const status = form.querySelector("[data-report-status]");
   const submit = form.querySelector('button[type="submit"]');
