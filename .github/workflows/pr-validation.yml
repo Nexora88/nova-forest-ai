@@ -36,6 +36,9 @@ jobs:
           node --check js/evacuation-sim.js
           node --check js/asset-guard.js
           node --check js/legal.js
+          node --check js/auth.js
+          node --check js/role-dashboard.js
+          node --check js/global-demo.js
 
       - name: Set up Python
         uses: actions/setup-python@v5
