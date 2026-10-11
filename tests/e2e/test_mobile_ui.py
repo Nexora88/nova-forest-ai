@@ -299,5 +299,47 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.close()
 
 
+
+    def test_map_status_does_not_claim_live_when_weather_provider_has_no_observations(self):
+        context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR")
+        page = context.new_page()
+
+        def route_request(route):
+            url = route.request.url
+            if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"):
+                route.continue_()
+            elif url.startswith("https://api.open-meteo.com/v1/forecast"):
+                route.fulfill(
+                    status=200,
+                    content_type="application/json",
+                    body=json.dumps({
+                        "current": {
+                            "temperature_2m": None,
+                            "relative_humidity_2m": None,
+                            "wind_speed_10m": None,
+                            "precipitation": None,
+                            "soil_moisture_0_to_7cm": None,
+                            "vapour_pressure_deficit": None,
+                        },
+                        "daily": {"et0_fao_evapotranspiration": [], "precipitation_sum": []},
+                    }),
+                )
+            else:
+                route.abort()
+
+        page.route("**/*", route_request)
+        try:
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function(
+                "document.querySelector('[data-map-status]')?.textContent.includes('HAVA VERİSİ YOK')",
+                timeout=20000,
+            )
+            status = page.locator("[data-map-status]").inner_text()
+            self.assertNotIn("CANLI", status)
+            self.assertIn("ÇEVRESEL KARAR DESTEK", page.locator("header .status").inner_text())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
+        finally:
+            context.close()
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
