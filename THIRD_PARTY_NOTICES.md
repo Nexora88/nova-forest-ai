@@ -17,11 +17,15 @@ The root `LICENSE` is MIT and applies to Nexora-authored source code covered by 
 | `rabahdev/fire-smoke-yolov8n` / `best.pt` | Third-party fire/smoke checkpoint downloaded at runtime | Upstream documentation has indicated AGPL-3.0. Verify the current model card, exact weight license, training-data terms, and attribution requirements at the time of use. No checkpoint is bundled in this repository. |
 | UCI Algerian Forest Fires dataset | Research-only Random Forest experiment | CC BY 4.0 as recorded in the dataset/model metadata; cite the UCI repository and DOI [10.24432/C5KW4N](https://doi.org/10.24432/C5KW4N). |
 | NASA FIRMS | Thermal-anomaly observations / proxy labels | Check the specific product, documentation, attribution, and data-use terms. A hotspot is not a confirmed incident. Do not commit API keys or restricted exports. |
-| Open-Meteo | Weather and air-quality API | Follow current API terms, attribution requirements, rate limits, and any commercial-use requirements that apply to the deployment. |
+| Open-Meteo | Weather and air-quality API | The public API terms describe free access for open-source/non-commercial use, ask users to contact Open-Meteo for commercial use, and license API data under CC BY 4.0 with attribution (for example, 'Weather data by Open-Meteo.com'). Re-check current terms and rate limits before launch. |
 | Copernicus / Sentinel-2 | Satellite-scene and vegetation-index workflows | Follow the relevant Copernicus Data Space, Sentinel product, processing, and attribution terms. A scene search is not itself a calculated NDVI/NDMI observation. |
 | OpenStreetMap | Base map tiles and geographic data | Preserve required attribution; public tile servers have usage policies. Do not assume unlimited production tile use. |
 | Esri, CARTO, OpenTopoMap and HOT tiles | Optional alternate basemaps | Each provider has its own attribution, acceptable-use, and licensing terms. Keep attribution visible and verify the terms before commercial use. |
 | Leaflet and related plugins | Browser mapping | Review the individual package license and retain required notices. |
+
+### Current release gate
+
+The repository's root code license is MIT while the optional YOLOv8 runtime uses the Ultralytics AGPL-3.0 ecosystem. Do **not** assume these licenses are automatically compatible. Before merging this integration into a release or operating the public model service, choose and document a compliant path: obtain a suitable license, license the covered combined work under compatible terms, or replace/isolate the AGPL component after qualified legal review. Until that decision is made, the YOLO service is a research integration, not a cleared commercial deployment.
 
 ### Distribution checklist
 
@@ -47,7 +51,7 @@ Kök dizindeki `LICENSE`, ilgili lisans kapsamındaki Nexora kaynak kodu için M
 | `rabahdev/fire-smoke-yolov8n` / `best.pt` | Çalışma zamanında indirilen üçüncü taraf yangın/duman modeli | Kaynak dokümantasyonu AGPL-3.0 lisansına işaret etmiştir. Kullanım sırasında güncel model kartını, ağırlıkların tam lisansını, eğitim verisi koşullarını ve atıf gerekliliklerini doğrulayın. Bu depo model ağırlığını içermez. |
 | UCI Cezayir Orman Yangınları veri kümesi | Araştırma amaçlı Random Forest deneyi | Veri kümesi/model metaverisinde CC BY 4.0 olarak kayıtlıdır; UCI kaynağına ve [10.24432/C5KW4N](https://doi.org/10.24432/C5KW4N) DOI'sine atıf yapın. |
 | NASA FIRMS | Termal anomali gözlemleri / vekil etiketler | Kullanılan ürünün belgelerini, atıf ve veri kullanım koşullarını kontrol edin. Sıcak nokta, doğrulanmış yangın kaydı değildir. API anahtarlarını veya kısıtlı dışa aktarımları depoya koymayın. |
-| Open-Meteo | Hava ve hava kalitesi API'si | Dağıtımda geçerli API koşullarına, atıf gerekliliklerine, hız sınırlarına ve ticari kullanım koşullarına uyun. |
+| Open-Meteo | Hava ve hava kalitesi API'si | Kamuya açık API koşulları açık kaynak/ticari olmayan kullanım için ücretsiz erişim belirtir; ticari kullanım için Open-Meteo ile iletişime geçilmesini ister. API verisi atıf şartıyla CC BY 4.0 lisansındadır (ör. 'Weather data by Open-Meteo.com'). Yayın öncesinde güncel koşulları ve hız sınırlarını yeniden kontrol edin. |
 | Copernicus / Sentinel-2 | Uydu sahnesi ve bitki indeksi iş akışları | İlgili Copernicus Data Space, Sentinel ürün, işleme ve atıf koşullarına uyun. Sahne araması tek başına hesaplanmış NDVI/NDMI gözlemi değildir. |
 | OpenStreetMap | Temel harita döşemeleri ve coğrafi veri | Gerekli atıfları koruyun; herkese açık döşeme sunucularının kullanım politikaları vardır. Üretim için sınırsız kullanım varsaymayın. |
 | Esri, CARTO, OpenTopoMap ve HOT döşemeleri | İsteğe bağlı alternatif haritalar | Her sağlayıcının ayrı atıf, kabul edilebilir kullanım ve lisans koşulları vardır. Atıfları görünür tutun ve ticari kullanım öncesi koşulları doğrulayın. |
