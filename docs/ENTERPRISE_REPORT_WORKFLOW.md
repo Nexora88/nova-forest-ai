@@ -1,6 +1,6 @@
 # Kurumsal rapor iş akışı — jüri diyagramı
 
-Bu diyagram hedeflenen/asenkron mimariyi açıklar. FastAPI tarafında kimlik doğrulamalı proxy ve worker çağrısı için iskelet vardır; gerçek kuyruğun, worker servisinin, Storage ve e-posta sağlayıcısının dağıtım ortamında ayrıca yapılandırılması gerekir. Bu belge tek başına worker'ın canlı çalıştığını göstermez.
+Bu diyagram, repoya eklenen FastAPI worker API + Celery/Redis kuyruk tüketicisi + PDF üretimi + Supabase Storage signed URL + Resend e-posta akışını gösterir. Kodun repoda olması canlı dağıtımın yapıldığını göstermez; servisleri ayrı ayrı dağıtıp gerçek kimlik bilgileriyle kabul testinden geçirmek gerekir.
 
 ```mermaid
 flowchart TD
@@ -30,12 +30,12 @@ flowchart TD
 ## Dağıtım kontrol listesi
 
 - [ ] `NEXORA_WORKER_URL` ve yalnız sunucuda tutulan `NEXORA_WORKER_TOKEN`.
-- [ ] Worker'da kalıcı kuyruk (ör. Celery + Redis/RabbitMQ veya Supabase tabanlı iş tablosu + Edge Function).
+- [x] Repo içinde Celery + Redis kuyruk iskeleti ve worker API eklendi; Redis'in kalıcı/erişilebilir yapılandırması dağıtımda doğrulanmalı.
 - [ ] Job tablosunda queued/running/completed/failed, progress, retry_count ve zaman damgaları.
 - [ ] Her durum/indirme isteğinde işin sahibini doğrula; Storage bucket'ı private tut.
-- [ ] Süreli signed URL üret; kalıcı public PDF URL kullanma.
+- [x] Kodda 7 günlük signed URL üretiliyor; bucket'ın private olduğuna ve URL erişiminin doğru çalıştığına dağıtımda bakılmalı.
 - [ ] İdempotency ve tekrar deneme; çift PDF/e-posta üretimini engelle.
-- [ ] E-posta için doğrulanmış sağlayıcı, rate limit ve teslimat logları.
+- [x] Resend e-posta gönderimi eklendi; doğrulanmış gönderen, rate limit ve teslimat logları dağıtımda ayarlanmalı.
 - [ ] Şirket varlığı koordinatlarını loglara ve herkese açık artefaktlara yazma.
 - [ ] Sağlayıcılar hata verirse rapor "veri yok/sağlayıcı hatası" yazsın; uydurma değer ekleme.
 - [ ] 60–120 saniye hedefini ölçümle doğrula; garanti gibi sunma.
