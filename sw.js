@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v23";
+const CACHE_NAME = "nexorawildfire-shell-v24";
 const DATA_CACHE = "nexorawildfire-data-v12";
 
 const APP_SHELL = [
@@ -12,6 +12,7 @@ const APP_SHELL = [
   "./pages/satellite.html",
   "./pages/about.html",
   "./pages/vision.html",
+  "./pages/enterprise.html",
   "./pages/events.html",
   "./pages/legal.html",
   "./pages/auth.html",
@@ -22,6 +23,7 @@ const APP_SHELL = [
   "./js/map.js",
   "./js/evacuation-sim.js?v=20261011b",
   "./js/global-nav.js?v=20261011b",
+  "./js/mobile-nav.js?v=20261011b",
   "./js/pwa.js?v=20261011b",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js",
@@ -33,8 +35,9 @@ const APP_SHELL = [
   "./js/role-dashboard.js?v=20261011b",
   "./js/map.js?v=20261011b",
   "./js/i18n.js?v=20261011h",
+  "./js/i18n-extra.js?v=20261011c",
   "./js/asset-guard.js?v=20261011a",
-  "./js/auth.js?v=20261011c",
+  "./js/auth.js?v=20261011d",
   "./js/global-demo.js?v=20261011g",
   "./js/nova-storage.js",
   "./js/nova-offline-engine.js",
@@ -48,7 +51,7 @@ const APP_SHELL = [
   "./css/legal.css?v=20261011b",
   "./css/field-events.css?v=20261011b",
   "./js/special-days.js",
-  "./js/legal.js?v=20261011c",
+  "./js/legal.js?v=20261011d",
   "./js/field-events.js?v=20261011d",
   "./js/ataturk-quotes.js?v=20261010f",
   "./assets/nexora-wildfire-logo.png",
