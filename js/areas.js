@@ -9,7 +9,15 @@ async function loadAreas(){
   let local=[];
   try{local=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
   let indexed=[];
-  try{indexed=await window.NovaStore.getAll("areas")}catch{}
+  // IndexedDB is an enhancement, not a prerequisite for showing saved areas.
+  // Some mobile/private/test contexts can leave an IDB request pending; bound
+  // the wait and keep the synchronous localStorage cache usable.
+  try {
+    indexed=await Promise.race([
+      window.NovaStore.getAll("areas"),
+      new Promise(resolve=>setTimeout(()=>resolve([]),1200))
+    ]);
+  } catch {}
   // Re-read after IndexedDB resolves: another tab or the user may save/delete
   // an area while this async read is in flight. A pre-await snapshot can erase
   // a just-added local area when this function writes the merged cache back.
@@ -27,7 +35,16 @@ async function loadAreas(){
   }
   areaCache=Array.from(merged.values()).filter(a=>a&&a.id!=null);
   localStorage.setItem(KEY,JSON.stringify(areaCache));
-  for(const area of areaCache){try{await window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()})}catch{}}
+  // Never block initial rendering on a stalled IndexedDB write. The
+  // localStorage copy is already committed and will be merged on next load.
+  for(const area of areaCache){
+    try {
+      await Promise.race([
+        window.NovaStore.put("areas",{...area,id:String(area.id),updatedAt:Number(area.updatedAt)||Date.now()}),
+        new Promise(resolve=>setTimeout(resolve,800))
+      ]);
+    } catch {}
+  }
   return areaCache;
 }
 async function removeArea(id){
