@@ -363,7 +363,7 @@
       : "Project concept and development: Ahmet Eymen Bakraç";
     const secondary = document.createElement("span");
     secondary.dataset.attributionSecondary = "true";
-    secondary.textContent = "NexoraWildfire AI · Independent environmental intelligence · © 2026";
+    secondary.textContent = languageIsTurkish() ? "NexoraWildfire AI · Bağımsız çevresel istihbarat projesi · © 2026" : "NexoraWildfire AI · Independent environmental intelligence · © 2026";
     line.append(primary, secondary);
   }
   function boot() {
