@@ -454,7 +454,6 @@
     ["Gerçek etiketli yangın geçmişi ile değerlendirildiğinde bu panel sayısal metrikleri gösterecek.","This panel will display numerical metrics after evaluation against real labelled wildfire history."],
     ["Akıllı Tahliye ve Kaçış Koridoru","Evacuation and Escape Corridor"],
     ["Gerçek acil durumda resmi kurumların yönlendirmeleri esas alınır. Bu modül, seçilen alan için yangından uzaklaşma mantığını","In a real emergency, follow official instructions. This module shows a conceptual approach to moving away from a wildfire for the selected area"],
-    ["olarak gösterir.","."],
     ["KÖY / ALAN","VILLAGE / AREA"],
     ["GÜVENLİ TOPLANMA","SAFE ASSEMBLY"],
     ["POST-FIRE / RESTORATION INTELLIGENCE","POST-FIRE / RESTORATION INTELLIGENCE"],
