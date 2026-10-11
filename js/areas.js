@@ -106,7 +106,16 @@ async function cardEdge(a){
   const baseAlerts=alerts(a,d,sat);
   const edgeAlerts=d.offlineAlerts||[];
   const all=edgeAlerts.length?edgeAlerts.map(x=>[x.title,x.message,"warn"]):baseAlerts;
-  try{for(const x of all.filter(a=>a[2]!=="ok"))await window.NovaStore.put("alerts",{id:"local:"+a.id+":"+x[0]+":"+new Date().toISOString().slice(0,13),areaId:a.id,area:a.name,title:x[0],message:x[1],level:x[2],createdAt:Date.now(),source:d.offline?"offline-engine":"live-data"})}catch{}
+  // Alerts must not hold the entire card hostage when IndexedDB is slow.
+  // Risk status is rendered immediately; durable alert persistence is best-effort.
+  for(const x of all.filter(item=>item[2]!=="ok")){
+    try {
+      await Promise.race([
+        window.NovaStore.put("alerts",{id:"local:"+a.id+":"+x[0]+":"+new Date().toISOString().slice(0,13),areaId:a.id,area:a.name,title:x[0],message:x[1],level:x[2],createdAt:Date.now(),source:d.offline?"offline-engine":"live-data"}),
+        new Promise(resolve=>setTimeout(resolve,500))
+      ]);
+    } catch {}
+  }
   const alertsHtml=all.map(x=>'<div class="area-alert '+x[2]+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
   return '<article class="area-card"><div class="area-card-head"><div><div class="eyebrow">'+a.type.toUpperCase()+'</div><h3>'+a.name+'</h3><p>'+a.province+(a.district?" · "+a.district:"")+'</p></div><button data-delete="'+a.id+'">Sil</button></div><div class="area-card-actions"><a class="secondary-action" href="map.html?area='+encodeURIComponent(a.id)+'">Haritada görüntüle →</a><button type="button" data-area-push="'+a.id+'">Bu alan için bildirimleri aç</button><span data-area-push-status="'+a.id+'" role="status" aria-live="polite"></span><label class="area-alert-toggle"><input type="checkbox" data-area-alert-toggle="'+a.id+'" '+(areaAlertsEnabled(a.id)?"checked":"")+'><span>Bu alanın risk uyarılarını izle</span></label></div><div class="area-mini-map" id="area-map-'+a.id+'" aria-label="Kaydedilmiş alan harita görünümü"></div><div class="area-live"><span>'+(d.offline?"ÇEVRİMDIŞI / SON VERİ":"CANLI DURUM")+'</span><strong>'+d.risk+'/100 risk</strong><small>'+(d.updatedAt?"Son kayıt: "+new Date(d.updatedAt).toLocaleString("tr-TR"):"Yeni veri yok")+'</small></div><div class="area-metrics"><div><span>Sıcaklık</span><b>'+d.w.t+' °C</b></div><div><span>Toprak nemi</span><b>'+Math.round(d.w.soil*100)+' %</b></div><div><span>ET₀</span><b>'+d.w.et0.toFixed(1)+' mm</b></div><div><span>VPD</span><b>'+d.w.vpd.toFixed(2)+'</b></div><div><span>Tarım skoru</span><b>'+d.crop+'/100</b></div><div><span>Arı uçuş</span><b>'+d.bee+'/100</b></div></div>'+satelliteBox(sat)+'<div class="area-alerts"><h4>Yerel olay merkezi</h4>'+alertsHtml+'</div><div class="area-footer">'+(d.offline?"NEXORAWILDFIRE EDGE: internet yok. Son kayıt üzerinden yerel karar motoru çalıştı.":"Canlı hava/toprak verisi. Yeni kayıtlar yerel veri deposuna alınır.")+'</div></article>';
 }
