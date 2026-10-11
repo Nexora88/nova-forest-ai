@@ -938,10 +938,21 @@
   const originals = new WeakMap();
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
-    if (!originals.has(node)) originals.set(node, node.nodeValue);
+    // data-tr/data-en is authoritative for simple labels. Do not immediately
+    // reverse-translate the value just written from those attributes.
+    const owner = node.parentElement;
+    if (owner?.matches?.("[data-tr][data-en]") && (owner.children.length === 0 || owner.dataset.nxExplicitTranslation === "true")) return;
     const current = node.nodeValue;
-    const translated = replace(current, lang);
+    let record = originals.get(node);
+    if (!record) {
+      record = { source: current, translated: current };
+      originals.set(node, record);
+    } else if (current !== record.translated) {
+      record.source = current;
+    }
+    const translated = replace(record.source, lang);
     if (translated !== current) node.nodeValue = translated;
+    record.translated = translated;
   }
   function translateAttributes(root=document) {
     const selector = "[placeholder],[title],[aria-label],[content]";
@@ -958,6 +969,38 @@
       el.setAttribute(attr, replace(saved[attr], lang));
     }
   }
+  function translateDataContent(root=document) {
+    const nodes = [];
+    if (root.nodeType === Node.ELEMENT_NODE && root.matches?.("[data-tr][data-en]")) nodes.push(root);
+    root.querySelectorAll?.("[data-tr][data-en]").forEach(el => nodes.push(el));
+    nodes.forEach(el => {
+      const value = lang === "en" ? el.dataset.en : el.dataset.tr;
+      if (!value) return;
+      if (el.children.length === 0) {
+        if (el.textContent !== value) el.textContent = value;
+        return;
+      }
+      // Keep inline icons/decoration intact. For a mixed-content label, use
+      // the explicit translation on its sole direct text node only when child
+      // elements are decorative; otherwise translate each text node normally.
+      const directText = Array.from(el.childNodes).filter(node =>
+        node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()
+      );
+      const decorativeChildren = Array.from(el.children).every(child =>
+        ["SVG", "IMG", "I"].includes(child.tagName) ||
+        child.getAttribute("aria-hidden") === "true" ||
+        !child.textContent.trim()
+      );
+      if (directText.length === 1 && decorativeChildren) {
+        el.dataset.nxExplicitTranslation = "true";
+        if (directText[0].nodeValue !== value) directText[0].nodeValue = value;
+      } else {
+        el.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) translateNode(node);
+        });
+      }
+    });
+  }
   function applyLanguage() {
     document.documentElement.lang = lang;
     document.title = replace(document.title, lang);
@@ -966,6 +1009,7 @@
       el.childNodes.forEach(translateNode);
     });
     translateAttributes();
+    translateDataContent();
     const btn = document.getElementById("nexora-language-toggle");
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
@@ -1012,6 +1056,7 @@
             node.querySelectorAll?.("*").forEach(el => el.childNodes.forEach(translateNode));
             node.childNodes?.forEach(translateNode);
             translateAttributes(node);
+            translateDataContent(node);
           }
         });
       }
