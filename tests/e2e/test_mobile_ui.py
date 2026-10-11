@@ -236,20 +236,24 @@ class MobileUiSmokeTests(unittest.TestCase):
             with self.subTest(width=width):
                 context = self.browser.new_context(viewport={"width": width, "height": height}, locale="tr-TR")
                 context.add_init_script("""
-                    if (!sessionStorage.getItem('qa-area-fixture-seeded')) {
-                      localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
-                        id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
-                        district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
-                        createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
-                      }]));
-                      sessionStorage.setItem('qa-area-fixture-seeded','1');
+                    if (location.origin === 'http://127.0.0.1:4173') {
+                      const key = 'nexorawildfire-my-areas-v1';
+                      const rows = JSON.parse(localStorage.getItem(key) || '[]');
+                      if (!rows.some(area => String(area.id) === 'qa-area-1')) {
+                        rows.push({
+                          id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
+                          district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                          createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                        });
+                        localStorage.setItem(key, JSON.stringify(rows));
+                      }
                     }
                 """)
                 page = context.new_page()
 
                 def route_request(route):
                     url = route.request.url
-                    if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
+                    if url.startswith(BASE) or url.startswith("https://unpkg.com/leaflet/") or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
@@ -261,21 +265,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                 page.route("**/*", route_request)
                 try:
                     page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
-                    # Seed on the real origin after navigation as well: init scripts can run
-                    # on about:blank before localStorage is available in some Chromium builds.
-                    page.evaluate("""() => {
-                      const key = 'nexorawildfire-my-areas-v1';
-                      const rows = JSON.parse(localStorage.getItem(key) || '[]');
-                      if (!rows.some(area => String(area.id) === 'qa-area-1')) {
-                        rows.push({
-                          id:'qa-area-1', name:'QA Saved Area', type:'orman', province:'Edirne',
-                          district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
-                          createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
-                        });
-                        localStorage.setItem(key, JSON.stringify(rows));
-                      }
-                      window.dispatchEvent(new CustomEvent('nova:areas-updated'));
-                    }""")
+                    # The context init script seeds the fixture before app scripts run.
                     page.wait_for_function("""() => Array.from(document.querySelectorAll('.area-card h3'))
                       .some(el => /QA Saved Area|QA Kaydedilen Alan/.test(el.textContent))""", timeout=20000)
                     self.assertTrue(any("QA Saved Area" in name or "QA Kaydedilen Alan" in name for name in page.locator(".area-card h3").all_inner_texts()))
