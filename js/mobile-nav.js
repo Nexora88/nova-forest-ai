@@ -8,11 +8,12 @@
       const links = Array.from(nav.querySelectorAll(":scope > a"));
       if (!links.length) return;
 
+      if (!nav.id) nav.id = "nx-nav-" + index;
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "nx-nav-toggle";
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-controls", "nx-nav-links-" + index);
+      toggle.setAttribute("aria-controls", nav.id);
       toggle.innerHTML = '<span aria-hidden="true">☰</span><span class="nx-nav-toggle-label"></span>';
       const more = document.createElement("div");
       more.className = "nx-nav-more";
@@ -27,7 +28,8 @@
       moreToggle.append(moreLabel, document.createTextNode(" "), moreChevron);
       const moreLinks = document.createElement("div");
       moreLinks.className = "nx-nav-more-links";
-      moreLinks.id = "nx-nav-links-" + index;
+      moreLinks.id = "nx-nav-more-links-" + index;
+      moreToggle.setAttribute("aria-controls", moreLinks.id);
       links.forEach((link, i) => {
         if (i < Math.min(3, links.length)) nav.appendChild(link);
         else moreLinks.appendChild(link);
