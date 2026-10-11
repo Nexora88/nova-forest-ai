@@ -50,7 +50,7 @@ By the end of PR #15, a first-time user should be able to open NexoraWildfire AI
 ### P0 — Live provider verification (owner configuration required)
 Configure secrets directly in the hosting provider's environment-variable settings; never commit keys or paste them into chat:
 - `FIRMS_MAP_KEY` (NASA FIRMS)
-- The exact Copernicus Data Space Ecosystem credentials/environment variables used by the backend's processing client (confirm names from the current code/config before setting them).
+- `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` (Copernicus Data Space Ecosystem processing credentials; server-side only).
 - Any required production-only backend settings, service tokens, and allowed origins, stored as server-side secrets.
 
 Then rerun diagnostics and prove all of the following with response metadata, not just HTTP 200:
