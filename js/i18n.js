@@ -1,6 +1,19 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
+    ["LIVE TELEMETRY","CANLI TELEMETRİ"],
+    ["MODEL EVIDENCE","MODEL KANITLARI"],
+    ["FIELD SAFETY / SIMULATION","SAHA GÜVENLİĞİ / SİMÜLASYON"],
+    ["POST-FIRE / RESTORATION INTELLIGENCE","YANGIN SONRASI / REHABİLİTASYON İSTİHBARATI"],
+    ["NOVA-ALERT / EARLY WARNING","NOVA-ALERT / ERKEN UYARI"],
+    ["Kırsal Erken Uyarı Durumu","Rural Early Warning Status"],
+    ["Yapay Zeka Model Kanıtı","AI Model Evidence"],
+    ["Akıllı Tahliye ve Kaçış Koridoru","Smart Evacuation and Escape Corridor"],
+    ["Yangın Sonrası Rehabilitasyon ve Ağaçlandırma Öngörüsü","Post-Fire Restoration and Reforestation Outlook"],
+    ["DOĞAL YENİLENME","NATURAL REGENERATION"],
+    ["TÜR PLANLAMA","SPECIES PLANNING"],
+    ["Analiz altyapısı hazır, tarihsel veri bağlantısı bekleniyor.","Analysis infrastructure is ready; historical data connection is pending."],
+    ["Ormansız ve ağaçsız toprak vatan değildir.","Land without forests and trees is not a homeland."],
     ["“Ormanları korumak, geleceği korumaktır.”","“Protecting forests means protecting the future.”"],
     ["NexoraWildfire AI · Proje ilkesi","NexoraWildfire AI · Project principle"],
     ["Bilim, üretim ve toplumsal fayda için ilham.","Inspired by science, production, and public benefit."],
@@ -245,7 +258,8 @@
   const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
-  let lang = stored === "en" || stored === "tr" ? stored : "en";
+  const documentLang = /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
+  let lang = stored === "en" || stored === "tr" ? stored : documentLang;
   const ordered = (map) => [...map.entries()].sort((a,b) => b[0].length-a[0].length);
   function replace(text, target) {
     const entries = ordered(target === "en" ? trToEn : enToTr);
@@ -257,9 +271,9 @@
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
     if (!originals.has(node)) originals.set(node, node.nodeValue);
-    const current = node.nodeValue;
-    const translated = replace(current, lang);
-    if (translated !== current) node.nodeValue = translated;
+    const original = originals.get(node);
+    const translated = replace(original, lang);
+    if (translated !== node.nodeValue) node.nodeValue = translated;
   }
   function translateAttributes(root=document) {
     const selector = "[placeholder],[title],[aria-label],[content]";
