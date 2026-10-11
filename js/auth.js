@@ -3,6 +3,7 @@
   const URL="https://ckxgbmvjehshgicafsjp.supabase.co";
   const KEY="sb_publishable_J370jM_6LUMXGfwGfbWK0Q_nR0I6NA2";
   const AREA_KEY="nexorawildfire-my-areas-v1";
+  const AREA_TOMBSTONES_KEY="nexorawildfire-deleted-area-ids-v1";
   const PROFILE_CACHE_KEY="nexorawildfire-profile-cache-v1";
   const PROFILE_CACHE_TTL=600000;
   let client=null, session=null, profile=null;
@@ -29,7 +30,15 @@
     let local=[];try{local=JSON.parse(localStorage.getItem(AREA_KEY)||"[]")}catch{}
     const cloud=await client.from("nexorawildfire_areas").select("*").order("updated_at",{ascending:false});
     if(cloud.error)throw cloud.error;
-    const existing=cloud.data||[];const valid=existing.map(a=>({id:String(a.id),name:a.name,type:a.area_type==="field"?"çiftçi":a.area_type==="apiary"?"arıcı":a.area_type==="forest"?"orman":"genel",province:a.province||"",district:a.district||"",coordinates:a.coordinates||[],createdAt:a.created_at,updatedAt:a.updated_at}));
+    const tombstones=new Set((()=>{try{const x=JSON.parse(localStorage.getItem(AREA_TOMBSTONES_KEY)||"[]");return Array.isArray(x)?x.map(String):[]}catch{return []}})());
+    const existing=[];
+    for(const row of (cloud.data||[])){
+      if(tombstones.has(String(row.id))){
+        try{const del=await client.from("nexorawildfire_areas").delete().eq("id",row.id);if(!del.error)tombstones.delete(String(row.id));else console.warn("Deleted area remains queued",row.id)}catch(e){console.warn("Deleted area remains queued",e)}
+      }else existing.push(row);
+    }
+    try{localStorage.setItem(AREA_TOMBSTONES_KEY,JSON.stringify([...tombstones]))}catch{}
+    const valid=existing.map(a=>({id:String(a.id),name:a.name,type:a.area_type==="field"?"çiftçi":a.area_type==="apiary"?"arıcı":a.area_type==="forest"?"orman":"genel",province:a.province||"",district:a.district||"",coordinates:a.coordinates||[],createdAt:a.created_at,updatedAt:a.updated_at}));
     const known=new Set(existing.map(a=>String(a.name)+"|"+JSON.stringify(a.coordinates)));
     for(const a of local){const key=String(a.name)+"|"+JSON.stringify(a.coordinates);if(!known.has(key)&&Array.isArray(a.coordinates)&&a.coordinates.length>=3){const c=a.coordinates.reduce((z,p)=>[z[0]+Number(p[0]),z[1]+Number(p[1])],[0,0]);const type=a.type?.includes("arı")?"apiary":a.type?.includes("orman")?"forest":a.type?.includes("çift")?"field":"other";const ins=await client.from("nexorawildfire_areas").insert({user_id:session.user.id,name:a.name,area_type:type,province:a.province||null,district:a.district||null,coordinates:a.coordinates,center_lat:c[0]/a.coordinates.length,center_lon:c[1]/a.coordinates.length}).select().single();if(!ins.error)valid.push({id:String(ins.data.id),name:a.name,type:a.type,province:a.province||"",district:a.district||"",coordinates:a.coordinates,createdAt:ins.data.created_at,updatedAt:ins.data.updated_at})}}
     localStorage.setItem(AREA_KEY,JSON.stringify(valid));
