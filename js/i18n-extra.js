@@ -58,7 +58,14 @@
  const toEn=new Map(pairs), toTr=new Map(pairs.map(([a,b])=>[b,a]));
  const originals=new WeakMap();
  const attributeOriginals=new WeakMap();
- function lang(){return document.documentElement.dataset.language || (localStorage.getItem("nexorawildfire-language-v1")||"en")}
+ function lang(){
+   if(document.documentElement.dataset.language) return document.documentElement.dataset.language;
+   try {
+     const saved=localStorage.getItem("nexorawildfire-language-v1");
+     if(saved==="en"||saved==="tr") return saved;
+   } catch {}
+   return /^en(?:-|$)/i.test(document.documentElement.lang) ? "en" : "tr";
+ }
  function translate(root=document.body){
    const en=lang()==="en", dict=en?toEn:toTr;
    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
@@ -67,6 +74,7 @@
    root.querySelectorAll?.("[placeholder],[title],[aria-label]").forEach(el=>{let saved=attributeOriginals.get(el);if(!saved){saved={};attributeOriginals.set(el,saved)}for(const attr of ["placeholder","title","aria-label"]){if(!el.hasAttribute(attr))continue;if(!(attr in saved))saved[attr]=el.getAttribute(attr);const orig=saved[attr];if(dict.has(orig))el.setAttribute(attr,dict.get(orig));}});
  }
  document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))requestAnimationFrame(()=>translate());},true);
+ window.addEventListener("nexora:languagechange", () => translate());
  const observer=new MutationObserver(records=>{if(lang()!=="en")return;records.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===Node.ELEMENT_NODE)translate(n);else if(n.nodeType===Node.TEXT_NODE)translate(n.parentElement||document.body)}))});
  observer.observe(document.body,{childList:true,subtree:true});
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>translate(),{once:true});else translate();
