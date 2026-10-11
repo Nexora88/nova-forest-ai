@@ -1,7 +1,7 @@
 /* Accessible, bilingual navigation shared by every NexoraWildfire page. */
 (() => {
   function initNavigation() {
-    document.querySelectorAll("body > nav").forEach((nav, index) => {
+    document.querySelectorAll('body > nav:not([aria-label="Personal workspace shortcuts"])').forEach((nav, index) => {
       if (nav.dataset.nxReady === "true") return;
       nav.dataset.nxReady = "true";
       nav.classList.add("nx-nav");
