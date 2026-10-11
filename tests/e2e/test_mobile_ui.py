@@ -374,7 +374,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
             fail_weather["value"] = True
             page.locator("#atmo-refresh").click()
-            page.wait_for_function("document.querySelector('#atmo-provider-status')?.textContent.includes('PROVIDER UNAVAILABLE')", timeout=5000)
+            page.wait_for_function("document.querySelector('#atmo-provider-status')?.dataset.state === 'error'", timeout=5000)
             self.assertEqual(page.locator("#atmo-score").inner_text(), "—", "stale risk score must clear after a failed refresh")
         finally:
             context.close()
