@@ -34,7 +34,7 @@ const APP_SHELL = [
   "./js/dashboard.js",
   "./js/role-dashboard.js?v=20261011b",
   "./js/map.js?v=20261011b",
-  "./js/i18n.js?v=20261011h",
+  "./js/i18n.js?v=20261011i",
   "./js/i18n-extra.js?v=20261011c",
   "./js/asset-guard.js?v=20261011b",
   "./js/auth.js?v=20261011d",
