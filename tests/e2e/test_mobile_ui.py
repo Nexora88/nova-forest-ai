@@ -248,15 +248,11 @@ class MobileUiSmokeTests(unittest.TestCase):
                 """)
                 page = context.new_page()
 
-        fail_weather = {"value": False}
                 def route_request(route):
                     url = route.request.url
                     if url.startswith(BASE) or url.startswith("https://cdn.jsdelivr.net/npm/leaflet@1.9.4/"):
                         route.continue_()
                     elif "api.open-meteo.com/v1/forecast" in url:
-                if fail_weather["value"]:
-                    route.fulfill(status=503, content_type="application/json", body="{}")
-                    return
                         route.fulfill(json={"current":{"temperature_2m":25,"relative_humidity_2m":48,"wind_speed_10m":8,"precipitation":0,"soil_moisture_0_to_7cm":0.24,"vapour_pressure_deficit":1.1},"daily":{"time":["2026-10-10"],"et0_fao_evapotranspiration":[3.1],"precipitation_sum":[0]}})
                     elif "air-quality-api.open-meteo.com" in url:
                         route.fulfill(json={"current":{"alder_pollen":0,"birch_pollen":0,"grass_pollen":0,"mugwort_pollen":0,"olive_pollen":0,"ragweed_pollen":0}})
@@ -316,11 +312,15 @@ class MobileUiSmokeTests(unittest.TestCase):
         context = self.browser.new_context(viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
         page = context.new_page()
 
+        fail_weather = {"value": False}
         def route_request(route):
             url = route.request.url
             if url.startswith(BASE):
                 route.continue_()
             elif "api.open-meteo.com/v1/forecast" in url:
+                if fail_weather["value"]:
+                    route.fulfill(status=503, content_type="application/json", body="{}")
+                    return
                 from datetime import datetime, timedelta
                 now = datetime.now().replace(minute=0, second=0, microsecond=0)
                 recent = (now - timedelta(hours=24)).strftime("%Y-%m-%dT%H:00")
