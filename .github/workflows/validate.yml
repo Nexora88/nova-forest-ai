@@ -124,31 +124,18 @@ jobs:
   deployed-ml-smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify dedicated Railway ML service health and model configuration
+      - name: Verify Railway service health without requiring a removed AGPL detector
         run: |
           python - <<'PY'
           import json
           import urllib.request
 
           base = "https://nexorawildfire-ml-production.up.railway.app"
-          def get_json(path):
-              request = urllib.request.Request(base + path, headers={"Accept": "application/json"})
-              with urllib.request.urlopen(request, timeout=30) as response:
-                  if response.status != 200:
-                      raise SystemExit(f"{path} returned HTTP {response.status}")
-                  return json.load(response)
-
-          health = get_json("/health")
+          request = urllib.request.Request(base + "/health", headers={"Accept": "application/json"})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              health = json.load(response)
           if health.get("status") != "healthy":
-              raise SystemExit(f"ML health response is not healthy: {health}")
-
-          model = get_json("/ml/yolo/status")
-          if model.get("runtime_available") is not True:
-              raise SystemExit(f"YOLO runtime is unavailable: {model.get('status')}")
-          if model.get("status") not in {"configured_not_loaded", "loaded"}:
-              raise SystemExit(f"YOLO model source is not configured: {model.get('status')}")
-          print("Railway ML health: healthy")
-          print("YOLO runtime: available")
-          print("Checkpoint status:", model.get("status"))
-          print("Configured source:", model.get("source", "not loaded yet"))
+              raise SystemExit(f"ML service is not healthy: {health}")
+          print("Railway ML service health: healthy")
+          print("Fire/smoke inference remains intentionally disabled until a license-compatible model is validated.")
           PY
