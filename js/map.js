@@ -129,14 +129,18 @@ function weatherRow(name,area,w,pollen=0,lat=null,lon=null){const risk=riskScore
 async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(rows.map(async r=>{if(r.lat!=null&&r.lon!=null)r.pollen=await pollenAt(r.lat,r.lon);r.bee=beeScore(r.w,r.pollen)}))}
 async function loadProvinceData(){
  try{
-  const gj=await fetch(provincePath).then(x=>x.json());
+  const gj=await fetch(provincePath).then(x=>{if(!x.ok)throw new Error("province_geojson_unavailable");return x.json()});
   provinceFeatures=(gj.features||[]);
-  const activeNames=provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>norm((f.properties||{}).il_adi));const ws=await weatherFor(provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>coords(f.geometry)));
-  provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
+  const activeFeatures=provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi)));
+  const ws=await weatherFor(activeFeatures.map(f=>coords(f.geometry)));
+  weatherLive=ws.some(item=>item?.current&&item.current.time);
+  const weatherByProvince=new Map(activeFeatures.map((f,i)=>[norm((f.properties||{}).il_adi),ws[i]||null]));
+  provinceRows=provinceFeatures.map(f=>{const p=f.properties||{},supported=ACTIVE_PROVINCES.has(norm(p.il_adi)),record=weatherByProvince.get(norm(p.il_adi)),cur=record?.current||{},daily=record?.daily||{};const metric=v=>v===null||v===undefined||v===""||!Number.isFinite(Number(v))?null:Number(v);const w={t:metric(cur.temperature_2m),h:metric(cur.relative_humidity_2m),wind:metric(cur.wind_speed_10m),soil:metric(cur.soil_moisture_0_to_7cm),et0:metric(daily.et0_fao_evapotranspiration?.[0]),vpd:metric(cur.vapour_pressure_deficit),precip:metric(cur.precipitation)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),supported?w:{t:null,h:null,wind:null,soil:null,et0:null,vpd:null,precip:null},null,cc[0],cc[1])});
   await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
   localStorage.setItem("nexorawildfire-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));
-  setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
+  setStatus(weatherLive?"CANLI • "+activeFeatures.length+" DESTEKLENEN İL • "+mode.toUpperCase():"VERİ EKSİK • CANLI GÖZLEM DOĞRULANAMADI");
  }catch(e){
+  weatherLive=false;
   try{
    const cached=JSON.parse(localStorage.getItem("nexorawildfire-map-cache-v1")||"null");
    if(cached?.rows?.length){provinceRows=cached.rows;drawProvinces();setStatus("ÇEVRİMDIŞI • SON GEÇERLİ VERİ • "+new Date(cached.savedAt).toLocaleString("tr-TR"))}
