@@ -1,11 +1,11 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
-    ["LIVE TELEMETRY","CANLI TELEMETRİ"],
-    ["MODEL EVIDENCE","MODEL KANITLARI"],
-    ["FIELD SAFETY / SIMULATION","SAHA GÜVENLİĞİ / SİMÜLASYON"],
-    ["POST-FIRE / RESTORATION INTELLIGENCE","YANGIN SONRASI / REHABİLİTASYON İSTİHBARATI"],
-    ["NOVA-ALERT / EARLY WARNING","NOVA-ALERT / ERKEN UYARI"],
+    ["CANLI TELEMETRİ","LIVE TELEMETRY"],
+    ["MODEL KANITLARI","MODEL EVIDENCE"],
+    ["SAHA GÜVENLİĞİ / SİMÜLASYON","FIELD SAFETY / SIMULATION"],
+    ["YANGIN SONRASI / REHABİLİTASYON İSTİHBARATI","POST-FIRE / RESTORATION INTELLIGENCE"],
+    ["NOVA-ALERT / ERKEN UYARI","NOVA-ALERT / EARLY WARNING"],
     ["Kırsal Erken Uyarı Durumu","Rural Early Warning Status"],
     ["Yapay Zeka Model Kanıtı","AI Model Evidence"],
     ["Akıllı Tahliye ve Kaçış Koridoru","Smart Evacuation and Escape Corridor"],
