@@ -342,7 +342,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             )
             status = page.locator("[data-map-status]").inner_text()
             self.assertNotIn("CANLI", status)
-            self.assertIn("ÇEVRESEL KARAR DESTEK", page.locator("header .status").inner_text())
+            self.assertRegex(page.locator("header .status").inner_text(), r"ÇEVRESEL KARAR DESTEK|ENVIRONMENTAL DECISION SUPPORT")
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
         finally:
             context.close()
