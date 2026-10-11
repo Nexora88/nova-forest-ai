@@ -36,14 +36,14 @@
   <h2 data-tr="Atmosfer ve Yangın Risk Laboratuvarı" data-en="Atmosphere & Wildfire Risk Lab">Atmosfer ve Yangın Risk Laboratuvarı</h2>
   <p data-tr="Gerçek meteoroloji gözlemlerini şeffaf bir kural tabanlı göstergeyle birleştir. Senaryolar araştırma amaçlıdır; resmî yangın uyarısı veya doğrulanmış yangın yayılım tahmini değildir." data-en="Combine real meteorological observations with a transparent rule-based indicator. Scenarios are for research; they are not official fire warnings or validated fire-spread forecasts.">Gerçek meteoroloji gözlemlerini şeffaf bir kural tabanlı göstergeyle birleştir. Senaryolar araştırma amaçlıdır; resmî yangın uyarısı veya doğrulanmış yangın yayılım tahmini değildir.</p>
   <div class="atmo-toolbar">
-    <label for="atmo-region" data-tr="Analiz noktası" data-en="Analysis location">Analiz noktası
+    <label for="atmo-region"><span data-tr="Analiz noktası" data-en="Analysis location">Analiz noktası</span>
       <select id="atmo-region"><option value="edirne" data-tr="Edirne / Türkiye" data-en="Edirne / Türkiye">Edirne / Türkiye</option><option value="canakkale" data-tr="Çanakkale / Türkiye" data-en="Çanakkale / Türkiye">Çanakkale / Türkiye</option><option value="queensland" data-tr="Queensland / Avustralya" data-en="Queensland / Australia">Queensland / Avustralya</option><option value="california" data-tr="Kaliforniya / ABD" data-en="California / USA">Kaliforniya / ABD</option></select>
     </label>
     <button id="atmo-refresh" type="button" data-tr="Veriyi yenile" data-en="Refresh data">Veriyi yenile</button>
     <span id="atmo-updated" data-tr="Henüz veri alınmadı" data-en="No data retrieved yet">Henüz veri alınmadı</span>
   </div>
 </section>
-<section class="atmo-metrics" aria-label="Meteoroloji ölçümleri">
+<section class="atmo-metrics" aria-label="Meteoroloji ölçümleri" data-tr-aria-label="Meteoroloji ölçümleri" data-en-aria-label="Weather metrics">
   <article class="atmo-card"><span data-tr="SICAKLIK" data-en="TEMPERATURE">SICAKLIK</span><strong id="atmo-temp">—</strong><small id="atmo-temp-meta">Open-Meteo</small></article>
   <article class="atmo-card"><span data-tr="BAĞIL NEM" data-en="RELATIVE HUMIDITY">BAĞIL NEM</span><strong id="atmo-humidity">—</strong><small id="atmo-humidity-meta">Open-Meteo</small></article>
   <article class="atmo-card"><span data-tr="RÜZGÂR HIZI" data-en="WIND SPEED">RÜZGÂR HIZI</span><strong id="atmo-wind">—</strong><small id="atmo-wind-meta">Open-Meteo</small></article>
