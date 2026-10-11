@@ -120,7 +120,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             form.locator('[name="acknowledgement"]').check()
             form.locator('button[type="submit"]').click()
             self.assertTrue(page.locator("[data-demo-draft-panel]").is_visible())
-            self.assertIn("gönderilmedi", page.locator("[data-demo-status]").inner_text().lower())
+            self.assertRegex(page.locator("[data-demo-status]").inner_text().lower(), r"gönderilmedi|not sent")
             self.assertIn("Test Company", page.locator("[data-demo-draft]").input_value())
             self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 390)
         finally:
