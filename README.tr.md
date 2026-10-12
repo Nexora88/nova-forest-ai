@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI" width="120"></p>
+
 # NexoraWildfire AI
 
 **Ormanlar, tarlalar ve onlara bağlı yaşam için çevresel istihbarat.**
@@ -5,6 +7,28 @@
 NexoraWildfire AI, Nexora tarafından geliştirilen bağımsız bir çevresel karar destek projesidir. Mevcut hava durumu, uydu sahnesi keşfi, yangın farkındalığı, tarım, toprak ve su, arıcılık, polen ve ekosistem gözlemlerini harita merkezli bir çalışma alanında bir araya getirmeyi amaçlar. İlk pilot bölge **Trakya, Türkiye**'dir.
 
 [English README](README.md) · [AI destekli geliştirme beyanı](AI_ASSISTED_DEVELOPMENT.md) · [Küresel mimari notları](docs/GLOBAL_SCALABILITY.md) · [Katkı rehberi](.github/CONTRIBUTING.md)
+
+
+## Saha görüntüsünden incelenebilir kanıta
+
+İlk pilot alan Trakya, Türkiye'dir. Amaç, bağlantı zayıfken bile görüntüleri inceleyebilmek; ancak kural tabanlı bir göstergiyi doğrulanmış yangın tespiti gibi sunmamaktır.
+
+```mermaid
+flowchart TD
+    A[İHA / saha kamerası görüntüsü] --> B[Tarayıcıda yerel görüntü laboratuvarı]
+    B --> C[RGB histogramı ve renk istatistikleri]
+    B --> D[Varsa EXIF GPS]
+    B --> E[Kontrast / gri ton / Sobel]
+    C --> F[İnsan incelemesi]
+    D --> G[Fotoğraf konumunu haritada göster]
+    E --> F
+    F --> H[İsteğe bağlı arındırılmış JSON raporu]
+    H --> I[Açık onayla buluta aktarım]
+```
+
+**Araştırma durumu:** RGB istatistikleri ve Sobel filtreleri yerel görüntü işleme araçlarıdır; eğitilmiş yangın/duman tespit modeli değildir. EXIF koordinatı, fotoğrafın kaydedilmiş konumunu gösterir; yangının başladığı yeri kanıtlamaz. Kaynak fotoğraf tarayıcı laboratuvarında kalır. İsteğe bağlı [Google Cloud rapor aktarım demosu](docs/CLOUD_INTEGRATION_DEMO.md) yalnızca açık komut satırı onayından sonra arındırılmış JSON raporunu yükler.
+
+Sunum anlatımı, model/lisans koşulları, çevrimdışı kullanım sınırları ve sorumlu İHA/gözetleme kamerası yol haritası için [Yarışma ve Araştırma Dosyası](docs/COMPETITION_PITCH.md) belgesine bakın.
 
 ## Vizyon
 
@@ -28,6 +52,8 @@ Proje, Mustafa Kemal Atatürk'ün bilim, üretim ve toplumsal faydaya verdiği �
 - **Uydu sahnesi keşfi:** Bitki örtüsü ve arazi gözlemi iş akışlarını desteklemek üzere tasarlanmıştır.
 - **Mobil uyumlu, yüklenebilir web uygulaması:** Çevrimdışı öncelikli uygulama kabuğu ve yerel kayıtlı alan deneyimi.
 - **Türkçe ve İngilizce arayüz:** İlk dil, tarayıcı diline göre seçilir (Türkçe tarayıcılarda Türkçe, diğerlerinde İngilizce).
+- **Yarışma sunumu ve araştırma anlatısı:** [Yarışma ve Araştırma Dosyası](docs/COMPETITION_PITCH.md).
+- **İsteğe bağlı, gizlilik odaklı bulut aktarımı:** [Google Cloud rapor aktarım demosu](docs/CLOUD_INTEGRATION_DEMO.md).
 - **İHA / görüntü laboratuvarı:** AGPL-3.0 lisanslı algılama çalışma zamanı ve model kaldırıldığı için yangın/duman çıkarımı şimdilik devre dışıdır. Yalnızca MIT lisanslama hedefiyle uyumlu bir model seçilip etiketli bölgesel verilerle bağımsız doğrulama yapıldıktan sonra yeniden etkinleştirilebilir.
 
 ## Mevcut kapsam ve kanıt
