@@ -1,0 +1,2 @@
+# Optional dependency for the explicit metadata-only Google Cloud Storage export demo.
+google-cloud-storage>=2.16,<4
