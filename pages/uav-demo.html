@@ -138,6 +138,7 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
  let objectUrl=null, original=null, activeFile=null, gps=null, imageReady=false;
  const $=id=>document.getElementById(id);
  const setText=(id,text)=>$(id).textContent=text;
+ const setLocalized=(id,trText,enText)=>{const el=$(id);el.dataset.uavTr=trText;el.dataset.uavEn=enText;el.textContent=lang()==="en"?enText:trText;};
  const drawEmpty=(canvas,ctx,label)=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#8aa493";ctx.font="16px system-ui";ctx.textAlign="center";ctx.fillText(label,canvas.width/2,canvas.height/2);};
  drawEmpty(histogram,hctx,tr("Görüntü bekleniyor","Waiting for image"));
  drawEmpty(filtered,fctx,tr("Filtre önizlemesi","Filter preview"));
@@ -183,7 +184,7 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
   draw(binsR,"#ff5454");draw(binsG,"#40f28b");draw(binsB,"#55aaff");hctx.fillStyle="#a9c2b1";hctx.font="12px system-ui";hctx.fillText("0",pad,h-12);hctx.fillText("128",w/2-10,h-12);hctx.fillText("255",w-pad-20,h-12);hctx.fillStyle="#ff7777";hctx.fillText("R",pad+10,14);hctx.fillStyle="#4aff91";hctx.fillText("G",pad+30,14);hctx.fillStyle="#72b6ff";hctx.fillText("B",pad+50,14);
   setText("smoke-share",(pale/Math.max(total,1)*100).toFixed(1)+"%");setText("fire-share",(red/Math.max(total,1)*100).toFixed(1)+"%");
   const note=pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?tr("Renk eşiği aşımı görüldü. Bu yalnızca piksel istatistiğidir; duman/yangın tespiti değildir.","Color thresholds were exceeded. This is a pixel statistic only, not smoke/fire detection."):tr("Bu eşiklerde belirgin renk anomalisi görünmüyor. Bu, yangın olmadığı anlamına gelmez.","No strong color anomaly at these thresholds. This does not mean there is no fire.");
-  setText("heuristic-message",note);
+  setLocalized("heuristic-message",pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?"Renk eşiği aşımı görüldü. Bu yalnızca piksel istatistiğidir; duman/yangın tespiti değildir.":"Bu eşiklerde belirgin renk anomalisi görünmüyor. Bu, yangın olmadığı anlamına gelmez.",pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?"Color thresholds were exceeded. This is a pixel statistic only, not smoke/fire detection.":"No strong color anomaly at these thresholds. This does not mean there is no fire.");
  }
  function applyFilter(mode){
   if(!original)return;
@@ -197,39 +198,40 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
  }
  function showGPS(value){
   gps=value;const box=$("gps-result"),mapLink=$("open-map"),osm=$("open-osm");
-  if(!value){box.classList.add("visible");box.textContent=tr("Bu JPEG dosyasında okunabilir EXIF GPS koordinatı bulunamadı. GPS bilgisi olmayan dosyalarda koordinat üretilmez.","No readable EXIF GPS coordinates were found in this JPEG. Coordinates are never invented when metadata is absent.");mapLink.style.display=osm.style.display="none";return;}
-  box.classList.add("visible");box.textContent=tr("EXIF koordinatı: ","EXIF coordinates: ")+value.lat.toFixed(6)+", "+value.lon.toFixed(6)+(value.altitude===null?"":" · "+tr("yükseklik ","altitude ")+value.altitude.toFixed(1)+" m");
+  if(!value){box.classList.add("visible");setLocalized("gps-result","Bu JPEG dosyasında okunabilir EXIF GPS koordinatı bulunamadı. GPS bilgisi olmayan dosyalarda koordinat üretilmez.","No readable EXIF GPS coordinates were found in this JPEG. Coordinates are never invented when metadata is absent.");mapLink.style.display=osm.style.display="none";return;}
+  box.classList.add("visible");const coords=value.lat.toFixed(6)+", "+value.lon.toFixed(6);setLocalized("gps-result","EXIF koordinatı: "+coords+(value.altitude===null?"":" · yükseklik "+value.altitude.toFixed(1)+" m"),"EXIF coordinates: "+coords+(value.altitude===null?"":" · altitude "+value.altitude.toFixed(1)+" m"));
   mapLink.href="../pages/map.html?lat="+encodeURIComponent(value.lat)+"&lon="+encodeURIComponent(value.lon)+"&source=exif";mapLink.style.display="inline-flex";
   osm.href="https://www.openstreetmap.org/?mlat="+encodeURIComponent(value.lat)+"&mlon="+encodeURIComponent(value.lon)+"#map=15/"+value.lat+"/"+value.lon;osm.style.display="inline-flex";
  }
  input.addEventListener("change",async()=>{
   const file=input.files&&input.files[0];imageReady=false;enableFilters(false);original=null;activeFile=file||null;gps=null;$("gps-result").classList.remove("visible");$("open-map").style.display=$("open-osm").style.display="none";
   if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}preview.classList.remove("visible");preview.removeAttribute("src");
-  if(!file){msg.textContent=tr("Henüz görüntü seçilmedi.","No image selected yet.");return;}
-  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){msg.textContent=tr("JPG, PNG veya WebP seç.","Choose JPG, PNG, or WebP.");return;}
-  if(file.size>20*1024*1024){msg.textContent=tr("Dosya 20 MB sınırını aşıyor.","The file exceeds the 20 MB limit.");return;}
+  if(!file){setLocalized("image-message","Henüz görüntü seçilmedi.","No image selected yet.");return;}
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){setLocalized("image-message","JPG, PNG veya WebP seç.","Choose JPG, PNG, or WebP.");return;}
+  if(file.size>20*1024*1024){setLocalized("image-message","Dosya 20 MB sınırını aşıyor.","The file exceeds the 20 MB limit.");return;}
   objectUrl=URL.createObjectURL(file);preview.onload=async()=>{
    try{
     const scale=Math.min(1,900/Math.max(preview.naturalWidth,preview.naturalHeight));off.width=Math.max(1,Math.round(preview.naturalWidth*scale));off.height=Math.max(1,Math.round(preview.naturalHeight*scale));octx.drawImage(preview,0,0,off.width,off.height);original=octx.getImageData(0,0,off.width,off.height);imageReady=true;
     setText("file-name",file.name);setText("file-dimensions",preview.naturalWidth+" × "+preview.naturalHeight+" px");setText("file-size",formatBytes(file.size));setText("file-type",file.type);preview.classList.add("visible");
-    renderHistogram(original.data);applyFilter("original");enableFilters(true);msg.textContent=tr("Görüntü cihazda okundu ve yerel olarak analiz edildi. Dosya sunucuya gönderilmedi.","Image read and analysed locally. The file was not uploaded.");
+    renderHistogram(original.data);applyFilter("original");enableFilters(true);setLocalized("image-message","Görüntü cihazda okundu ve yerel olarak analiz edildi. Dosya sunucuya gönderilmedi.","Image read and analysed locally. The file was not uploaded.");
     showGPS(await parseExifGPS(file));
-   }catch(error){msg.textContent=tr("Bu görüntü cihaz belleğinde işlenemedi. Daha küçük bir dosya dene.","This image could not be processed in device memory. Try a smaller file.");}
+   }catch(error){setLocalized("image-message","Bu görüntü cihaz belleğinde işlenemedi. Daha küçük bir dosya dene.","This image could not be processed in device memory. Try a smaller file.");}
   };
-  preview.onerror=()=>{msg.textContent=tr("Görüntü dosyası okunamadı.","Could not read image file.");};
+  preview.onerror=()=>{setLocalized("image-message","Görüntü dosyası okunamadı.","Could not read image file.");};
   preview.src=objectUrl;
  });
  $("filter-original").addEventListener("click",()=>applyFilter("original"));$("filter-contrast").addEventListener("click",()=>applyFilter("contrast"));$("filter-gray").addEventListener("click",()=>applyFilter("gray"));$("filter-sobel").addEventListener("click",()=>applyFilter("sobel"));
  const apiButton=$("check-api"),apiChip=$("api-chip"),apiStatus=$("api-status");
  apiButton.addEventListener("click",async()=>{
-  apiButton.disabled=true;apiButton.textContent=tr("Kontrol ediliyor…","Checking…");apiChip.className="lab-chip";apiChip.textContent=tr("Kontrol ediliyor","Checking");
+  apiButton.disabled=true;apiButton.textContent=tr("Kontrol ediliyor…","Checking…");apiChip.className="lab-chip";setLocalized("api-chip","Kontrol ediliyor","Checking");
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
-  try{const response=await fetch(API_BASE+"/health",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);const data=await response.json();if(data.status!=="healthy")throw new Error("Unexpected health response");apiChip.className="lab-chip ok";apiChip.textContent=tr("API erişilebilir","API reachable");apiStatus.textContent=tr("Servis sağlık yanıtı alındı. Bu, modelin etkinliğini veya doğruluğunu kanıtlamaz.","Service health response received. This does not prove model availability or accuracy.")+" · "+(data.version||"version unavailable");}
-  catch(error){apiChip.className="lab-chip error";apiChip.textContent=tr("Doğrulanamadı","Unverified");apiStatus.textContent=tr("Tarayıcı yanıtı okuyamadı; ağ veya CORS engeli olabilir. Bu tek başına servisin kapalı olduğunu kanıtlamaz.","The browser could not read the response; network or CORS may be involved. This alone does not prove the service is down.")+" "+String(error&&error.message||error);const a=document.createElement("a");a.href=API_BASE+"/health";a.target="_blank";a.rel="noopener noreferrer";a.textContent=tr("Uç noktayı aç","Open endpoint");apiStatus.append(" ",a);}
+  try{const response=await fetch(API_BASE+"/health",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);const data=await response.json();if(data.status!=="healthy")throw new Error("Unexpected health response");apiChip.className="lab-chip ok";setLocalized("api-chip","API erişilebilir","API reachable");const version=" · "+(data.version||"version unavailable");setLocalized("api-status","Servis sağlık yanıtı alındı. Bu, modelin etkinliğini veya doğruluğunu kanıtlamaz."+version,"Service health response received. This does not prove model availability or accuracy."+version);}
+  catch(error){apiChip.className="lab-chip error";setLocalized("api-chip","Doğrulanamadı","Unverified");const err=" "+String(error&&error.message||error);setLocalized("api-status","Tarayıcı yanıtı okuyamadı; ağ veya CORS engeli olabilir. Bu tek başına servisin kapalı olduğunu kanıtlamaz."+err,"The browser could not read the response; network or CORS may be involved. This alone does not prove the service is down."+err);const a=document.createElement("a");a.href=API_BASE+"/health";a.target="_blank";a.rel="noopener noreferrer";a.textContent=tr("Uç noktayı aç","Open endpoint");apiStatus.append(" ",a);}
   finally{clearTimeout(timer);apiButton.disabled=false;apiButton.textContent=tr("API bağlantısını kontrol et","Check API connection");}
  });
  function applyLanguage(){
-  const language=lang();document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el=>{if(!["api-chip","api-status","image-message","heuristic-message","gps-result"].includes(el.id))el.textContent=language==="en"?el.dataset.uavEn:el.dataset.uavTr;});
+  const language=lang();document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el=>{el.textContent=language==="en"?el.dataset.uavEn:el.dataset.uavTr;});
+  if(imageReady && $("gps-result").classList.contains("visible")) showGPS(gps);
   document.title=tr("İHA Görüntü Laboratuvarı · NexoraWildfire AI","UAV Image Lab · NexoraWildfire AI");
   if(!imageReady){drawEmpty(histogram,hctx,tr("Görüntü bekleniyor","Waiting for image"));drawEmpty(filtered,fctx,tr("Filtre önizlemesi","Filter preview"));}
  }
