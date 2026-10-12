@@ -16,6 +16,7 @@
   function installConnectivity() {
     const header = document.querySelector("body > header");
     if (!header || header.querySelector(".nx-device-status")) return;
+    const brandLine = header.querySelector(".brand-lockup .logo p, .logo p");
     const chip = document.createElement("div");
     chip.className = "nx-device-status";
     chip.setAttribute("role", "status");
@@ -23,6 +24,7 @@
     chip.innerHTML = '<span class="nx-device-dot" aria-hidden="true"></span><span class="nx-device-label"></span>';
     header.appendChild(chip);
     const paint = () => {
+      if (brandLine && header.querySelector("h1")?.textContent.includes("NexoraWildfire")) brandLine.textContent = inEnglish() ? "Environmental Intelligence" : "Çevresel Zekâ";
       chip.querySelector(".nx-device-label").textContent = navigator.onLine
         ? (inEnglish() ? "Device active · Internet connected" : "Cihaz aktif · İnternet bağlı")
         : (inEnglish() ? "Device active · Offline" : "Cihaz aktif · Çevrimdışı");
