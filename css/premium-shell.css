@@ -88,3 +88,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .nexora-language-toggle{left:14px!important;right:auto!important;bottom:14px!important;min-height:42px!important;padding:10px 14px!important;border:1px solid #28e77e!important;background:#07150c!important;color:#dfffea!important;box-shadow:0 8px 28px #0009!important;z-index:1200!important}
 .nx-install-button,.install-app-button,.pwa-install-button{right:14px;left:auto;bottom:14px;max-width:calc(100vw - 100px)}
 @media(max-width:760px){.nexora-language-toggle{left:12px!important;bottom:12px!important}.nx-install-button,.install-app-button,.pwa-install-button{right:12px;bottom:12px;max-width:calc(100vw - 112px)}}
+
+/* Account/profile surfaces inherit the same enterprise design language. */
+.ops-main{width:min(1440px,100%);padding:clamp(14px,3vw,38px)!important}
+.ops-hero,.ops-panel,.ops-metric{box-shadow:0 14px 42px #0002}
+.ops-user{border-color:#2c6240!important;background:linear-gradient(140deg,#0b1d11,#040906)!important;border-radius:18px!important}
+.ops-user h3{font-size:clamp(18px,2vw,25px)!important}
+.ops-user .nova-avatar-fallback,.ops-user img{border:2px solid #2ae77d!important;border-radius:50%!important;box-shadow:0 0 0 6px #20e87913}
+.ops-metric strong{color:#dfffea!important}
+.ops-chip{font-family:Inter,system-ui,sans-serif!important}
+@media(max-width:760px){.ops-hero{grid-template-columns:minmax(0,1fr)!important}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ops-user{align-items:flex-start}.ops-user>div{min-width:0}}
