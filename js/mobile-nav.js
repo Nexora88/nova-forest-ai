@@ -22,9 +22,9 @@
       nav.classList.add("nx-nav");
       nav.setAttribute("aria-label", lang === "en" ? "Main navigation" : "Ana gezinme");
       entries.forEach(([path,tr,en]) => {
-        const target = inPages ? path.replace(/^pages\//, "") : path;
+        const target = inPages ? (path === "index.html" ? "../index.html" : path.replace(/^pages\//, "")) : path;
         const link = document.createElement("a");
-        link.href = prefix + target;
+        link.href = target;
         link.textContent = lang === "en" ? en : tr;
         const page = path.split("/").pop();
         if (page === current || (current === "" && page === "index.html")) {
