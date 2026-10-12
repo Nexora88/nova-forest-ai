@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#020303">
-<meta name="description" content="NexoraWildfire AI UAV image lab: local image inspection, API health checks, model readiness and scientific transparency.">
+<meta name="description" content="NexoraWildfire AI — çevrimdışı İHA görüntü analizi, RGB histogramı, EXIF GPS ve görüntü filtreleri.">
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="icon" type="image/png" href="../assets/nexora-wildfire-logo.png">
 <link rel="apple-touch-icon" href="../assets/nexora-wildfire-logo.png">
@@ -13,218 +13,234 @@
 <link rel="stylesheet" href="../css/product-ui.css?v=20261012a">
 <link rel="stylesheet" href="../css/special-days.css?v=20261008a">
 <link rel="stylesheet" href="../css/auth.css?v=20261008a">
-<title>İHA / Görüntü Laboratuvarı · NexoraWildfire AI</title>
+<title>İHA Görüntü Laboratuvarı · NexoraWildfire AI</title>
 <style>
-:root{--lab-bg:#030806;--lab-panel:rgba(7,17,11,.9);--lab-line:#1d5130;--lab-green:#00ff66;--lab-cyan:#00d9ff;--lab-muted:#9bb0a1;--lab-amber:#ffcb66}
-body{background:radial-gradient(ellipse at 50% -15%,#123b26 0,transparent 46%),#020504;color:#e9f7ed;font-family:Inter,system-ui,-apple-system,sans-serif}
-header{padding:22px clamp(16px,4vw,44px);gap:16px;flex-wrap:wrap}
+:root{--lab-bg:#030806;--lab-panel:#07110b;--lab-line:#1d5130;--lab-green:#00ff66;--lab-cyan:#00d9ff;--lab-muted:#9bb0a1;--lab-amber:#ffcb66}
+body{background:radial-gradient(ellipse at 50% -15%,#123b26 0,transparent 46%),#020504;color:#e9f7ed}
+header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
 .brand-lockup{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;min-width:0}
 .brand-lockup img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 12px #00ff6633)}
 .brand-lockup h1{font-size:clamp(17px,2.6vw,25px);letter-spacing:1px!important;overflow-wrap:anywhere}
 .brand-lockup p{font-size:12px!important;margin:5px 0 0;line-height:1.45}
-.lab-shell{width:min(1120px,100%);margin:0 auto;padding:clamp(16px,3vw,32px)}
-.lab-hero{position:relative;overflow:hidden;border:1px solid #1b5732;border-radius:24px;padding:clamp(22px,4vw,42px);background:linear-gradient(120deg,#0c2518ed,#07110df2 65%,#071a1c);box-shadow:0 20px 70px #0006}
-.lab-hero:after{content:"";position:absolute;width:280px;height:280px;right:-100px;top:-120px;border:1px solid #00ff662b;border-radius:50%;box-shadow:0 0 0 28px #00ff6608,0 0 0 58px #00ff6606;pointer-events:none}
-.eyebrow{font-size:10px;letter-spacing:2px;color:var(--lab-green);font-weight:800}
-.lab-hero h2{font-size:clamp(28px,5vw,48px);line-height:1.08;max-width:780px;margin:13px 0}
-.lab-hero p{max-width:760px;color:#b7cbbd;line-height:1.8}
-.lab-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
-.lab-btn,.lab-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:11px 15px;border:1px solid #2b6340;border-radius:11px;background:#0a1a10;color:#e9ffef;font:600 13px system-ui;text-decoration:none;cursor:pointer}
+.lab-shell{width:min(1180px,100%);margin:0 auto;padding:clamp(14px,3vw,32px)}
+.lab-hero{position:relative;overflow:hidden;border:1px solid #1b5732;border-radius:22px;padding:clamp(22px,4vw,42px);background:linear-gradient(120deg,#0c2518ed,#07110df2 65%,#071a1c);box-shadow:0 20px 70px #0006}
+.eyebrow{font-size:10px;letter-spacing:1.6px;color:var(--lab-green);font-weight:800}
+.lab-hero h2{font-size:clamp(28px,5vw,46px);line-height:1.08;max-width:790px;margin:13px 0}
+.lab-hero p{max-width:780px;color:#b7cbbd;line-height:1.75}
+.lab-actions,.tool-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.lab-btn,.lab-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 14px;border:1px solid #2b6340;border-radius:10px;background:#0a1a10;color:#e9ffef;font:650 12px system-ui;text-decoration:none;cursor:pointer}
 .lab-btn.primary{background:var(--lab-green);border-color:var(--lab-green);color:#001b08}
-.lab-btn:hover,.lab-link:hover{border-color:var(--lab-green)}
-.lab-btn:focus-visible,.lab-link:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
-.lab-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;margin-top:16px}
-.lab-panel{min-width:0;border:1px solid var(--lab-line);border-radius:18px;padding:clamp(17px,2.5vw,25px);background:var(--lab-panel);box-shadow:0 12px 42px #0003}
-.lab-panel h3{font-size:19px;margin:8px 0}
-.lab-panel p{color:#a9bcae;font-size:13px;line-height:1.75}
-.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.lab-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #785b22;background:#33281266;color:#ffdda0;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;white-space:normal}
-.lab-chip:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.lab-btn:disabled{opacity:.45;cursor:not-allowed}
+.lab-btn:focus-visible,.lab-link:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
+.lab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:15px}
+.lab-panel{min-width:0;border:1px solid var(--lab-line);border-radius:17px;padding:clamp(15px,2.5vw,24px);background:rgba(7,17,11,.94);box-shadow:0 12px 42px #0003}
+.lab-panel h3{font-size:18px;margin:8px 0}
+.lab-panel p{color:#a9bcae;font-size:12px;line-height:1.75}
+.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.lab-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #785b22;background:#33281266;color:#ffdda0;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;white-space:normal}
+.lab-chip:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
 .lab-chip.ok{border-color:#23683d;background:#0d3a1c;color:#a9ffbf}
 .lab-chip.error{border-color:#7c3338;background:#351417;color:#ffb9be}
-.lab-divider{height:1px;background:#1a3825;margin:19px 0}
-.lab-status{padding:13px 14px;border:1px solid #254831;border-radius:12px;background:#07140b;color:#c7dbcd;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
-.lab-status strong{color:#eaffef}
+.lab-status{padding:12px 13px;border:1px solid #254831;border-radius:11px;background:#07140b;color:#c7dbcd;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
 .lab-status a{color:#70ff9d}
 .lab-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
-.lab-meta div{padding:12px;border:1px solid #1a3925;border-radius:10px;background:#050c07;min-width:0}
-.lab-meta small{display:block;color:#718878;font-size:10px;letter-spacing:.8px;text-transform:uppercase}
-.lab-meta strong{display:block;color:#eaffef;font-size:13px;margin-top:5px;overflow-wrap:anywhere}
-.lab-upload{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.lab-upload input[type=file]{width:100%;max-width:100%;padding:12px;border:1px dashed #356344;border-radius:11px;background:#061009;color:#c7dacd;font:12px system-ui}
-.lab-preview{display:none;width:100%;max-height:280px;object-fit:contain;border:1px solid #264b31;border-radius:12px;background:#020504}
+.lab-meta div,.lab-result{padding:10px;border:1px solid #1a3925;border-radius:10px;background:#050c07;min-width:0}
+.lab-meta small,.lab-result span{display:block;color:#819787;font-size:10px;letter-spacing:.3px}
+.lab-meta strong,.lab-result strong{display:block;color:#eaffef;font-size:12px;margin-top:5px;overflow-wrap:anywhere}
+.lab-upload{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+.lab-upload input[type=file]{width:100%;max-width:100%;padding:11px;border:1px dashed #356344;border-radius:10px;background:#061009;color:#c7dacd;font:12px system-ui}
+.lab-preview{display:none;width:100%;max-height:330px;object-fit:contain;border:1px solid #264b31;border-radius:11px;background:#020504}
 .lab-preview.visible{display:block}
-.lab-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
-.lab-result{border:1px solid #1b3d27;border-radius:10px;padding:11px;min-width:0}
-.lab-result span{display:block;color:#819787;font-size:11px}
-.lab-result strong{display:block;color:#edfff1;font-size:13px;overflow-wrap:anywhere;margin-top:4px}
-.lab-list{padding-left:19px;color:#b8cbbd;font-size:13px;line-height:1.8}
-.lab-list li{margin:7px 0}
-.lab-list strong{color:#eaffef}
-.lab-note{border-left:3px solid var(--lab-cyan);padding:12px 14px;background:#05202770;color:#b9d6d9;border-radius:0 10px 10px 0;font-size:12px;line-height:1.7;margin-top:14px}
-.lab-gates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
-.lab-gate{padding:13px;border:1px solid #23442d;border-radius:12px;background:#061009}
-.lab-gate b{display:block;color:#ffdc9a;font-size:12px}
-.lab-gate span{display:block;color:#8fa696;font-size:11px;line-height:1.6;margin-top:7px}
-.lab-footer{padding:25px 16px 38px;text-align:center;color:#758b7a;font-size:11px}
+.lab-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:11px}
+.lab-canvas{display:block;width:100%;height:auto;min-height:100px;border:1px solid #1a3925;border-radius:10px;background:#020704;margin-top:10px}
+.lab-note{border-left:3px solid var(--lab-cyan);padding:11px 13px;background:#05202770;color:#b9d6d9;border-radius:0 10px 10px 0;font-size:11px;line-height:1.7;margin-top:12px}
+.lab-list{padding-left:18px;color:#b8cbbd;font-size:12px;line-height:1.8}.lab-list li{margin:6px 0}
+.lab-footer{padding:24px 16px 36px;text-align:center;color:#758b7a;font-size:11px}
 .lab-footer a{color:#8cffab}
-@media(max-width:760px){.lab-grid{grid-template-columns:1fr}.lab-gates{grid-template-columns:1fr}.lab-meta{grid-template-columns:1fr}.lab-hero{border-radius:18px}.lab-hero h2{font-size:clamp(27px,8vw,38px)}header{padding:16px}.brand-lockup img{width:36px;height:36px}.status{font-size:10px;padding:7px 10px}}
+#gps-result{display:none}#gps-result.visible{display:block}
+@media(max-width:760px){.lab-grid{grid-template-columns:1fr}.lab-meta{grid-template-columns:repeat(3,minmax(0,1fr))}.lab-hero{border-radius:17px}.lab-hero h2{font-size:clamp(27px,8vw,37px)}header{padding:14px}.brand-lockup img{width:36px;height:36px}}
+@media(max-width:390px){.lab-meta{grid-template-columns:1fr}.lab-results{grid-template-columns:1fr}.lab-btn,.lab-link{flex:1 1 auto}}
 </style>
 </head>
 <body>
 <header>
   <a class="brand-lockup" href="../index.html" aria-label="NexoraWildfire AI ana sayfa">
     <img src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu">
-    <div class="logo"><h1>NexoraWildfire AI</h1><p data-uav-tr="Çevresel istihbarat · İHA görüntü laboratuvarı" data-uav-en="Environmental intelligence · UAV image lab">Çevresel istihbarat · İHA görüntü laboratuvarı</p></div>
+    <div class="logo"><h1>NexoraWildfire AI</h1><p data-uav-tr="Çevresel Zekâ" data-uav-en="Environmental Intelligence">Çevresel Zekâ</p></div>
   </a>
-  <div class="status"><span></span> <span data-uav-tr="ARAŞTIRMA LABORATUVARI" data-uav-en="RESEARCH LAB">ARAŞTIRMA LABORATUVARI</span></div>
+  <div class="status"><span></span><span data-uav-tr="İHA GÖRÜNTÜ LABORATUVARI" data-uav-en="UAV IMAGE LAB">İHA GÖRÜNTÜ LABORATUVARI</span></div>
 </header>
 <nav aria-label="Ana gezinme">
   <a href="../index.html">Ana Panel</a><a href="map.html">Risk Haritası</a><a href="areas.html">Alanlarım</a><a href="weather.html">Atmosfer</a><a href="satellite.html">Uydu Merkezi</a><a class="active" href="uav-demo.html">İHA / Yapay Zekâ</a><a href="about.html">Sistem</a><a href="feedback.html">Geri Bildirim</a><a href="vision.html">Cumhuriyet Vizyonu</a>
 </nav>
 <main class="lab-shell">
-  <section class="lab-hero">
-    <div class="eyebrow" data-uav-tr="NEXORAWILDFIRE / GÖRÜNTÜ ANALİZİ" data-uav-en="NEXORAWILDFIRE / IMAGE ANALYSIS">NEXORAWILDFIRE / GÖRÜNTÜ ANALİZİ</div>
-    <h2 data-uav-tr="Saha görüntülerini kontrollü ve izlenebilir bir iş akışında incele." data-uav-en="Inspect field imagery in a controlled, traceable workflow.">Saha görüntülerini kontrollü ve izlenebilir bir iş akışında incele.</h2>
-    <p data-uav-tr="Bu laboratuvar şimdilik görüntü dosyasını cihazında inceler, model API'sinin sağlık durumunu kontrol eder ve modelin neden henüz etkin olmadığını açıklar. Yangın/duman çıkarımı lisans uyumlu model ve Trakya koşullarında bağımsız doğrulama hazır olana kadar kapalıdır." data-uav-en="For now, this lab inspects an image file locally on your device, checks the model API health, and explains why the model is not enabled yet. Fire/smoke inference remains disabled until a license-compatible model and independent validation for Thrace conditions are available.">Bu laboratuvar şimdilik görüntü dosyasını cihazında inceler, model API'sinin sağlık durumunu kontrol eder ve modelin neden henüz etkin olmadığını açıklar. Yangın/duman çıkarımı lisans uyumlu model ve Trakya koşullarında bağımsız doğrulama hazır olana kadar kapalıdır.</p>
-    <div class="lab-actions">
-      <button class="lab-btn primary" id="check-api" type="button" data-uav-tr="API sağlık kontrolü" data-uav-en="Check API health">API sağlık kontrolü</button>
-      <a class="lab-link" href="../docs/SCIENTIFIC_STATUS.md" data-uav-tr="Bilimsel durum raporu ↗" data-uav-en="Scientific status report ↗">Bilimsel durum raporu ↗</a>
-      <a class="lab-link" href="../THIRD_PARTY_NOTICES.md" data-uav-tr="Lisans bildirimleri ↗" data-uav-en="License notices ↗">Lisans bildirimleri ↗</a>
-    </div>
-  </section>
-  <div class="lab-grid">
-    <section class="lab-panel">
-      <div class="lab-head"><div><div class="eyebrow" data-uav-tr="01 / SERVİS DURUMU" data-uav-en="01 / SERVICE STATUS">01 / SERVİS DURUMU</div><h3 data-uav-tr="Model API bağlantısı" data-uav-en="Model API connection">Model API bağlantısı</h3></div><span id="api-chip" class="lab-chip" data-uav-tr="Kontrol edilmedi" data-uav-en="Not checked">Kontrol edilmedi</span></div>
-      <p data-uav-tr="Kontrol, sunucunun sağlık uç noktasına kısa bir istek gönderir. API hazır yanıt verse bile bu, yangın modelinin etkin veya dış veri sağlayıcılarının erişilebilir olduğu anlamına gelmez." data-uav-en="This check sends a short request to the service health endpoint. Even if the API responds as healthy, that does not mean the fire model is enabled or external data providers are reachable.">Kontrol, sunucunun sağlık uç noktasına kısa bir istek gönderir. API hazır yanıt verse bile bu, yangın modelinin etkin veya dış veri sağlayıcılarının erişilebilir olduğu anlamına gelmez.</p>
-      <div id="api-status" class="lab-status" role="status" aria-live="polite" data-uav-tr="Kontrol için düğmeye bas. İstek zaman aşımına uğrarsa servis durumu doğrulanamadı olarak gösterilir." data-uav-en="Press the button to check. If the request times out, the service will be shown as unverified.">Kontrol için düğmeye bas. İstek zaman aşımına uğrarsa servis durumu doğrulanamadı olarak gösterilir.</div>
-      <div class="lab-meta">
-        <div><small data-uav-tr="Sağlık uç noktası" data-uav-en="Health endpoint">Sağlık uç noktası</small><strong>GET /health</strong></div>
-        <div><small data-uav-tr="İstek zaman aşımı" data-uav-en="Request timeout">İstek zaman aşımı</small><strong>8 s</strong></div>
-        <div><small data-uav-tr="Çıkarım" data-uav-en="Inference">Çıkarım</small><strong data-uav-tr="Devre dışı" data-uav-en="Disabled">Devre dışı</strong></div>
-      </div>
-    </section>
-    <section class="lab-panel">
-      <div class="lab-head"><div><div class="eyebrow" data-uav-tr="02 / YEREL DOSYA İNCELEME" data-uav-en="02 / LOCAL FILE INSPECTION">02 / YEREL DOSYA İNCELEME</div><h3 data-uav-tr="Görüntü dosyası bilgileri" data-uav-en="Image file details">Görüntü dosyası bilgileri</h3></div><span class="lab-chip ok" data-uav-tr="Cihazında kalır" data-uav-en="Stays on device">Cihazında kalır</span></div>
-      <p data-uav-tr="Bir fotoğraf seçerek dosya türünü, boyutunu ve piksel ölçülerini kontrol et. Bu özellik görüntü içeriğini sınıflandırmaz; dosyayı API'ye yüklemez." data-uav-en="Choose a photo to check its file type, size, and pixel dimensions. This feature does not classify image content and does not upload the file to the API.">Bir fotoğraf seçerek dosya türünü, boyutunu ve piksel ölçülerini kontrol et. Bu özellik görüntü içeriğini sınıflandırmaz; dosyayı API'ye yüklemez.</p>
-      <div class="lab-upload">
-        <label for="image-file" data-uav-tr="JPG, PNG veya WebP görüntüsü (en fazla 20 MB)" data-uav-en="JPG, PNG, or WebP image (up to 20 MB)">JPG, PNG veya WebP görüntüsü (en fazla 20 MB)</label>
-        <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp">
-        <img id="image-preview" class="lab-preview" alt="Seçilen görüntünün yerel önizlemesi">
-        <div id="image-message" class="lab-status" role="status" aria-live="polite" data-uav-tr="Henüz dosya seçilmedi." data-uav-en="No file selected yet.">Henüz dosya seçilmedi.</div>
-        <div class="lab-results">
-          <div class="lab-result"><span data-uav-tr="Dosya adı" data-uav-en="File name">Dosya adı</span><strong id="file-name">—</strong></div>
-          <div class="lab-result"><span data-uav-tr="Dosya türü" data-uav-en="File type">Dosya türü</span><strong id="file-type">—</strong></div>
-          <div class="lab-result"><span data-uav-tr="Dosya boyutu" data-uav-en="File size">Dosya boyutu</span><strong id="file-size">—</strong></div>
-          <div class="lab-result"><span data-uav-tr="Piksel ölçüsü" data-uav-en="Pixel dimensions">Piksel ölçüsü</span><strong id="file-dimensions">—</strong></div>
-        </div>
-      </div>
-    </section>
+<section class="lab-hero">
+ <div class="eyebrow" data-uav-tr="SAHA ARAÇLARI / YEREL GÖRÜNTÜ İŞLEME" data-uav-en="FIELD TOOLS / LOCAL IMAGE PROCESSING">SAHA ARAÇLARI / YEREL GÖRÜNTÜ İŞLEME</div>
+ <h2 data-uav-tr="Saha görüntüsünü incele. Veriyi cihazında tut." data-uav-en="Inspect field imagery. Keep the data on your device.">Saha görüntüsünü incele. Veriyi cihazında tut.</h2>
+ <p data-uav-tr="Görüntü seçimi, RGB histogramı, renk anomalisi göstergeleri, EXIF/GPS okuma ve görüntü filtreleri tarayıcıda yerel olarak çalışır. Fotoğraf sunucuya gönderilmez. Bu araç araştırma amaçlıdır; otomatik yangın ihbarı veya doğrulanmış duman tespiti değildir." data-uav-en="Image selection, RGB histogram, color-anomaly indicators, EXIF/GPS reading, and image filters run locally in your browser. The photo is not uploaded. This is a research tool, not an official fire alert or validated smoke detector.">Görüntü seçimi, RGB histogramı, renk anomalisi göstergeleri, EXIF/GPS okuma ve görüntü filtreleri tarayıcıda yerel olarak çalışır. Fotoğraf sunucuya gönderilmez. Bu araç araştırma amaçlıdır; otomatik yangın ihbarı veya doğrulanmış duman tespiti değildir.</p>
+ <div class="lab-actions"><button class="lab-btn primary" id="check-api" type="button" data-uav-tr="API bağlantısını kontrol et" data-uav-en="Check API connection">API bağlantısını kontrol et</button><a class="lab-link" href="../docs/SCIENTIFIC_STATUS.md" data-uav-tr="Bilimsel durum ↗" data-uav-en="Scientific status ↗">Bilimsel durum ↗</a><a class="lab-link" href="../THIRD_PARTY_NOTICES.md" data-uav-tr="Lisans bilgileri ↗" data-uav-en="License notices ↗">Lisans bilgileri ↗</a></div>
+</section>
+<div class="lab-grid">
+ <section class="lab-panel">
+  <div class="lab-head"><div><div class="eyebrow">01 / API</div><h3 data-uav-tr="Model servisi" data-uav-en="Model service">Model servisi</h3></div><span id="api-chip" class="lab-chip" data-uav-tr="Kontrol edilmedi" data-uav-en="Not checked">Kontrol edilmedi</span></div>
+  <p data-uav-tr="Bu düğme yalnızca servis sağlık yanıtını kontrol eder. API yanıtı, yangın/duman modelinin etkin veya doğrulanmış olduğu anlamına gelmez." data-uav-en="This button checks service health only. An API response does not mean a fire/smoke model is enabled or validated.">Bu düğme yalnızca servis sağlık yanıtını kontrol eder. API yanıtı, yangın/duman modelinin etkin veya doğrulanmış olduğu anlamına gelmez.</p>
+  <div id="api-status" class="lab-status" role="status" aria-live="polite" data-uav-tr="İnternet varsa kontrolü başlat. Çevrimdışı analiz araçları bu kontrolden bağımsız çalışır." data-uav-en="Run the check when online. Offline analysis tools work independently of this check.">İnternet varsa kontrolü başlat. Çevrimdışı analiz araçları bu kontrolden bağımsız çalışır.</div>
+  <div class="lab-meta"><div><small data-uav-tr="Uç nokta" data-uav-en="Endpoint">Uç nokta</small><strong>/health</strong></div><div><small data-uav-tr="Zaman aşımı" data-uav-en="Timeout">Zaman aşımı</small><strong>8 s</strong></div><div><small data-uav-tr="AI çıkarımı" data-uav-en="AI inference">AI çıkarımı</small><strong data-uav-tr="Etkin değil" data-uav-en="Not enabled">Etkin değil</strong></div></div>
+ </section>
+ <section class="lab-panel">
+  <div class="lab-head"><div><div class="eyebrow">02 / GÖRÜNTÜ</div><h3 data-uav-tr="İHA / kamera fotoğrafı" data-uav-en="UAV / camera image">İHA / kamera fotoğrafı</h3></div><span class="lab-chip ok" data-uav-tr="Yerel işlem" data-uav-en="Local processing">Yerel işlem</span></div>
+  <p data-uav-tr="JPG, PNG veya WebP seç. Görüntü bellekte işlenir; yüklenmez. Daha hızlı işlem için analiz kopyası en fazla 900 piksel kenar uzunluğuna ölçeklenir." data-uav-en="Choose a JPG, PNG, or WebP image. It is processed in memory and never uploaded. For speed, the analysis copy is scaled to a maximum edge of 900 pixels.">JPG, PNG veya WebP seç. Görüntü bellekte işlenir; yüklenmez. Daha hızlı işlem için analiz kopyası en fazla 900 piksel kenar uzunluğuna ölçeklenir.</p>
+  <div class="lab-upload"><label for="image-file" data-uav-tr="Görüntü dosyası (20 MB sınırı)" data-uav-en="Image file (20 MB limit)">Görüntü dosyası (20 MB sınırı)</label><input id="image-file" type="file" accept="image/jpeg,image/png,image/webp">
+   <img id="image-preview" class="lab-preview" alt="Seçilen görüntünün yerel önizlemesi">
+   <div id="image-message" class="lab-status" role="status" aria-live="polite" data-uav-tr="Henüz görüntü seçilmedi." data-uav-en="No image selected yet.">Henüz görüntü seçilmedi.</div>
+   <div class="lab-results"><div class="lab-result"><span data-uav-tr="Dosya" data-uav-en="File">Dosya</span><strong id="file-name">—</strong></div><div class="lab-result"><span data-uav-tr="Ölçü" data-uav-en="Dimensions">Ölçü</span><strong id="file-dimensions">—</strong></div><div class="lab-result"><span data-uav-tr="Boyut" data-uav-en="Size">Boyut</span><strong id="file-size">—</strong></div><div class="lab-result"><span data-uav-tr="Format" data-uav-en="Format">Format</span><strong id="file-type">—</strong></div></div>
   </div>
-  <section class="lab-panel" style="margin-top:16px">
-    <div class="eyebrow" data-uav-tr="03 / MODEL HAZIRLIK KAPILARI" data-uav-en="03 / MODEL READINESS GATES">03 / MODEL HAZIRLIK KAPILARI</div>
-    <h3 data-uav-tr="Çıkarım neden henüz kapalı?" data-uav-en="Why is inference still disabled?">Çıkarım neden henüz kapalı?</h3>
-    <p data-uav-tr="Bu kapılar geçilmeden sonuç kartı, algılama kutusu veya yangın alarmı gösterilmez. API'nin çalışması tek başına modelin güvenilirliğini kanıtlamaz." data-uav-en="No result card, detection box, or fire alert is shown until these gates are passed. A working API alone does not prove model reliability.">Bu kapılar geçilmeden sonuç kartı, algılama kutusu veya yangın alarmı gösterilmez. API'nin çalışması tek başına modelin güvenilirliğini kanıtlamaz.</p>
-    <div class="lab-gates">
-      <div class="lab-gate"><b data-uav-tr="01 · Lisans uyumu" data-uav-en="01 · License compatibility">01 · Lisans uyumu</b><span data-uav-tr="MIT hedefiyle uyumlu model ve ağırlık kaynağı doğrulanmalı." data-uav-en="A model and weights source compatible with the MIT goal must be verified.">MIT hedefiyle uyumlu model ve ağırlık kaynağı doğrulanmalı.</span></div>
-      <div class="lab-gate"><b data-uav-tr="02 · Bölgesel test" data-uav-en="02 · Regional validation">02 · Bölgesel test</b><span data-uav-tr="Trakya koşullarını temsil eden etiketli pozitif/negatif örnekler üzerinde ölçüm yapılmalı." data-uav-en="Measure performance on labelled positive and negative examples representative of Thrace conditions.">Trakya koşullarını temsil eden etiketli pozitif/negatif örnekler üzerinde ölçüm yapılmalı.</span></div>
-      <div class="lab-gate"><b data-uav-tr="03 · Hata analizi" data-uav-en="03 · Error analysis">03 · Hata analizi</b><span data-uav-tr="Yanlış pozitifler, kaçırılan olaylar, eşikler ve model sürümü yayımlanmalı." data-uav-en="Publish false positives, missed events, thresholds, and model version.">Yanlış pozitifler, kaçırılan olaylar, eşikler ve model sürümü yayımlanmalı.</span></div>
-    </div>
-    <div class="lab-note" data-uav-tr="Güvenlik notu: Bu sayfa resmî yangın ihbarı veya doğrulanmış yangın tahmini değildir. Acil bir durum görürsen resmî acil durum kanallarını kullan; bu laboratuvarı tek karar kaynağı olarak kullanma." data-uav-en="Safety note: this page is not an official wildfire alert or validated fire forecast. If you see an emergency, use official emergency channels; do not use this lab as your sole decision source.">Güvenlik notu: Bu sayfa resmî yangın ihbarı veya doğrulanmış yangın tahmini değildir. Acil bir durum görürsen resmî acil durum kanallarını kullan; bu laboratuvarı tek karar kaynağı olarak kullanma.</div>
-  </section>
+ </section>
+</div>
+<div class="lab-grid">
+ <section class="lab-panel">
+  <div class="eyebrow">03 / RGB HISTOGRAM</div><h3 data-uav-tr="Renk kanalları ve yoğunluk" data-uav-en="RGB channels and intensity">Renk kanalları ve yoğunluk</h3>
+  <p data-uav-tr="Grafik, her kanalın 0–255 yoğunluk dağılımını gösterir. Renk ölçümü tek başına dumanı veya ateşi kanıtlamaz; gökyüzü, gün batımı, toprak ve sis benzer renkler üretebilir." data-uav-en="The chart shows each channel's intensity distribution from 0–255. Color alone cannot prove smoke or fire; sky, sunset, soil, and haze can produce similar colors.">Grafik, her kanalın 0–255 yoğunluk dağılımını gösterir. Renk ölçümü tek başına dumanı veya ateşi kanıtlamaz; gökyüzü, gün batımı, toprak ve sis benzer renkler üretebilir.</p>
+  <canvas id="histogram" class="lab-canvas" width="768" height="250" aria-label="RGB histogram"></canvas>
+  <div class="lab-results"><div class="lab-result"><span data-uav-tr="Gri/açık piksel oranı" data-uav-en="Bright/gray pixel share">Gri/açık piksel oranı</span><strong id="smoke-share">—</strong></div><div class="lab-result"><span data-uav-tr="Kırmızı baskın piksel oranı" data-uav-en="Red-dominant pixel share">Kırmızı baskın piksel oranı</span><strong id="fire-share">—</strong></div></div>
+  <div id="heuristic-message" class="lab-status" style="margin-top:10px" data-uav-tr="Renk analizi için bir görüntü seç." data-uav-en="Select an image to run color analysis.">Renk analizi için bir görüntü seç.</div>
+ </section>
+ <section class="lab-panel">
+  <div class="eyebrow">04 / GÖRÜNTÜ FİLTRELERİ</div><h3 data-uav-tr="Kontrast ve kenar inceleme" data-uav-en="Contrast and edge inspection">Kontrast ve kenar inceleme</h3>
+  <p data-uav-tr="Filtreler orijinal görüntüyü değiştirmez; yerel analiz kopyasına uygulanır. Kenar haritası şekil sınırlarını görünür kılabilir ancak duman sınıflandırması yapmaz." data-uav-en="Filters do not change the original image; they operate on the local analysis copy. Edge maps can reveal boundaries but do not classify smoke.">Filtreler orijinal görüntüyü değiştirmez; yerel analiz kopyasına uygulanır. Kenar haritası şekil sınırlarını görünür kılabilir ancak duman sınıflandırması yapmaz.</p>
+  <div class="tool-row"><button class="lab-btn" id="filter-original" disabled data-uav-tr="Orijinal" data-uav-en="Original">Orijinal</button><button class="lab-btn" id="filter-contrast" disabled data-uav-tr="Kontrast artır" data-uav-en="Enhance contrast">Kontrast artır</button><button class="lab-btn" id="filter-gray" disabled data-uav-tr="Gri ton" data-uav-en="Grayscale">Gri ton</button><button class="lab-btn" id="filter-sobel" disabled data-uav-tr="Sobel kenar" data-uav-en="Sobel edges">Sobel kenar</button></div>
+  <canvas id="filtered" class="lab-canvas" width="768" height="420" aria-label="Filtered image preview"></canvas>
+  <div class="lab-note" data-uav-tr="İşlem tamamen tarayıcıda yapılır. Büyük görüntüler düşük bellekli telefonlarda yavaşlayabilir; analiz çözünürlüğü otomatik olarak küçültülür." data-uav-en="Processing runs entirely in the browser. Large images may be slower on low-memory phones; the analysis resolution is automatically reduced.">İşlem tamamen tarayıcıda yapılır. Büyük görüntüler düşük bellekli telefonlarda yavaşlayabilir; analiz çözünürlüğü otomatik olarak küçültülür.</div>
+ </section>
+</div>
+<section class="lab-panel" style="margin-top:15px">
+ <div class="eyebrow">05 / EXIF · GPS</div><h3 data-uav-tr="Fotoğraf içindeki konumu bul" data-uav-en="Find embedded photo coordinates">Fotoğraf içindeki konumu bul</h3>
+ <p data-uav-tr="JPEG fotoğraflarda EXIF GPS etiketi varsa enlem, boylam ve yükseklik cihaz üzerinde okunur. Birçok sosyal medya görseli GPS bilgisini siler; PNG/WebP veya konumsuz fotoğraflarda sonuç bulunmayabilir." data-uav-en="If a JPEG contains EXIF GPS tags, latitude, longitude, and altitude are read locally. Social platforms often strip GPS metadata; PNG/WebP files or photos without location may have no result.">JPEG fotoğraflarda EXIF GPS etiketi varsa enlem, boylam ve yükseklik cihaz üzerinde okunur. Birçok sosyal medya görseli GPS bilgisini siler; PNG/WebP veya konumsuz fotoğraflarda sonuç bulunmayabilir.</p>
+ <div id="gps-result" class="lab-status" aria-live="polite"></div>
+ <div class="tool-row"><a id="open-map" class="lab-link" href="../pages/map.html" data-uav-tr="Risk haritasında konumu aç" data-uav-en="Open location in risk map" style="display:none">Risk haritasında konumu aç</a><a id="open-osm" class="lab-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none" data-uav-tr="Çevrimiçi haritada aç ↗" data-uav-en="Open online map ↗">Çevrimiçi haritada aç ↗</a></div>
+ <div class="lab-note" data-uav-tr="GPS yoksa yazılım koordinat uydurmaz. Koordinat okunması, yangının orada başladığını kanıtlamaz; fotoğrafın çekildiği konumu gösterir. Harita altlığı için internet veya önbelleğe alınmış harita gerekebilir." data-uav-en="If GPS is absent, no coordinates are fabricated. Coordinates do not prove a fire started there; they indicate the photo's recorded location. Map tiles may require internet or a cached map.">GPS yoksa yazılım koordinat uydurmaz. Koordinat okunması, yangının orada başladığını kanıtlamaz; fotoğrafın çekildiği konumu gösterir. Harita altlığı için internet veya önbelleğe alınmış harita gerekebilir.</div>
+</section>
+<section class="lab-panel" style="margin-top:15px">
+ <div class="eyebrow">06 / BİLİMSEL SINIRLAR</div><h3 data-uav-tr="Gerçek yapay zekâ için gerekenler" data-uav-en="What is required for real AI detection">Gerçek yapay zekâ için gerekenler</h3>
+ <ul class="lab-list"><li data-uav-tr="Lisansı doğrulanmış model kodu ve ağırlıklar." data-uav-en="Model code and weights with verified licensing.">Lisansı doğrulanmış model kodu ve ağırlıklar.</li><li data-uav-tr="Trakya'da çekilmiş, etiketli duman/ateş ve zor negatif örnekler." data-uav-en="Labelled smoke/fire and hard-negative examples captured in Thrace.">Trakya'da çekilmiş, etiketli duman/ateş ve zor negatif örnekler.</li><li data-uav-tr="Ayrı test kümesinde hassasiyet, yanlış alarm ve kaçırma oranlarının raporlanması." data-uav-en="Report precision, false-alarm rate, and missed detections on a held-out test set.">Ayrı test kümesinde hassasiyet, yanlış alarm ve kaçırma oranlarının raporlanması.</li></ul>
+ <div class="lab-note" data-uav-tr="Şu anda bu sayfada gerçek duman/ateş sınıflandırma modeli çalışmıyor. RGB göstergeleri yalnızca açıklayıcı, kural tabanlı renk ölçümleridir; resmî uyarı olarak kullanılmamalıdır." data-uav-en="No real smoke/fire classifier is running on this page yet. RGB indicators are explanatory rule-based color measurements only and must not be used as official alerts.">Şu anda bu sayfada gerçek duman/ateş sınıflandırma modeli çalışmıyor. RGB göstergeleri yalnızca açıklayıcı, kural tabanlı renk ölçümleridir; resmî uyarı olarak kullanılmamalıdır.</div>
+</section>
 </main>
 <footer class="lab-footer">NexoraWildfire AI · Ahmet Eymen Bakraç · Nexora88 © 2026</footer>
 <script>
 (() => {
-  const API_BASE = "https://nexorawildfire-ml-production.up.railway.app";
-  const tr = (key, en) => (document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr") === "en" ? en : key;
-  const apiButton = document.getElementById("check-api");
-  const apiChip = document.getElementById("api-chip");
-  const apiStatus = document.getElementById("api-status");
-  apiButton.addEventListener("click", async () => {
-    apiButton.disabled = true;
-    apiButton.textContent = tr("Kontrol ediliyor…", "Checking…");
-    apiChip.className = "lab-chip";
-    apiChip.textContent = tr("Kontrol ediliyor", "Checking");
-    apiStatus.textContent = tr("Sağlık uç noktasına istek gönderiliyor…", "Requesting the health endpoint…");
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    try {
-      const response = await fetch(API_BASE + "/health", {method:"GET", headers:{Accept:"application/json"}, signal:controller.signal, cache:"no-store"});
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      const data = await response.json();
-      if (data.status !== "healthy") throw new Error(tr("Beklenmeyen sağlık yanıtı", "Unexpected health response"));
-      apiChip.className = "lab-chip ok";
-      apiChip.textContent = tr("API erişilebilir", "API reachable");
-      apiStatus.textContent = tr("API yanıt verdi. Bu yalnızca servis sağlık kontrolüdür; model çıkarımının etkin olduğunu veya dış veri sağlayıcılarının çalıştığını doğrulamaz.", "The API responded. This only verifies service health; it does not confirm that model inference or external data providers are active.") + " · " + (data.version || "version unavailable");
-    } catch (error) {
-      apiChip.className = "lab-chip error";
-      apiChip.textContent = tr("Doğrulanamadı", "Unverified");
-      apiStatus.textContent = tr("Tarayıcıdan sağlık yanıtı alınamadı. Ağ, servis veya CORS kısıtlaması olabilir; bu durum tek başına servisin kapalı olduğunu kanıtlamaz.", "The health response could not be read in this browser. Network, service, or CORS restrictions may be responsible; this alone does not prove the service is down.") + " " + String(error && error.message || error);
-      const link = document.createElement("a");
-      link.href = API_BASE + "/health";
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = tr("Sağlık uç noktasını yeni sekmede aç", "Open health endpoint in a new tab");
-      apiStatus.append(" ");
-      apiStatus.append(link);
-    } finally {
-      clearTimeout(timeout);
-      apiButton.disabled = false;
-      apiButton.textContent = tr("API sağlık kontrolü", "Check API health");
-    }
+ const API_BASE="https://nexorawildfire-ml-production.up.railway.app";
+ const lang=()=>document.documentElement.dataset.language||localStorage.getItem("nexorawildfire-language-v1")||"tr";
+ const tr=(a,b)=>lang()==="en"?b:a;
+ const input=document.getElementById("image-file"), preview=document.getElementById("image-preview"), msg=document.getElementById("image-message");
+ const histogram=document.getElementById("histogram"), hctx=histogram.getContext("2d"), filtered=document.getElementById("filtered"), fctx=filtered.getContext("2d");
+ const off=document.createElement("canvas"), octx=off.getContext("2d",{willReadFrequently:true});
+ let objectUrl=null, original=null, activeFile=null, gps=null, imageReady=false;
+ const $=id=>document.getElementById(id);
+ const setText=(id,text)=>$(id).textContent=text;
+ const setLocalized=(id,trText,enText)=>{const el=$(id);el.dataset.uavTr=trText;el.dataset.uavEn=enText;el.textContent=lang()==="en"?enText:trText;};
+ const drawEmpty=(canvas,ctx,label)=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#8aa493";ctx.font="16px system-ui";ctx.textAlign="center";ctx.fillText(label,canvas.width/2,canvas.height/2);};
+ drawEmpty(histogram,hctx,tr("Görüntü bekleniyor","Waiting for image"));
+ drawEmpty(filtered,fctx,tr("Filtre önizlemesi","Filter preview"));
+ const enableFilters=on=>["filter-original","filter-contrast","filter-gray","filter-sobel"].forEach(id=>$(id).disabled=!on);
+ const formatBytes=n=>n<1024*1024?(n/1024).toFixed(1)+" KB":(n/(1024*1024)).toFixed(2)+" MB";
+ function parseExifGPS(file) {
+  return new Promise(resolve=>{
+   if(!file||!/^image\/jpeg$/i.test(file.type)){resolve(null);return;}
+   const reader=new FileReader();
+   reader.onerror=()=>resolve(null);
+   reader.onload=()=>{
+    try{
+     const b=new DataView(reader.result); if(b.getUint16(0)!==0xFFD8){resolve(null);return;}
+     let p=2, tiff=-1;
+     while(p+4<b.byteLength){if(b.getUint8(p)!==0xFF)break;const marker=b.getUint8(p+1),len=b.getUint16(p+2);if(marker===0xE1&&len>8&&b.getUint32(p+4)===0x45786966&&b.getUint16(p+8)===0){tiff=p+10;break;}if(len<2)break;p+=2+len;}
+     if(tiff<0){resolve(null);return;}
+     const endian=b.getUint16(tiff);const little=endian===0x4949;if(!little&&endian!==0x4D4D){resolve(null);return;}
+     const u16=o=>b.getUint16(o,little),u32=o=>b.getUint32(o,little);
+     if(u16(tiff+2)!==42){resolve(null);return;}
+     const ifd0=tiff+u32(tiff+4),n=u16(ifd0);let gpsOffset=null;
+     for(let i=0;i<n;i++){const e=ifd0+2+i*12;if(u16(e)===0x8825){gpsOffset=tiff+u32(e+8);break;}}
+     if(gpsOffset===null||gpsOffset+2>b.byteLength){resolve(null);return;}
+     const gn=u16(gpsOffset),tags={};
+     for(let i=0;i<gn;i++){const e=gpsOffset+2+i*12,tag=u16(e),type=u16(e+2),count=u32(e+4),val=e+8;tags[tag]={type,count,value:((type===2||type===1||type===7)&&count<=4)?(type===2?String.fromCharCode(...Array.from({length:count},(_,k)=>b.getUint8(val+k))).replace(/\0/g,""):b.getUint8(val)):tiff+u32(val)};}
+     const ascii=tag=>{const x=tags[tag];if(!x)return null;if(typeof x.value==="string")return x.value;return String.fromCharCode(...Array.from({length:x.count},(_,k)=>b.getUint8(x.value+k))).replace(/\0/g,"");};
+     const rationals=tag=>{const x=tags[tag];if(!x||x.type!==5||x.count<3)return null;const a=[];for(let i=0;i<3;i++){const at=x.value+i*8,num=u32(at),den=u32(at+4);if(!den)return null;a.push(num/den);}return a[0]+a[1]/60+a[2]/3600;};
+     let lat=rationals(2),lon=rationals(4);const latRef=ascii(1),lonRef=ascii(3);
+     if(lat===null||lon===null){resolve(null);return;}if(latRef==="S")lat=-lat;if(lonRef==="W")lon=-lon;
+     let altitude=null;if(tags[6]&&tags[6].type===5){const at=tags[6].value,den=u32(at+4);if(den)altitude=u32(at)/den*(tags[5]&&tags[5].value===1?-1:1);}
+     resolve({lat,lon,altitude});
+    }catch{resolve(null);}
+   };
+   reader.readAsArrayBuffer(file.slice(0,Math.min(file.size,8*1024*1024)));
   });
-  const input = document.getElementById("image-file");
-  const preview = document.getElementById("image-preview");
-  const message = document.getElementById("image-message");
-  let currentUrl = null;
-  const reset = () => {
-    ["file-name","file-type","file-size","file-dimensions"].forEach(id => document.getElementById(id).textContent = "—");
-    preview.classList.remove("visible");
-    preview.removeAttribute("src");
-    if (currentUrl) URL.revokeObjectURL(currentUrl);
-    currentUrl = null;
+ }
+ function renderHistogram(data){
+  const binsR=new Uint32Array(256),binsG=new Uint32Array(256),binsB=new Uint32Array(256);let pale=0,red=0,total=data.length/4;
+  for(let i=0;i<data.length;i+=4){const r=data[i],g=data[i+1],b=data[i+2],max=Math.max(r,g,b),min=Math.min(r,g,b);binsR[r]++;binsG[g]++;binsB[b]++;if(max>165&&(max-min)<34)pale++;if(r>150&&r>g*1.22&&g>b*1.08)red++;}
+  hctx.clearRect(0,0,histogram.width,histogram.height);hctx.fillStyle="#020704";hctx.fillRect(0,0,histogram.width,histogram.height);
+  const max=Math.max(...binsR,...binsG,...binsB,1),w=histogram.width,h=histogram.height,pad=18,chartH=h-48;
+  hctx.strokeStyle="#173b25";hctx.lineWidth=1;for(let k=0;k<=4;k++){const y=pad+k*chartH/4;hctx.beginPath();hctx.moveTo(pad,y);hctx.lineTo(w-pad,y);hctx.stroke();}
+  const draw=(bins,color)=>{hctx.strokeStyle=color;hctx.lineWidth=2;hctx.beginPath();bins.forEach((v,i)=>{const x=pad+i*(w-2*pad)/255,y=pad+chartH-(v/max)*chartH;if(i===0)hctx.moveTo(x,y);else hctx.lineTo(x,y);});hctx.stroke();};
+  draw(binsR,"#ff5454");draw(binsG,"#40f28b");draw(binsB,"#55aaff");hctx.fillStyle="#a9c2b1";hctx.font="12px system-ui";hctx.fillText("0",pad,h-12);hctx.fillText("128",w/2-10,h-12);hctx.fillText("255",w-pad-20,h-12);hctx.fillStyle="#ff7777";hctx.fillText("R",pad+10,14);hctx.fillStyle="#4aff91";hctx.fillText("G",pad+30,14);hctx.fillStyle="#72b6ff";hctx.fillText("B",pad+50,14);
+  setText("smoke-share",(pale/Math.max(total,1)*100).toFixed(1)+"%");setText("fire-share",(red/Math.max(total,1)*100).toFixed(1)+"%");
+  const note=pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?tr("Renk eşiği aşımı görüldü. Bu yalnızca piksel istatistiğidir; duman/yangın tespiti değildir.","Color thresholds were exceeded. This is a pixel statistic only, not smoke/fire detection."):tr("Bu eşiklerde belirgin renk anomalisi görünmüyor. Bu, yangın olmadığı anlamına gelmez.","No strong color anomaly at these thresholds. This does not mean there is no fire.");
+  setLocalized("heuristic-message",pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?"Renk eşiği aşımı görüldü. Bu yalnızca piksel istatistiğidir; duman/yangın tespiti değildir.":"Bu eşiklerde belirgin renk anomalisi görünmüyor. Bu, yangın olmadığı anlamına gelmez.",pale/Math.max(total,1)>.18||red/Math.max(total,1)>.03?"Color thresholds were exceeded. This is a pixel statistic only, not smoke/fire detection.":"No strong color anomaly at these thresholds. This does not mean there is no fire.");
+ }
+ function applyFilter(mode){
+  if(!original)return;
+  const w=off.width,h=off.height;filtered.width=w;filtered.height=h;const src=original.data;const out=fctx.createImageData(w,h);const d=out.data;
+  if(mode==="sobel"){
+   const gray=new Uint8Array(w*h);for(let i=0,j=0;i<src.length;i+=4,j++)gray[j]=.299*src[i]+.587*src[i+1]+.114*src[i+2];
+   const at=(x,y)=>gray[Math.max(0,Math.min(h-1,y))*w+Math.max(0,Math.min(w-1,x))];
+   for(let y=0;y<h;y++)for(let x=0;x<w;x++){const gx=-at(x-1,y-1)+at(x+1,y-1)-2*at(x-1,y)+2*at(x+1,y)-at(x-1,y+1)+at(x+1,y+1);const gy=-at(x-1,y-1)-2*at(x,y-1)-at(x+1,y-1)+at(x-1,y+1)+2*at(x,y+1)+at(x+1,y+1);const v=Math.min(255,Math.hypot(gx,gy));const i=(y*w+x)*4;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}
+  }else for(let i=0;i<src.length;i+=4){let r=src[i],g=src[i+1],b=src[i+2];if(mode==="gray"){const v=.299*r+.587*g+.114*b;r=g=b=v;}if(mode==="contrast"){r=Math.max(0,Math.min(255,(r-128)*1.35+128));g=Math.max(0,Math.min(255,(g-128)*1.35+128));b=Math.max(0,Math.min(255,(b-128)*1.35+128));}d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;}
+  fctx.putImageData(out,0,0);
+ }
+ function showGPS(value){
+  gps=value;const box=$("gps-result"),mapLink=$("open-map"),osm=$("open-osm");
+  if(!value){box.classList.add("visible");setLocalized("gps-result","Bu JPEG dosyasında okunabilir EXIF GPS koordinatı bulunamadı. GPS bilgisi olmayan dosyalarda koordinat üretilmez.","No readable EXIF GPS coordinates were found in this JPEG. Coordinates are never invented when metadata is absent.");mapLink.style.display=osm.style.display="none";return;}
+  box.classList.add("visible");const coords=value.lat.toFixed(6)+", "+value.lon.toFixed(6);setLocalized("gps-result","EXIF koordinatı: "+coords+(value.altitude===null?"":" · yükseklik "+value.altitude.toFixed(1)+" m"),"EXIF coordinates: "+coords+(value.altitude===null?"":" · altitude "+value.altitude.toFixed(1)+" m"));
+  mapLink.href="../pages/map.html?lat="+encodeURIComponent(value.lat)+"&lon="+encodeURIComponent(value.lon)+"&source=exif";mapLink.style.display="inline-flex";
+  osm.href="https://www.openstreetmap.org/?mlat="+encodeURIComponent(value.lat)+"&mlon="+encodeURIComponent(value.lon)+"#map=15/"+value.lat+"/"+value.lon;osm.style.display="inline-flex";
+ }
+ input.addEventListener("change",async()=>{
+  const file=input.files&&input.files[0];imageReady=false;enableFilters(false);original=null;activeFile=file||null;gps=null;$("gps-result").classList.remove("visible");$("open-map").style.display=$("open-osm").style.display="none";
+  if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}preview.classList.remove("visible");preview.removeAttribute("src");
+  if(!file){setLocalized("image-message","Henüz görüntü seçilmedi.","No image selected yet.");return;}
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){setLocalized("image-message","JPG, PNG veya WebP seç.","Choose JPG, PNG, or WebP.");return;}
+  if(file.size>20*1024*1024){setLocalized("image-message","Dosya 20 MB sınırını aşıyor.","The file exceeds the 20 MB limit.");return;}
+  objectUrl=URL.createObjectURL(file);preview.onload=async()=>{
+   try{
+    const scale=Math.min(1,900/Math.max(preview.naturalWidth,preview.naturalHeight));off.width=Math.max(1,Math.round(preview.naturalWidth*scale));off.height=Math.max(1,Math.round(preview.naturalHeight*scale));octx.drawImage(preview,0,0,off.width,off.height);original=octx.getImageData(0,0,off.width,off.height);imageReady=true;
+    setText("file-name",file.name);setText("file-dimensions",preview.naturalWidth+" × "+preview.naturalHeight+" px");setText("file-size",formatBytes(file.size));setText("file-type",file.type);preview.classList.add("visible");
+    renderHistogram(original.data);applyFilter("original");enableFilters(true);setLocalized("image-message","Görüntü cihazda okundu ve yerel olarak analiz edildi. Dosya sunucuya gönderilmedi.","Image read and analysed locally. The file was not uploaded.");
+    showGPS(await parseExifGPS(file));
+   }catch(error){setLocalized("image-message","Bu görüntü cihaz belleğinde işlenemedi. Daha küçük bir dosya dene.","This image could not be processed in device memory. Try a smaller file.");}
   };
-  input.addEventListener("change", () => {
-    reset();
-    const file = input.files && input.files[0];
-    if (!file) { message.textContent = tr("Henüz dosya seçilmedi.", "No file selected yet."); return; }
-    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) {
-      message.textContent = tr("Desteklenmeyen tür. JPG, PNG veya WebP seç.", "Unsupported type. Choose JPG, PNG, or WebP.");
-      return;
-    }
-    if (file.size > 20 * 1024 * 1024) {
-      message.textContent = tr("Dosya 20 MB sınırını aşıyor. Daha küçük bir görüntü seç.", "The file exceeds 20 MB. Choose a smaller image.");
-      return;
-    }
-    currentUrl = URL.createObjectURL(file);
-    preview.onload = () => {
-      document.getElementById("file-name").textContent = file.name;
-      document.getElementById("file-type").textContent = file.type || tr("Bilinmiyor", "Unknown");
-      document.getElementById("file-size").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-      document.getElementById("file-dimensions").textContent = preview.naturalWidth + " × " + preview.naturalHeight + " px";
-      message.textContent = tr("Dosya başarıyla okundu. Görüntü cihazında kaldı; sunucuya gönderilmedi ve içerik analizi yapılmadı.", "File read successfully. The image stayed on your device; it was not uploaded and no content analysis was performed.");
-      preview.classList.add("visible");
-    };
-    preview.onerror = () => { message.textContent = tr("Görüntü dosyası okunamadı.", "The image file could not be read."); reset(); };
-    preview.src = currentUrl;
-  });
-  const applyLocalLanguage = () => {
-    const lang = document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr";
-    document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el => {
-      el.textContent = lang === "en" ? el.dataset.uavEn : el.dataset.uavTr;
-    });
-    document.title = tr("İHA / Görüntü Laboratuvarı · NexoraWildfire AI", "UAV / Image Lab · NexoraWildfire AI");
-  };
-  const observer = new MutationObserver(applyLocalLanguage);
-  observer.observe(document.documentElement, {attributes:true, attributeFilter:["data-language"]});
-  applyLocalLanguage();
-  document.addEventListener("click", event => {
-    if (event.target.closest("#nexora-language-toggle")) queueMicrotask(applyLocalLanguage);
-  }, true);
+  preview.onerror=()=>{setLocalized("image-message","Görüntü dosyası okunamadı.","Could not read image file.");};
+  preview.src=objectUrl;
+ });
+ $("filter-original").addEventListener("click",()=>applyFilter("original"));$("filter-contrast").addEventListener("click",()=>applyFilter("contrast"));$("filter-gray").addEventListener("click",()=>applyFilter("gray"));$("filter-sobel").addEventListener("click",()=>applyFilter("sobel"));
+ const apiButton=$("check-api"),apiChip=$("api-chip"),apiStatus=$("api-status");
+ apiButton.addEventListener("click",async()=>{
+  apiButton.disabled=true;apiButton.textContent=tr("Kontrol ediliyor…","Checking…");apiChip.className="lab-chip";setLocalized("api-chip","Kontrol ediliyor","Checking");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
+  try{const response=await fetch(API_BASE+"/health",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);const data=await response.json();if(data.status!=="healthy")throw new Error("Unexpected health response");apiChip.className="lab-chip ok";setLocalized("api-chip","API erişilebilir","API reachable");const version=" · "+(data.version||"version unavailable");setLocalized("api-status","Servis sağlık yanıtı alındı. Bu, modelin etkinliğini veya doğruluğunu kanıtlamaz."+version,"Service health response received. This does not prove model availability or accuracy."+version);}
+  catch(error){apiChip.className="lab-chip error";setLocalized("api-chip","Doğrulanamadı","Unverified");const err=" "+String(error&&error.message||error);setLocalized("api-status","Tarayıcı yanıtı okuyamadı; ağ veya CORS engeli olabilir. Bu tek başına servisin kapalı olduğunu kanıtlamaz."+err,"The browser could not read the response; network or CORS may be involved. This alone does not prove the service is down."+err);const a=document.createElement("a");a.href=API_BASE+"/health";a.target="_blank";a.rel="noopener noreferrer";a.textContent=tr("Uç noktayı aç","Open endpoint");apiStatus.append(" ",a);}
+  finally{clearTimeout(timer);apiButton.disabled=false;apiButton.textContent=tr("API bağlantısını kontrol et","Check API connection");}
+ });
+ function applyLanguage(){
+  const language=lang();document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el=>{el.textContent=language==="en"?el.dataset.uavEn:el.dataset.uavTr;});
+  if(imageReady && $("gps-result").classList.contains("visible")) showGPS(gps);
+  document.title=tr("İHA Görüntü Laboratuvarı · NexoraWildfire AI","UAV Image Lab · NexoraWildfire AI");
+  if(!imageReady){drawEmpty(histogram,hctx,tr("Görüntü bekleniyor","Waiting for image"));drawEmpty(filtered,fctx,tr("Filtre önizlemesi","Filter preview"));}
+ }
+ new MutationObserver(applyLanguage).observe(document.documentElement,{attributes:true,attributeFilter:["data-language"]});
+ document.addEventListener("click",event=>{if(event.target.closest("#nexora-language-toggle"))queueMicrotask(applyLanguage);},true);
+ applyLanguage();
 })();
 </script>
-<script src="../js/mobile-nav.js?v=20261012a"></script>
-<script src="../js/i18n.js?v=20261012a"></script>
-</body>
-</html>
+<script src="../js/pwa.js?v=20261010h"></script>
+<script src="../js/mobile-nav.js?v=20261012c"></script>
+<script src="../js/i18n.js?v=20261012c"></script>
+</body></html>

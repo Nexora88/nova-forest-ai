@@ -1,11 +1,11 @@
 /* Accessible Atatürk quote carousel and historical photo gallery for every product page. */
 (function () {
   const quotes = [
-    { quote: "“Hayatta en hakiki mürşit ilimdir.”", context: "Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin." },
-    { quote: "“Yurtta sulh, cihanda sulh.”", context: "Güvenli gelecek; barış, iş birliği ve ortak sorumlulukla kurulur." },
-    { quote: "“Köylü milletin efendisidir.”", context: "Üreticiyi, kırsal emeği ve doğal kaynakları korumak toplumsal refahın parçasıdır." },
-    { quote: "“Bütün ümidim gençliktedir.”", context: "Yeni fikirler, öğrenme ve sorumluluk geleceği şekillendirir." },
-    { quote: "“Milletin efendisi hakiki müstahsil olan köylüdür.”", context: "Üretim ve tarım, ülkenin ekonomik bağımsızlığının temel unsurlarındandır." }
+    { quote: "“Hayatta en hakiki mürşit ilimdir.”", enQuote: "“The truest guide in life is science.”", context: "Bilimi, kanıtı ve sürekli öğrenmeyi rehber edin.", enContext: "Let science, evidence, and continuous learning guide the way." },
+    { quote: "“Yurtta sulh, cihanda sulh.”", enQuote: "“Peace at home, peace in the world.”", context: "Güvenli gelecek; barış, iş birliği ve ortak sorumlulukla kurulur.", enContext: "A safer future is built through peace, cooperation, and shared responsibility." },
+    { quote: "“Köylü milletin efendisidir.”", enQuote: "“The peasant is the master of the nation.”", context: "Üreticiyi, kırsal emeği ve doğal kaynakları korumak toplumsal refahın parçasıdır.", enContext: "Protecting producers, rural work, and natural resources is part of public well-being." },
+    { quote: "“Bütün ümidim gençliktedir.”", enQuote: "“All my hope is in the youth.”", context: "Yeni fikirler, öğrenme ve sorumluluk geleceği şekillendirir.", enContext: "New ideas, learning, and responsibility shape the future." },
+    { quote: "“Milletin efendisi hakiki müstahsil olan köylüdür.”", enQuote: "“The true producer, the peasant, is the master of the nation.”", context: "Üretim ve tarım, ülkenin ekonomik bağımsızlığının temel unsurlarındandır.", enContext: "Production and agriculture are fundamental to a country's economic independence." }
   ];
   const photos = [
     { src: "https://commons.wikimedia.org/wiki/Special:FilePath/Orman%20%C3%87iftli%C4%9Fi%2C%20Ankara%2C%2014%20Temmuz%201929%20%287%29.png", alt: "Atatürk Orman Çiftliği, 1929 tarihli fotoğraf", caption: "Orman Çiftliği · 1929", source: "https://commons.wikimedia.org/wiki/File:Orman_%C3%87iftli%C4%9Fi,_Ankara,_14_Temmuz_1929_(7).png" },
@@ -84,13 +84,23 @@
     let index = 0;
     function show(next) {
       index = (next + quotes.length) % quotes.length;
-      if (quote) quote.textContent = quotes[index].quote;
-      if (context) context.textContent = quotes[index].context;
+      const english = (document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr") === "en";
+      if (quote) quote.textContent = english ? quotes[index].enQuote : quotes[index].quote;
+      if (context) context.textContent = english ? quotes[index].enContext : quotes[index].context;
       if (count) count.textContent = (index + 1) + " / " + quotes.length;
+      const prev = panel.querySelector("[data-quote-prev]");
+      const nextButton = panel.querySelector("[data-quote-next]");
+      if (prev) { prev.textContent = english ? "← Previous" : "← Önceki"; prev.setAttribute("aria-label", english ? "Previous quote" : "Önceki söz"); }
+      if (nextButton) { nextButton.textContent = english ? "Next quote →" : "Sonraki söz →"; nextButton.setAttribute("aria-label", english ? "Next quote" : "Sonraki söz"); }
+      const heading = panel.querySelector("#ataturk-shared-heading");
+      if (heading) heading.textContent = english ? "Ideas that shape the future" : "Geleceğe yön veren düşünceler";
     }
     panel.querySelector("[data-quote-prev]")?.addEventListener("click", () => show(index - 1));
     panel.querySelector("[data-quote-next]")?.addEventListener("click", () => show(index + 1));
     show(0);
+    const languageObserver = new MutationObserver(() => show(index));
+    languageObserver.observe(document.documentElement, {attributes:true, attributeFilter:["data-language"]});
+    document.addEventListener("click", event => { if (event.target.closest("#nexora-language-toggle")) queueMicrotask(() => show(index)); }, true);
     if (isVisionPage && !document.querySelector(".ataturk-photo-gallery")) {
       const gallery = makeGallery();
       panel.after(gallery);
