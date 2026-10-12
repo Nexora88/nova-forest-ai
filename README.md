@@ -1,8 +1,32 @@
+<p align="center"><img src="assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI" width="120"></p>
+
 # NexoraWildfire AI
 
 **Environmental intelligence for forests, farms, and the people who care for them.**
 
 NexoraWildfire AI is an independent environmental decision-support project by Nexora. It brings available weather, satellite-discovery, wildfire-awareness, agriculture, soil-and-water, beekeeping, pollen, and ecosystem observations into a map-first workspace. The first pilot area is Thrace (Trakya), Türkiye.
+
+
+## From field image to reviewable evidence
+
+The first pilot area is Thrace, Türkiye. The goal is to make observations easier to inspect—even when connectivity is intermittent—without pretending that a heuristic is a validated detector.
+
+```mermaid
+flowchart TD
+    A[UAV / field camera image] --> B[Local browser image lab]
+    B --> C[RGB histogram and colour statistics]
+    B --> D[EXIF GPS, when present]
+    B --> E[Contrast / grayscale / Sobel]
+    C --> F[Human review]
+    D --> G[Recorded-location map pin]
+    E --> F
+    F --> H[Optional sanitized JSON report]
+    H --> I[Explicit cloud export]
+```
+
+**Research status:** RGB statistics and Sobel filters are local image-analysis tools, not a trained fire/smoke detector. EXIF coordinates show the photo's recorded location, not where a fire started. Source images remain in the browser lab; the optional [Google Cloud report-export demo](docs/CLOUD_INTEGRATION_DEMO.md) only uploads a sanitized JSON report after an explicit manual confirmation.
+
+For a presentation-ready narrative, model/licensing gates, offline limitations, and a responsible drone/tower-camera roadmap, see the [Competition & Research Brief](docs/COMPETITION_PITCH.md).
 
 ## Vision
 
@@ -25,7 +49,9 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.
 - **Responsive, installable web app** with an offline-first shell and local saved-area experience.
-- **Experimental image-analysis page:** [UAV / image lab](pages/uav-demo.html). Fire/smoke inference is intentionally disabled after removing the AGPL-licensed runtime and checkpoint. It will only be re-enabled after selecting a license-compatible model and validating it with labelled regional data.
+- **Experimental image-analysis page:** [UAV / image lab](pages/uav-demo.html).
+- **Competition presentation and research story:** [Competition & Research Brief](docs/COMPETITION_PITCH.md).
+- **Optional privacy-aware cloud export demo:** [Google Cloud report export](docs/CLOUD_INTEGRATION_DEMO.md). Fire/smoke inference is intentionally disabled after removing the AGPL-licensed runtime and checkpoint. It will only be re-enabled after selecting a license-compatible model and validating it with labelled regional data.
 - **Experimental weather-risk index:** [methodology and limitations](docs/NEXORA_RISK_INDEX.md). The current index is rule-based and has not been calibrated or validated for operational fire prediction.
 - **Turkish and English interface**; the initial language follows the browser locale (Turkish for Turkish locales, English otherwise).
 
