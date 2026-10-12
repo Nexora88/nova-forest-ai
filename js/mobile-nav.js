@@ -13,7 +13,7 @@
   ];
   function initNavigation() {
     const inPages = /\/pages\//.test(location.pathname);
-    const prefix = inPages ? "../" : "";
+  
     document.querySelectorAll("body > nav").forEach((nav, index) => {
       if (nav.dataset.nxReady === "true") return;
       const current = location.pathname.split("/").pop() || "index.html";
@@ -113,10 +113,12 @@
     .nx-nav-toggle{display:none;align-items:center;gap:9px;min-height:42px;padding:9px 13px;border:1px solid #245b36;border-radius:10px;background:#07130b;color:#eaffef;font:700 12px system-ui;cursor:pointer}
     .nx-nav-more{position:relative;display:flex;align-items:center}
     .nx-nav-more-links{display:contents}
-    .nx-nav-more-toggle{border-color:#1a3925!important}
+    .nx-nav-more-toggle{display:none;border-color:#1a3925!important}
     @media(max-width:780px){
       body>nav.nx-nav{justify-content:space-between}
       .nx-nav-toggle{display:inline-flex}
+      .nx-nav-more-toggle{display:inline-flex}
+      .nx-nav-more-links a.active{display:flex!important}
       body>nav.nx-nav>a{display:none}
       body>nav.nx-nav>a.active{display:inline-flex}
       .nx-nav-more{margin-left:auto}
