@@ -2,38 +2,229 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#07130f">
-<meta name="description" content="NexoraWildfire AI deneysel görüntü laboratuvarı ve lisans durumu.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#020303">
+<meta name="description" content="NexoraWildfire AI UAV image lab: local image inspection, API health checks, model readiness and scientific transparency.">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../assets/nexora-wildfire-logo.png">
+<link rel="apple-touch-icon" href="../assets/nexora-wildfire-logo.png">
+<link rel="stylesheet" href="../css/style.css?v=20261010c">
+<link rel="stylesheet" href="../css/field-ui.css?v=20261006">
+<link rel="stylesheet" href="../css/product-ui.css?v=20261012a">
+<link rel="stylesheet" href="../css/special-days.css?v=20261008a">
+<link rel="stylesheet" href="../css/auth.css?v=20261008a">
 <title>İHA / Görüntü Laboratuvarı · NexoraWildfire AI</title>
 <style>
-:root{color-scheme:dark;--bg:#07130f;--panel:#0d2019;--line:#234b38;--green:#65ff9a;--muted:#a5b9ad;--amber:#ffce69}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#123526,var(--bg) 65%);color:#e9fff0;font:16px/1.6 system-ui,sans-serif}
-main{max-width:860px;margin:auto;padding:clamp(16px,4vw,36px)}a{color:var(--green)}h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15}h2{font-size:1.2rem}.panel{background:#0d2019dd;border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,26px);margin:18px 0}.status{display:inline-block;border:1px solid #80652d;background:#332a153d;color:#ffe5a8;border-radius:999px;padding:5px 11px;font-weight:700}.muted{color:var(--muted)}li{margin:.6rem 0}
+:root{--lab-bg:#030806;--lab-panel:rgba(7,17,11,.9);--lab-line:#1d5130;--lab-green:#00ff66;--lab-cyan:#00d9ff;--lab-muted:#9bb0a1;--lab-amber:#ffcb66}
+body{background:radial-gradient(ellipse at 50% -15%,#123b26 0,transparent 46%),#020504;color:#e9f7ed;font-family:Inter,system-ui,-apple-system,sans-serif}
+header{padding:22px clamp(16px,4vw,44px);gap:16px;flex-wrap:wrap}
+.brand-lockup{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;min-width:0}
+.brand-lockup img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 12px #00ff6633)}
+.brand-lockup h1{font-size:clamp(17px,2.6vw,25px);letter-spacing:1px!important;overflow-wrap:anywhere}
+.brand-lockup p{font-size:12px!important;margin:5px 0 0;line-height:1.45}
+.lab-shell{width:min(1120px,100%);margin:0 auto;padding:clamp(16px,3vw,32px)}
+.lab-hero{position:relative;overflow:hidden;border:1px solid #1b5732;border-radius:24px;padding:clamp(22px,4vw,42px);background:linear-gradient(120deg,#0c2518ed,#07110df2 65%,#071a1c);box-shadow:0 20px 70px #0006}
+.lab-hero:after{content:"";position:absolute;width:280px;height:280px;right:-100px;top:-120px;border:1px solid #00ff662b;border-radius:50%;box-shadow:0 0 0 28px #00ff6608,0 0 0 58px #00ff6606;pointer-events:none}
+.eyebrow{font-size:10px;letter-spacing:2px;color:var(--lab-green);font-weight:800}
+.lab-hero h2{font-size:clamp(28px,5vw,48px);line-height:1.08;max-width:780px;margin:13px 0}
+.lab-hero p{max-width:760px;color:#b7cbbd;line-height:1.8}
+.lab-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.lab-btn,.lab-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:11px 15px;border:1px solid #2b6340;border-radius:11px;background:#0a1a10;color:#e9ffef;font:600 13px system-ui;text-decoration:none;cursor:pointer}
+.lab-btn.primary{background:var(--lab-green);border-color:var(--lab-green);color:#001b08}
+.lab-btn:hover,.lab-link:hover{border-color:var(--lab-green)}
+.lab-btn:focus-visible,.lab-link:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;margin-top:16px}
+.lab-panel{min-width:0;border:1px solid var(--lab-line);border-radius:18px;padding:clamp(17px,2.5vw,25px);background:var(--lab-panel);box-shadow:0 12px 42px #0003}
+.lab-panel h3{font-size:19px;margin:8px 0}
+.lab-panel p{color:#a9bcae;font-size:13px;line-height:1.75}
+.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lab-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #785b22;background:#33281266;color:#ffdda0;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;white-space:normal}
+.lab-chip:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.lab-chip.ok{border-color:#23683d;background:#0d3a1c;color:#a9ffbf}
+.lab-chip.error{border-color:#7c3338;background:#351417;color:#ffb9be}
+.lab-divider{height:1px;background:#1a3825;margin:19px 0}
+.lab-status{padding:13px 14px;border:1px solid #254831;border-radius:12px;background:#07140b;color:#c7dbcd;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.lab-status strong{color:#eaffef}
+.lab-status a{color:#70ff9d}
+.lab-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.lab-meta div{padding:12px;border:1px solid #1a3925;border-radius:10px;background:#050c07;min-width:0}
+.lab-meta small{display:block;color:#718878;font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+.lab-meta strong{display:block;color:#eaffef;font-size:13px;margin-top:5px;overflow-wrap:anywhere}
+.lab-upload{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.lab-upload input[type=file]{width:100%;max-width:100%;padding:12px;border:1px dashed #356344;border-radius:11px;background:#061009;color:#c7dacd;font:12px system-ui}
+.lab-preview{display:none;width:100%;max-height:280px;object-fit:contain;border:1px solid #264b31;border-radius:12px;background:#020504}
+.lab-preview.visible{display:block}
+.lab-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.lab-result{border:1px solid #1b3d27;border-radius:10px;padding:11px;min-width:0}
+.lab-result span{display:block;color:#819787;font-size:11px}
+.lab-result strong{display:block;color:#edfff1;font-size:13px;overflow-wrap:anywhere;margin-top:4px}
+.lab-list{padding-left:19px;color:#b8cbbd;font-size:13px;line-height:1.8}
+.lab-list li{margin:7px 0}
+.lab-list strong{color:#eaffef}
+.lab-note{border-left:3px solid var(--lab-cyan);padding:12px 14px;background:#05202770;color:#b9d6d9;border-radius:0 10px 10px 0;font-size:12px;line-height:1.7;margin-top:14px}
+.lab-gates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.lab-gate{padding:13px;border:1px solid #23442d;border-radius:12px;background:#061009}
+.lab-gate b{display:block;color:#ffdc9a;font-size:12px}
+.lab-gate span{display:block;color:#8fa696;font-size:11px;line-height:1.6;margin-top:7px}
+.lab-footer{padding:25px 16px 38px;text-align:center;color:#758b7a;font-size:11px}
+.lab-footer a{color:#8cffab}
+@media(max-width:760px){.lab-grid{grid-template-columns:1fr}.lab-gates{grid-template-columns:1fr}.lab-meta{grid-template-columns:1fr}.lab-hero{border-radius:18px}.lab-hero h2{font-size:clamp(27px,8vw,38px)}header{padding:16px}.brand-lockup img{width:36px;height:36px}.status{font-size:10px;padding:7px 10px}}
 </style>
 </head>
-<body><main>
-<a href="../index.html">← NexoraWildfire AI ana panel</a>
-<h1>İHA / Görüntü Laboratuvarı</h1>
-<p>Bu alan, ileride lisansı uyumlu ve bağımsız olarak değerlendirilmiş görüntü analizini desteklemek üzere ayrılmıştır.</p>
-<section class="panel">
-<span class="status">Çıkarım şu anda devre dışı</span>
-<h2>Neden kapalı?</h2>
-<p>Projenin MIT lisanslama hedefini korumak için AGPL-3.0 lisanslı Ultralytics çalışma zamanı ve üçüncü taraf yangın/duman model ağırlıkları etkin entegrasyondan kaldırıldı. Lisansı uygunluğu doğrulanmış bir alternatif seçilene kadar bu sayfa görüntü yüklemez ve algılama sonucu üretmez.</p>
-</section>
-<section class="panel">
-<h2>Bilimsel ve güvenlik sınırları</h2>
-<ul>
-<li>Trakya koşullarında etiketli pozitif ve negatif yangın/duman görüntüleriyle bağımsız doğruluk değerlendirmesi yapılmış değildir.</li>
-<li>Bu sistem resmî uyarı, yangın teyidi veya doğrulanmış yangın tahmini olarak sunulmaz.</li>
-<li>İleride seçilecek model; lisansı, ağırlıkların kaynağı, eğitim verisi koşulları ve kullanım izinleri incelendikten sonra etkinleştirilecektir.</li>
-<li>Modelin teknik olarak çalışması tek başına doğruluk kanıtı sayılmaz. Bölgesel etiketli test, yanlış pozitif/negatif analizi ve belgelenmiş sınırlamalar gerekir.</li>
-</ul>
-</section>
-<section class="panel">
-<h2>Sonraki adım</h2>
-<p class="muted">Öncelik, MIT lisansını koruyarak güvenilir ve sürdürülebilir bir model yolu belirlemektir. Uyumlu bir model ve uygun değerlendirme verisi hazır olana kadar algılama özelliği kapalı kalacaktır.</p>
-<p><a href="../THIRD_PARTY_NOTICES.md">Üçüncü taraf lisans bildirimleri</a> · <a href="../docs/SCIENTIFIC_STATUS.md">Bilimsel durum ve doğrulama planı</a></p>
-</section>
-<script src="../js/i18n.js?v=20261011g"></script>
-</main></body></html>
+<body>
+<header>
+  <a class="brand-lockup" href="../index.html" aria-label="NexoraWildfire AI ana sayfa">
+    <img src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu">
+    <div class="logo"><h1>NexoraWildfire AI</h1><p data-uav-tr="Çevresel istihbarat · İHA görüntü laboratuvarı" data-uav-en="Environmental intelligence · UAV image lab">Çevresel istihbarat · İHA görüntü laboratuvarı</p></div>
+  </a>
+  <div class="status"><span></span> <span data-uav-tr="ARAŞTIRMA LABORATUVARI" data-uav-en="RESEARCH LAB">ARAŞTIRMA LABORATUVARI</span></div>
+</header>
+<nav aria-label="Ana gezinme">
+  <a href="../index.html">Ana Panel</a><a href="map.html">Risk Haritası</a><a href="areas.html">Alanlarım</a><a href="weather.html">Atmosfer</a><a href="satellite.html">Uydu Merkezi</a><a class="active" href="uav-demo.html">İHA / Yapay Zekâ</a><a href="about.html">Sistem</a><a href="feedback.html">Geri Bildirim</a><a href="vision.html">Cumhuriyet Vizyonu</a>
+</nav>
+<main class="lab-shell">
+  <section class="lab-hero">
+    <div class="eyebrow" data-uav-tr="NEXORAWILDFIRE / GÖRÜNTÜ ANALİZİ" data-uav-en="NEXORAWILDFIRE / IMAGE ANALYSIS">NEXORAWILDFIRE / GÖRÜNTÜ ANALİZİ</div>
+    <h2 data-uav-tr="Saha görüntülerini kontrollü ve izlenebilir bir iş akışında incele." data-uav-en="Inspect field imagery in a controlled, traceable workflow.">Saha görüntülerini kontrollü ve izlenebilir bir iş akışında incele.</h2>
+    <p data-uav-tr="Bu laboratuvar şimdilik görüntü dosyasını cihazında inceler, model API'sinin sağlık durumunu kontrol eder ve modelin neden henüz etkin olmadığını açıklar. Yangın/duman çıkarımı lisans uyumlu model ve Trakya koşullarında bağımsız doğrulama hazır olana kadar kapalıdır." data-uav-en="For now, this lab inspects an image file locally on your device, checks the model API health, and explains why the model is not enabled yet. Fire/smoke inference remains disabled until a license-compatible model and independent validation for Thrace conditions are available.">Bu laboratuvar şimdilik görüntü dosyasını cihazında inceler, model API'sinin sağlık durumunu kontrol eder ve modelin neden henüz etkin olmadığını açıklar. Yangın/duman çıkarımı lisans uyumlu model ve Trakya koşullarında bağımsız doğrulama hazır olana kadar kapalıdır.</p>
+    <div class="lab-actions">
+      <button class="lab-btn primary" id="check-api" type="button" data-uav-tr="API sağlık kontrolü" data-uav-en="Check API health">API sağlık kontrolü</button>
+      <a class="lab-link" href="../docs/SCIENTIFIC_STATUS.md" data-uav-tr="Bilimsel durum raporu ↗" data-uav-en="Scientific status report ↗">Bilimsel durum raporu ↗</a>
+      <a class="lab-link" href="../THIRD_PARTY_NOTICES.md" data-uav-tr="Lisans bildirimleri ↗" data-uav-en="License notices ↗">Lisans bildirimleri ↗</a>
+    </div>
+  </section>
+  <div class="lab-grid">
+    <section class="lab-panel">
+      <div class="lab-head"><div><div class="eyebrow" data-uav-tr="01 / SERVİS DURUMU" data-uav-en="01 / SERVICE STATUS">01 / SERVİS DURUMU</div><h3 data-uav-tr="Model API bağlantısı" data-uav-en="Model API connection">Model API bağlantısı</h3></div><span id="api-chip" class="lab-chip" data-uav-tr="Kontrol edilmedi" data-uav-en="Not checked">Kontrol edilmedi</span></div>
+      <p data-uav-tr="Kontrol, sunucunun sağlık uç noktasına kısa bir istek gönderir. API hazır yanıt verse bile bu, yangın modelinin etkin veya dış veri sağlayıcılarının erişilebilir olduğu anlamına gelmez." data-uav-en="This check sends a short request to the service health endpoint. Even if the API responds as healthy, that does not mean the fire model is enabled or external data providers are reachable.">Kontrol, sunucunun sağlık uç noktasına kısa bir istek gönderir. API hazır yanıt verse bile bu, yangın modelinin etkin veya dış veri sağlayıcılarının erişilebilir olduğu anlamına gelmez.</p>
+      <div id="api-status" class="lab-status" role="status" aria-live="polite" data-uav-tr="Kontrol için düğmeye bas. İstek zaman aşımına uğrarsa servis durumu doğrulanamadı olarak gösterilir." data-uav-en="Press the button to check. If the request times out, the service will be shown as unverified.">Kontrol için düğmeye bas. İstek zaman aşımına uğrarsa servis durumu doğrulanamadı olarak gösterilir.</div>
+      <div class="lab-meta">
+        <div><small data-uav-tr="Sağlık uç noktası" data-uav-en="Health endpoint">Sağlık uç noktası</small><strong>GET /health</strong></div>
+        <div><small data-uav-tr="İstek zaman aşımı" data-uav-en="Request timeout">İstek zaman aşımı</small><strong>8 s</strong></div>
+        <div><small data-uav-tr="Çıkarım" data-uav-en="Inference">Çıkarım</small><strong data-uav-tr="Devre dışı" data-uav-en="Disabled">Devre dışı</strong></div>
+      </div>
+    </section>
+    <section class="lab-panel">
+      <div class="lab-head"><div><div class="eyebrow" data-uav-tr="02 / YEREL DOSYA İNCELEME" data-uav-en="02 / LOCAL FILE INSPECTION">02 / YEREL DOSYA İNCELEME</div><h3 data-uav-tr="Görüntü dosyası bilgileri" data-uav-en="Image file details">Görüntü dosyası bilgileri</h3></div><span class="lab-chip ok" data-uav-tr="Cihazında kalır" data-uav-en="Stays on device">Cihazında kalır</span></div>
+      <p data-uav-tr="Bir fotoğraf seçerek dosya türünü, boyutunu ve piksel ölçülerini kontrol et. Bu özellik görüntü içeriğini sınıflandırmaz; dosyayı API'ye yüklemez." data-uav-en="Choose a photo to check its file type, size, and pixel dimensions. This feature does not classify image content and does not upload the file to the API.">Bir fotoğraf seçerek dosya türünü, boyutunu ve piksel ölçülerini kontrol et. Bu özellik görüntü içeriğini sınıflandırmaz; dosyayı API'ye yüklemez.</p>
+      <div class="lab-upload">
+        <label for="image-file" data-uav-tr="JPG, PNG veya WebP görüntüsü (en fazla 20 MB)" data-uav-en="JPG, PNG, or WebP image (up to 20 MB)">JPG, PNG veya WebP görüntüsü (en fazla 20 MB)</label>
+        <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp">
+        <img id="image-preview" class="lab-preview" alt="Seçilen görüntünün yerel önizlemesi">
+        <div id="image-message" class="lab-status" role="status" aria-live="polite" data-uav-tr="Henüz dosya seçilmedi." data-uav-en="No file selected yet.">Henüz dosya seçilmedi.</div>
+        <div class="lab-results">
+          <div class="lab-result"><span data-uav-tr="Dosya adı" data-uav-en="File name">Dosya adı</span><strong id="file-name">—</strong></div>
+          <div class="lab-result"><span data-uav-tr="Dosya türü" data-uav-en="File type">Dosya türü</span><strong id="file-type">—</strong></div>
+          <div class="lab-result"><span data-uav-tr="Dosya boyutu" data-uav-en="File size">Dosya boyutu</span><strong id="file-size">—</strong></div>
+          <div class="lab-result"><span data-uav-tr="Piksel ölçüsü" data-uav-en="Pixel dimensions">Piksel ölçüsü</span><strong id="file-dimensions">—</strong></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <section class="lab-panel" style="margin-top:16px">
+    <div class="eyebrow" data-uav-tr="03 / MODEL HAZIRLIK KAPILARI" data-uav-en="03 / MODEL READINESS GATES">03 / MODEL HAZIRLIK KAPILARI</div>
+    <h3 data-uav-tr="Çıkarım neden henüz kapalı?" data-uav-en="Why is inference still disabled?">Çıkarım neden henüz kapalı?</h3>
+    <p data-uav-tr="Bu kapılar geçilmeden sonuç kartı, algılama kutusu veya yangın alarmı gösterilmez. API'nin çalışması tek başına modelin güvenilirliğini kanıtlamaz." data-uav-en="No result card, detection box, or fire alert is shown until these gates are passed. A working API alone does not prove model reliability.">Bu kapılar geçilmeden sonuç kartı, algılama kutusu veya yangın alarmı gösterilmez. API'nin çalışması tek başına modelin güvenilirliğini kanıtlamaz.</p>
+    <div class="lab-gates">
+      <div class="lab-gate"><b data-uav-tr="01 · Lisans uyumu" data-uav-en="01 · License compatibility">01 · Lisans uyumu</b><span data-uav-tr="MIT hedefiyle uyumlu model ve ağırlık kaynağı doğrulanmalı." data-uav-en="A model and weights source compatible with the MIT goal must be verified.">MIT hedefiyle uyumlu model ve ağırlık kaynağı doğrulanmalı.</span></div>
+      <div class="lab-gate"><b data-uav-tr="02 · Bölgesel test" data-uav-en="02 · Regional validation">02 · Bölgesel test</b><span data-uav-tr="Trakya koşullarını temsil eden etiketli pozitif/negatif örnekler üzerinde ölçüm yapılmalı." data-uav-en="Measure performance on labelled positive and negative examples representative of Thrace conditions.">Trakya koşullarını temsil eden etiketli pozitif/negatif örnekler üzerinde ölçüm yapılmalı.</span></div>
+      <div class="lab-gate"><b data-uav-tr="03 · Hata analizi" data-uav-en="03 · Error analysis">03 · Hata analizi</b><span data-uav-tr="Yanlış pozitifler, kaçırılan olaylar, eşikler ve model sürümü yayımlanmalı." data-uav-en="Publish false positives, missed events, thresholds, and model version.">Yanlış pozitifler, kaçırılan olaylar, eşikler ve model sürümü yayımlanmalı.</span></div>
+    </div>
+    <div class="lab-note" data-uav-tr="Güvenlik notu: Bu sayfa resmî yangın ihbarı veya doğrulanmış yangın tahmini değildir. Acil bir durum görürsen resmî acil durum kanallarını kullan; bu laboratuvarı tek karar kaynağı olarak kullanma." data-uav-en="Safety note: this page is not an official wildfire alert or validated fire forecast. If you see an emergency, use official emergency channels; do not use this lab as your sole decision source.">Güvenlik notu: Bu sayfa resmî yangın ihbarı veya doğrulanmış yangın tahmini değildir. Acil bir durum görürsen resmî acil durum kanallarını kullan; bu laboratuvarı tek karar kaynağı olarak kullanma.</div>
+  </section>
+</main>
+<footer class="lab-footer">NexoraWildfire AI · Ahmet Eymen Bakraç · Nexora88 © 2026</footer>
+<script>
+(() => {
+  const API_BASE = "https://nexorawildfire-ml-production.up.railway.app";
+  const tr = (key, en) => (document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr") === "en" ? en : key;
+  const apiButton = document.getElementById("check-api");
+  const apiChip = document.getElementById("api-chip");
+  const apiStatus = document.getElementById("api-status");
+  apiButton.addEventListener("click", async () => {
+    apiButton.disabled = true;
+    apiButton.textContent = tr("Kontrol ediliyor…", "Checking…");
+    apiChip.className = "lab-chip";
+    apiChip.textContent = tr("Kontrol ediliyor", "Checking");
+    apiStatus.textContent = tr("Sağlık uç noktasına istek gönderiliyor…", "Requesting the health endpoint…");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch(API_BASE + "/health", {method:"GET", headers:{Accept:"application/json"}, signal:controller.signal, cache:"no-store"});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const data = await response.json();
+      if (data.status !== "healthy") throw new Error(tr("Beklenmeyen sağlık yanıtı", "Unexpected health response"));
+      apiChip.className = "lab-chip ok";
+      apiChip.textContent = tr("API erişilebilir", "API reachable");
+      apiStatus.textContent = tr("API yanıt verdi. Bu yalnızca servis sağlık kontrolüdür; model çıkarımının etkin olduğunu veya dış veri sağlayıcılarının çalıştığını doğrulamaz.", "The API responded. This only verifies service health; it does not confirm that model inference or external data providers are active.") + " · " + (data.version || "version unavailable");
+    } catch (error) {
+      apiChip.className = "lab-chip error";
+      apiChip.textContent = tr("Doğrulanamadı", "Unverified");
+      apiStatus.textContent = tr("Tarayıcıdan sağlık yanıtı alınamadı. Ağ, servis veya CORS kısıtlaması olabilir; bu durum tek başına servisin kapalı olduğunu kanıtlamaz.", "The health response could not be read in this browser. Network, service, or CORS restrictions may be responsible; this alone does not prove the service is down.") + " " + String(error && error.message || error);
+      const link = document.createElement("a");
+      link.href = API_BASE + "/health";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = tr("Sağlık uç noktasını yeni sekmede aç", "Open health endpoint in a new tab");
+      apiStatus.append(" ");
+      apiStatus.append(link);
+    } finally {
+      clearTimeout(timeout);
+      apiButton.disabled = false;
+      apiButton.textContent = tr("API sağlık kontrolü", "Check API health");
+    }
+  });
+  const input = document.getElementById("image-file");
+  const preview = document.getElementById("image-preview");
+  const message = document.getElementById("image-message");
+  let currentUrl = null;
+  const reset = () => {
+    ["file-name","file-type","file-size","file-dimensions"].forEach(id => document.getElementById(id).textContent = "—");
+    preview.classList.remove("visible");
+    preview.removeAttribute("src");
+    if (currentUrl) URL.revokeObjectURL(currentUrl);
+    currentUrl = null;
+  };
+  input.addEventListener("change", () => {
+    reset();
+    const file = input.files && input.files[0];
+    if (!file) { message.textContent = tr("Henüz dosya seçilmedi.", "No file selected yet."); return; }
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) {
+      message.textContent = tr("Desteklenmeyen tür. JPG, PNG veya WebP seç.", "Unsupported type. Choose JPG, PNG, or WebP.");
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      message.textContent = tr("Dosya 20 MB sınırını aşıyor. Daha küçük bir görüntü seç.", "The file exceeds 20 MB. Choose a smaller image.");
+      return;
+    }
+    currentUrl = URL.createObjectURL(file);
+    preview.onload = () => {
+      document.getElementById("file-name").textContent = file.name;
+      document.getElementById("file-type").textContent = file.type || tr("Bilinmiyor", "Unknown");
+      document.getElementById("file-size").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      document.getElementById("file-dimensions").textContent = preview.naturalWidth + " × " + preview.naturalHeight + " px";
+      message.textContent = tr("Dosya başarıyla okundu. Görüntü cihazında kaldı; sunucuya gönderilmedi ve içerik analizi yapılmadı.", "File read successfully. The image stayed on your device; it was not uploaded and no content analysis was performed.");
+      preview.classList.add("visible");
+    };
+    preview.onerror = () => { message.textContent = tr("Görüntü dosyası okunamadı.", "The image file could not be read."); reset(); };
+    preview.src = currentUrl;
+  });
+  const applyLocalLanguage = () => {
+    const lang = document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr";
+    document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el => {
+      el.textContent = lang === "en" ? el.dataset.uavEn : el.dataset.uavTr;
+    });
+    document.title = tr("İHA / Görüntü Laboratuvarı · NexoraWildfire AI", "UAV / Image Lab · NexoraWildfire AI");
+  };
+  const observer = new MutationObserver(applyLocalLanguage);
+  observer.observe(document.documentElement, {attributes:true, attributeFilter:["data-language"]});
+  applyLocalLanguage();
+  document.addEventListener("click", event => {
+    if (event.target.closest("#nexora-language-toggle")) queueMicrotask(applyLocalLanguage);
+  }, true);
+})();
+</script>
+<script src="../js/mobile-nav.js?v=20261012a"></script>
+<script src="../js/i18n.js?v=20261012a"></script>
+</body>
+</html>
