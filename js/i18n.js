@@ -591,11 +591,12 @@
     ["Kare JPEG olarak hazırlanamadı.","Could not prepare the frame as JPEG."],["Video oynatılamadı:","Could not play video:"],
     ["Yerel video hazır. Kareler yalnızca gerçek algılama başlatıldığında API adresine gönderilir.","Local video is ready. Frames are sent to the API only when real detection starts."],
     ["Yerel video","Local video"],["Model servisi henüz doğrulanmadı.","Model service has not been verified yet."],
-    ["Weather data by Open-Meteo.com","Hava verisi: Open-Meteo.com"],["Veri Durumu","Data Status"],["GÖZLEM HAZIR","OBSERVATION READY"],["VERİ YOK","DATA UNAVAILABLE"],["Güncel hava yanıtı alındı; bu kart yangın tahmini değildir.","A current weather response was received; this card is not a fire forecast."],["Hava API'si erişilemedi; risk skoru üretilmedi.","Weather API unavailable; no risk score was produced."],
+    ["Hava verisi: Open-Meteo.com","Weather data by Open-Meteo.com"],["Veri Durumu","Data Status"],["GÖZLEM HAZIR","OBSERVATION READY"],["VERİ YOK","DATA UNAVAILABLE"],["Güncel hava yanıtı alındı; bu kart yangın tahmini değildir.","A current weather response was received; this card is not a fire forecast."],["Hava API'si erişilemedi; risk skoru üretilmedi.","Weather API unavailable; no risk score was produced."],
 
   ];
   const trToEn = new Map(pairs);
-  const enToTr = new Map(pairs.map(([tr,en]) => [en,tr]));
+  const enToTr = new Map();
+  for (const [tr,en] of pairs) if (!enToTr.has(en)) enToTr.set(en,tr);
   const stateKey = "nexorawildfire-language-v1";
   const stored = (() => { try { return localStorage.getItem(stateKey); } catch { return null; } })();
   let lang = stored === "en" || stored === "tr" ? stored : ((navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en");
