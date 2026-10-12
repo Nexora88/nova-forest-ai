@@ -161,12 +161,12 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
      for(let i=0;i<n;i++){const e=ifd0+2+i*12;if(u16(e)===0x8825){gpsOffset=tiff+u32(e+8);break;}}
      if(gpsOffset===null||gpsOffset+2>b.byteLength){resolve(null);return;}
      const gn=u16(gpsOffset),tags={};
-     for(let i=0;i<gn;i++){const e=gpsOffset+2+i*12,tag=u16(e),type=u16(e+2),count=u32(e+4),val=e+8;tags[tag]={type,count,value:(type===2&&count<=4)?String.fromCharCode(...Array.from({length:count},(_,k)=>b.getUint8(val+k))).replace(/\0/g,""):tiff+u32(val)};}
+     for(let i=0;i<gn;i++){const e=gpsOffset+2+i*12,tag=u16(e),type=u16(e+2),count=u32(e+4),val=e+8;tags[tag]={type,count,value:((type===2||type===1||type===7)&&count<=4)?(type===2?String.fromCharCode(...Array.from({length:count},(_,k)=>b.getUint8(val+k))).replace(/\0/g,""):b.getUint8(val)):tiff+u32(val)};}
      const ascii=tag=>{const x=tags[tag];if(!x)return null;if(typeof x.value==="string")return x.value;return String.fromCharCode(...Array.from({length:x.count},(_,k)=>b.getUint8(x.value+k))).replace(/\0/g,"");};
      const rationals=tag=>{const x=tags[tag];if(!x||x.type!==5||x.count<3)return null;const a=[];for(let i=0;i<3;i++){const at=x.value+i*8,num=u32(at),den=u32(at+4);if(!den)return null;a.push(num/den);}return a[0]+a[1]/60+a[2]/3600;};
      let lat=rationals(2),lon=rationals(4);const latRef=ascii(1),lonRef=ascii(3);
      if(lat===null||lon===null){resolve(null);return;}if(latRef==="S")lat=-lat;if(lonRef==="W")lon=-lon;
-     let altitude=null;if(tags[6]&&tags[6].type===5){const at=tags[6].value,den=u32(at+4);if(den)altitude=u32(at)/den*(tags[5]&&b.getUint8(tags[5].value)===1?-1:1);}
+     let altitude=null;if(tags[6]&&tags[6].type===5){const at=tags[6].value,den=u32(at+4);if(den)altitude=u32(at)/den*(tags[5]&&tags[5].value===1?-1:1);}
      resolve({lat,lon,altitude});
     }catch{resolve(null);}
    };
