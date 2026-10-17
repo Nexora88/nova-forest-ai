@@ -9,7 +9,10 @@
     ["pages/uav-demo.html", "İHA / Yapay Zekâ", "UAV / AI"],
     ["pages/about.html", "Sistem", "About the System"],
     ["pages/feedback.html", "Geri Bildirim", "Feedback"],
-    ["pages/vision.html", "Cumhuriyet Vizyonu", "Republic Vision"]
+    ["pages/vision.html", "Cumhuriyet Vizyonu", "Republic Vision"],
+    ["pages/account.html", "Hesap Merkezi", "Account Center"],
+    ["pages/auth.html", "Giriş / Kayıt", "Sign in / Sign up"],
+    ["pages/enterprise.html", "Kurumsal Analiz", "Enterprise Analysis"]
   ];
   const language = () => document.documentElement.dataset.language || localStorage.getItem("nexorawildfire-language-v1") || "tr";
   const english = () => language() === "en";
