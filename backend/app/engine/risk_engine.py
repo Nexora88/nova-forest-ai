@@ -32,7 +32,10 @@ def calculate_risk(temperature, humidity, wind_speed):
 
     return {
         "risk_score": risk_score,
-        "risk_level": get_risk_level(risk_score)
+        "risk_level": get_risk_level(risk_score),
+        "score_type": "heuristic_environmental_indicator",
+        "validated": False,
+        "warning": "Deneysel, kural tabanlı meteorolojik göstergedir; doğrulanmış yangın tespiti, resmi uyarı veya kesin tahmin değildir."
     }
 
 
