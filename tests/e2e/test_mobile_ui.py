@@ -237,5 +237,42 @@ class MobileUiSmokeTests(unittest.TestCase):
                     context.close()
 
 
+    def test_shared_navigation_logo_and_active_page_on_every_page(self):
+        for path in ALL_UI_PAGES:
+            with self.subTest(path=path):
+                context, page = self.new_page()
+                try:
+                    page.goto(BASE + path, wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector("nav.nx-nav", timeout=10000)
+                    self.assertTrue(page.locator('nav.nx-nav a[href*="uav-demo.html"]').count() == 1,
+                                    f"UAV link missing or duplicated on {path}")
+                    self.assertEqual(page.locator('nav.nx-nav a[aria-current="page"]').count(), 1,
+                                     f"active-page marker missing or duplicated on {path}")
+                    self.assertEqual(page.locator('header img[src*="nexora-wildfire-logo"]').count(), 1,
+                                     f"header logo missing or duplicated on {path}")
+                    self.assertEqual(page.locator('nav.nx-nav a[href*="account.html"]').count(), 1,
+                                     f"account link missing or duplicated on {path}")
+                finally:
+                    context.close()
+
+    def test_service_worker_cache_version_and_offline_navigation(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
+            page.evaluate("navigator.serviceWorker.ready")
+            page.reload(wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
+            keys = page.evaluate("caches.keys()")
+            self.assertIn("nexorawildfire-shell-v20", keys, "new app-shell cache version was not installed")
+            self.assertNotIn("nexorawildfire-shell-v19", keys, "stale app-shell cache was not removed")
+            context.set_offline(True)
+            page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)
+            self.assertIn("NexoraWildfire", page.title())
+            self.assertTrue(page.locator("main").count(), "cached page shell was not available offline")
+        finally:
+            context.set_offline(False)
+            context.close()
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
