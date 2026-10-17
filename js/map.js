@@ -38,7 +38,7 @@ function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").fi
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
 function popup(r,level="province"){
  const s=scoreFor(r);
- const action=level==="province"
+ const action=(level==="province"||level==="il")
   ? '<button type="button" class="map-drill-button" data-open-province>İlçeleri aç →</button>'
   : level==="ilçe"
    ? '<button type="button" class="map-drill-button" data-open-district>İlçeyi aç · köy/mahalleleri göster →</button>'
