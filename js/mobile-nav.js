@@ -69,7 +69,7 @@
   }
 
   function initNavigation() {
-    const logoBase = /\\/pages\\//.test(location.pathname) ? "../" : "";
+    const logoBase = location.pathname.includes("/pages/") ? "../" : "";
     document.querySelectorAll("body > header .brand-lockup img, body > header img.nx-header-logo").forEach(img => {
       if (img.dataset.nxFallbackBound === "true") return;
       img.dataset.nxFallbackBound = "true";
