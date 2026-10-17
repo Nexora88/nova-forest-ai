@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v17";
-const DATA_CACHE = "nexorawildfire-data-v17";
+const CACHE_NAME = "nexorawildfire-shell-v18";
+const DATA_CACHE = "nexorawildfire-data-v18";
 
 const APP_SHELL = [
   "./",
@@ -23,6 +23,7 @@ const APP_SHELL = [
   "./js/mobile-nav.js?v=20261012c",
   "./js/i18n.js",
   "./js/i18n.js?v=20261012c",
+  "./js/i18n.js?v=20261017a",
   "./js/ataturk-quotes.js",
   "./js/ataturk-quotes.js?v=20261012c",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
