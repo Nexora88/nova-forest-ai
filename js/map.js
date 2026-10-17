@@ -36,7 +36,15 @@ function beeScore(w,pollen=0){let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
-function popup(r,level="province"){const s=scoreFor(r);return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+level.toUpperCase()+'</div><h3>'+r.name+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div><div class="popup-source">Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>'}
+function popup(r,level="province"){
+ const s=scoreFor(r);
+ const action=level==="province"
+  ? '<button type="button" class="map-drill-button" data-open-province>İlçeleri aç →</button>'
+  : level==="ilçe"
+   ? '<button type="button" class="map-drill-button" data-open-district>İlçeyi aç · köy/mahalleleri göster →</button>'
+   : "";
+ return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+level.toUpperCase()+'</div><h3>'+escapeHtml(r.name)+'</h3><div class="popup-area">'+(r.area?Math.round(r.area).toLocaleString("tr-TR")+" km²":"Çevresel analiz alanı")+'</div><div class="popup-score" style="color:'+color(s)+'">'+(mode==="water"?Math.round(s*100):Math.round(s))+'<small>/100</small></div><div class="popup-level">'+label(s,mode)+'</div><div class="popup-grid"><span>Sıcaklık</span><b>'+r.w.t+' °C</b><span>Nem</span><b>'+r.w.h+' %</b><span>Rüzgar</span><b>'+r.w.wind+' km/s</b><span>Toprak nemi</span><b>'+Math.round(r.w.soil*100)+' %</b><span>ET₀</span><b>'+r.w.et0.toFixed(1)+' mm</b><span>VPD</span><b>'+r.w.vpd.toFixed(2)+'</b></div><div class="popup-warning"><strong>'+label(s,mode)+'</strong><br>'+modeDescription(mode)+'</div><div class="popup-history"><strong>Geçmiş</strong><br>'+hist(r.name)+'</div>'+action+'<div class="popup-source">Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.</div></div>';
+}
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
@@ -77,23 +85,15 @@ function breadcrumb(t){const x=el("[data-breadcrumb]");if(x)x.textContent=t}
 
 function drawProvinces(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("click",()=>openProvince(r.name))}else{l.bindTooltip(r.name+' · Yakında',{permanent:true,direction:"center",className:"region-label region-label-muted"});l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
+ provinceFeatures.forEach((f,i)=>{const r=provinceRows[i];if(!r)return;L.geoJSON(f,{style:styleFor(r),onEachFeature:(x,l)=>{if(ACTIVE_PROVINCES.has(norm(r.name))){l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label"});l.bindPopup(popup(r,"il"),{maxWidth:360});l.on("popupopen",e=>{const b=e.popup.getElement()?.querySelector("[data-open-province]");if(b)b.addEventListener("click",()=>openProvince(r.name),{once:true})})}else{l.bindTooltip(r.name+' · Yakında',{permanent:true,direction:"center",className:"region-label region-label-muted"});l.on("click",()=>window.NexoraFeedback?.comingSoon(r.name))}l.on({mouseover:e=>e.target.setStyle(ACTIVE_PROVINCES.has(norm(r.name))?{weight:3,fillOpacity:.9}:{weight:1.2,fillOpacity:.32}),mouseout:e=>e.target.setStyle(styleFor(r))})}}).addTo(provinceLayer)});
  breadcrumb("İL SEVİYESİ");setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
 }
 function drawDistricts(){
  provinceLayer.clearLayers();districtLayer.clearLayers();settlementLayer.clearLayers();
- districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r,true),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("click",()=>chooseDistrict(r))}}).addTo(districtLayer)});
+ districtFeatures.forEach((f,i)=>{const r=districtRows[i];L.geoJSON(f,{style:styleFor(r,true),onEachFeature:(x,l)=>{l.bindTooltip(r.name,{permanent:true,direction:"center",className:"region-label region-"+mode+"-"+band(scoreFor(r),mode)});l.bindPopup(popup(r,"ilçe"),{maxWidth:360});l.on("popupopen",e=>{const b=e.popup.getElement()?.querySelector("[data-open-district]");if(b)b.addEventListener("click",()=>{selectedDistrict=r.name;focusDistrict(r)},{once:true})})}}).addTo(districtLayer)});
  breadcrumb(selectedProvince+" → İLÇELER");setStatus("CANLI • "+districtRows.length+" İLÇE • "+selectedProvince+" • "+mode.toUpperCase());
 }
-function chooseDistrict(r){
- selectedDistrict=null;
- let old=el(".district-picker");if(old)old.remove();
- const box=document.createElement("div");box.className="district-picker";
- box.innerHTML='<div><strong>İLÇE SEÇ</strong><button data-close>×</button></div><h3>'+r.name+'</h3><p>Bu ilçeyi açmak ve köy/mahalle seviyesine inmek için seç.</p><button class="district-open">İlçeyi aç →</button>';
- el(".map-section").appendChild(box);
- box.querySelector("[data-close]").onclick=()=>box.remove();
- box.querySelector(".district-open").onclick=()=>{box.remove();selectedDistrict=r.name;focusDistrict(r)};
-}
+function chooseDistrict(r){selectedDistrict=r.name;focusDistrict(r)}
 async function weatherFor(coordsList){
  if(!coordsList.length)return[];
  const u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",coordsList.map(x=>x[0]).join(","));u.searchParams.set("longitude",coordsList.map(x=>x[1]).join(","));u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,soil_moisture_0_to_7cm,vapour_pressure_deficit");u.searchParams.set("daily","et0_fao_evapotranspiration,precipitation_sum");u.searchParams.set("forecast_days","3");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());return Array.isArray(j)?j:[j]}
@@ -262,4 +262,4 @@ async function finishDraw(){
 function renderSavedAreas(){fieldLayer.clearLayers();let areas=[];try{const raw=JSON.parse(localStorage.getItem(areaKey)||"[]");if(Array.isArray(raw))areas=raw.filter(validSavedArea)}catch{}const polygons=new Map();areas.forEach(a=>{try{const polygon=L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+escapeHtml(a.name)+" · "+escapeHtml(a.type),{className:"saved-field-label"}).addTo(fieldLayer);polygons.set(String(a.id),polygon)}catch(error){console.warn("Invalid saved area skipped",a?.id,error)}});const focusId=new URLSearchParams(location.search).get("area");if(focusId&&polygons.has(String(focusId))){const target=polygons.get(String(focusId));map.fitBounds(target.getBounds(),{padding:[30,30],maxZoom:15});target.openTooltip();setStatus("SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR");}}
 map.on("dblclick",finishDraw);
 async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
-load();enableMobileMapGesture();setInterval(loadProvinceData,300000);
+load();enableMobileMapGesture();setInterval(()=>{if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()},300000);
