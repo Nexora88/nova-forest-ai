@@ -14,7 +14,7 @@
     if(Number(w.vpd)>2)alerts.push({level:"warning",title:"VPD YÜKSEK",message:"Hava koşulları su kaybı baskısını artırıyor."});
     if(Number(w.wind)>25)alerts.push({level:"warning",title:"RÜZGAR",message:"Yerel veride yüksek rüzgar görülüyor."});
     if(previous && r-previous.risk>=15)alerts.push({level:"warning",title:"RİSK ARTIŞI",message:"Son kayıtla karşılaştırıldığında risk belirgin arttı."});
-    return {risk:r,alerts,calculatedAt:Date.now(),mode:"offline-decision-support"};
+    return {risk:r,alerts,calculatedAt:Date.now(),mode:"offline-decision-support",score_type:"heuristic_environmental_indicator",validated:false,warning:"Deneysel, kural tabanlı karar destek göstergesidir; doğrulanmış yangın tespiti, resmi uyarı veya kesin tahmin değildir."};
   }
   window.NovaOfflineEngine={risk,evaluate};
 })();
