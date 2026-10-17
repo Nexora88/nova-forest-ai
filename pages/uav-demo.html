@@ -22,7 +22,10 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
 .brand-lockup img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 12px #00ff6633)}
 .brand-lockup h1{font-size:clamp(17px,2.6vw,25px);letter-spacing:1px!important;overflow-wrap:anywhere}
 .brand-lockup p{font-size:12px!important;margin:5px 0 0;line-height:1.45}
-.lab-shell{width:min(1180px,100%);margin:0 auto;padding:clamp(14px,3vw,32px)}
+.lab-shell{box-sizing:border-box;width:100%;max-width:1180px;margin:0 auto;padding:clamp(14px,3vw,32px)}
+main.lab-shell{padding:clamp(14px,3vw,32px)!important;min-width:0;overflow-wrap:anywhere}
+.lab-shell *{min-width:0}
+.lab-shell canvas{max-width:100%}
 .lab-hero{position:relative;overflow:hidden;border:1px solid #1b5732;border-radius:22px;padding:clamp(22px,4vw,42px);background:linear-gradient(120deg,#0c2518ed,#07110df2 65%,#071a1c);box-shadow:0 20px 70px #0006}
 .eyebrow{font-size:10px;letter-spacing:1.6px;color:var(--lab-green);font-weight:800}
 .lab-hero h2{font-size:clamp(28px,5vw,46px);line-height:1.08;max-width:790px;margin:13px 0}
@@ -65,7 +68,7 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
 <body>
 <header>
   <a class="brand-lockup" href="../index.html" aria-label="NexoraWildfire AI ana sayfa">
-    <img src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu">
+    <img class="brand-logo" src="../assets/nexora-wildfire-logo.png" alt="NexoraWildfire AI logosu">
     <div class="logo"><h1>NexoraWildfire AI</h1><p data-uav-tr="Çevresel Zekâ" data-uav-en="Environmental Intelligence">Çevresel Zekâ</p></div>
   </a>
   <div class="status"><span></span><span data-uav-tr="İHA GÖRÜNTÜ LABORATUVARI" data-uav-en="UAV IMAGE LAB">İHA GÖRÜNTÜ LABORATUVARI</span></div>
@@ -222,13 +225,43 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
  });
  $("filter-original").addEventListener("click",()=>applyFilter("original"));$("filter-contrast").addEventListener("click",()=>applyFilter("contrast"));$("filter-gray").addEventListener("click",()=>applyFilter("gray"));$("filter-sobel").addEventListener("click",()=>applyFilter("sobel"));
  const apiButton=$("check-api"),apiChip=$("api-chip"),apiStatus=$("api-status");
- apiButton.addEventListener("click",async()=>{
+ async function checkService(){
   apiButton.disabled=true;apiButton.textContent=tr("Kontrol ediliyor…","Checking…");apiChip.className="lab-chip";setLocalized("api-chip","Kontrol ediliyor","Checking");
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
-  try{const response=await fetch(API_BASE+"/health",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);const data=await response.json();if(data.status!=="healthy")throw new Error("Unexpected health response");apiChip.className="lab-chip ok";setLocalized("api-chip","API erişilebilir","API reachable");const version=" · "+(data.version||"version unavailable");setLocalized("api-status","Servis sağlık yanıtı alındı. Bu, modelin etkinliğini veya doğruluğunu kanıtlamaz."+version,"Service health response received. This does not prove model availability or accuracy."+version);}
-  catch(error){apiChip.className="lab-chip error";setLocalized("api-chip","Doğrulanamadı","Unverified");const err=" "+String(error&&error.message||error);setLocalized("api-status","Tarayıcı yanıtı okuyamadı; ağ veya CORS engeli olabilir. Bu tek başına servisin kapalı olduğunu kanıtlamaz."+err,"The browser could not read the response; network or CORS may be involved. This alone does not prove the service is down."+err);const a=document.createElement("a");a.href=API_BASE+"/health";a.target="_blank";a.rel="noopener noreferrer";a.textContent=tr("Uç noktayı aç","Open endpoint");apiStatus.append(" ",a);}
-  finally{clearTimeout(timer);apiButton.disabled=false;apiButton.textContent=tr("API bağlantısını kontrol et","Check API connection");}
- });
+  try{
+   const response=await fetch(API_BASE+"/health",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});
+   if(!response.ok)throw new Error("HTTP "+response.status);
+   const data=await response.json();if(data.status!=="healthy")throw new Error("Unexpected health response");
+   let modelLine="";
+   try{
+    const modelResponse=await fetch(API_BASE+"/ml/yolo/status",{headers:{Accept:"application/json"},signal:controller.signal,cache:"no-store"});
+    if(!modelResponse.ok)throw new Error("HTTP "+modelResponse.status);
+    const model=await modelResponse.json();
+    if(model.status==="disabled_license_safe"||model.runtime_available===false){
+     apiChip.className="lab-chip error";
+     setLocalized("api-chip","API açık · model kapalı","API online · model disabled");
+     modelLine=tr(" Yangın/duman modeli lisans ve doğrulama koşulları nedeniyle devre dışı."," The fire/smoke model is disabled pending licensing and validation.");
+    }else{
+     apiChip.className="lab-chip ok";
+     setLocalized("api-chip","API erişilebilir","API reachable");
+     modelLine=tr(" Model servisinin durum yanıtı alındı; bu tek başına doğruluk kanıtı değildir."," Model status was returned; this alone does not prove accuracy.");
+    }
+   }catch(modelError){
+    apiChip.className="lab-chip";
+    setLocalized("api-chip","API açık · model durumu bilinmiyor","API online · model unknown");
+    modelLine=tr(" Model durumu uç noktası doğrulanamadı."," The model-status endpoint could not be verified.");
+   }
+   const version=" · "+(data.version||"sürüm bilinmiyor");
+   setLocalized("api-status","API sağlık kontrolü başarılı."+modelLine+" Canlı İHA/SİHA uçuş telemetrisi bu sayfaya bağlı değil; burada yüklenen fotoğraflar cihaz üzerinde analiz edilir."+version,"API health check passed."+modelLine+" Live UAV/UCAV flight telemetry is not connected to this page; uploaded photos are analysed on this device."+version);
+  }catch(error){
+   apiChip.className="lab-chip error";setLocalized("api-chip","Doğrulanamadı","Unverified");
+   const err=" "+String(error&&error.message||error);
+   setLocalized("api-status","Tarayıcı servis yanıtını okuyamadı; ağ veya CORS engeli olabilir. Bu tek başına servisin kapalı olduğunu kanıtlamaz."+err,"The browser could not read the service response; network or CORS may be involved. This alone does not prove the service is down."+err);
+   const a=document.createElement("a");a.href=API_BASE+"/health";a.target="_blank";a.rel="noopener noreferrer";a.textContent=tr("Uç noktayı aç","Open endpoint");apiStatus.append(" ",a);
+  }finally{clearTimeout(timer);apiButton.disabled=false;apiButton.textContent=tr("API bağlantısını kontrol et","Check API connection");}
+ }
+ apiButton.addEventListener("click",checkService);
+
  function applyLanguage(){
   const language=lang();document.querySelectorAll("[data-uav-tr][data-uav-en]").forEach(el=>{el.textContent=language==="en"?el.dataset.uavEn:el.dataset.uavTr;});
   if(imageReady && $("gps-result").classList.contains("visible")) showGPS(gps);
@@ -238,6 +271,7 @@ header{padding:20px clamp(16px,4vw,40px);gap:16px;flex-wrap:wrap}
  new MutationObserver(applyLanguage).observe(document.documentElement,{attributes:true,attributeFilter:["data-language"]});
  document.addEventListener("click",event=>{if(event.target.closest("#nexora-language-toggle"))queueMicrotask(applyLanguage);},true);
  applyLanguage();
+ checkService();
 })();
 </script>
 <script src="../js/pwa.js?v=20261010h"></script>
