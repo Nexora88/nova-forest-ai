@@ -47,6 +47,27 @@
   }
 
   function initNavigation() {
+    const header = document.querySelector("body > header");
+    if (header && !header.querySelector(".brand-lockup img") && !header.querySelector(".nx-header-logo")) {
+      const logo = header.querySelector(".logo");
+      if (logo) {
+        const img = document.createElement("img");
+        img.className = "nx-header-logo";
+        img.src = (location.pathname.includes("/pages/") ? "../" : "") + "assets/nexora-wildfire-logo.png";
+        img.alt = "NexoraWildfire AI";
+        img.width = 44;
+        img.height = 44;
+        logo.prepend(img);
+        logo.classList.add("nx-standard-logo");
+      }
+    }
+    if (header && !document.querySelector("body > nav")) {
+      const nav = document.createElement("nav");
+      header.insertAdjacentElement("afterend", nav);
+    }
+    const style = document.createElement("style");
+    style.textContent = ".logo.nx-standard-logo{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;column-gap:12px;min-width:0}.nx-header-logo{grid-column:1;grid-row:1/span 2;width:44px;height:44px;object-fit:contain;flex:0 0 44px}.logo.nx-standard-logo h1,.logo.nx-standard-logo p{grid-column:2;min-width:0;overflow-wrap:anywhere}.logo.nx-standard-logo h1{margin:0}.logo.nx-standard-logo p{margin:4px 0 0}@media(max-width:480px){.nx-header-logo{width:38px;height:38px}.logo.nx-standard-logo{grid-template-columns:38px minmax(0,1fr);column-gap:9px}}";
+    document.head.appendChild(style);
     installConnectivity();
     const inPages = /\/pages\//.test(location.pathname);
     document.querySelectorAll("body > nav").forEach(nav => {
