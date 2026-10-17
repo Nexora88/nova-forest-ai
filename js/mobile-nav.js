@@ -69,6 +69,16 @@
   }
 
   function initNavigation() {
+    const logoBase = /\\/pages\\//.test(location.pathname) ? "../" : "";
+    document.querySelectorAll("body > header .brand-lockup img, body > header img.nx-header-logo").forEach(img => {
+      if (img.dataset.nxFallbackBound === "true") return;
+      img.dataset.nxFallbackBound = "true";
+      img.addEventListener("error", () => {
+        if (img.dataset.nxFallbackApplied === "true") return;
+        img.dataset.nxFallbackApplied = "true";
+        img.src = logoBase + "assets/nexora-wildfire-logo-fallback.svg";
+      });
+    });
     const header = document.querySelector("body > header");
     if (header && !header.querySelector(".brand-lockup img") && !header.querySelector(".nx-header-logo")) {
       const logo = header.querySelector(".logo");
