@@ -15,7 +15,7 @@
   function clearSignedInLocalData(){
     try{localStorage.removeItem(AREA_KEY);localStorage.removeItem(AREA_TOMBSTONES_KEY);localStorage.removeItem(PROFILE_CACHE_KEY)}catch{}
     try{
-      const req=indexedDB.open("nexorawildfire-edge",1);
+      const req=indexedDB.open("nexorawildfire-edge");
       req.onsuccess=()=>{const db=req.result;if(db.objectStoreNames.contains("areas")){const tx=db.transaction("areas","readwrite");tx.objectStore("areas").clear();tx.oncomplete=()=>db.close();tx.onerror=()=>db.close()}else db.close()};
       req.onerror=()=>{};
     }catch{}
