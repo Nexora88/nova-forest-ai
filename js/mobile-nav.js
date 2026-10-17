@@ -78,6 +78,7 @@
         img.dataset.nxFallbackApplied = "true";
         img.src = logoBase + "assets/nexora-wildfire-logo-fallback.svg";
       });
+      if (img.complete && img.naturalWidth === 0) img.src = logoBase + "assets/nexora-wildfire-logo-fallback.svg";
     });
     const header = document.querySelector("body > header");
     if (header && !header.querySelector(".brand-lockup img") && !header.querySelector(".nx-header-logo")) {
