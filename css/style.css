@@ -875,3 +875,38 @@ main{padding-bottom:76px}
 /* Keep floating controls reachable above the full-screen mobile drawer. */
 #nexora-language-toggle{z-index:100001!important}
 #nexora-install{z-index:100002!important}
+
+
+/* 2026-10-17 UX correction: map controls belong below the map, not over important geography. */
+.map-filters{
+  position:relative!important;inset:auto!important;bottom:auto!important;top:auto!important;
+  z-index:5!important;margin:14px 0 0!important;padding:14px!important;
+  display:grid;gap:12px;background:rgba(3,9,5,.98)!important;
+  border:1px solid #28563a;border-radius:14px;box-shadow:0 10px 28px #0005;
+}
+.map-filters>strong{font-size:12px;letter-spacing:.12em;color:#b9f6cb}
+.map-filters .filter-buttons,.map-filters .map-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.map-filters button,.map-filters .map-actions a{
+  display:inline-flex;align-items:center;justify-content:center;min-height:40px;
+  padding:9px 12px;border:1px solid #2b5038;border-radius:10px;
+  background:#09170d;color:#dff8e6;text-decoration:none;cursor:pointer;
+}
+.map-filters button:hover,.map-filters .map-actions a:hover,
+.map-filters button.on{background:#173b23;border-color:#42d879;color:#fff}
+.map-filters .legend{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px}
+.map-filters .legend span{display:inline-block;width:10px;height:10px;border-radius:50%}
+.map-filters>small{display:block;color:#9fb3a4;font-size:11px;line-height:1.55}
+.map-drill-button{display:block;width:100%;min-height:42px;margin:12px 0;padding:10px 12px;border:1px solid #36d879;border-radius:10px;background:#0b2614;color:#eaffef;font-weight:800;cursor:pointer}
+.map-drill-button:hover{background:#17452a}
+.district-picker{display:none!important}
+#map{min-height:420px}
+@media(max-width:700px){
+  #map{height:clamp(420px,68vh,620px);min-height:420px}
+  .map-filters{gap:10px;padding:11px!important}
+  .map-filters .filter-buttons button{flex:1 1 calc(33.333% - 8px);min-width:0;font-size:12px;padding:8px 6px}
+  .map-filters .map-actions>*{flex:1 1 auto}
+  .map-filters .legend{font-size:11px}
+}
+@media(min-width:701px){
+  #map{height:min(72vh,780px);min-height:560px}
+}
