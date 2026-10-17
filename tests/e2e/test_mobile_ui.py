@@ -250,6 +250,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                                      f"active-page marker missing or duplicated on {path}")
                     self.assertEqual(page.locator('header img[src*="nexora-wildfire-logo"]').count(), 1,
                                      f"header logo missing or duplicated on {path}")
+                    self.assertTrue(page.locator('header img[src*="nexora-wildfire-logo"]').evaluate("(img) => img.complete && img.naturalWidth > 0"),
+                                    f"header logo failed to load on {path}")
                     self.assertEqual(page.locator('nav.nx-nav a[href*="account.html"]').count(), 1,
                                      f"account link missing or duplicated on {path}")
                 finally:
