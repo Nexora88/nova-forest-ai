@@ -46,6 +46,28 @@
     paint();
   }
 
+  function installScientificNotice() {
+    if (document.querySelector(".nx-science-notice")) return;
+    const nav = document.querySelector("body > nav");
+    if (!nav) return;
+    const note = document.createElement("aside");
+    note.className = "nx-science-notice";
+    note.setAttribute("role", "note");
+    note.textContent = english()
+      ? "Scientific note: risk scores are experimental decision-support indicators, not confirmed wildfire detection, official alerts, or validated forecasts."
+      : "Bilimsel not: risk puanları deneysel karar destek göstergeleridir; doğrulanmış yangın tespiti, resmî uyarı veya kesin tahmin değildir.";
+    const style = document.createElement("style");
+    style.textContent = ".nx-science-notice{box-sizing:border-box;max-width:1440px;margin:0 auto;padding:8px clamp(12px,3vw,24px);color:#c9b98a;background:#151208;border-bottom:1px solid #51421d;font:500 11px/1.55 system-ui,sans-serif;overflow-wrap:anywhere}.nx-science-notice::before{content:'ⓘ';font-weight:800;margin-right:7px;color:#f1ce6e}";
+    document.head.appendChild(style);
+    const status = nav.nextElementSibling?.classList.contains("nx-connectivity-bar") ? nav.nextElementSibling : nav;
+    status.insertAdjacentElement("afterend", note);
+    new MutationObserver(() => {
+      note.textContent = english()
+        ? "Scientific note: risk scores are experimental decision-support indicators, not confirmed wildfire detection, official alerts, or validated forecasts."
+        : "Bilimsel not: risk puanları deneysel karar destek göstergeleridir; doğrulanmış yangın tespiti, resmî uyarı veya kesin tahmin değildir.";
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-language"] });
+  }
+
   function initNavigation() {
     const header = document.querySelector("body > header");
     if (header && !header.querySelector(".brand-lockup img") && !header.querySelector(".nx-header-logo")) {
@@ -69,6 +91,7 @@
     style.textContent = ".logo.nx-standard-logo{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;column-gap:12px;min-width:0}.nx-header-logo{grid-column:1;grid-row:1/span 2;width:44px;height:44px;object-fit:contain;flex:0 0 44px}.logo.nx-standard-logo h1,.logo.nx-standard-logo p{grid-column:2;min-width:0;overflow-wrap:anywhere}.logo.nx-standard-logo h1{margin:0}.logo.nx-standard-logo p{margin:4px 0 0}@media(max-width:480px){.nx-header-logo{width:38px;height:38px}.logo.nx-standard-logo{grid-template-columns:38px minmax(0,1fr);column-gap:9px}}";
     document.head.appendChild(style);
     installConnectivity();
+    installScientificNotice();
     const inPages = /\/pages\//.test(location.pathname);
     document.querySelectorAll("body > nav").forEach(nav => {
       if (nav.dataset.nxReady === "true") return;
