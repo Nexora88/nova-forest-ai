@@ -70,7 +70,7 @@
 
   function initNavigation() {
     const logoBase = location.pathname.includes("/pages/") ? "../" : "";
-    document.querySelectorAll("body > header .brand-lockup img, body > header img.nx-header-logo").forEach(img => {
+    const bindLogoFallbacks = () => document.querySelectorAll("body > header .brand-lockup img, body > header img.nx-header-logo").forEach(img => {
       if (img.dataset.nxFallbackBound === "true") return;
       img.dataset.nxFallbackBound = "true";
       img.addEventListener("error", () => {
@@ -80,6 +80,7 @@
       });
       if (img.complete && img.naturalWidth === 0) img.src = logoBase + "assets/nexora-wildfire-logo-fallback.svg";
     });
+    bindLogoFallbacks();
     const header = document.querySelector("body > header");
     if (header && !header.querySelector(".brand-lockup img") && !header.querySelector(".nx-header-logo")) {
       const logo = header.querySelector(".logo");
@@ -94,6 +95,7 @@
         logo.classList.add("nx-standard-logo");
       }
     }
+    bindLogoFallbacks();
     if (header && !document.querySelector("body > nav")) {
       const nav = document.createElement("nav");
       header.insertAdjacentElement("afterend", nav);
