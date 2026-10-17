@@ -50,5 +50,8 @@ def calculate_advanced_risk(temperature, humidity, wind_speed, ndvi=None, fire_a
         "factors": factors,
         "ndvi_used": ndvi is not None,
         "fire_alert_used": bool(fire_alert),
-        "engine": "NexoraWildfire Explainable Risk Engine v1"
+        "engine": "NexoraWildfire Explainable Risk Engine v1",
+        "score_type": "heuristic_environmental_indicator",
+        "validated": False,
+        "warning": "Deneysel, kural tabanlı çevresel göstergedir; doğrulanmış yangın tespiti, resmi uyarı veya kesin tahmin değildir."
     }
