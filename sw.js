@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v22";
-const DATA_CACHE = "nexorawildfire-data-v22";
+const CACHE_NAME = "nexorawildfire-shell-v23";
+const DATA_CACHE = "nexorawildfire-data-v23";
 
 const APP_SHELL = [
   "./",
@@ -19,17 +19,21 @@ const APP_SHELL = [
   "./pages/about.html",
   "./css/style.css",
   "./css/style.css?v=20261010c",
+  "./css/style.css?v=20261017d",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
   "./js/map.js",
   "./js/map.js?v=20261012c",
+  "./js/map.js?v=20261017c",
   "./js/mobile-nav.js",
   "./js/mobile-nav.js?v=20261012c",
   "./js/i18n.js",
   "./js/i18n.js?v=20261012c",
   "./js/mobile-nav.js?v=20261017b",
+  "./js/mobile-nav.js?v=20261017c",
   "./js/auth.js?v=20261017b",
   "./js/i18n.js?v=20261017a",
+  "./js/global-demo.js?v=20261017b",
   "./js/ataturk-quotes.js",
   "./js/ataturk-quotes.js?v=20261012c",
   "https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css",
@@ -54,6 +58,7 @@ const APP_SHELL = [
   "./css/special-days.css",
   "./css/special-days.css?v=20261008a",
   "./js/special-days.js",
+  "./assets/nexora-wildfire-logo-fallback.svg",
   "./assets/nexora-wildfire-logo.png",
   "./assets/nexora-wildfire-logo.png?v=20261017a",
   "./assets/ataturk-1925.jpg",
