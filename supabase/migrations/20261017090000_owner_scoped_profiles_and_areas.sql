@@ -13,6 +13,24 @@ begin
     execute 'create policy nexora_profiles_update_own on public.profiles for update to authenticated using ((select auth.uid()) = id) with check ((select auth.uid()) = id)';
   end if;
 
+  if to_regclass('public.profiles') is not null
+     and exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='role') then
+    execute $fn$
+      create or replace function public.nexora_prevent_profile_role_escalation()
+      returns trigger language plpgsql security invoker set search_path = ''
+      as $body$
+      begin
+        if current_user <> 'service_role' and (select auth.uid()) is not null then
+          new.role := old.role;
+        end if;
+        return new;
+      end;
+      $body$
+    $fn$;
+    execute 'drop trigger if exists nexora_prevent_profile_role_escalation_trigger on public.profiles';
+    execute 'create trigger nexora_prevent_profile_role_escalation_trigger before update on public.profiles for each row execute function public.nexora_prevent_profile_role_escalation()';
+  end if;
+
   if to_regclass('public.nexorawildfire_areas') is not null then
     execute 'alter table public.nexorawildfire_areas enable row level security';
     execute 'drop policy if exists nexorawildfire_areas_select_own on public.nexorawildfire_areas';
