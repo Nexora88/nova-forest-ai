@@ -102,7 +102,15 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
 
   // Never put authenticated or account-scoped responses into a shared origin cache.
-  if (request.headers.has("authorization") || request.headers.has("cookie") || /\\/(?:account|profiles|nexorawildfire_areas|nexorawildfire_push_subscriptions)(?:\\/|$)/i.test(url.pathname)) {\n    event.respondWith(fetch(request).catch(() => new Response(\n      JSON.stringify({status:"offline",offline:true,message:"Bu hesap verisi çevrimdışıyken sunucudan doğrulanamıyor."}),\n      {headers:{"Content-Type":"application/json","Cache-Control":"no-store"},status:503}\n    )));\n    return;\n  }\n\n  if (isDataRequest(url)) {
+  if (request.headers.has("authorization") || request.headers.has("cookie") || /(^|\/)(account|profiles|nexorawildfire_areas|nexorawildfire_push_subscriptions)(\/|$)/i.test(url.pathname)) {
+    event.respondWith(fetch(request).catch(() => new Response(
+      JSON.stringify({status:"offline",offline:true,message:"Bu hesap verisi çevrimdışıyken sunucudan doğrulanamıyor."}),
+      {headers:{"Content-Type":"application/json","Cache-Control":"no-store"},status:503}
+    )));
+    return;
+  }
+
+  if (isDataRequest(url)) {
     event.respondWith(
       fetch(request).then(response => {
         if (response.ok) {
