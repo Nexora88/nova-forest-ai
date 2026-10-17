@@ -10,15 +10,13 @@
   "background_color": "#020303",
   "theme_color": "#020303",
   "lang": "tr",
-  "categories": ["utilities", "productivity", "weather"],
+  "categories": [
+    "utilities",
+    "productivity",
+    "weather"
+  ],
   "prefer_related_applications": false,
   "icons": [
-    {
-      "src": "assets/nexora-wildfire-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
     {
       "src": "assets/nexora-wildfire-logo.png",
       "sizes": "any",
