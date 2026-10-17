@@ -32,6 +32,8 @@ jobs:
         run: python -m pytest -q backend/tests
       - name: Test opt-in cloud export privacy safeguards
         run: python tests/test_cloud_export_gcs.py
+      - name: Validate local HTML links and asset references
+        run: python scripts/validate_web_assets.py
       - name: Check JavaScript syntax
         run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
   browser-smoke:
