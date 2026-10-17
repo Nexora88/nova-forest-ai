@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v19";
-const DATA_CACHE = "nexorawildfire-data-v19";
+const CACHE_NAME = "nexorawildfire-shell-v20";
+const DATA_CACHE = "nexorawildfire-data-v20";
 
 const APP_SHELL = [
   "./",
@@ -12,6 +12,10 @@ const APP_SHELL = [
   "./pages/satellite.html",
   "./pages/uav-demo.html",
   "./pages/vision.html",
+  "./pages/auth.html",
+  "./pages/account.html",
+  "./pages/enterprise.html",
+  "./pages/feedback.html",
   "./pages/about.html",
   "./css/style.css",
   "./css/style.css?v=20261010c",
@@ -23,6 +27,8 @@ const APP_SHELL = [
   "./js/mobile-nav.js?v=20261012c",
   "./js/i18n.js",
   "./js/i18n.js?v=20261012c",
+  "./js/mobile-nav.js?v=20261017b",
+  "./js/auth.js?v=20261017b",
   "./js/i18n.js?v=20261017a",
   "./js/ataturk-quotes.js",
   "./js/ataturk-quotes.js?v=20261012c",
@@ -95,7 +101,8 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(request.url);
 
-  if (isDataRequest(url)) {
+  // Never put authenticated or account-scoped responses into a shared origin cache.
+  if (request.headers.has("authorization") || request.headers.has("cookie") || /\\/(?:account|profiles|nexorawildfire_areas|nexorawildfire_push_subscriptions)(?:\\/|$)/i.test(url.pathname)) {\n    event.respondWith(fetch(request).catch(() => new Response(\n      JSON.stringify({status:"offline",offline:true,message:"Bu hesap verisi çevrimdışıyken sunucudan doğrulanamıyor."}),\n      {headers:{"Content-Type":"application/json","Cache-Control":"no-store"},status:503}\n    )));\n    return;\n  }\n\n  if (isDataRequest(url)) {
     event.respondWith(
       fetch(request).then(response => {
         if (response.ok) {
