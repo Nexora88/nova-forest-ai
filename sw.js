@@ -11,6 +11,8 @@ const APP_SHELL = [
   "./pages/weather.html",
   "./pages/satellite.html",
   "./js/satellite-analysis.js?v=20261020a",
+  "./js/nova-intelligence.js?v=20261020a",
+  "./css/nova-intelligence.css?v=20261020a",
   "./pages/uav-demo.html",
   "./pages/vision.html",
   "./pages/auth.html",
