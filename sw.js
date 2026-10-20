@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v24";
-const DATA_CACHE = "nexorawildfire-data-v24";
+const CACHE_NAME = "nexorawildfire-shell-v25";
+const DATA_CACHE = "nexorawildfire-data-v25";
 
 const APP_SHELL = [
   "./",
@@ -79,7 +79,7 @@ self.addEventListener("install", event => {
         // A single optional CDN/legacy asset must not prevent the local app shell from caching.
         await Promise.allSettled(APP_SHELL.map(asset => cache.add(asset)));
       })
-      .then(() => self.skipWaiting())
+      // Updated workers wait until the app explicitly approves activation.
   );
 });
 
