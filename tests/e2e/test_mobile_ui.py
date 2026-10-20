@@ -257,6 +257,22 @@ class MobileUiSmokeTests(unittest.TestCase):
                 finally:
                     context.close()
 
+
+    def test_map_shows_separate_provider_health_states(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("[data-provider-status-list]", timeout=15000)
+            panel = page.locator("[data-provider-status-list]")
+            text = panel.inner_text()
+            self.assertIn("NASA FIRMS", text)
+            self.assertIn("Open-Meteo", text)
+            self.assertIn("NASA GIBS", text)
+            self.assertIn("Son kontrol", text)
+            self.assertIn("Henüz doğrulanmadı", text)
+        finally:
+            context.close()
+
     def test_service_worker_cache_version_and_offline_navigation(self):
         context, page = self.new_page()
         try:
