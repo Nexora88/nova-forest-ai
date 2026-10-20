@@ -1,13 +1,14 @@
 from typing import Literal
 
+import os
 import requests
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])
 
-SUPABASE_URL = __import__("os").getenv("SUPABASE_URL", "").rstrip("/")
-SUPABASE_ADMIN_KEY = __import__("os").getenv("SUPABASE_ADMIN_KEY", "")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_ADMIN_KEY = os.getenv("SUPABASE_ADMIN_KEY", "")
 
 
 class FieldFeedback(BaseModel):
