@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v25";
-const DATA_CACHE = "nexorawildfire-data-v25";
+const CACHE_NAME = "nexorawildfire-shell-v26";
+const DATA_CACHE = "nexorawildfire-data-v26";
 
 const APP_SHELL = [
   "./",
@@ -22,12 +22,15 @@ const APP_SHELL = [
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261017d",
   "./css/field-ui.css",
+  "./css/region-quick-picker.css?v=20261020a",
   "./css/field-ui.css?v=20261006",
   "./js/nexora-insight-engine.js",
   "./js/nexora-insight-engine.js?v=20261020a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
+  "./js/map.js?v=20261020b",
+  "./js/region-quick-picker.js?v=20261020a",
   "./js/mobile-nav.js",
   "./js/mobile-nav.js?v=20261012c",
   "./js/i18n.js",
