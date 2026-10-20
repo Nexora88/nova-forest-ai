@@ -10,6 +10,7 @@ const APP_SHELL = [
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
+  "./js/satellite-analysis.js?v=20261020a",
   "./pages/uav-demo.html",
   "./pages/vision.html",
   "./pages/auth.html",
