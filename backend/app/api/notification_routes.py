@@ -71,7 +71,7 @@ def calculate_risk(weather):
 def notification_status():
     cron_ready = bool(os.getenv("CRON_SECRET"))
     push_ready = configured()
-    return {"status":"available","system":"Nova-Alert","push":push_ready,"cron_configured":cron_ready,"channels":["in_app","browser","web_push"] if push_ready else ["in_app","browser"],"background_delivery":push_ready and cron_ready,"note":"Background delivery also requires the hosting cron schedule and valid Supabase/VAPID secrets."}
+    return {"status":"available","system":"Nova-Alert","push":push_ready,"cron_configured":cron_ready,"channels":["in_app","browser","web_push"] if push_ready else ["in_app","browser"],"background_delivery_configuration_ready":push_ready and cron_ready,"note":"Actual background delivery also requires the GitHub Actions schedule, a matching Actions CRON_SECRET, valid Supabase/VAPID secrets, and a device delivery test."}
 
 @router.get("/push/config")
 def push_config():
@@ -110,12 +110,42 @@ def evaluate_notification(payload:EvaluateRequest):
     if weather.get("status") != "available" or any(weather.get(k) is None for k in ("temperature","humidity","wind","precipitation","observed_at")):
         raise HTTPException(status_code=502,detail={"message":"Canlı hava verisi eksik; risk skoru üretilmedi.","status":weather.get("status"),"missing_fields":weather.get("missing_fields",[])})
     risk=calculate_risk(weather); threshold=max(25,min(100,int(payload.threshold)))
-    level="critical" if risk>=80 else "high" if risk>=60 else "medium" if risk>=40 else "low"
+    level="critical" if risk>=90 else "high" if risk>=75 else "warning" if risk>=50 else "info"
     alert=risk>=threshold
     return {"status":"alert" if alert else "normal","system":"Nova-Alert","area":payload.area_name,"risk":risk,"threshold":threshold,"level":level,"weather":{"temperature":weather.get("temperature"),"humidity":weather.get("humidity"),"wind":weather.get("wind")},"alert":alert,"title":f"{payload.area_name} • Çevresel risk yükseldi" if alert else f"{payload.area_name} • Risk normal","message":f"Çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgar {weather.get('wind')} km/s."}
 
+async def _evaluate_subscription(row, now):
+    if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"):
+        return "skipped"
+    try:
+        weather = await asyncio.to_thread(get_current_weather, float(row["lat"]), float(row["lon"]))
+        if weather.get("status") != "available" or any(weather.get(k) is None for k in ("temperature", "humidity", "wind", "precipitation", "observed_at")):
+            return "skipped"
+        risk = calculate_risk(weather)
+        threshold = max(25, min(100, int(row.get("threshold") or 70)))
+        last = row.get("last_alert_at")
+        recent = False
+        if last:
+            try:
+                recent = (now - datetime.fromisoformat(str(last).replace("Z", "+00:00"))).total_seconds() < 21600
+            except (ValueError, TypeError):
+                pass
+        if risk >= threshold and not recent:
+            level = "KRİTİK" if risk >= 90 else "YÜKSEK" if risk >= 75 else "DİKKAT" if risk >= 50 else "BİLGİ"
+            msg = (f"{row['area_name']}: {level} çevresel risk {risk}/100. "
+                   f"Sıcaklık {weather['temperature']}°C, nem %{weather['humidity']}, "
+                   f"rüzgar {weather['wind']} km/s. Kaynak: Open-Meteo.")
+            ok = await asyncio.to_thread(send_push, row, f"NexoraWildfire AI • {level}", msg, "./")
+            await asyncio.to_thread(update_alert_state, row["id"], risk, ok)
+            return "delivered" if ok else "failed"
+        await asyncio.to_thread(update_alert_state, row["id"], risk, False)
+        return "skipped"
+    except Exception:
+        return "failed"
+
+
 async def background_push_cycle():
-    """Evaluate every saved area from live provider data and send threshold alerts."""
+    """Evaluate saved areas against live provider data and send threshold alerts."""
     stats = {"checked": 0, "delivered": 0, "failed": 0, "skipped": 0}
     if not configured():
         return {**stats, "status": "not_configured"}
@@ -124,37 +154,24 @@ async def background_push_cycle():
     except Exception:
         return {**stats, "status": "subscription_store_unavailable"}
     now = datetime.now(timezone.utc)
-    for row in rows:
-        if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"):
-            stats["skipped"] += 1
-            continue
-        try:
-            weather = get_current_weather(float(row["lat"]), float(row["lon"]))
-            if weather.get("status") != "available" or any(weather.get(k) is None for k in ("temperature", "humidity", "wind", "precipitation", "observed_at")):
-                stats["skipped"] += 1
-                continue
-            risk = calculate_risk(weather)
-            threshold = max(25, min(100, int(row.get("threshold") or 70)))
+    semaphore = asyncio.Semaphore(8)
+
+    async def bounded(row):
+        async with semaphore:
+            return await _evaluate_subscription(row, now)
+
+    outcomes = await asyncio.gather(*(bounded(row) for row in rows), return_exceptions=True)
+    for outcome in outcomes:
+        result = outcome if isinstance(outcome, str) else "failed"
+        if result == "delivered":
+            stats["delivered"] += 1
             stats["checked"] += 1
-            last = row.get("last_alert_at")
-            recent = False
-            if last:
-                try:
-                    recent = (now - datetime.fromisoformat(str(last).replace("Z", "+00:00"))).total_seconds() < 21600
-                except (ValueError, TypeError):
-                    pass
-            if risk >= threshold and not recent:
-                msg = (f"{row['area_name']}: çevresel risk {risk}/100. "
-                       f"Sıcaklık {weather['temperature']}°C, nem %{weather['humidity']}, "
-                       f"rüzgar {weather['wind']} km/s. Kaynak: Open-Meteo.")
-                ok = send_push(row, "NexoraWildfire AI • Nova-Alert", msg, "./")
-                update_alert_state(row["id"], risk, ok)
-                stats["delivered" if ok else "failed"] += 1
-            else:
-                update_alert_state(row["id"], risk, False)
-        except Exception:
+        elif result == "failed":
             stats["failed"] += 1
-            continue
+        elif result == "skipped":
+            stats["skipped"] += 1
+        else:
+            stats["checked"] += 1
     return {**stats, "status": "completed", "checked_at": now.isoformat()}
 
 async def background_push_loop():
