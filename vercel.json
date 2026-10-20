@@ -50,11 +50,5 @@
         "service": "web"
       }
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/notifications/cron",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
