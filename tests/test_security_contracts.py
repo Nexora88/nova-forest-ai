@@ -63,3 +63,15 @@ def test_nova_alert_has_protected_scheduled_delivery_without_vercel_hobby_cron()
     assert "/notifications/cron" in workflow
     assert "GitHub Actions" in docs
     assert "cihazda" in docs
+
+
+def test_field_feedback_is_private_structured_and_not_a_fake_local_submission():
+    migration = read("supabase/migrations/20261020110000_private_field_feedback.sql")
+    page = read("pages/feedback.html")
+    script = read("js/field-feedback.js")
+    pilot = read("docs/THRACE_FIELD_PILOT.md")
+    assert "enable row level security" in migration.lower()
+    assert "revoke all" in migration.lower()
+    assert 'id="field-feedback-form"' in page
+    assert '"/feedback/submit"' in script
+    assert "görüşme yapıldığı anlamına gelmez" in pilot
