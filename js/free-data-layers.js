@@ -13,7 +13,7 @@
  function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
  function setStatus(text){const el=document.querySelector("[data-map-status]");if(el)el.textContent=text}
  function providerState(key,state,detail,observedAt){window.NovaProviderStatus?.update(key,state,detail,observedAt)}
- function cMissing(obj,keys){return keys.every(k=>obj[k]==null)}
+ function cMissing(obj,keys){return keys.some(k=>obj[k]==null)}
  function popup(place,kind,values,source,time){return '<div class="risk-popup"><div class="popup-kicker">'+safe(source)+'</div><h3>'+safe(place.name)+'</h3>'+values.map(v=>'<div class="metric-row"><span>'+safe(v[0])+'</span><b>'+safe(v[1])+'</b></div>').join("")+'<small>Güncelleme: '+safe(time||"kaynak zaman bilgisi yok")+'</small></div>'}
  overlays["Open-Meteo · Hava durumu"]=weatherLayer;
  overlays["Open-Meteo / CAMS · Hava kalitesi + polen"]=airLayer;
