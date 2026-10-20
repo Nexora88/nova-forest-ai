@@ -1,7 +1,7 @@
 const PROFILE_KEY = "nexorawildfire-profile-v1";
 const HOME_KEY = "nexorawildfire-home-v1";
 const DISTRICT_DATA_URL = "data/admin/tur_admin2.geojson";
-let districtFeatures = [];
+let onboardingDistrictFeatures = [];
 
 function novaEscape(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
@@ -32,17 +32,17 @@ function novaOnboard() {
 }
 
 async function loadDistrictData() {
-  if (districtFeatures.length) return districtFeatures;
+  if (onboardingDistrictFeatures.length) return onboardingDistrictFeatures;
   const response = await fetch(DISTRICT_DATA_URL, { cache: "force-cache" });
   if (!response.ok) throw new Error("district_data_unavailable");
   const data = await response.json();
-  districtFeatures = Array.isArray(data.features) ? data.features.filter(feature => {
+  onboardingDistrictFeatures = Array.isArray(data.features) ? data.features.filter(feature => {
     const p = feature?.properties || {};
     return (p.adm1_name1 || p.adm1_name) && p.adm2_name1 &&
       Number.isFinite(Number(p.center_lat)) && Number.isFinite(Number(p.center_lon));
   }) : [];
-  if (!districtFeatures.length) throw new Error("district_data_empty");
-  return districtFeatures;
+  if (!onboardingDistrictFeatures.length) throw new Error("district_data_empty");
+  return onboardingDistrictFeatures;
 }
 
 function showRegionPicker(isEditing) {
@@ -99,7 +99,7 @@ function showRegionPicker(isEditing) {
     districtSelect.replaceChildren(new Option("İlçe seç…", ""));
     districtSelect.disabled = !province;
     if (!province) return;
-    const names = [...new Set(districtFeatures.filter(feature => {
+    const names = [...new Set(onboardingDistrictFeatures.filter(feature => {
       const p = feature.properties || {};
       return String(p.adm1_name1 || p.adm1_name).trim() === province;
     }).map(feature => String(feature.properties.adm2_name1).trim()).filter(Boolean))]
@@ -138,7 +138,7 @@ function showRegionPicker(isEditing) {
       status.textContent = "Rastgele konum atanmaz. Lütfen il ve ilçe seç veya konum seçmeden devam et.";
       return;
     }
-    const feature = districtFeatures.find(item => {
+    const feature = onboardingDistrictFeatures.find(item => {
       const p = item.properties || {};
       return String(p.adm1_name1 || p.adm1_name).trim() === province &&
         String(p.adm2_name1).trim() === district;
