@@ -21,12 +21,17 @@ async function checkLiveIncidents(){
     const t=b?.querySelector('[data-incident-text]');
     if(hits.length){
       b?.classList.add('show');
-      if(t)t.textContent=hits.length+' bölgede NASA FIRMS termal anomali tespit edildi. Bu kesin yangın doğrulaması değildir; sahada teyit gerekir.';
+      if(t)t.textContent=hits.length+' bölgede NASA FIRMS termal anomali tespit edildi. Son kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'. Bu kesin yangın doğrulaması değildir; sahada teyit gerekir.';
     }else{
       b?.classList.remove('show');
-      if(t)t.textContent='Son 24 saatte bölgesel NASA FIRMS termal anomali bulunmadı.';
+      if(t)t.textContent='Son başarılı kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'. Son 24 saatte bölgesel NASA FIRMS termal anomali bulunmadı.';
     }
-  }catch{}
+  }catch(error){
+    const b=document.querySelector('.nova-incident-banner');
+    b?.classList.add('show');
+    const t=b?.querySelector('[data-incident-text]');
+    if(t)t.textContent='NASA FIRMS durumu doğrulanamadı ('+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'). Bu, sıfır olay anlamına gelmez. Yeniden deneyin.';
+  }
 }
 
 function riskRasterMessage(weatherRisk){
