@@ -71,4 +71,4 @@ def test_map_has_live_nasa_firms_overlay_and_source_disclaimer():
 def test_field_pilot_material_does_not_claim_official_validation():
     doc = (ROOT / "docs/THRACE_FIELD_PILOT.md").read_text(encoding="utf-8")
     assert "resmî yangın uyarısı" in doc
-    assert "izin verilmeden" in doc
+    assert "İzin verilmeden" in doc
