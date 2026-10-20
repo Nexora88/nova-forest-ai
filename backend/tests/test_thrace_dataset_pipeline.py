@@ -56,3 +56,12 @@ def test_metrics_report_confusion_matrix_and_calibration_error():
     assert result["confusion_matrix_labels_0_1"] == [[2, 0], [0, 2]]
     assert result["roc_auc"] == 1.0
     assert result["brier_score"] >= 0
+
+
+def test_metrics_report_specificity_false_alarms_and_missed_events():
+    y = np.array([0, 0, 1, 1])
+    probabilities = np.array([0.9, 0.1, 0.9, 0.1])
+    result = score(y, probabilities, threshold=0.5)
+    assert result["specificity"] == 0.5
+    assert result["false_alarm_rate"] == 0.5
+    assert result["missed_event_rate"] == 0.5
