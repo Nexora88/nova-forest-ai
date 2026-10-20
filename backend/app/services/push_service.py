@@ -9,10 +9,10 @@ SUPABASE_URL=os.getenv("SUPABASE_URL","").rstrip("/")
 SUPABASE_ADMIN_KEY=os.getenv("SUPABASE_ADMIN_KEY","")
 VAPID_PRIVATE_KEY_B64=os.getenv("VAPID_PRIVATE_KEY_B64","")
 VAPID_SUBJECT=os.getenv("VAPID_SUBJECT","mailto:hello@nexora88.com")
-VAPID_PUBLIC_KEY=os.getenv("VAPID_PUBLIC_KEY") or "BA9PgktSWf1VAcGa7bvOB_HkqfGcztBQ7azhGaAXofjHkJgQI0Zjs9tbsCa8-hm8FkFWZH9N8jOVlMGtEcpu-L4"
+VAPID_PUBLIC_KEY=os.getenv("VAPID_PUBLIC_KEY", "").strip()
 
 def configured():
-    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PRIVATE_KEY_B64)
+    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY_B64 and VAPID_SUBJECT.startswith(("mailto:", "https://")))
 
 def verify_supabase_user(access_token: str) -> str:
     if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
