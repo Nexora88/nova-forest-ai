@@ -55,7 +55,7 @@
     if (!root) return;
     const result = analyze(report);
     const sourceRows = [
-      ["weather",!!report.weather,report.weather?.source || report.weather?.error || t("unavailable"),report.weather?.timestamp],
+      ["weather",!!report.weather?.weather,report.weather?.source || report.weather?.error || t("unavailable"),report.weather?.timestamp],
       ["satellite",!!report.satellite?.ok,report.satellite?.ok ? (report.satellite.data.source || report.satellite.data.status || "API reachable") : t("unavailable"),report.satellite?.data?.timestamp],
       ["ml",!!report.ml?.ok,report.ml?.ok ? (report.ml.data.status || report.ml.data.message || "API reachable") : t("unavailable"),report.ml?.data?.timestamp],
       ["yolo",!!report.yolo?.ok,report.yolo?.ok ? (report.yolo.data.status || report.yolo.data.message || "API reachable") : t("unavailable"),report.yolo?.data?.timestamp]
