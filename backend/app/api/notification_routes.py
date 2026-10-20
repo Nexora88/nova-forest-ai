@@ -110,7 +110,7 @@ def evaluate_notification(payload:EvaluateRequest):
     if weather.get("status") != "available" or any(weather.get(k) is None for k in ("temperature","humidity","wind","precipitation","observed_at")):
         raise HTTPException(status_code=502,detail={"message":"Canlı hava verisi eksik; risk skoru üretilmedi.","status":weather.get("status"),"missing_fields":weather.get("missing_fields",[])})
     risk=calculate_risk(weather); threshold=max(25,min(100,int(payload.threshold)))
-    level="critical" if risk>=90 else "high" if risk>=75 else "warning" if risk>=50 else "info"
+    level="critical" if risk>=75 else "high" if risk>=60 else "warning" if risk>=40 else "info"
     alert=risk>=threshold
     return {"status":"alert" if alert else "normal","system":"Nova-Alert","area":payload.area_name,"risk":risk,"threshold":threshold,"level":level,"weather":{"temperature":weather.get("temperature"),"humidity":weather.get("humidity"),"wind":weather.get("wind")},"alert":alert,"title":f"{payload.area_name} • Çevresel risk yükseldi" if alert else f"{payload.area_name} • Risk normal","message":f"Çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgar {weather.get('wind')} km/s."}
 
