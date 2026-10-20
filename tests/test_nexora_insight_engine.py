@@ -33,6 +33,16 @@ class NexoraInsightContractTests(unittest.TestCase):
         home = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="pages/insight-ai.html"', home)
 
+    def test_map_and_satellite_show_live_model_readiness(self):
+        engine = (ROOT / "js/nexora-insight-engine.js").read_text(encoding="utf-8")
+        satellite = (ROOT / "pages/satellite.html").read_text(encoding="utf-8")
+        map_page = (ROOT / "pages/map.html").read_text(encoding="utf-8")
+        self.assertIn('"/ml/status"', engine)
+        self.assertIn('"/ml/research-status"', engine)
+        self.assertIn('id="satelliteMlStatus"', satellite)
+        self.assertIn('href="insight-ai.html"', satellite)
+        self.assertIn('href="insight-ai.html"', map_page)
+
 
 if __name__ == "__main__":
     unittest.main()
