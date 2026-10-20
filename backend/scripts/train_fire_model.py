@@ -7,6 +7,7 @@ Use chronological holdout and compare against a prior-only baseline.
 import argparse
 import datetime as dt
 import json
+import hashlib
 from pathlib import Path
 
 import joblib
@@ -49,6 +50,9 @@ def score(y, probability, threshold=0.5):
         "recall": float(recall_score(y, prediction, zero_division=0)),
         "f1": float(f1_score(y, prediction, zero_division=0)),
         "confusion_matrix_labels_0_1": confusion_matrix(y, prediction, labels=[0, 1]).tolist(),
+        "specificity": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
+        "false_alarm_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 1] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
+        "missed_event_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[1, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[1].sum())),
         "brier_score": float(brier_score_loss(y, probability)),
         "roc_auc": float(roc_auc_score(y, probability)) if len(np.unique(y)) == 2 else None,
         "average_precision": float(average_precision_score(y, probability)) if len(np.unique(y)) == 2 else None,
@@ -113,6 +117,8 @@ def main():
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_path)
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    label_counts = {str(int(key)): int(value) for key, value in frame["label"].astype(int).value_counts().sort_index().items()}
     metadata = {
         "model_version": "thrace-hotspot-proxy-weather-v1",
         "model_type": "RandomForestClassifier",
@@ -122,7 +128,14 @@ def main():
         "negative_definition": "No FIRMS detection within 1 km at sampled location/date; not proof of fire absence.",
         "features": FEATURES,
         "dataset_path": str(source),
+        "dataset_sha256": source_hash,
         "dataset_rows_used": int(len(frame)),
+        "label_counts": label_counts,
+        "date_range": {"start": str(frame["date"].min()), "end": str(frame["date"].max())},
+        "train_date_range": {"start": str(train["date"].min()), "end": str(train["date"].max())},
+        "test_date_range": {"start": str(test["date"].min()), "end": str(test["date"].max())},
+        "site_counts": {str(k): int(v) for k, v in frame["site_id"].value_counts().items()} if "site_id" in frame.columns else {},
+        "label_provenance_counts": {str(k): int(v) for k, v in frame["label_type"].value_counts().items()},
         "distinct_dates": int(frame["date"].nunique()),
         "train_rows": int(len(train)),
         "test_rows": int(len(test)),
