@@ -24,6 +24,14 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn("{m:5,d:20,k:'bee',title:'Dünya Arıcılık Günü'", source)
         self.assertNotIn("{m:3,d:20,k:'bee',title:'Dünya Arıcılık Günü'", source)
 
+    def test_special_day_sources_are_linked_and_dates_use_turkey_timezone(self):
+        source = (ROOT / "js" / "special-days.js").read_text(encoding="utf-8")
+        self.assertIn("timeZone:'Europe/Istanbul'", source)
+        self.assertIn("const SOURCES=", source)
+        self.assertIn("https://www.fao.org/world-bee-day/en", source)
+        self.assertIn("https://www.tarimorman.gov.tr/GKGM/Haber/1314/14-Mayis-Dunya-Ciftciler-Gunu-Kutlu-Olsun", source)
+        self.assertIn("special-source", source)
+
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v25";', source)
