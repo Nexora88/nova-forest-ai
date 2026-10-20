@@ -34,10 +34,33 @@
 </ul>
 <p>Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors.</p>
 </section>
-<section class="ataturk-vision">
+<section class="sources" aria-labelledby="field-feedback-heading">
+<h2 id="field-feedback-heading">Trakya saha pilotu · Field feedback</h2>
+<p>Bu form gerçek kullanıcı geri bildirimi toplamak içindir; görüşme veya kurum onayı yapıldığı anlamına gelmez. Yanıtlar ürün geliştirme için özel veritabanında saklanır. Ad, telefon, e-posta, parola, API anahtarı veya hassas tarla/arılık koordinatı yazma.</p>
+<form id="field-feedback-form">
+<label>Katılımcı profili / Role
+<select name="audience" required><option value="">Seç / Select</option><option value="farmer">Çiftçi / Farmer</option><option value="beekeeper">Arıcı / Beekeeper</option><option value="forestry">Orman çalışanı / Forestry</option><option value="researcher">Araştırmacı / Researcher</option><option value="resident">Bölge sakini / Resident</option><option value="other">Diğer / Other</option></select></label>
+<label>Bölge (il veya genel bölge; kesin konum değil) / Region
+<input name="region" required minlength="2" maxlength="80" placeholder="Örn. Edirne / Thrace"></label>
+<label>Geri bildirim türü / Category
+<select name="category" required><option value="">Seç / Select</option><option value="data_quality">Veri doğruluğu / Data quality</option><option value="alert_quality">Alarm kalitesi / Alert quality</option><option value="usability">Kullanım kolaylığı / Usability</option><option value="missing_feature">Eksik özellik / Missing feature</option><option value="other">Diğer / Other</option></select></label>
+<label>Bu prototip ne kadar faydalı? / Usefulness (1–5)
+<select name="usefulness" required><option value="1">1 · Faydalı değil</option><option value="2">2</option><option value="3" selected>3 · Orta</option><option value="4">4</option><option value="5">5 · Çok faydalı</option></select></label>
+<label>Gerçek bir görev veya senaryo anlat / Describe a real task or scenario
+<textarea name="scenario" required minlength="10" maxlength="1000" rows="3" placeholder="Bu bilgiyi hangi kararı vermek için kullanırdın?"></textarea></label>
+<label>Ne gördün? / What did you observe? (optional)
+<textarea name="observed" maxlength="1500" rows="2"></textarea></label>
+<label>Ne bekliyordun? / What did you expect? (optional)
+<textarea name="expected" maxlength="1500" rows="2"></textarea></label>
+<label style="position:absolute;left:-10000px" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+<label><input type="checkbox" name="privacy_acknowledged" required> Bu yanıtın ürün geliştirme amacıyla özel olarak saklanmasını kabul ediyorum. Kişisel/hassas veri eklemedim.</label>
+<button class="primary-action" type="submit">Geri bildirimi güvenli biçimde gönder / Submit</button>
+<p id="field-feedback-status" role="status" aria-live="polite">Gönderim durumu kontrol ediliyor…</p>
+</form>
+</section><section class="ataturk-vision">
 <div class="ataturk-copy"><div class="eyebrow">SCIENCE · SERVICE · RESPONSIBILITY</div><h2>Science should help people solve real problems.</h2><blockquote>“Hayatta en hakiki mürşit ilimdir.”<cite>— Mustafa Kemal Atatürk</cite></blockquote><p>That principle guides the product direction: build carefully, be honest about evidence, and make technology useful to the people and ecosystems it serves.</p></div>
 </section>
 </main>
 <footer><p>NexoraWildfire AI · Independent project by Ahmet Eymen Bakraç · Nexora</p></footer>
-<script src="../js/ataturk-quotes.js?v=20261012c"></script><script src="../js/mobile-nav.js?v=20261017c"></script><script src="../js/i18n.js?v=20261017a"></script><script src="../js/pwa.js?v=20261010h"></script>
+<script src="../js/field-feedback.js?v=20261020a"></script><script src="../js/ataturk-quotes.js?v=20261012c"></script><script src="../js/mobile-nav.js?v=20261017c"></script><script src="../js/i18n.js?v=20261017a"></script><script src="../js/pwa.js?v=20261010h"></script>
 </body></html>
