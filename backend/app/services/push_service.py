@@ -67,7 +67,7 @@ def send_push(sub,title,message,url="./"):
     if not VAPID_PRIVATE_KEY_B64: return False
     pem=base64.urlsafe_b64decode(VAPID_PRIVATE_KEY_B64).decode()
     info={"endpoint":sub["endpoint"],"keys":{"p256dh":sub["p256dh"],"auth":sub["auth"]}}
-    data=json.dumps({"title":title,"message":message,"url":url,"icon":"/assets/nexora-wildfire-logo.png","tag":"nexorawildfire-alert"})
+    data=json.dumps({"title":title,"message":message,"url":url,"icon":"./assets/nexora-wildfire-logo.png","tag":"nexorawildfire-alert"})
     try:
         webpush(subscription_info=info,data=data,vapid_private_key=pem,vapid_claims={"sub":VAPID_SUBJECT},ttl=300)
         return True
