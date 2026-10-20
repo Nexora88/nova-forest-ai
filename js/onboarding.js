@@ -2,7 +2,6 @@ const PROFILE_KEY = "nexorawildfire-profile-v1";
 const HOME_KEY = "nexorawildfire-home-v1";
 const DISTRICT_DATA_URL = "data/admin/tur_admin2.geojson";
 let districtFeatures = [];
-let districtLoadError = false;
 
 function novaEscape(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
@@ -93,7 +92,6 @@ function showRegionPicker(isEditing) {
       fillDistricts(prior.province, prior.district || "");
     }
   }).catch(() => {
-    districtLoadError = true;
     status.textContent = "İlçe verisi yüklenemedi. Konum seçmeden devam edebilirsin; sistem konum uydurmaz.";
   });
 
@@ -119,10 +117,17 @@ function showRegionPicker(isEditing) {
   });
 
   wrap.querySelector("[data-skip]").addEventListener("click", () => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify({ completed: true, locationSkipped: true }));
+    if (!isEditing || !prior.completed) {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({ completed: true, locationSkipped: true }));
+    }
     wrap.remove();
     const trigger = document.getElementById("nova-region-trigger");
-    if (trigger) trigger.textContent = "📍 İl / ilçe seç";
+    if (trigger) {
+      const current = novaProfile();
+      trigger.textContent = current?.district
+        ? "📍 Bölge: " + current.district + " · Değiştir"
+        : "📍 İl / ilçe seç";
+    }
   });
 
   form.addEventListener("submit", event => {
