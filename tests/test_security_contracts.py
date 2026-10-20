@@ -62,4 +62,4 @@ def test_nova_alert_has_protected_scheduled_delivery_without_vercel_hobby_cron()
     assert "secrets.CRON_SECRET" in workflow
     assert "/notifications/cron" in workflow
     assert "GitHub Actions" in docs
-    assert "gerçek cihaz" in docs
+    assert "cihazda" in docs
