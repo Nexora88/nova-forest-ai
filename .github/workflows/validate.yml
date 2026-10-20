@@ -106,7 +106,7 @@ jobs:
               credentials = requests.get(base + "/satellite/providers/status", params={"probe": "true"}, timeout=45)
               print("Provider credential validation HTTP:", credentials.status_code)
               if credentials.ok:
-                  status = credentials.json()
+                  status = credentials.json().get("providers", {})
                   for provider in ("nasa_firms", "copernicus_sentinel_hub", "open_meteo"):
                       item = status.get(provider, {})
                       print(provider, "credential/provider status:", item.get("status", "unknown"))
