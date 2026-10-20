@@ -18,6 +18,12 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn('setAttribute("role","status")', source)
         self.assertIn('setAttribute("aria-live","polite")', source)
 
+    def test_special_day_uses_turkey_timezone_and_correct_bee_day_date(self):
+        source = (ROOT / "js" / "special-days.js").read_text(encoding="utf-8")
+        self.assertIn("timeZone:'Europe/Istanbul'", source)
+        self.assertIn("{m:5,d:20,k:'bee',title:'Dünya Arıcılık Günü'", source)
+        self.assertNotIn("{m:3,d:20,k:'bee',title:'Dünya Arıcılık Günü'", source)
+
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v25";', source)
