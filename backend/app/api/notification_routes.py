@@ -131,7 +131,7 @@ async def _evaluate_subscription(row, now):
             except (ValueError, TypeError):
                 pass
         if risk >= threshold and not recent:
-            level = "KRİTİK" if risk >= 90 else "YÜKSEK" if risk >= 75 else "DİKKAT" if risk >= 50 else "BİLGİ"
+            level = "KRİTİK" if risk >= 75 else "YÜKSEK" if risk >= 60 else "DİKKAT" if risk >= 40 else "BİLGİ"
             msg = (f"{row['area_name']}: {level} çevresel risk {risk}/100. "
                    f"Sıcaklık {weather['temperature']}°C, nem %{weather['humidity']}, "
                    f"rüzgar {weather['wind']} km/s. Kaynak: Open-Meteo.")
@@ -139,7 +139,7 @@ async def _evaluate_subscription(row, now):
             await asyncio.to_thread(update_alert_state, row["id"], risk, ok)
             return "delivered" if ok else "failed"
         await asyncio.to_thread(update_alert_state, row["id"], risk, False)
-        return "skipped"
+        return "checked"
     except Exception:
         return "failed"
 
@@ -170,7 +170,7 @@ async def background_push_cycle():
             stats["failed"] += 1
         elif result == "skipped":
             stats["skipped"] += 1
-        else:
+        elif result == "checked":
             stats["checked"] += 1
     return {**stats, "status": "completed", "checked_at": now.isoformat()}
 
