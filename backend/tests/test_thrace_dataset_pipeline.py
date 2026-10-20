@@ -56,3 +56,35 @@ def test_metrics_report_confusion_matrix_and_calibration_error():
     assert result["confusion_matrix_labels_0_1"] == [[2, 0], [0, 2]]
     assert result["roc_auc"] == 1.0
     assert result["brier_score"] >= 0
+
+
+def test_metrics_report_specificity_false_alarms_and_missed_events():
+    y = np.array([0, 0, 1, 1])
+    probabilities = np.array([0.9, 0.1, 0.9, 0.1])
+    result = score(y, probabilities, threshold=0.5)
+    assert result["specificity"] == 0.5
+    assert result["false_alarm_rate"] == 0.5
+    assert result["missed_event_rate"] == 0.5
+
+
+def test_spatial_holdout_keeps_geographic_blocks_disjoint():
+    from scripts.train_fire_model import split_by_spatial_block
+
+    rows = []
+    for lat_step in range(5):
+        for lon_step in range(5):
+            for label in (0, 1):
+                rows.append({
+                    "latitude": 40.0 + lat_step * 0.6,
+                    "longitude": 25.0 + lon_step * 0.6,
+                    "date": f"2020-01-{label + 1:02d}",
+                    "label": label,
+                })
+    frame = pd.DataFrame(rows)
+    train, test, held_out = split_by_spatial_block(frame)
+    train_blocks = set(zip(np.floor(train["latitude"] / 0.5).astype(int), np.floor(train["longitude"] / 0.5).astype(int)))
+    test_blocks = set(zip(np.floor(test["latitude"] / 0.5).astype(int), np.floor(test["longitude"] / 0.5).astype(int)))
+    assert train_blocks.isdisjoint(test_blocks)
+    assert test_blocks
+    assert set(train["label"]) == {0, 1}
+    assert set(test["label"]) == {0, 1}

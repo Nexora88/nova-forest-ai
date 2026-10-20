@@ -1,0 +1,43 @@
+name: Nova-Alert background Web Push
+
+on:
+  schedule:
+    # GitHub Actions cron supports five-minute intervals; runs only after this workflow is on the default branch.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nova-alert-background-push
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Validate required secret
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Configure repository Actions secret CRON_SECRET to match the Vercel backend environment variable."
+            exit 1
+          fi
+      - name: Evaluate live weather risk and deliver queued Web Push alerts
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          NEXORA_API_URL: ${{ vars.NEXORA_API_URL }}
+        run: |
+          API_URL="${NEXORA_API_URL:-https://nova-forest-ai.vercel.app/api}"
+          API_URL="${API_URL%/}"
+          case "$API_URL" in
+            https://*) ;;
+            *) echo "::error::NEXORA_API_URL must use HTTPS."; exit 1 ;;
+          esac
+          curl --fail --silent --show-error --max-time 90 --retry 2 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Accept: application/json" \
+            "$API_URL/notifications/cron"

@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v24";
-const DATA_CACHE = "nexorawildfire-data-v24";
+const CACHE_NAME = "nexorawildfire-shell-v29";
+const DATA_CACHE = "nexorawildfire-data-v29";
 
 const APP_SHELL = [
   "./",
@@ -10,6 +10,7 @@ const APP_SHELL = [
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
+  "./pages/insight-ai.html",
   "./pages/uav-demo.html",
   "./pages/vision.html",
   "./pages/auth.html",
@@ -21,10 +22,15 @@ const APP_SHELL = [
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261017d",
   "./css/field-ui.css",
+  "./css/region-quick-picker.css?v=20261020a",
   "./css/field-ui.css?v=20261006",
+  "./js/nexora-insight-engine.js",
+  "./js/nexora-insight-engine.js?v=20261020a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
+  "./js/map.js?v=20261020b",
+  "./js/region-quick-picker.js?v=20261020a",
   "./js/mobile-nav.js",
   "./js/mobile-nav.js?v=20261012c",
   "./js/i18n.js",
@@ -41,6 +47,8 @@ const APP_SHELL = [
   "./js/map-intelligence.js",
   "./js/areas.js",
   "./js/notification-ui.js",
+  "./js/field-feedback.js?v=20261020a",
+  "./js/seed-points.js?v=20261020a",
   "./js/onboarding.js",
   "./js/dashboard.js",
   "./js/nova-storage.js",
@@ -164,8 +172,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: new URL(data.icon || "./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    badge: new URL(data.icon || "./assets/nexora-wildfire-logo.png", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
@@ -175,7 +183,7 @@ self.addEventListener("push", event => {
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
-  const target = new URL(event.notification.data?.url || "./", self.location.origin).href;
+  const target = new URL(event.notification.data?.url || "./", self.registration.scope).href;
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
       for (const client of list) {

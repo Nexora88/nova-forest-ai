@@ -9,10 +9,10 @@ SUPABASE_URL=os.getenv("SUPABASE_URL","").rstrip("/")
 SUPABASE_ADMIN_KEY=os.getenv("SUPABASE_ADMIN_KEY","")
 VAPID_PRIVATE_KEY_B64=os.getenv("VAPID_PRIVATE_KEY_B64","")
 VAPID_SUBJECT=os.getenv("VAPID_SUBJECT","mailto:hello@nexora88.com")
-VAPID_PUBLIC_KEY=os.getenv("VAPID_PUBLIC_KEY") or "BA9PgktSWf1VAcGa7bvOB_HkqfGcztBQ7azhGaAXofjHkJgQI0Zjs9tbsCa8-hm8FkFWZH9N8jOVlMGtEcpu-L4"
+VAPID_PUBLIC_KEY=os.getenv("VAPID_PUBLIC_KEY", "").strip()
 
 def configured():
-    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PRIVATE_KEY_B64)
+    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY_B64 and VAPID_SUBJECT.startswith(("mailto:", "https://")))
 
 def verify_supabase_user(access_token: str) -> str:
     if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
@@ -65,9 +65,9 @@ def update_alert_state(row_id,risk,alerted):
 
 def send_push(sub,title,message,url="./"):
     if not VAPID_PRIVATE_KEY_B64: return False
-    pem=base64.urlsafe_b64decode(VAPID_PRIVATE_KEY_B64).decode()
+    pem=base64.urlsafe_b64decode(VAPID_PRIVATE_KEY_B64 + "=" * (-len(VAPID_PRIVATE_KEY_B64) % 4)).decode()
     info={"endpoint":sub["endpoint"],"keys":{"p256dh":sub["p256dh"],"auth":sub["auth"]}}
-    data=json.dumps({"title":title,"message":message,"url":url,"icon":"/assets/nexora-wildfire-logo.png","tag":"nexorawildfire-alert"})
+    data=json.dumps({"title":title,"message":message,"url":url,"icon":"./assets/nexora-wildfire-logo.png","tag":"nexorawildfire-alert-"+str(sub.get("area_name","area"))[:80]})
     try:
         webpush(subscription_info=info,data=data,vapid_private_key=pem,vapid_claims={"sub":VAPID_SUBJECT},ttl=300)
         return True

@@ -44,7 +44,10 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 
 ## Explore the product
 
+- **Nexora Insight AI**: bilingual, explainable regional analysis workspace that scans the existing environmental API and reports source coverage and missing inputs. See [engine architecture and limits](docs/NEXORA_INSIGHT_ENGINE.md).
 - **Interactive map** with available geographic layers and saved areas.
+- **Nova-Alert background Web Push:** scheduled live-weather risk checks, authenticated device subscriptions, and a test notification. [Setup and verification guide](docs/NOVA_ALERT_WEB_PUSH_SETUP.md).
+- **Structured field feedback:** private, consent-based reports for the Thrace pilot; no personal contact details or sensitive coordinates are requested. See the [field pilot process](docs/THRACE_FIELD_PILOT.md).
 - **Field workspace** for farms, apiaries, forests, and other user-selected areas.
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.

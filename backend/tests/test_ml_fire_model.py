@@ -36,3 +36,9 @@ def test_invalid_metadata_is_not_reported_as_ready(tmp_path, monkeypatch):
 
     assert result["status"] == "artifact_invalid"
     assert result["artifact_present"] is True
+
+
+def test_default_artifact_paths_are_anchored_to_backend_package():
+    expected_root = ml_fire_model.Path(__file__).resolve().parents[1]
+    assert ml_fire_model.MODEL_PATH == expected_root / "models" / "fire_risk.joblib"
+    assert ml_fire_model.METADATA_PATH == expected_root / "models" / "fire_risk_metadata.json"

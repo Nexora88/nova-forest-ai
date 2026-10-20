@@ -11,8 +11,16 @@ import os
 from pathlib import Path
 from typing import Any
 
-MODEL_PATH = Path(os.getenv("NEXORA_FIRE_MODEL_PATH", "models/fire_risk.joblib"))
-METADATA_PATH = Path(os.getenv("NEXORA_FIRE_MODEL_METADATA_PATH", "models/fire_risk_metadata.json"))
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+def _artifact_path(env_name: str, default_name: str) -> Path:
+    configured = Path(os.getenv(env_name, str(BACKEND_ROOT / "models" / default_name)))
+    if not configured.is_absolute():
+        configured = BACKEND_ROOT / configured
+    return configured.resolve()
+
+MODEL_PATH = _artifact_path("NEXORA_FIRE_MODEL_PATH", "fire_risk.joblib")
+METADATA_PATH = _artifact_path("NEXORA_FIRE_MODEL_METADATA_PATH", "fire_risk_metadata.json")
 FEATURES = [
     "temperature_max",
     "humidity_min",

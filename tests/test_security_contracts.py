@@ -26,8 +26,8 @@ def test_owner_scoped_rls_and_role_guard_are_declared():
 def test_service_worker_never_caches_authenticated_responses_and_rotates_shell():
     worker = read("sw.js")
     assert 'request.headers.has("authorization")' in worker
-    assert "nexorawildfire-shell-v24" in worker
-    assert "nexorawildfire-data-v24" in worker
+    assert "nexorawildfire-shell-v29" in worker
+    assert "nexorawildfire-data-v29" in worker
     assert '"Cache-Control":"no-store"' in worker
 
 
@@ -50,3 +50,28 @@ def test_map_drilldown_is_explicit_and_controls_do_not_cover_map():
     assert 'l.on("click",()=>openProvince(r.name))' not in script
     assert 'if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()' in script
     assert ".map-filters{\n  position:relative!important" in styles
+
+
+def test_nova_alert_has_protected_scheduled_delivery_without_vercel_hobby_cron():
+    import json
+    config = json.loads(read("vercel.json"))
+    workflow = read(".github/workflows/nova-alert-web-push.yml")
+    docs = read("docs/NOVA_ALERT_WEB_PUSH_SETUP.md")
+    assert "crons" not in config
+    assert 'cron: "*/5 * * * *"' in workflow
+    assert "secrets.CRON_SECRET" in workflow
+    assert "/notifications/cron" in workflow
+    assert "GitHub Actions" in docs
+    assert "cihazda" in docs
+
+
+def test_field_feedback_is_private_structured_and_not_a_fake_local_submission():
+    migration = read("supabase/migrations/20261020110000_private_field_feedback.sql")
+    page = read("pages/feedback.html")
+    script = read("js/field-feedback.js")
+    pilot = read("docs/THRACE_FIELD_PILOT.md")
+    assert "enable row level security" in migration.lower()
+    assert "revoke all" in migration.lower()
+    assert 'id="field-feedback-form"' in page
+    assert '"/feedback/submit"' in script
+    assert "görüşme yapıldığını göstermez" in pilot
