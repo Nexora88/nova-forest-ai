@@ -200,7 +200,7 @@ function selectSettlement(x){
  breadcrumb(selectedProvince+" → "+selectedDistrict+" → "+x.display_name.split(",")[0]+" → SEÇİLİ SAHA");
  setStatus("SEÇİLİ SAHA • "+x.display_name.split(",")[0]+" • "+x.envLabel);
 }
-window.NexoraMap={selectSettlement};
+window.NexoraMap={selectSettlement,openProvince,selectDistrict:async name=>{const row=districtRows.find(x=>norm(x.name)===norm(name));if(!row)return false;await focusDistrict(row);return true}};
 async function refreshView(){
   setStatus("VERİLER YENİLENİYOR…");
   if(selectedDistrict){
