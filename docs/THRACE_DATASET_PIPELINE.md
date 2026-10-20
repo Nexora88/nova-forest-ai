@@ -78,3 +78,14 @@ Bunlar tekrar edilebilir test koordinatlarıdır; istasyon doğrulaması değild
 - NASA FIRMS Area API: https://firms.modaps.eosdis.nasa.gov/api/area/
 - NASA FIRMS API kullanımı: https://firms2.modaps.eosdis.nasa.gov/content/academy/data_api/firms_api_use.html
 - Open-Meteo Historical Weather API: https://open-meteo.com/en/docs/historical-weather-api
+
+
+## Model artifact, reproducibility and UI integration / Model artefaktı, tekrarlanabilirlik ve arayüz entegrasyonu
+
+The trainer records the source CSV SHA-256, label counts and label provenance counts, dataset/train/test date ranges, site counts when available, and the chronological holdout metrics. In addition to precision, recall and F1, the report explicitly records specificity, false-alarm rate (FP / all negative examples), and missed-event rate (FN / all positive examples). These are still metrics against FIRMS detection proxies, not verified-fire truth.
+
+Eğitim betiği kaynak CSV'nin SHA-256 özetini, etiket ve etiket kaynağı sayılarını, veri/eğitim/test tarih aralıklarını, varsa saha sayılarını ve kronolojik test metriklerini kaydeder. Precision, recall ve F1'e ek olarak specificity, yanlış alarm oranı (FP / tüm negatif örnekler) ve kaçırılan olay oranı (FN / tüm pozitif örnekler) açıkça raporlanır. Bunlar yine doğrulanmış yangın gerçeğine değil, FIRMS tespit vekil etiketlerine göre hesaplanır.
+
+The API model loader resolves default artifacts relative to the backend package, so the expected deployable paths are `backend/models/fire_risk.joblib` and `backend/models/fire_risk_metadata.json`. The satellite and Insight AI screens read `/ml/status` and `/ml/research-status`; they display the actual deployed artifact status and do not assume training succeeded. Once a reviewed artifact is placed at the expected path and the backend is redeployed, `/ml/predict` becomes available for its documented seven weather features. A prediction is not shown when the artifact is missing or invalid.
+
+API model yükleyicisi varsayılan artefaktları backend paketine göre çözer; dağıtıma uygun beklenen yollar `backend/models/fire_risk.joblib` ve `backend/models/fire_risk_metadata.json` olur. Uydu ve Insight AI ekranları `/ml/status` ile `/ml/research-status` uç noktalarını okuyarak dağıtımdaki gerçek artefakt durumunu gösterir; eğitimin başarılı olduğunu varsaymaz. İncelenmiş artefakt beklenen yola konup backend yeniden dağıtıldığında, belgelenen yedi hava özelliği için `/ml/predict` kullanılabilir. Artefakt eksik veya geçersizse tahmin üretilmez.
