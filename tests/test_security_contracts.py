@@ -50,3 +50,16 @@ def test_map_drilldown_is_explicit_and_controls_do_not_cover_map():
     assert 'l.on("click",()=>openProvince(r.name))' not in script
     assert 'if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()' in script
     assert ".map-filters{\n  position:relative!important" in styles
+
+
+def test_nova_alert_has_protected_scheduled_delivery_without_vercel_hobby_cron():
+    import json
+    config = json.loads(read("vercel.json"))
+    workflow = read(".github/workflows/nova-alert-web-push.yml")
+    docs = read("docs/NOVA_ALERT_WEB_PUSH_SETUP.md")
+    assert "crons" not in config
+    assert 'cron: "*/5 * * * *"' in workflow
+    assert "secrets.CRON_SECRET" in workflow
+    assert "/notifications/cron" in workflow
+    assert "GitHub Actions" in docs
+    assert "gerçek cihaz" in docs
