@@ -53,6 +53,9 @@ def score(y, probability, threshold=0.5):
         "specificity": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
         "false_alarm_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 1] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
         "missed_event_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[1, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[1].sum())),
+        "specificity": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
+        "false_alarm_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 1] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
+        "missed_event_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[1, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[1].sum())),
         "brier_score": float(brier_score_loss(y, probability)),
         "roc_auc": float(roc_auc_score(y, probability)) if len(np.unique(y)) == 2 else None,
         "average_precision": float(average_precision_score(y, probability)) if len(np.unique(y)) == 2 else None,
@@ -117,6 +120,8 @@ def main():
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_path)
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    label_counts = {str(int(key)): int(value) for key, value in frame["label"].astype(int).value_counts().sort_index().items()}
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     label_counts = {str(int(key)): int(value) for key, value in frame["label"].astype(int).value_counts().sort_index().items()}
     metadata = {
