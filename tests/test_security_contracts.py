@@ -50,3 +50,20 @@ def test_map_drilldown_is_explicit_and_controls_do_not_cover_map():
     assert 'l.on("click",()=>openProvince(r.name))' not in script
     assert 'if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()' in script
     assert ".map-filters{\n  position:relative!important" in styles
+
+
+def test_map_provider_status_is_separate_and_does_not_fake_observations():
+    panel = read("js/provider-status.js")
+    layers = read("js/free-data-layers.js")
+    firms = read("js/live-risk-raster.js")
+    page = read("pages/map.html")
+    assert "data-provider-status-list" in panel
+    assert "Son kontrol" in panel
+    assert 'providerState("weather","loading"' in layers
+    assert 'providerState("weather","error"' in layers
+    assert 'providerState("air","error"' in layers
+    assert 'providerState("satellite","error"' in layers
+    assert 'update("firms","error"' in firms
+    assert "Bu, sıfır olay anlamına gelmez" in firms
+    assert 'src="../js/provider-status.js?v=20261020a"' in page
+    assert 'p.name+" · Open-Meteo"' not in layers
