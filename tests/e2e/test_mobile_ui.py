@@ -273,6 +273,25 @@ class MobileUiSmokeTests(unittest.TestCase):
         finally:
             context.close()
 
+
+    def test_mobile_map_render_budget_and_network_disconnect_recovery(self):
+        context, page = self.new_page()
+        try:
+            started = time.monotonic()
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#map.leaflet-container", timeout=20000)
+            elapsed = time.monotonic() - started
+            self.assertLess(elapsed, 20, f"mobile map initialization exceeded 20s: {elapsed:.2f}s")
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 391)
+            page.context.set_offline(True)
+            page.wait_for_function("navigator.onLine === false", timeout=5000)
+            page.wait_for_function("document.documentElement.dataset.network === 'offline'", timeout=5000)
+            self.assertTrue(page.locator("#map.leaflet-container").is_visible())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 391)
+        finally:
+            context.set_offline(False)
+            context.close()
+
     def test_service_worker_cache_version_and_offline_navigation(self):
         context, page = self.new_page()
         try:
