@@ -25,13 +25,34 @@ class FieldFeedback(BaseModel):
 
 @router.get("/status")
 def feedback_status():
-    configured = bool(SUPABASE_URL and SUPABASE_ADMIN_KEY)
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        return {
+            "status": "not_configured",
+            "submission_enabled": False,
+            "message": "Geri bildirim veritabanı sunucu tarafında yapılandırılmadı."
+        }
+    try:
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/nexorawildfire_field_feedback",
+            headers={
+                "apikey": SUPABASE_ADMIN_KEY,
+                "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+            },
+            params={"select": "id", "limit": "0"},
+            timeout=4,
+        )
+        response.raise_for_status()
+    except requests.RequestException:
+        return {
+            "status": "storage_not_ready",
+            "submission_enabled": False,
+            "message": "Özel geri bildirim tablosu henüz hazır değil; veritabanı migrasyonunu kontrol et."
+        }
     return {
-        "status": "available" if configured else "not_configured",
-        "submission_enabled": configured,
-        "message": "Feedback is stored privately for product improvement; do not submit personal details or exact sensitive coordinates."
+        "status": "available",
+        "submission_enabled": True,
+        "message": "Geri bildirim özel veritabanında saklanır; kişisel ayrıntılar veya hassas kesin koordinatlar ekleme."
     }
-
 
 @router.post("/submit", status_code=201)
 def submit_field_feedback(payload: FieldFeedback):
