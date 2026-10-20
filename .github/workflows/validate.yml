@@ -127,6 +127,38 @@ jobs:
                   print("Copernicus NDVI probe returned a non-success response; response body omitted.")
           except (requests.RequestException, ValueError) as exc:
               print("Copernicus NDVI probe failed:", type(exc).__name__)
+          weather_url = "https://api.open-meteo.com/v1/forecast"
+          try:
+              weather = requests.get(weather_url, params={
+                  "latitude": 41.6771, "longitude": 26.5557,
+                  "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
+                  "timezone": "Europe/Istanbul",
+              }, timeout=20)
+              print("Open-Meteo weather HTTP:", weather.status_code)
+              if weather.ok:
+                  current = weather.json().get("current", {})
+                  print("Open-Meteo current observation time:", current.get("time", "not reported"))
+                  print("Open-Meteo temperature field present:", current.get("temperature_2m") is not None)
+              else:
+                  print("Open-Meteo weather unavailable; response body omitted.")
+          except (requests.RequestException, ValueError) as exc:
+              print("Open-Meteo weather probe failed:", type(exc).__name__)
+
+          try:
+              from datetime import datetime, timedelta, timezone
+              day = (datetime.now(timezone.utc) - timedelta(days=1)).date().isoformat()
+              gibs = requests.get("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi", params={
+                  "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.1.1",
+                  "LAYERS": "MODIS_Terra_CorrectedReflectance_TrueColor",
+                  "SRS": "EPSG:4326", "BBOX": "26.0,40.0,29.0,42.0",
+                  "WIDTH": 256, "HEIGHT": 256, "FORMAT": "image/jpeg",
+                  "TIME": day,
+              }, timeout=30)
+              print("NASA GIBS satellite tile HTTP:", gibs.status_code)
+              print("NASA GIBS content type:", gibs.headers.get("content-type", "not reported"))
+              print("NASA GIBS response bytes:", len(gibs.content) if gibs.ok else "not available")
+          except requests.RequestException as exc:
+              print("NASA GIBS tile probe failed:", type(exc).__name__)
           PY
 
   deployed-ml-smoke:
