@@ -72,3 +72,15 @@ def test_field_pilot_material_does_not_claim_official_validation():
     doc = (ROOT / "docs/THRACE_FIELD_PILOT.md").read_text(encoding="utf-8")
     assert "resmî yangın uyarısı" in doc
     assert "İzin verilmeden" in doc
+
+
+def test_onboarding_requires_explicit_province_and_district_without_random_assignment():
+    source = (ROOT / "js/onboarding.js").read_text(encoding="utf-8")
+    page = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert "data/admin/tur_admin2.geojson" in source
+    assert 'name="province"' in source
+    assert 'name="district"' in source
+    assert "Rastgele konum atanmaz" in source
+    assert "Konum seçmeden devam et" in source
+    assert "center_lat" in source and "center_lon" in source
+    assert "js/onboarding.js?v=20261020a" in page
