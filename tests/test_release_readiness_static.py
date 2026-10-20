@@ -29,7 +29,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn("timeZone:'Europe/Istanbul'", source)
         self.assertIn("const SOURCES=", source)
         self.assertIn("https://www.fao.org/world-bee-day/en", source)
-        self.assertIn("https://www.tarimorman.gov.tr/GKGM/Haber/1314/14-Mayis-Dunya-Ciftciler-Gunu-Kutlu-Olsun", source)
+        self.assertIn("https://www.tarimorman.gov.tr/Haber/7071/", source)
         self.assertIn("special-source", source)
 
     def test_service_worker_cache_version_is_bumped(self):
