@@ -38,6 +38,32 @@ def split_by_time(frame, fraction=0.8):
     return train, test, cutoff
 
 
+def split_by_spatial_block(frame, fraction=0.2, block_degrees=0.5):
+    """Hold out entire coarse geographic cells so coordinates cannot leak across splits."""
+    required = {"latitude", "longitude"}
+    if not required.issubset(frame.columns):
+        raise ValueError("Spatial holdout requires latitude and longitude columns.")
+    if not 0 < fraction < 1 or block_degrees <= 0:
+        raise ValueError("Spatial split fraction and block size are invalid.")
+    work = frame.copy()
+    work["_spatial_block"] = list(zip(
+        np.floor(pd.to_numeric(work["latitude"], errors="coerce") / block_degrees).astype(int),
+        np.floor(pd.to_numeric(work["longitude"], errors="coerce") / block_degrees).astype(int),
+    ))
+    blocks = sorted(work["_spatial_block"].unique())
+    if len(blocks) < 5:
+        raise ValueError("At least five distinct spatial blocks are required.")
+    stride = max(2, round(1 / fraction))
+    test_blocks = set(blocks[::stride])
+    if len(test_blocks) >= len(blocks):
+        test_blocks = {blocks[-1]}
+    train = work[~work["_spatial_block"].isin(test_blocks)].drop(columns=["_spatial_block"]).copy()
+    test = work[work["_spatial_block"].isin(test_blocks)].drop(columns=["_spatial_block"]).copy()
+    if train.empty or test.empty:
+        raise ValueError("Spatial split created an empty partition.")
+    return train, test, sorted(test_blocks)
+
+
 def score(y, probability, threshold=0.5):
     prediction = (probability >= threshold).astype(int)
     metrics = {
@@ -50,9 +76,6 @@ def score(y, probability, threshold=0.5):
         "recall": float(recall_score(y, prediction, zero_division=0)),
         "f1": float(f1_score(y, prediction, zero_division=0)),
         "confusion_matrix_labels_0_1": confusion_matrix(y, prediction, labels=[0, 1]).tolist(),
-        "specificity": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
-        "false_alarm_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 1] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
-        "missed_event_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[1, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[1].sum())),
         "specificity": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
         "false_alarm_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[0, 1] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[0].sum())),
         "missed_event_rate": float(confusion_matrix(y, prediction, labels=[0, 1])[1, 0] / max(1, confusion_matrix(y, prediction, labels=[0, 1])[1].sum())),
@@ -116,6 +139,38 @@ def main():
     baseline_probability = baseline.predict_proba(test[FEATURES])[:, list(baseline.classes_).index(1)]
     baseline_metrics = score(y_test.to_numpy(), baseline_probability)
 
+    spatial_evaluation = {"status": "not_evaluable"}
+    try:
+        spatial_train, spatial_test, held_out_blocks = split_by_spatial_block(frame)
+        spatial_train_y = spatial_train["label"].astype(int)
+        spatial_test_y = spatial_test["label"].astype(int)
+        if set(spatial_train_y.unique()) == {0, 1} and set(spatial_test_y.unique()) == {0, 1}:
+            spatial_model = RandomForestClassifier(
+                n_estimators=400, min_samples_leaf=3,
+                class_weight="balanced_subsample", random_state=args.seed, n_jobs=-1,
+            )
+            spatial_model.fit(spatial_train[FEATURES], spatial_train_y)
+            spatial_probability = spatial_model.predict_proba(spatial_test[FEATURES])[:, list(spatial_model.classes_).index(1)]
+            spatial_evaluation = {
+                "status": "evaluated_spatial_block_holdout",
+                "method": "hold out entire 0.5-degree latitude/longitude grid cells",
+                "held_out_blocks": [list(block) for block in held_out_blocks],
+                "train_rows": int(len(spatial_train)),
+                "test_rows": int(len(spatial_test)),
+                "metrics": score(spatial_test_y.to_numpy(), spatial_probability),
+                "warning": "Coarse spatial holdout reduces coordinate leakage but does not establish independent verified-fire accuracy.",
+            }
+        else:
+            spatial_evaluation = {
+                "status": "not_evaluable",
+                "reason": "Both classes must occur in spatial training and held-out blocks.",
+                "held_out_blocks": [list(block) for block in held_out_blocks],
+                "train_rows": int(len(spatial_train)),
+                "test_rows": int(len(spatial_test)),
+            }
+    except ValueError as error:
+        spatial_evaluation = {"status": "not_evaluable", "reason": str(error)}
+
     model_path, metadata_path = Path(args.model_output), Path(args.metadata_output)
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
@@ -148,6 +203,7 @@ def main():
         "split_method": "chronological holdout by date; no random row split",
         "evaluation": evaluation,
         "baseline_prior_classifier": baseline_metrics,
+        "spatial_evaluation": spatial_evaluation,
         "vegetation_indices": {"ndvi": "not integrated", "ndmi": "not integrated"},
         "limitations": [
             "Metrics describe FIRMS hotspot proxy discrimination, not verified fire prediction accuracy.",
@@ -166,6 +222,7 @@ def main():
         "metadata_output": str(metadata_path),
         "evaluation": evaluation,
         "baseline_prior_classifier": baseline_metrics,
+        "spatial_evaluation": spatial_evaluation,
         "warning": "Metrics apply only to FIRMS hotspot proxies, not verified wildfire prediction.",
     }, ensure_ascii=False, indent=2))
 
