@@ -77,6 +77,13 @@
 - [ ] Deploy to Preview, run smoke tests and inspect provider configuration before production promotion.
 - [ ] Merge only after all required checks and human review pass; do not merge or deploy solely because a PR exists.
 
+## Implementation artifacts in this candidate
+
+- [Provider status panel](../js/provider-status.js) exposes separate states, last check, and source observation time for NASA FIRMS, weather/air quality, NASA GIBS satellite imagery, marine, elevation, and USGS layers. Missing/invalid provider fields are not treated as a confirmed zero-event result.
+- [Backup/restore/rollback runbook](OPERATIONS_BACKUP_RESTORE_ROLLBACK.md) documents a staging-only restore drill and safe rollback steps; these are procedures, not evidence that a real restore has passed.
+- [Physical Android test record](ANDROID_REAL_DEVICE_TEST_REPORT.md) lists device-specific background, reconnect, reopen, offline, and mobile map cases. It remains NOT RUN until a real device tester records results.
+- The UAV image page explicitly states that it is a local image-analysis demo, not live flight telemetry. Republic Vision has attribution links and a project-independence statement. Special-day notices link to official/reliable date sources where available.
+
 ## Acceptance evidence required before release
 - [ ] Latest CI run linked to the exact candidate commit.
 - [ ] Sanitized provider diagnostics showing success/failure and timestamps for each configured source.
