@@ -46,7 +46,8 @@ Proje, Mustafa Kemal Atatürk'ün bilim, üretim ve toplumsal faydaya verdiği �
 
 ## Ürünü keşfet
 
-- **Nexora Insight AI:** Mevcut çevresel API verilerini tarayan, kaynak kapsamını ve eksik girdileri gösteren iki dilli, açıklanabilir bölgesel analiz alanı. [Motor mimarisi ve sınırları](docs/NEXORA_INSIGHT_ENGINE.md).\n- **Etkileşimli harita:** Kullanılabilir coğrafi katmanlar ve kaydedilmiş alanlar.
+- **Nexora Insight AI:** Mevcut çevresel API verilerini tarayan, kaynak kapsamını ve eksik girdileri gösteren iki dilli, açıklanabilir bölgesel analiz alanı. [Motor mimarisi ve sınırları](docs/NEXORA_INSIGHT_ENGINE.md).
+- **Etkileşimli harita:** Kullanılabilir coğrafi katmanlar ve kaydedilmiş alanlar.
 - **Saha çalışma alanı:** Tarla, arılık, orman ve kullanıcının seçtiği diğer alanlar.
 - **Hava ve çevre göstergeleri:** Yalnızca ilgili veri sağlayıcılarına erişilebildiğinde.
 - **Uydu sahnesi keşfi:** Bitki örtüsü ve arazi gözlemi iş akışlarını desteklemek üzere tasarlanmıştır.
