@@ -17,8 +17,9 @@ async function checkLiveIncidents(){
   window.NovaProviderStatus?.update("firms","loading","Backend üzerinden NASA FIRMS olay kontrolü sürüyor.");
   try{
     const r=await fetch(API_BASE+'/risk-analysis',{cache:'no-store'}).then(x=>x.json());
-    if(!r||!Array.isArray(r.regions))throw new Error("Risk yanıtında regions alanı yok");
-    const hits=r.regions.filter(x=>x.satellite?.nasa_firms?.nearby_hotspot);
+    if(!r||!Array.isArray(r.regions)||!r.regions.length)throw new Error("Risk yanıtında doğrulanabilir bölge kaydı yok");
+    if(r.regions.some(x=>!x.satellite||!x.satellite.nasa_firms||typeof x.satellite.nasa_firms.nearby_hotspot!=="boolean"))throw new Error("NASA FIRMS alanı eksik; bu durum sıfır olay anlamına gelmez");
+    const hits=r.regions.filter(x=>x.satellite.nasa_firms.nearby_hotspot);
     const sourceTime=r.nasa_firms_observed_at||r.generated_at||r.updated_at||null;
     window.NovaProviderStatus?.update("firms",hits.length?"ok":"empty",hits.length+" bölgesel FIRMS sinyali; bu kesin yangın doğrulaması değildir.",sourceTime);
     const b=document.querySelector('.nova-incident-banner');
