@@ -85,3 +85,16 @@ def test_onboarding_requires_explicit_province_and_district_without_random_assig
     assert "center_lat" in source and "center_lon" in source
     assert "js/onboarding.js?v=20261020a" in page
     assert "css/field-ui.css?v=20261020a" in page
+
+
+def test_map_has_explicit_province_and_optional_district_picker_without_random_location():
+    page = (ROOT / "pages/map.html").read_text(encoding="utf-8")
+    selector = (ROOT / "js/region-quick-picker.js").read_text(encoding="utf-8")
+    map_js = (ROOT / "js/map.js").read_text(encoding="utf-8")
+    assert "İlini ve istersen ilçeni seç" in selector
+    assert 'name="province"' in selector
+    assert 'name="district"' in selector
+    assert "Konum otomatik veya rastgele atanmaz" in selector
+    assert "Haritada göster" in selector
+    assert "region-quick-picker.js?v=20261020a" in page
+    assert "selectDistrict" in map_js and "openProvince" in map_js
