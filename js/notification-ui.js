@@ -1,7 +1,7 @@
 const NOVA_ALERT_SETTINGS_KEY="nexorawildfire-alert-settings-v3";
 const NOVA_ALERTS_KEY="nexorawildfire-alerts-v1";
 const PUSH_AREA_KEY="nexorawildfire-push-area-v1";
-const PUSH_API=(window.NOVA_API_BASE||"").replace(/\/$/,"");
+const PUSH_API=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api")).replace(/\/$/,"");
 
 function getNovaAlertSettings(){try{return JSON.parse(localStorage.getItem(NOVA_ALERT_SETTINGS_KEY)||'{"enabled":true,"threshold":70}')}catch{return {enabled:true,threshold:70}}}
 function novaSeverity(alert){const risk=Number(alert?.risk);if(!Number.isFinite(risk))return {key:"info",label:"BİLGİ",icon:"ℹ️"};if(risk>=90)return {key:"critical",label:"KRİTİK",icon:"🚨"};if(risk>=75)return {key:"high",label:"YÜKSEK",icon:"🔴"};if(risk>=50)return {key:"warning",label:"DİKKAT",icon:"🟠"};return {key:"info",label:"BİLGİ",icon:"🟢"}}
@@ -42,9 +42,16 @@ if(notifyForm){
     if(!enabled){if(status)status.textContent="Nova-Alert kapalı.";return}
     const permission=await requestNovaBrowserPermission();
     if(permission!=="granted"){if(status)status.textContent="Nova-Alert yerel olarak açık; tarayıcı bildirim izni verilmedi.";return}
-    const area=JSON.parse(localStorage.getItem(PUSH_AREA_KEY)||"null")||{name:"Genel Nova-Alert",lat:41.0082,lon:28.9784};
+    const area={name:String(notifyForm.areaName?.value||"Genel Nova-Alert").trim().slice(0,120),lat:Number(notifyForm.lat?.value||41.0082),lon:Number(notifyForm.lon?.value||28.9784)};
+    if(!area.name||!Number.isFinite(area.lat)||Math.abs(area.lat)>90||!Number.isFinite(area.lon)||Math.abs(area.lon)>180){if(status)status.textContent="Alan adı veya koordinatlar geçersiz.";return}
     const result=await enableNovaWebPush(area);
     if(status)status.textContent=result.ok?"Nova-Alert aktif • hesap ve sunucu Web Push aboneliği kaydedildi.":result.reason==="login_required"?"Tarayıcı izni açık. Kişisel arka plan bildirimi için hesabına giriş yap.":result.reason==="server"?"Tarayıcı izni açık; sunucu VAPID/Supabase anahtarları henüz yapılandırılmadı.":result.reason==="permission"?"Tarayıcı bildirim izni verilmedi.":"Tarayıcı izni açık; Web Push kurulumu tamamlanamadı.";
   };
 }
+const areaForm=document.getElementById("notify-form");
+function populatePushArea(area){if(!area||!areaForm)return;if(areaForm.areaName)areaForm.areaName.value=area.name||"";if(areaForm.lat)areaForm.lat.value=Number(area.lat).toFixed(6);if(areaForm.lon)areaForm.lon.value=Number(area.lon).toFixed(6);const label=document.querySelector("[data-push-area-label]");if(label)label.textContent="Bildirim alanı: "+(area.name||"Seçilmedi")}
+try{const savedArea=JSON.parse(localStorage.getItem(PUSH_AREA_KEY)||"null");if(savedArea)populatePushArea(savedArea)}catch{}
+window.addEventListener("nova:area-saved",event=>{const a=event.detail;if(!a)return;localStorage.setItem(PUSH_AREA_KEY,JSON.stringify(a));populatePushArea(a)});
+const testButton=document.getElementById("notify-test");
+if(testButton)testButton.addEventListener("click",async()=>{const status=document.querySelector("[data-notify-status]");try{const session=window.NovaAuth?.session();if(!session?.access_token){if(status)status.textContent="Test bildirimi için önce giriş yap.";return}const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(!sub){if(status)status.textContent="Önce Nova-Alert formunu kaydedip Web Push aboneliğini oluştur.";return}const area={name:String(areaForm?.areaName?.value||"Genel Nova-Alert").trim(),lat:Number(areaForm?.lat?.value||41.0082),lon:Number(areaForm?.lon?.value||28.9784),threshold:Number(areaForm?.threshold?.value||70)};const response=await fetch(PUSH_API+"/notifications/push/test",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({subscription:sub.toJSON(),...area})});if(!response.ok)throw new Error("HTTP "+response.status);if(status)status.textContent="Test Web Push isteği sunucu tarafından kabul edildi; cihaz teslimatını kontrol et."}catch{if(status)status.textContent="Test bildirimi gönderilemedi. Giriş, tarayıcı izni, API ve VAPID/Supabase ayarlarını kontrol et."}});
 window.NovaAlert={settings:getNovaAlertSettings,save:saveNovaAlert,browser:showNovaBrowserAlert,severity:novaSeverity,requestPermission:requestNovaBrowserPermission,enablePush:enableNovaWebPush};
