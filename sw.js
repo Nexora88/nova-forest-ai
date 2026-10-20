@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v27";
-const DATA_CACHE = "nexorawildfire-data-v27";
+const CACHE_NAME = "nexorawildfire-shell-v28";
+const DATA_CACHE = "nexorawildfire-data-v28";
 
 const APP_SHELL = [
   "./",
@@ -171,8 +171,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: new URL(data.icon || "./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    badge: new URL(data.icon || "./assets/nexora-wildfire-logo.png", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
@@ -182,7 +182,7 @@ self.addEventListener("push", event => {
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
-  const target = new URL(event.notification.data?.url || "./", self.location.origin).href;
+  const target = new URL(event.notification.data?.url || "./", self.registration.scope).href;
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
       for (const client of list) {
