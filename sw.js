@@ -22,6 +22,7 @@ const APP_SHELL = [
   "./css/style.css?v=20261017d",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
+  "./js/provider-status.js",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
