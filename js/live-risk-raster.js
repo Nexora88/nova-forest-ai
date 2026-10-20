@@ -13,10 +13,14 @@ function incidentBanner(){
 
 async function checkLiveIncidents(){
   incidentBanner();
-  if(!API_BASE)return;
+  if(!API_BASE){window.NovaProviderStatus?.update("firms","error","Backend API yapılandırılmamış; NASA FIRMS durumu doğrulanamıyor.");return;}
+  window.NovaProviderStatus?.update("firms","loading","Backend üzerinden NASA FIRMS olay kontrolü sürüyor.");
   try{
     const r=await fetch(API_BASE+'/risk-analysis',{cache:'no-store'}).then(x=>x.json());
-    const hits=(r.regions||[]).filter(x=>x.satellite?.nasa_firms?.nearby_hotspot);
+    if(!r||!Array.isArray(r.regions))throw new Error("Risk yanıtında regions alanı yok");
+    const hits=r.regions.filter(x=>x.satellite?.nasa_firms?.nearby_hotspot);
+    const sourceTime=r.nasa_firms_observed_at||r.generated_at||r.updated_at||null;
+    window.NovaProviderStatus?.update("firms",hits.length?"ok":"empty",hits.length+" bölgesel FIRMS sinyali; bu kesin yangın doğrulaması değildir.",sourceTime);
     const b=document.querySelector('.nova-incident-banner');
     const t=b?.querySelector('[data-incident-text]');
     if(hits.length){
@@ -30,6 +34,7 @@ async function checkLiveIncidents(){
     const b=document.querySelector('.nova-incident-banner');
     b?.classList.add('show');
     const t=b?.querySelector('[data-incident-text]');
+    window.NovaProviderStatus?.update("firms","error","NASA FIRMS kontrolü başarısız; sıfır olay olarak yorumlanmamalıdır.");
     if(t)t.textContent='NASA FIRMS durumu doğrulanamadı ('+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'). Bu, sıfır olay anlamına gelmez. Yeniden deneyin.';
   }
 }
