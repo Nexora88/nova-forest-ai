@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v24";
-const DATA_CACHE = "nexorawildfire-data-v24";
+const CACHE_NAME = "nexorawildfire-shell-v25";
+const DATA_CACHE = "nexorawildfire-data-v25";
 
 const APP_SHELL = [
   "./",
@@ -10,6 +10,9 @@ const APP_SHELL = [
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
+  "./js/satellite-analysis.js?v=20261020a",
+  "./js/nova-intelligence.js?v=20261020a",
+  "./css/nova-intelligence.css?v=20261020a",
   "./pages/uav-demo.html",
   "./pages/vision.html",
   "./pages/auth.html",
