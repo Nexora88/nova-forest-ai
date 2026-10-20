@@ -116,7 +116,7 @@
     $("clearBtn")?.addEventListener("click",clear);
     $("refreshModelBtn")?.addEventListener("click",loadModelStatus);
     loadModelStatus();
-    $("languageBtn")?.addEventListener("click",()=>setLanguage(language==="tr"?"en":"tr"));
+    $("languageBtn")?.addEventListener("click",()=>{setLanguage(language==="tr"?"en":"tr");loadModelStatus();});
     $("regionSelect")?.addEventListener("change",event=>focusRegion(event.target.value));
     setLanguage(language);
   });
