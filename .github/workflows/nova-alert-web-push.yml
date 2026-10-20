@@ -32,6 +32,7 @@ jobs:
           NEXORA_API_URL: ${{ vars.NEXORA_API_URL }}
         run: |
           API_URL="${NEXORA_API_URL:-https://nova-forest-ai.vercel.app/api}"
+          API_URL="${API_URL%/}"
           case "$API_URL" in
             https://*) ;;
             *) echo "::error::NEXORA_API_URL must use HTTPS."; exit 1 ;;
