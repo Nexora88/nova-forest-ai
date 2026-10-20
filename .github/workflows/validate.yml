@@ -102,6 +102,20 @@ jobs:
           except (requests.RequestException, ValueError) as exc:
               print("Live provider diagnostic failed:", type(exc).__name__)
 
+          try:
+              credentials = requests.get(base + "/satellite/providers/status", params={"probe": "true"}, timeout=45)
+              print("Provider credential validation HTTP:", credentials.status_code)
+              if credentials.ok:
+                  status = credentials.json()
+                  for provider in ("nasa_firms", "copernicus_sentinel_hub", "open_meteo"):
+                      item = status.get(provider, {})
+                      print(provider, "credential/provider status:", item.get("status", "unknown"))
+                      print(provider, "secret exposed:", bool(item.get("secret_exposed", False)))
+              else:
+                  print("Provider credential validation unavailable; response body omitted.")
+          except (requests.RequestException, ValueError) as exc:
+              print("Provider credential validation failed:", type(exc).__name__)
+
           geometry = {
               "type": "Polygon",
               "coordinates": [[
