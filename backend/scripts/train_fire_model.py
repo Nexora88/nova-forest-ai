@@ -177,8 +177,6 @@ def main():
     joblib.dump(model, model_path)
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     label_counts = {str(int(key)): int(value) for key, value in frame["label"].astype(int).value_counts().sort_index().items()}
-    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
-    label_counts = {str(int(key)): int(value) for key, value in frame["label"].astype(int).value_counts().sort_index().items()}
     metadata = {
         "model_version": "thrace-hotspot-proxy-weather-v1",
         "model_type": "RandomForestClassifier",
