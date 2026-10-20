@@ -84,3 +84,4 @@ def test_onboarding_requires_explicit_province_and_district_without_random_assig
     assert "Konum seçmeden devam et" in source
     assert "center_lat" in source and "center_lon" in source
     assert "js/onboarding.js?v=20261020a" in page
+    assert "css/field-ui.css?v=20261020a" in page
