@@ -74,4 +74,4 @@ def test_field_feedback_is_private_structured_and_not_a_fake_local_submission():
     assert "revoke all" in migration.lower()
     assert 'id="field-feedback-form"' in page
     assert '"/feedback/submit"' in script
-    assert "görüşme yapıldığı anlamına gelmez" in pilot
+    assert "görüşme yapıldığını göstermez" in pilot
