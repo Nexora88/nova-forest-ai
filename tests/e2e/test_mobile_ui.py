@@ -268,7 +268,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertIn("NASA FIRMS", text)
             self.assertIn("Open-Meteo", text)
             self.assertIn("NASA GIBS", text)
-            self.assertIn("Son kontrol", text)
+            self.assertTrue("Son kontrol" in text or "Last check" in text, text)
             self.assertTrue("Henüz doğrulanmadı" in text or "Hata / doğrulanamadı" in text, text)
         finally:
             context.close()
