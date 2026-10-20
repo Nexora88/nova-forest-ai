@@ -46,3 +46,29 @@ class NexoraInsightContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_trakya_weather_panel_uses_live_provider_and_never_fakes_values():
+    source = (ROOT / "js/weather.js").read_text(encoding="utf-8")
+    page = (ROOT / "pages/weather.html").read_text(encoding="utf-8")
+    for region in ("Edirne", "Kırklareli", "Tekirdağ"):
+        assert region in source
+    assert "api.open-meteo.com/v1/forecast" in source
+    assert "Veri alınamadı" in source
+    assert "weather.js" in page
+
+
+def test_map_has_live_nasa_firms_overlay_and_source_disclaimer():
+    source = (ROOT / "js/thrace-hotspots.js").read_text(encoding="utf-8")
+    page = (ROOT / "pages/map.html").read_text(encoding="utf-8")
+    assert "/satellite/firms?" in source
+    assert 'days:"1"' in source
+    assert 'fillColor:"#ef4444"' in source
+    assert "doğrulanmış yangın kaydı değildir" in source
+    assert "thrace-hotspots.js" in page
+
+
+def test_field_pilot_material_does_not_claim_official_validation():
+    doc = (ROOT / "docs/THRACE_FIELD_PILOT.md").read_text(encoding="utf-8")
+    assert "resmî yangın uyarısı" in doc
+    assert "izin verilmeden" in doc
