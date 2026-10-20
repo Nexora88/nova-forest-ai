@@ -31,3 +31,18 @@ NexoraWildfire AI proje ekibi
 - Kişisel konum ve hassas arılık/tarla koordinatlarını açık paylaşmayın.
 - Sistem çıktılarını resmî kurum uyarılarının yerine koymayın.
 - FIRMS termal anomalilerini doğrulanmış yangın olarak etiketlemeyin.
+
+
+## Gerçek kullanıcı geri bildirimi toplama süreci
+
+Bu belge bir davet taslağıdır; herhangi bir kooperatif, kurum veya üreticiyle görüşme yapıldığını göstermez.
+
+1. **Katılımcı bulma:** Trakya'daki çiftçi, arıcı, orman çalışanı ve araştırmacılara yalnızca uygun, izinli kanallardan bireysel davet gönder. Kurum adı/logo/ortaklık iddiası için ayrıca yazılı izin gerekir.
+2. **Durumu kaydetme:** Her daveti yalnızca gerçekten gerçekleşen aşamayla işaretle: planlandı → gönderildi → yanıtlandı → görüşme için onay verdi → görüşme yapıldı. Yanıt gelmemesini katılım veya onay olarak sayma.
+3. **Gönüllü görüşme:** 15–20 dakikalık görüşme için önce amaç, gönüllülük, kayıt alınıp alınmayacağı ve verinin nasıl kullanılacağını açıkla. Ses/görüntü kaydı varsayılan olarak alma; gerekirse ayrıca açık izin iste.
+4. **Yapılandırılmış geri bildirim:** Uygulamadaki Geri Bildirim formunda katılımcı rolü, genel bölge, sorun türü, kullanım senaryosu, görülen/beklenen davranış ve fayda puanını topla. Ad, iletişim bilgisi ve kesin tarla/arılık koordinatı isteme.
+5. **İnceleme:** Her bildirimi **yeni**, **inceleniyor**, **düzeltildi**, **tekrar test edildi** veya **kapatıldı** durumuyla izle. Hata raporlarında yeniden üretim adımı ve veri kaynağı/zamanı varsa ekle; kişisel/hassas verileri çıkar.
+6. **Başarı ölçütleri:** Katılımcı sayısı ve roller, tamamlanan görüşmeler, tekrarlanan sorunlar, yanlış alarm/kaçırılmış olay örnekleri, mobil kullanım engelleri ve düzeltmelerden sonra yeniden test sonuçlarını raporla. Örneklem küçükse genelleme yapma.
+7. **Şeffaf raporlama:** Yalnızca gerçekten toplanan ve izin verilen sonuçları yayımla. Hiç görüşme yapılmadıysa bunu açıkça söyle; boş şablonları veya davetleri saha doğrulaması olarak sunma.
+
+Geri Bildirim sayfasındaki form, yapılandırılmış yanıtları yalnızca sunucu ve özel Supabase tablosu yapılandırıldığında alır. Sunucu yapılandırması eksikse form bunu açıkça bildirir; yerel cihazda kaydetmiş gibi başarı göstermez.
