@@ -44,7 +44,7 @@ The project is inspired by Mustafa Kemal Atatürk's emphasis on science, product
 
 ## Explore the product
 
-- **Interactive map** with available geographic layers and saved areas.
+- **Nexora Insight AI**: bilingual, explainable regional analysis workspace that scans the existing environmental API and reports source coverage and missing inputs. See [engine architecture and limits](docs/NEXORA_INSIGHT_ENGINE.md).\n- **Interactive map** with available geographic layers and saved areas.
 - **Field workspace** for farms, apiaries, forests, and other user-selected areas.
 - **Weather and environmental indicators** when supported data providers are reachable.
 - **Satellite-scene discovery** intended to support vegetation and land-observation workflows.
