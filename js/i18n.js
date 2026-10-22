@@ -849,6 +849,7 @@
     ["Trakya'da çekilmiş, etiketli duman/ateş ve zor negatif örnekler.","Labelled smoke/fire and hard-negative samples captured in Thrace."],
     ["Ayrı test kümesinde hassasiyet, yanlış alarm ve kaçırma oranlarının raporlanması.","Report precision, false-alarm rate, and missed detections on a separate test set."],
     ["Şu anda bu sayfada gerçek duman/ateş sınıflandırma modeli çalışmıyor. RGB göstergeleri yalnızca açıklayıcı, kural tabanlı renk ölçümleridir; resmî uyarı olarak kullanılmamalıdır.","No real smoke/fire classification model currently runs on this page. RGB indicators are explanatory, rule-based colour measurements only and must not be used as official warnings."],
+    ["olarak gösterir.","is displayed as."],["Çevresel Zekâ","Environmental Intelligence"],[" (Türkiye saati)"," (Türkiye time)"],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
