@@ -1,4 +1,6 @@
 import asyncio
+import hmac
+import os
 from datetime import datetime, timezone
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -64,7 +66,15 @@ def calculate_risk(weather):
 
 @router.get("/status")
 def notification_status():
-    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":["in_app","browser","web_push"] if configured() else ["in_app","browser"],"background_delivery":configured()}
+    return {
+        "status": "available",
+        "system": "Nova-Alert",
+        "push": configured(),
+        "channels": ["in_app", "browser", "web_push"] if configured() else ["in_app", "browser"],
+        "background_delivery": False,
+        "scheduler_endpoint": "/notifications/cron/run",
+        "note": "A configured push provider alone does not mean background delivery is scheduled. Configure an authenticated external scheduler to call the cron endpoint.",
+    }
 
 @router.get("/push/config")
 def push_config():
@@ -126,6 +136,20 @@ async def background_push_loop():
         try: await background_push_cycle()
         except Exception: pass
         await asyncio.sleep(300)
+
+@router.get("/cron/run")
+async def run_background_push_cycle(authorization: str | None = Header(default=None)):
+    secret = os.getenv("NOVA_CRON_SECRET", "").strip()
+    if not secret:
+        raise HTTPException(status_code=503, detail="NOVA_CRON_SECRET yapılandırılmadı; zamanlanmış bildirim çalıştırılamaz.")
+    expected = f"Bearer {secret}"
+    if not authorization or not hmac.compare_digest(authorization, expected):
+        raise HTTPException(status_code=401, detail="Geçersiz zamanlayıcı yetkisi.")
+    if not configured():
+        raise HTTPException(status_code=503, detail="Web Push, VAPID ve Supabase yapılandırması eksik.")
+    await background_push_cycle()
+    return {"status": "cycle_completed", "system": "Nova-Alert", "note": "Bu çağrı bir değerlendirme döngüsünü tamamladı; sonraki döngüler için harici zamanlayıcı gerekir."}
+
 
 @router.post("/send")
 def send_notification():

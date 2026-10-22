@@ -1,6 +1,6 @@
 # Nova Bee & Tarım — pilot kapsamı
 
-Durum: **pilot arayüzü ve tarayıcı tabanlı göstergeler**. Ödeme, otomatik premium yükseltme ve garantili arka plan bildirimleri etkin değildir.
+Durum: **pilot arayüzü + isteğe bağlı bağımsız model ajanı API'si**. Agro-Agent, Eco-Agent ve Writer Agent ayrı model çağrıları yapacak şekilde kodlandı; gerçek çıkarım için Ollama uyumlu model sunucusu ve üç model adı sunucu ortam değişkenlerinde yapılandırılmalıdır. Bu yapılandırma yapılmadan model raporu tamamlanmış gibi gösterilmez. Ödeme ve otomatik Premium yükseltme etkin değildir; zamanlanmış arka plan Web Push için sunucu anahtarlarına ek olarak harici zamanlayıcı gerekir.
 
 ## Ücretsiz pilot
 - Alanlarım bölümünde kaydedilen arılık/tarla alanını seçme.

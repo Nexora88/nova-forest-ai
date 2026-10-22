@@ -1,0 +1,31 @@
+/* Focused repairs for the geospatial command screen. Keep the existing military/command visual language. */
+body>header .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;max-width:100%;padding:6px 10px 6px 6px;border:1px solid #1c402b;border-radius:12px;background:#020604;box-shadow:inset 0 0 0 1px #ffffff03}
+body>header .brand-lockup .brand-logo{display:block;width:46px;height:46px;max-width:46px;object-fit:contain;flex:0 0 46px;padding:3px;border-radius:8px;background:#020604;filter:drop-shadow(0 0 8px #20e87938)}
+body>header .brand-lockup .logo{min-width:0}
+body>header .brand-lockup .logo h1{color:#eaffef!important}
+body>header .brand-lockup .logo p{color:#6deba0!important}
+.map-filters{transition:opacity .18s ease,transform .18s ease}
+.map-filters .map-filters-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.map-filters .map-filters-head>strong{display:flex;align-items:center;gap:9px;margin:0!important;color:#9df6b8!important;font-size:10px!important;letter-spacing:.17em!important}
+.map-filters .map-filters-head>strong:before{content:"";width:24px;height:2px;background:#24ed7d;box-shadow:0 0 10px #24ed7d}
+.map-filters .map-filters-close,.map-tools-reopen{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:7px 10px;border:1px solid #315c3d;border-radius:9px;background:#061009;color:#d9ffe3;font:700 11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}
+.map-filters .map-filters-close:hover,.map-tools-reopen:hover{border-color:#28e77e;color:#fff}
+.map-tools-reopen{position:absolute;z-index:1001;top:78px;left:26px;box-shadow:0 12px 34px #0009;background:#041008f5}
+.map-tools-reopen[hidden]{display:none!important}
+.map-filters.is-collapsed{display:none!important}
+.risk-popup .popup-close-detail{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:40px;margin-top:10px;border:1px solid #315c3d;border-radius:10px;background:#040b06;color:#ccebd5;font:700 11px Inter,system-ui,sans-serif;cursor:pointer}
+.risk-popup .popup-close-detail:hover{border-color:#f0b94d;color:#fff1c9}
+.map-section{min-width:0}
+.map-toolbar{flex-wrap:wrap}
+.map-toolbar>span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:700px){
+ .map-filters{left:10px!important;top:60px!important;width:min(300px,calc(100% - 20px))!important;max-height:calc(100% - 76px);overflow:auto;padding:13px!important}
+ .map-tools-reopen{left:10px;top:60px;min-height:42px}
+ .map-filters .map-filters-head{align-items:flex-start}
+ .map-filters .map-filters-close{flex:0 0 auto}
+ .map-toolbar{align-items:flex-start}
+ .map-toolbar>span:first-child{max-width:100%;letter-spacing:.06em}
+ #map{min-height:clamp(420px,68vh,680px)!important}
+ body>header .brand-lockup{flex:1 1 100%;width:100%}
+ body>header .brand-lockup .brand-logo{width:40px;height:40px;max-width:40px;flex-basis:40px}
+}
