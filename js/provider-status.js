@@ -28,7 +28,7 @@
     panel.append(head,list);
     const mapSection=document.querySelector(".map-section");
     const toolbar=mapSection?.querySelector(".map-toolbar");
-    if(toolbar)mapSection.insertBefore(panel,toolbar);else mapSection?.prepend(panel);
+    if(mapSection?.parentNode)mapSection.parentNode.insertBefore(panel,mapSection);
     render();
   }
   window.NovaProviderStatus={
