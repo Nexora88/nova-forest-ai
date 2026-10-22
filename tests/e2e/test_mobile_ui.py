@@ -258,18 +258,21 @@ class MobileUiSmokeTests(unittest.TestCase):
                     context.close()
 
 
-    def test_map_shows_separate_provider_health_states(self):
+    def test_map_keeps_provider_diagnostics_out_of_the_primary_map(self):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
-            page.wait_for_selector("[data-provider-status-list]", timeout=15000)
-            panel = page.locator("[data-provider-status-list]")
-            text = panel.inner_text()
-            self.assertIn("NASA FIRMS", text)
-            self.assertIn("Open-Meteo", text)
-            self.assertIn("NASA GIBS", text)
-            self.assertTrue("Son kontrol" in text or "Last check" in text, text)
-            self.assertTrue("Henüz doğrulanmadı" in text or "Hata / doğrulanamadı" in text, text)
+            page.wait_for_selector("#map.leaflet-container", timeout=20000)
+            # Provider-health details were cluttering and shifting the main map;
+            # source state remains tracked by the layer modules without a large panel.
+            self.assertEqual(page.locator("[data-provider-status-list]").count(), 0)
+            self.assertEqual(page.locator(".provider-status-panel").count(), 0)
+            self.assertTrue(page.locator(".map-filters-close").is_visible())
+            self.assertTrue(page.locator(".map-tools-reopen").count() == 1)
+            page.locator(".map-filters-close").click()
+            self.assertTrue(page.locator(".map-tools-reopen").is_visible())
+            page.locator(".map-tools-reopen").click()
+            self.assertTrue(page.locator(".map-filters-close").is_visible())
         finally:
             context.close()
 
