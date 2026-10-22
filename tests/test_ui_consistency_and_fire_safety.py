@@ -13,6 +13,23 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('Haritada konumu aç', source)
         self.assertIn('kesin yangın doğrulaması', source.lower())
 
+    def test_firms_alert_is_in_map_flow_and_dismissal_is_scoped_to_signal(self):
+        source = (ROOT / "js" / "live-risk-raster.js").read_text(encoding="utf-8")
+        self.assertIn('const toolbar=document.querySelector(".map-toolbar")', source)
+        self.assertIn('toolbar.after(b)', source)
+        self.assertIn('sessionStorage.setItem("nova-dismissed-firms:"+signature,"1")', source)
+        self.assertIn('b?.classList.toggle(\'show\',!dismissed)', source)
+        self.assertIn("Source observation", (ROOT / "js" / "i18n.js").read_text(encoding="utf-8"))
+
+    def test_feedback_translation_and_footer_cannot_be_retranslated_by_observer(self):
+        source = (ROOT / "js" / "i18n.js").read_text(encoding="utf-8")
+        self.assertIn('["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."]', source)
+        self.assertIn('footer,[data-nexora-credit]', source)
+        self.assertIn('if(!footer){footer=document.createElement("footer")', source)
+        page = (ROOT / "pages" / "feedback.html").read_text(encoding="utf-8")
+        self.assertIn('<html lang="tr">', page)
+        self.assertIn('i18n.js?v=20261022a', page)
+
     def test_firms_alert_scope_is_limited_to_five_pilot_provinces(self):
         source = (ROOT / "js" / "live-risk-raster.js").read_text(encoding="utf-8")
         for province in ("Edirne", "Tekirdağ", "Kırklareli", "Çanakkale", "İstanbul"):
@@ -39,10 +56,18 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn("official", source.lower())
         self.assertIn("Resmî uyarı ve acil durum ekiplerinin talimatları önceliklidir", page)
 
+    def test_evacuation_readiness_checklist_is_interactive_and_honest(self):
+        page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
+        source = (ROOT / "js" / "fire-safety-sim.js").read_text(encoding="utf-8")
+        self.assertIn('data-evac-check', page)
+        self.assertIn('data-evac-progress-bar', page)
+        self.assertIn('updateEvacuationReadiness', source)
+        self.assertIn('does not replace official evacuation instructions', source)
+
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v26', source)
-        self.assertIn('nexorawildfire-data-v26', source)
+        self.assertIn('nexorawildfire-shell-v27', source)
+        self.assertIn('nexorawildfire-data-v27', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
