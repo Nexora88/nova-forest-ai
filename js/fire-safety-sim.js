@@ -17,13 +17,13 @@
     const label=document.querySelector("[data-evac-progress]");
     const bar=document.querySelector("[data-evac-progress-bar]");
     const progress=bar?.parentElement;
-    if(label)label.textContent=t("Tamamlanan hazırlık adımı: ","Readiness steps completed: ")+done+"/"+total;
+    if(label){label.dataset.languageFixed="";label.textContent=t("Tamamlanan hazırlık adımı: ","Readiness steps completed: ")+done+"/"+total;}
     if(bar)bar.style.width=(total?done/total*100:0)+"%";
     progress?.setAttribute("aria-valuenow",String(done));
     const note=document.querySelector("[data-evac-note]");
-    if(note)note.textContent=done===total
+    if(note){note.dataset.languageFixed="";note.textContent=done===total
       ?t("Kontrol listesi tamamlandı; bu, resmî tahliye izni veya güvenli rota onayı değildir.","Checklist complete; this is not official evacuation clearance or confirmation of a safe route.")
-      :t("Bu liste hazırlık kontrolüdür; resmî tahliye talimatının yerine geçmez.","This is a preparedness checklist; it does not replace official evacuation instructions.");
+      :t("Bu liste hazırlık kontrolüdür; resmî tahliye talimatının yerine geçmez.","This is a preparedness checklist; it does not replace official evacuation instructions.");}
   }
   const province=()=>provinces[$("[data-sim-province]").value]||provinces.Edirne;
   const status=text=>{$("[data-sim-status]").textContent=text;};
