@@ -693,6 +693,28 @@
     ["CUMHURİYET VİZYONU","REPUBLIC VISION"],
     ["BİLİM","SCIENCE"],
   ];
+    ["Help make environmental data more useful.","Çevresel verileri daha kullanışlı hâle getirmemize yardım et."],
+    ["NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field.","NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin yardımcı olacağını bize anlat."],
+    ["Report a bug or suggest a feature →","Hata bildir veya özellik öner →"],
+    ["Explore the product","Ürünü keşfet"],
+    ["What feedback is most useful?","Hangi geri bildirimler daha yararlı?"],
+    ["A reproducible bug: what page you opened, what you expected, and what happened.","Tekrarlanabilir hata: hangi sayfayı açtığın, ne beklediğin ve ne olduğu."],
+    ["A data issue: the selected area, the layer, the time, and whether the source showed an error or no observations.","Veri sorunu: seçili alan, katman, zaman ve kaynağın hata mı yoksa gözlem yokluğu mu gösterdiği."],
+    ["A practical feature request: who it helps and what task it would make easier.","Pratik özellik önerisi: kime yardımcı olacağı ve hangi işi kolaylaştıracağı."],
+    ["Mobile usability: device/browser type and the control that was difficult to use.","Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol."],
+    ["Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors.","Herkese açık bildirimlere parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Bildirimler başkaları tarafından görülebilir."],
+    ["SCIENCE · SERVICE · RESPONSIBILITY","BİLİM · HİZMET · SORUMLULUK"],
+    ["Science should help people solve real problems.","Bilim, insanların gerçek sorunlarını çözmesine yardımcı olmalı."],
+    ["That principle guides the product direction: build carefully, be honest about evidence, and make technology useful to the people and ecosystems it serves.","Bu ilke ürün yaklaşımını yönlendirir: dikkatle geliştirmek, kanıtlar konusunda dürüst olmak ve teknolojiyi insanlara ve ekosistemlere faydalı kılmak."],
+    ["PRODUCT FEEDBACK","ÜRÜN GERİ BİLDİRİMİ"],
+    ["Environmental intelligence for real-world needs","Gerçek ihtiyaçlar için çevresel istihbarat"],
+    ["Home","Ana Panel"],["About","Sistem"],["Environmental Map","Çevresel Harita"],["My Areas","Alanlarım"],["Atmosphere","Atmosfer"],["Satellite Hub","Uydu Merkezi"],
+    ["Sign in to your account","Hesabına giriş yap"],["Create your account","Hesap oluştur"],["Continue with Google","Google ile devam et"],["Continue with email","E-posta ile devam et"],["Continue with phone","Telefonla devam et"],
+    ["Email address","E-posta adresi"],["Password","Parola"],["Confirm password","Parolayı doğrula"],["Forgot password?","Parolamı unuttum"],["Send reset link","Sıfırlama bağlantısı gönder"],["Sign in","Giriş yap"],["Create account","Hesap oluştur"],["Register","Kayıt ol"],["Log in","Giriş yap"],["Log out","Çıkış yap"],
+    ["First name","Ad"],["Last name","Soyad"],["Full name","Ad soyad"],["Phone number","Telefon numarası"],["Verification code","Doğrulama kodu"],["Verify","Doğrula"],["Cancel","İptal"],["Save changes","Değişiklikleri kaydet"],
+    ["Processing…","İşlem yapılıyor…"],["Checking…","Kontrol ediliyor…"],["Sending SMS…","SMS gönderiliyor…"],["Verifying…","Doğrulanıyor…"],["Updating password…","Parola güncelleniyor…"],
+    ["The passwords do not match.","Parolalar eşleşmiyor."],["Password must be at least 8 characters.","Parola en az 8 karakter olmalı."],["Enter your email address first.","Önce e-posta adresini yaz."],["Enter the 6-digit verification code.","6 haneli doğrulama kodunu gir."],["Check your inbox for the verification link.","Doğrulama bağlantısı için gelen kutunu kontrol et."],
+    ["Wind and evacuation scenario","Rüzgâr ve tahliye senaryosu"],["Wind direction","Rüzgâr yönü"],["Wind speed","Rüzgâr hızı"],["Scenario duration","Senaryo süresi"],["Run simulation","Simülasyonu çalıştır"],["Reset simulation","Simülasyonu sıfırla"],["Planning aid only — not an official evacuation route or fire-spread forecast.","Yalnızca planlama desteğidir; resmî tahliye rotası veya yangın yayılım tahmini değildir."],
   const trToEn = new Map(pairs);
   const enToTr = new Map();
   for (const [tr,en] of pairs) if (!enToTr.has(en)) enToTr.set(en,tr);
@@ -743,6 +765,14 @@
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
+    const footer=document.querySelector("footer");
+    if(footer){
+      let credit=footer.querySelector("p");
+      if(!credit){credit=document.createElement("p");footer.appendChild(credit);}
+      credit.textContent=lang==="en"
+        ?"NexoraWildfire AI · Independent project · Developed by Ahmet Eymen Bakraç · Nexora88 © 2026"
+        :"NexoraWildfire AI · Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026";
+    }
   }
   function init() {
     const button = document.createElement("button");
