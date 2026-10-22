@@ -74,7 +74,8 @@ def calculate_risk(weather):
 
 @router.get("/status")
 def notification_status():
-    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":["in_app","browser","web_push"] if configured() else ["in_app","browser"],"background_delivery":configured()}
+    channels=channels_configured()
+    return {"status":"available","system":"Nova-Alert","push":configured(),"sms_whatsapp":channels,"channels":["in_app","browser"]+(["web_push"] if configured() else [])+(["sms","whatsapp"] if channels else []),"background_delivery":configured() or channels}
 
 @router.get("/push/config")
 def push_config():
@@ -143,8 +144,8 @@ def evaluate_notification(payload:EvaluateRequest):
     return {"status":"alert" if alert else "normal","system":"Nova-Alert","area":payload.area_name,"risk":risk,"threshold":threshold,"level":level,"weather":{"temperature":weather.get("temperature"),"humidity":weather.get("humidity"),"wind":weather.get("wind")},"alert":alert,"title":f"{payload.area_name} • Çevresel risk yükseldi" if alert else f"{payload.area_name} • Risk normal","message":f"Çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgar {weather.get('wind')} km/s."}
 
 async def background_push_cycle():
-    if not configured(): return
-    rows=list_subscriptions(); now=datetime.now(timezone.utc)
+    rows=list_subscriptions() if configured() else []
+    now=datetime.now(timezone.utc)
     for row in rows:
         if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"): continue
         try:
@@ -161,6 +162,30 @@ async def background_push_cycle():
                 update_alert_state(row["id"],risk,False)
         except Exception:
             continue
+
+
+    try:
+        channel_rows=list_channels() if channels_configured() else []
+        for row in channel_rows:
+            if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"): continue
+            try:
+                weather=get_current_weather(float(row["lat"]),float(row["lon"]))
+                risk=calculate_risk(weather)
+                threshold=max(25,min(100,int(row.get("threshold") or 70)))
+                last=row.get("last_alert_at"); recent=False
+                if last:
+                    try: recent=(now-datetime.fromisoformat(str(last).replace("Z","+00:00"))).total_seconds()<21600
+                    except ValueError: pass
+                if risk>=threshold and not recent:
+                    msg=f"{row['area_name']}: çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgâr {weather.get('wind')} km/s."
+                    ok=send_message(row,"NexoraWildfire AI · Nova-Alert",msg)
+                    update_channel_alert(row["id"],risk,ok)
+                else:
+                    update_channel_alert(row["id"],risk,False)
+            except Exception:
+                continue
+    except Exception:
+        pass
 
 async def background_push_loop():
     while True:
