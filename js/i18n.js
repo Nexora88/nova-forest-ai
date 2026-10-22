@@ -692,6 +692,47 @@
     ["Pilot Bölge","Pilot Region"],
     ["CUMHURİYET VİZYONU","REPUBLIC VISION"],
     ["BİLİM","SCIENCE"],
+    ["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."],
+    ["NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin yardımcı olacağını bize anlat.","NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field."],
+    ["Hata bildir veya özellik öner →","Report a bug or suggest a feature →"],
+    ["Ürünü keşfet","Explore the product"],
+    ["Hangi geri bildirimler daha yararlı?","What feedback is most useful?"],
+    ["Tekrarlanabilir hata: hangi sayfayı açtığın, ne beklediğin ve ne olduğu.","A reproducible bug: what page you opened, what you expected, and what happened."],
+    ["Veri sorunu: seçili alan, katman, zaman ve kaynağın hata mı yoksa gözlem yokluğu mu gösterdiği.","A data issue: the selected area, the layer, the time, and whether the source showed an error or no observations."],
+    ["Pratik özellik önerisi: kime yardımcı olacağı ve hangi işi kolaylaştıracağı.","A practical feature request: who it helps and what task it would make easier."],
+    ["Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol.","Mobile usability: device/browser type and the control that was difficult to use."],
+    ["Herkese açık bildirimlere parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Bildirimler başkaları tarafından görülebilir.","Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors."],
+    ["BİLİM · HİZMET · SORUMLULUK","SCIENCE · SERVICE · RESPONSIBILITY"],
+    ["Bilim, insanların gerçek sorunlarını çözmesine yardımcı olmalı.","Science should help people solve real problems."],
+    ["Bu ilke ürün yaklaşımını yönlendirir: dikkatle geliştirmek, kanıtlar konusunda dürüst olmak ve teknolojiyi insanlara ve ekosistemlere faydalı kılmak.","That principle guides the product direction: build carefully, be honest about evidence, and make technology useful to the people and ecosystems it serves."],
+    ["ÜRÜN GERİ BİLDİRİMİ","PRODUCT FEEDBACK"],
+    ["Gerçek ihtiyaçlar için çevresel istihbarat","Environmental intelligence for real-world needs"],
+    ["Ana Panel","Home"],["Sistem","About"],["Çevresel Harita","Environmental Map"],["Alanlarım","My Areas"],["Atmosfer","Atmosphere"],["Uydu Merkezi","Satellite Hub"],
+    ["Hesabına giriş yap","Sign in to your account"],["Hesap oluştur","Create your account"],["Google ile devam et","Continue with Google"],["E-posta ile devam et","Continue with email"],["Telefonla devam et","Continue with phone"],
+    ["E-posta adresi","Email address"],["Parola","Password"],["Parolayı doğrula","Confirm password"],["Parolamı unuttum","Forgot password?"],["Sıfırlama bağlantısı gönder","Send reset link"],["Giriş yap","Sign in"],["Hesap oluştur","Create account"],["Kayıt ol","Register"],["Giriş yap","Log in"],["Çıkış yap","Log out"],
+    ["Ad","First name"],["Soyad","Last name"],["Ad soyad","Full name"],["Telefon numarası","Phone number"],["Doğrulama kodu","Verification code"],["Doğrula","Verify"],["İptal","Cancel"],["Değişiklikleri kaydet","Save changes"],
+    ["İşlem yapılıyor…","Processing…"],["Kontrol ediliyor…","Checking…"],["SMS gönderiliyor…","Sending SMS…"],["Doğrulanıyor…","Verifying…"],["Parola güncelleniyor…","Updating password…"],
+    ["Parolalar eşleşmiyor.","The passwords do not match."],["Parola en az 8 karakter olmalı.","Password must be at least 8 characters."],["Önce e-posta adresini yaz.","Enter your email address first."],["6 haneli doğrulama kodunu gir.","Enter the 6-digit verification code."],["Doğrulama bağlantısı için gelen kutunu kontrol et.","Check your inbox for the verification link."],
+    ["Rüzgâr ve tahliye senaryosu","Wind and evacuation scenario"],["Rüzgâr yönü","Wind direction"],["Rüzgâr hızı","Wind speed"],["Senaryo süresi","Scenario duration"],["Simülasyonu çalıştır","Run simulation"],["Simülasyonu sıfırla","Reset simulation"],["Yalnızca planlama desteğidir; resmî tahliye rotası veya yangın yayılım tahmini değildir.","Planning aid only — not an official evacuation route or fire-spread forecast."],
+    ["Rüzgâr ve tahliye hazırlığı senaryosu","Wind and evacuation readiness scenario"],
+    ["Beş pilot ilde rüzgâr yönünü görselleştir; saha ve tahliye hazırlığını kontrol et.","Visualize wind direction in the five pilot provinces and review field and evacuation readiness."],
+    ["Pilot il","Pilot province"],["Rüzgârın geldiği yön","Wind direction (from)"],["Rüzgâr hızı","Wind speed"],["Senaryo süresi","Scenario duration"],
+    ["1 saat","1 hour"],["3 saat","3 hours"],["6 saat","6 hours"],["Güncel rüzgârı al","Load current wind"],["Haritada senaryoyu göster","Show scenario on map"],["Senaryoyu sıfırla","Reset scenario"],
+    ["Güncel rüzgâr verisini al veya manuel senaryo değerleri seç.","Load current wind data or choose scenario values manually."],
+    ["Tahliye hazırlığı kontrol listesi","Evacuation readiness checklist"],["Resmî kurum duyurularını ve yerel acil durum talimatlarını izle.","Follow official notices and local emergency instructions."],
+    ["Birden fazla çıkış seçeneğini ve buluşma noktasını önceden belirle.","Identify more than one exit option and a meeting point in advance."],
+    ["Telefon, ilaç, su ve temel ihtiyaçları hazır tut; aile iletişim planını paylaş.","Prepare a phone, medicines, water, and essentials; share a family communication plan."],
+    ["Yangına yaklaşma veya duman içinden geçme; yetkililerin kapattığı yollara girme.","Do not approach a fire or pass through smoke; do not enter roads closed by authorities."],
+    ["Önemli: Turuncu koridor yalnızca yönsel bir görselleştirmedir; yangının yayılmasını, dumanı, yol kapanmalarını veya güvenli tahliye rotasını hesaplamaz. Resmî uyarı ve acil durum ekiplerinin talimatları önceliklidir.","Important: The orange corridor is only a directional visualization; it does not calculate fire spread, smoke, road closures, or a safe evacuation route. Official warnings and emergency-service instructions take priority."],
+    ["ORMAN RİSK SİNYALİ","WILDFIRE RISK SIGNAL"],["Haritada incele","Inspect on map"],["Kapat ×","Close ×"],["NASA FIRMS · PİLOT BÖLGE","NASA FIRMS · PILOT AREA"],
+    ["Termal anomali sinyalleri","Thermal anomaly signals"],["Kaynak gözlem zamanı bildirilmedi","Source observation time not reported"],
+    ["Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.","A thermal anomaly is not confirmed proof of fire. Location is province-level unless hotspot coordinates are provided. A check time is not presented as an observation time when the source observation time is missing."],
+    ["Beş pilot ilde bölgesel sinyal bulunmuyor.","No regional signal is currently available in the five pilot provinces."],
+    ["Haritada konumu aç","Open location on map"],["Kaynak bu bölge için sıcak nokta koordinatı döndürmedi.","The source did not return hotspot coordinates for this region."],
+    ["NASA FIRMS · SON KONTROL","NASA FIRMS · LAST CHECK"],["NASA FIRMS · DURUM DOĞRULANAMADI","NASA FIRMS · STATUS UNVERIFIED"],
+    ["Veri alınamadı; bu sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.","Data could not be retrieved; this does not mean zero events. Check connectivity and provider status."],
+    ["pilot ilde termal anomali sinyali. Ayrıntı ve kaynak zamanını görmek için haritada incele.","pilot province(s) have thermal anomaly signals. Inspect the map for details and source times."],
+    ["Güncel rüzgâr verisi alınıyor…","Loading current wind data…"],["Rüzgâr verisi alınamadı. Manuel değerlerle devam edebilirsin.","Wind data unavailable. You can continue with manual values."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
@@ -743,6 +784,14 @@
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
+    const footer=document.querySelector("footer");
+    if(footer){
+      let credit=footer.querySelector("p");
+      if(!credit){credit=document.createElement("p");footer.appendChild(credit);}
+      credit.textContent=lang==="en"
+        ?"NexoraWildfire AI · Independent project · Developed by Ahmet Eymen Bakraç · Nexora88 © 2026"
+        :"NexoraWildfire AI · Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026";
+    }
   }
   function init() {
     const button = document.createElement("button");

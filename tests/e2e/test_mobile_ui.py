@@ -257,6 +257,41 @@ class MobileUiSmokeTests(unittest.TestCase):
                 finally:
                     context.close()
 
+
+    def test_map_shows_separate_provider_health_states(self):
+        context, page = self.new_page()
+        try:
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("[data-provider-status-list]", timeout=15000)
+            panel = page.locator("[data-provider-status-list]")
+            text = panel.inner_text()
+            self.assertIn("NASA FIRMS", text)
+            self.assertIn("Open-Meteo", text)
+            self.assertIn("NASA GIBS", text)
+            self.assertTrue("Son kontrol" in text or "Last check" in text, text)
+            self.assertTrue("Henüz doğrulanmadı" in text or "Hata / doğrulanamadı" in text, text)
+        finally:
+            context.close()
+
+
+    def test_mobile_map_render_budget_and_network_disconnect_recovery(self):
+        context, page = self.new_page()
+        try:
+            started = time.monotonic()
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#map.leaflet-container", timeout=20000)
+            elapsed = time.monotonic() - started
+            self.assertLess(elapsed, 20, f"mobile map initialization exceeded 20s: {elapsed:.2f}s")
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 391)
+            page.context.set_offline(True)
+            page.wait_for_function("navigator.onLine === false", timeout=5000)
+            page.wait_for_function("document.documentElement.dataset.network === 'offline'", timeout=5000)
+            self.assertTrue(page.locator("#map.leaflet-container").is_visible())
+            self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), 391)
+        finally:
+            context.set_offline(False)
+            context.close()
+
     def test_service_worker_cache_version_and_offline_navigation(self):
         context, page = self.new_page()
         try:
@@ -265,7 +300,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
             keys = page.evaluate("caches.keys()")
-            self.assertIn("nexorawildfire-shell-v24", keys, "new app-shell cache version was not installed")
+            self.assertIn("nexorawildfire-shell-v26", keys, "new app-shell cache version was not installed")
             self.assertNotIn("nexorawildfire-shell-v20", keys, "stale app-shell cache was not removed")
             context.set_offline(True)
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)

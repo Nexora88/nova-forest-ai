@@ -129,6 +129,24 @@ def risk_analysis():
                     "nasa_firms": {
                         "status": current_firms.get("status"),
                         "nearby_hotspot": bool(nearby_current) if current_firms_available else None,
+                        "hotspot_details_24h": [
+                            {
+                                "latitude": alert["latitude"],
+                                "longitude": alert["longitude"],
+                                "observed_at_utc": (
+                                    f"{alert.get('acq_date', '')}T"
+                                    f"{str(alert.get('acq_time', '')).zfill(4)[:2]}:"
+                                    f"{str(alert.get('acq_time', '')).zfill(4)[2:4]}:00Z"
+                                    if alert.get("acq_date") and alert.get("acq_time") not in (None, "")
+                                    else None
+                                ),
+                                "confidence": alert.get("confidence"),
+                                "frp": alert.get("frp"),
+                                "distance_km": alert.get("distance_km"),
+                                "source": "NASA FIRMS VIIRS SNPP NRT",
+                            }
+                            for alert in nearby_current[:12]
+                        ] if current_firms_available else None,
                         "nearby_hotspots_24h": len(nearby_current) if current_firms_available else None,
                         "nearby_hotspots_7d": len(nearby_history) if history_firms_available else None,
                         "alert_count_24h_trakya": current_firms.get("alert_count") if current_firms_available else None,

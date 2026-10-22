@@ -9,20 +9,35 @@ const DAYS=[
  {m:10,d:29,k:'national',title:'29 Ekim Cumhuriyet Bayramı',text:'Cumhuriyetimizin ışığında, vatan topraklarını ve ormanlarımızı koruyoruz.',tone:'red',icon:'🇹🇷'},
  {m:11,d:10,k:'memorial',title:'10 Kasım Atatürk\'ü Anma Günü',text:'Açtığın yolda, bilimsel ve çağdaş çevre anlayışının izindeyiz.',tone:'black',icon:'◼',image:'assets/ataturk-1925.jpg'},
  {m:3,d:21,k:'forest',title:'21 Mart Dünya Ormancılık Günü / Orman Haftası',text:'Ormanları yalnızca yangından değil; kuraklık, su stresi ve iklim baskısından da izlemek için çalışıyoruz.',tone:'forest',icon:'🌲'},
- {m:3,d:20,k:'bee',title:'Dünya Arıcılık Günü',text:'Arıcının emeği; orman, tarım ve biyoçeşitlilik arasındaki görünmez bağı taşır. Daha sağlıklı ekosistemler için birlikte izliyoruz.',tone:'earth',icon:'🐝'},
+ {m:5,d:20,k:'bee',title:'Dünya Arıcılık Günü',text:'Arıcının emeği; orman, tarım ve biyoçeşitlilik arasındaki görünmez bağı taşır. Daha sağlıklı ekosistemler için birlikte izliyoruz.',tone:'earth',icon:'🐝'},
  {m:3,d:22,k:'water',title:'Dünya Su Günü',text:'Su; ormanın, tarlanın ve arılığın ortak yaşam kaynağıdır. Veriyi suyu korumak için kullanıyoruz.',tone:'green',icon:'💧'},
  {m:10,d:16,k:'food',title:'Dünya Gıda Günü',text:'Topraktan sofraya uzanan emeğin; güvenli, sürdürülebilir ve verimli bir geleceğe ulaşmasına katkı sunuyoruz.',tone:'earth',icon:'🌾'},
  {m:12,d:5,k:'soil',title:'Dünya Toprak Günü',text:'Sağlıklı toprak, sağlıklı tarım ve güçlü ekosistemlerin temelidir. Toprağı veriden başlayarak daha iyi anlamaya çalışıyoruz.',tone:'earth',icon:'🌱'},
  {m:12,d:11,k:'mountain',title:'Uluslararası Dağlar Günü',text:'Dağ ekosistemlerinin su, orman ve biyoçeşitlilik için taşıdığı değeri izliyoruz.',tone:'forest',icon:'⛰️'}
 ];
+const SOURCES={
+ '4-23':'https://www.mfa.gov.tr/resmi-tatiller.tr.mfa',
+ '5-14':'https://www.tarimorman.gov.tr/Haber/7071/',
+ '5-19':'https://www.mfa.gov.tr/resmi-tatiller.tr.mfa',
+ '6-5':'https://www.un.org/observances/list-days-weeks',
+ '8-30':'https://www.mfa.gov.tr/resmi-tatiller.tr.mfa',
+ '10-29':'https://www.mfa.gov.tr/resmi-tatiller.tr.mfa',
+ '11-10':'https://atam.gov.tr/',
+ '3-21':'https://www.un.org/observances/list-days-weeks',
+ '5-20':'https://www.fao.org/world-bee-day/en',
+ '3-22':'https://www.un.org/observances/list-days-weeks',
+ '10-16':'https://www.fao.org/world-food-day/en',
+ '12-5':'https://www.fao.org/world-soil-day/en',
+ '12-11':'https://www.fao.org/international-mountain-day/en'
+};
 const root=location.pathname.includes('/pages/')?'../':'';
 const esc=s=>String(s).replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
-function today(){const n=new Date();return DAYS.find(x=>x.m===n.getMonth()+1&&x.d===n.getDate())}
+function today(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',month:'numeric',day:'numeric'}).formatToParts(new Date());const month=Number(parts.find(x=>x.type==='month')?.value);const day=Number(parts.find(x=>x.type==='day')?.value);return DAYS.find(x=>x.m===month&&x.d===day)}
 function boot(){const day=today();if(!day)return;const key='nexora-special-day:'+new Date().getFullYear()+':'+day.m+'-'+day.d;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');
- const banner=document.createElement('section');banner.className='nova-special-banner tone-'+day.tone;banner.innerHTML='<div class="special-icon">'+day.icon+'</div><div class="special-copy"><span>NOVA-ALERT / ÖZEL GÜN</span><strong>'+esc(day.title)+'</strong><p>'+esc(day.text)+'</p></div>'+(day.image?'<img src="'+root+day.image+'" alt="Atatürk, 1925">':'')+'<button class="special-close" aria-label="Bildirimi kapat">×</button>';
+ const banner=document.createElement('section');banner.className='nova-special-banner tone-'+day.tone;banner.innerHTML='<div class="special-icon">'+day.icon+'</div><div class="special-copy"><span>NOVA-ALERT / ÖZEL GÜN</span><strong>'+esc(day.title)+'</strong><p>'+esc(day.text)+'</p></div>'+(day.image?'<img src="'+root+day.image+'" alt="Atatürk, 1925">':'')+(SOURCES[day.m+'-'+day.d]?'<a class="special-source" href="'+SOURCES[day.m+'-'+day.d]+'" target="_blank" rel="noopener noreferrer">Tarih/kaynak ↗</a>':'')+'<button class="special-close" aria-label="Bildirimi kapat">×</button>';
  document.body.prepend(banner);banner.querySelector('.special-close').onclick=()=>banner.remove();
  let center=document.querySelector('.nova-special-center');if(!center){center=document.createElement('aside');center.className='nova-special-center';center.innerHTML='<div class="special-center-head"><div><span>NOVA-ALERT</span><b>Özel Gün</b></div><button>×</button></div><div data-special-body></div>';document.body.appendChild(center);center.querySelector('button').onclick=()=>center.classList.remove('show')}
- center.querySelector('[data-special-body]').innerHTML='<div class="special-center-icon">'+day.icon+'</div><small>'+String(day.d).padStart(2,'0')+'.'+String(day.m).padStart(2,'0')+'</small><h3>'+esc(day.title)+'</h3><p>'+esc(day.text)+'</p>'+(day.image?'<img src="'+root+day.image+'" alt="Atatürk, 1925">':'');center.classList.add('show');
+ center.querySelector('[data-special-body]').innerHTML='<div class="special-center-icon">'+day.icon+'</div><small>'+String(day.d).padStart(2,'0')+'.'+String(day.m).padStart(2,'0')+'</small><h3>'+esc(day.title)+'</h3><p>'+esc(day.text)+'</p>'+(day.image?'<img src="'+root+day.image+'" alt="Atatürk, 1925">':'')+(SOURCES[day.m+'-'+day.d]?'<a class="special-source" href="'+SOURCES[day.m+'-'+day.d]+'" target="_blank" rel="noopener noreferrer">Tarih/kaynak ↗</a>':'');center.classList.add('show');
  try{window.NovaStore?.put('alerts',{id:'special:'+key,title:day.title,message:day.text,severity:'info',source:'Nova-Alert / Özel Gün',createdAt:Date.now(),read:false})}catch{}
  }
  window.NexoraSpecialDays={days:DAYS,today};document.addEventListener('DOMContentLoaded',boot);
