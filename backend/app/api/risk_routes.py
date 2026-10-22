@@ -129,7 +129,7 @@ def risk_analysis():
                     "nasa_firms": {
                         "status": current_firms.get("status"),
                         "nearby_hotspot": bool(nearby_current) if current_firms_available else None,
-                        "nearby_hotspots_24h": [
+                        "hotspot_details_24h": [
                             {
                                 "latitude": alert["latitude"],
                                 "longitude": alert["longitude"],
