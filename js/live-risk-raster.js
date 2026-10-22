@@ -15,7 +15,6 @@ function incidentBanner(){
   const dialog=document.createElement("dialog");dialog.className="nova-incident-dialog";
   dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" data-dialog-close aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
   const list=dialog.querySelector("[data-incident-list]");
-  incidentPointLayer.clearLayers();
   if(incidentDetails.length){
     incidentDetails.forEach(region=>{
       if(region.hotspots.length){
@@ -26,7 +25,7 @@ function incidentBanner(){
           time.textContent=stamp&&!Number.isNaN(stamp.getTime())?stamp.toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"})+" (Türkiye saati)":"Kaynak gözlem zamanı bildirilmedi";
           coords.textContent="Konum: "+Number(point.latitude).toFixed(4)+", "+Number(point.longitude).toFixed(4)+(point.distance_km!=null?" · Bölge merkezine "+point.distance_km+" km":"")+(point.confidence?" · Güven: "+point.confidence:"")+(point.frp?" · FRP: "+point.frp:"");
           open.type="button";open.textContent="Haritada konumu aç";
-          open.onclick=()=>{const ll=[Number(point.latitude),Number(point.longitude)];map.setView(ll,11);L.circleMarker(ll,{radius:9,color:"#fff",weight:2,fillColor:"#ff3b30",fillOpacity:.95}).addTo(incidentPointLayer).bindPopup("<strong>"+escapeIncidentHtml(region.name)+" · NASA FIRMS</strong><br>"+escapeIncidentHtml(time.textContent)).openPopup();dialog.close();};
+          open.onclick=()=>{const ll=[Number(point.latitude),Number(point.longitude)];map.setView(ll,11);incidentPointLayer.eachLayer(layer=>{const p=layer.getLatLng?.();if(p&&Math.abs(p.lat-ll[0])<0.001&&Math.abs(p.lng-ll[1])<0.001)layer.openPopup();});dialog.close();};
           li.append(name,time,coords,open);list.append(li);
         });
       }else{
@@ -55,6 +54,16 @@ async function checkLiveIncidents(){
     const hits=r.regions.filter(x=>x.satellite.nasa_firms.nearby_hotspot);
     const scopedHits=hits.map(region=>({region,name:pilotProvinceName(region)})).filter(x=>x.name);
     incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r),hotspots:region.satellite.nasa_firms.hotspot_details_24h||[]}));
+    incidentPointLayer.clearLayers();
+    incidentDetails.forEach(region=>region.hotspots.forEach(point=>{
+      const lat=Number(point.latitude),lon=Number(point.longitude);
+      if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return;
+      const stamp=point.observed_at_utc?new Date(point.observed_at_utc):null;
+      const time=stamp&&!Number.isNaN(stamp.getTime())?stamp.toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"}):"Kaynak gözlem zamanı bildirilmedi";
+      L.circleMarker([lat,lon],{radius:7,color:"#fff",weight:2,fillColor:"#ff3b30",fillOpacity:.92})
+        .bindPopup("<strong>"+escapeIncidentHtml(region.name)+" · NASA FIRMS</strong><br>"+escapeIncidentHtml(time)+"<br>Kesin yangın doğrulaması değildir.")
+        .addTo(incidentPointLayer);
+    }));
     window.NovaProviderStatus?.update("firms",scopedHits.length?"ok":"empty",scopedHits.length+" pilot ilde bölgesel FIRMS sinyali; kesin yangın doğrulaması değildir.",r.nasa_firms_observed_at||null);
     const b=document.querySelector('.nova-incident-banner');
     const t=b?.querySelector('[data-incident-text]');
