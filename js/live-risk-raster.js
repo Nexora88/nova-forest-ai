@@ -10,7 +10,13 @@ function incidentBanner(){
  if(document.querySelector(".nova-incident-banner"))return;
  const b=document.createElement("section");b.className="nova-incident-banner";b.setAttribute("role","status");b.setAttribute("aria-live","polite");
  b.innerHTML=`<span class="incident-pulse" aria-hidden="true"></span><div class="incident-copy"><strong data-incident-title>ORMAN RİSK SİNYALİ</strong><span data-incident-text>NASA FIRMS kontrol ediliyor…</span><div class="incident-actions"><button type="button" data-incident-details>Haritada incele</button><button type="button" data-incident-close aria-label="Uyarıyı kapat">Kapat ×</button></div></div>`;
- document.body.prepend(b);b.querySelector("[data-incident-close]").onclick=()=>b.classList.remove("show");
+ const toolbar=document.querySelector(".map-toolbar");
+ if(toolbar)toolbar.after(b);else document.querySelector(".map-section")?.prepend(b);
+ b.querySelector("[data-incident-close]").onclick=()=>{
+  const signature=b.dataset.incidentSignature||"";
+  if(signature){try{sessionStorage.setItem("nova-dismissed-firms:"+signature,"1")}catch{}}
+  b.classList.remove("show");
+ };
  b.querySelector("[data-incident-details]").onclick=()=>{
   const dialog=document.createElement("dialog");dialog.className="nova-incident-dialog";
   dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" data-dialog-close aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
@@ -69,11 +75,21 @@ async function checkLiveIncidents(){
     const t=b?.querySelector('[data-incident-text]');
     const title=b?.querySelector('[data-incident-title]');
     if(scopedHits.length){
-      b?.classList.add('show');
-      if(title)title.textContent='ORMAN RİSK SİNYALİ · '+scopedHits.length+' PİLOT İL';
-      if(t)t.textContent=scopedHits.length+' pilot ilde termal anomali sinyali. Ayrıntı ve kaynak zamanını görmek için haritada incele.';
+      const provinceNames=[...new Set(scopedHits.map(x=>x.name))];
+      const observations=incidentDetails.flatMap(region=>(region.hotspots||[]).map(point=>point.observed_at_utc).filter(Boolean))
+        .map(value=>new Date(value)).filter(date=>!Number.isNaN(date.getTime())).sort((a,b)=>b-a);
+      const signature=provinceNames.slice().sort().join("|")+":"+incidentDetails.flatMap(region=>(region.hotspots||[]).map(point=>point.observed_at_utc||[point.latitude,point.longitude].join(","))).sort().join("|");
+      if(b)b.dataset.incidentSignature=signature;
+      let dismissed=false;try{dismissed=sessionStorage.getItem("nova-dismissed-firms:"+signature)==="1"}catch{}
+      b?.classList.toggle('show',!dismissed);
+      if(title)title.textContent='NASA FIRMS · '+provinceNames.join(', ');
+      const observationLabel=observations.length
+        ? observations[0].toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+' (Türkiye saati)'
+        : 'kaynakta gözlem zamanı belirtilmedi';
+      if(t)t.textContent='İl: '+provinceNames.join(', ')+'. Kaynak gözlemi: '+observationLabel+'. Termal anomali kesin yangın doğrulaması değildir. Ayrıntılar için “Haritada incele”yi seç.';
     }else{
       b?.classList.remove('show');
+      if(b)b.dataset.incidentSignature="";
       if(title)title.textContent='NASA FIRMS · SON KONTROL';
       if(t)t.textContent='Beş pilot ilde son başarılı kontrolde bölgesel termal anomali sinyali bulunmadı. Son kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'.';
     }
