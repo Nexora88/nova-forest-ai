@@ -6,7 +6,7 @@
 
 NexoraWildfire AI, Nexora tarafından geliştirilen bağımsız bir çevresel karar destek projesidir. Mevcut hava durumu, uydu sahnesi keşfi, yangın farkındalığı, tarım, toprak ve su, arıcılık, polen ve ekosistem gözlemlerini harita merkezli bir çalışma alanında bir araya getirmeyi amaçlar. İlk pilot bölge **Trakya, Türkiye**'dir.
 
-[Nova Bee & Tarım paneli](pages/bee.html) · [Pilot kapsamı ve özellik yol haritası](docs/NOVA_BEE_AND_FARM_PILOT.md) · [English README](README.md) · [AI destekli geliştirme beyanı](AI_ASSISTED_DEVELOPMENT.md) · [Küresel mimari notları](docs/GLOBAL_SCALABILITY.md) · [Katkı rehberi](.github/CONTRIBUTING.md)
+[Nova Bee & Tarım paneli](pages/bee.html) · [Pilot kapsamı ve özellik yol haritası](docs/NOVA_BEE_AND_FARM_PILOT.md) · [Bağımsız ajanlar ve bildirim kurulumu](docs/NOVA_COPILOT_AGENTS_SETUP.md) · [English README](README.md) · [AI destekli geliştirme beyanı](AI_ASSISTED_DEVELOPMENT.md) · [Küresel mimari notları](docs/GLOBAL_SCALABILITY.md) · [Katkı rehberi](.github/CONTRIBUTING.md)
 
 
 ## Saha görüntüsünden incelenebilir kanıta
