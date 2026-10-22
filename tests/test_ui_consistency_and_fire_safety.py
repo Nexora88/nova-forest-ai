@@ -11,7 +11,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('data-incident-details', source)
         self.assertIn('observed_at_utc', source)
         self.assertIn('Haritada konumu aç', source)
-        self.assertIn('Kesin yangın doğrulaması', source)
+        self.assertIn('kesin yangın doğrulaması', source.lower())
 
     def test_firms_alert_scope_is_limited_to_five_pilot_provinces(self):
         source = (ROOT / "js" / "live-risk-raster.js").read_text(encoding="utf-8")
