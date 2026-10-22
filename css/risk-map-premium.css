@@ -104,3 +104,25 @@
 .map-intelligence-strip small{color:#91aa9a;font-size:10px;line-height:1.5}
 @media(max-width:900px){.map-intelligence-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.map-intelligence-strip{grid-template-columns:1fr}.map-intelligence-strip article{padding:12px}.hero{border-radius:16px!important}}
+
+
+/* Provider observability: visible before the map, compact, honest and responsive. */
+.provider-status-panel{position:relative;z-index:2;margin:0 0 14px;padding:clamp(14px,2vw,20px);border:1px solid #28553a;border-radius:16px;background:linear-gradient(145deg,#08160c,#040906);box-shadow:0 14px 36px #0003}
+.provider-status-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:12px}
+.provider-status-heading>strong{display:flex;align-items:center;gap:10px;color:#c8ffda;font:850 11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em}
+.provider-status-heading>strong:before{content:"";width:22px;height:2px;background:#27e981;box-shadow:0 0 10px #27e981}
+.provider-status-heading>p{max-width:65ch;margin:0;color:#8fa99a;font-size:11px;line-height:1.6}
+.provider-status-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.provider-status-row{min-width:0;padding:12px;border:1px solid #1e3e2a;border-radius:11px;background:linear-gradient(145deg,#07120b,#040906)}
+.provider-status-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.provider-status-top>strong{min-width:0;color:#e0f5e6;font-size:11px;line-height:1.5}
+.provider-state{display:inline-flex;align-items:center;flex:0 0 auto;max-width:100%;padding:4px 7px;border:1px solid #3e4931;border-radius:999px;background:#17180c;color:#d8d09b;font-size:9px;font-weight:850;line-height:1.35}
+.provider-state:before{content:"";width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.provider-state-ok{border-color:#27623d;background:#092013;color:#8ff3ac}
+.provider-state-loading{border-color:#315b65;background:#08191b;color:#91e6ed}
+.provider-state-error{border-color:#753b36;background:#210f0d;color:#ffaaa0}
+.provider-state-empty{border-color:#4a5930;background:#131a0c;color:#c9ee8d}
+.provider-state-unknown,.provider-state-not-loaded{border-color:#3b493e;background:#0b120d;color:#9aafa0}
+.provider-status-detail{margin:8px 0 5px;color:#b2c9b9;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.provider-status-times{display:block;color:#728a7a;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+@media(max-width:700px){.provider-status-heading{flex-direction:column;gap:6px}.provider-status-list{grid-template-columns:1fr}.provider-status-row{padding:11px}.provider-status-top{flex-wrap:wrap}.provider-state{white-space:normal}}
