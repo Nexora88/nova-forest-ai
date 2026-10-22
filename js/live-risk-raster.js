@@ -54,7 +54,7 @@ async function checkLiveIncidents(){
     if(r.regions.some(x=>!x.satellite||!x.satellite.nasa_firms||typeof x.satellite.nasa_firms.nearby_hotspot!=="boolean"))throw new Error("NASA FIRMS alanı eksik; bu durum sıfır olay anlamına gelmez");
     const hits=r.regions.filter(x=>x.satellite.nasa_firms.nearby_hotspot);
     const scopedHits=hits.map(region=>({region,name:pilotProvinceName(region)})).filter(x=>x.name);
-    incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r),hotspots:region.satellite.nasa_firms.nearby_hotspots_24h||[]}));
+    incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r),hotspots:region.satellite.nasa_firms.hotspot_details_24h||[]}));
     window.NovaProviderStatus?.update("firms",scopedHits.length?"ok":"empty",scopedHits.length+" pilot ilde bölgesel FIRMS sinyali; kesin yangın doğrulaması değildir.",r.nasa_firms_observed_at||null);
     const b=document.querySelector('.nova-incident-banner');
     const t=b?.querySelector('[data-incident-text]');
