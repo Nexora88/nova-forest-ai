@@ -873,6 +873,12 @@
     ["VERİLER YENİLENİYOR…","REFRESHING DATA…"],
     ["ALAN ÇİZİMİ","AREA DRAWING"],
     ["KÖY / MAHALLE","VILLAGE / NEIGHBOURHOOD"],
+    ["Bağımsız AI ajanlarını çalıştır","Run independent AI agents"],
+    ["Üç ajan çalışıyor…","Three agents running…"],
+    ["Model ajanlarının sunucu yapılandırması kontrol ediliyor.","Checking model-agent server configuration."],
+    ["Üç model tanımlı · sağlayıcı erişimi çağrı sırasında doğrulanır.","Three models configured · provider access is checked during inference."],
+    ["Kişisel model raporu için hesabına giriş yap.","Sign in to run your personal model report."],
+    ["Üç bağımsız model çağrısı tamamlandı. Kaynak ve sınırlamalar rapor yanıtında yer alır.","Three independent model calls completed. Sources and limitations are included in the report."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
