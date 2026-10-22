@@ -1,6 +1,7 @@
 let sentinelRiskLayer=L.layerGroup().addTo(map);
 let sentinelRasterTimer=null;
 let sentinelRasterLoading=false;
+let incidentPointLayer=L.layerGroup().addTo(map);
 
 const FIRMS_PILOT_PROVINCES=["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"];
 const FIRMS_PROVINCE_CENTERS={"Edirne":[41.6771,26.5557],"Tekirdağ":[40.9781,27.5117],"Kırklareli":[41.7351,27.2252],"Çanakkale":[40.1553,26.4142],"İstanbul":[41.0082,28.9784]};
@@ -14,7 +15,26 @@ function incidentBanner(){
   const dialog=document.createElement("dialog");dialog.className="nova-incident-dialog";
   dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
   const list=dialog.querySelector("[data-incident-list]");
-  if(incidentDetails.length){incidentDetails.forEach(x=>{const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span");name.textContent=x.name;time.textContent=x.time;li.append(name,time);list.append(li);});}else{const li=document.createElement("li");li.textContent="Beş pilot ilde bölgesel sinyal bulunmuyor.";list.append(li);}
+  incidentPointLayer.clearLayers();
+  if(incidentDetails.length){
+    incidentDetails.forEach(region=>{
+      if(region.hotspots.length){
+        region.hotspots.forEach(point=>{
+          const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span"),coords=document.createElement("span"),open=document.createElement("button");
+          const stamp=point.observed_at_utc?new Date(point.observed_at_utc):null;
+          name.textContent=region.name+" · NASA FIRMS termal anomali";
+          time.textContent=stamp&&!Number.isNaN(stamp.getTime())?stamp.toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"})+" (Türkiye saati)":"Kaynak gözlem zamanı bildirilmedi";
+          coords.textContent="Konum: "+Number(point.latitude).toFixed(4)+", "+Number(point.longitude).toFixed(4)+(point.distance_km!=null?" · Bölge merkezine "+point.distance_km+" km":"")+(point.confidence?" · Güven: "+point.confidence:"")+(point.frp?" · FRP: "+point.frp:"");
+          open.type="button";open.textContent="Haritada konumu aç";
+          open.onclick=()=>{const ll=[Number(point.latitude),Number(point.longitude)];map.setView(ll,11);L.circleMarker(ll,{radius:9,color:"#fff",weight:2,fillColor:"#ff3b30",fillOpacity:.95}).addTo(incidentPointLayer).bindPopup("<strong>"+escapeIncidentHtml(region.name)+" · NASA FIRMS</strong><br>"+escapeIncidentHtml(time.textContent)).openPopup();dialog.close();};
+          li.append(name,time,coords,open);list.append(li);
+        });
+      }else{
+        const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span");
+        name.textContent=region.name;time.textContent=region.time+" · Kaynak bu bölge için sıcak nokta koordinatı döndürmedi.";li.append(name,time);list.append(li);
+      }
+    });
+  }else{const li=document.createElement("li");li.textContent="Beş pilot ilde bölgesel sinyal bulunmuyor.";list.append(li);}
   document.body.appendChild(dialog);dialog.querySelectorAll("button").forEach(x=>x.onclick=()=>dialog.close());dialog.addEventListener("close",()=>dialog.remove());
   const centers=incidentDetails.map(x=>FIRMS_PROVINCE_CENTERS[x.name]).filter(Boolean);
   if(typeof map!=="undefined"&&centers.length===1)map.setView(centers[0],8);else if(typeof map!=="undefined"&&centers.length>1)map.fitBounds(L.latLngBounds(centers),{padding:[30,30],maxZoom:7});
@@ -34,7 +54,7 @@ async function checkLiveIncidents(){
     if(r.regions.some(x=>!x.satellite||!x.satellite.nasa_firms||typeof x.satellite.nasa_firms.nearby_hotspot!=="boolean"))throw new Error("NASA FIRMS alanı eksik; bu durum sıfır olay anlamına gelmez");
     const hits=r.regions.filter(x=>x.satellite.nasa_firms.nearby_hotspot);
     const scopedHits=hits.map(region=>({region,name:pilotProvinceName(region)})).filter(x=>x.name);
-    incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r)}));
+    incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r),hotspots:region.satellite.nasa_firms.nearby_hotspots_24h||[]}));
     window.NovaProviderStatus?.update("firms",scopedHits.length?"ok":"empty",scopedHits.length+" pilot ilde bölgesel FIRMS sinyali; kesin yangın doğrulaması değildir.",r.nasa_firms_observed_at||null);
     const b=document.querySelector('.nova-incident-banner');
     const t=b?.querySelector('[data-incident-text]');
