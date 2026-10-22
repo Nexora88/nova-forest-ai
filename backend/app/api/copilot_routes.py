@@ -2,7 +2,8 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 import requests
 
-from app.services.copilot_agents import analyze, status\nfrom app.api.notification_routes import require_user_id
+from app.services.copilot_agents import analyze, status
+from app.api.notification_routes import require_user_id
 
 router = APIRouter(prefix="/copilot", tags=["Nova Copilot"])
 
