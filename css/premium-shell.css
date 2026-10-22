@@ -8,7 +8,7 @@ button,input,select,textarea{font:inherit}
 a{touch-action:manipulation}
 body>header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px clamp(14px,3vw,38px)!important;min-height:76px;border-bottom:1px solid #183b27!important;background:rgba(2,7,4,.94)!important;position:relative;z-index:100;flex-wrap:wrap}
 .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;max-width:100%;text-decoration:none}
-.brand-lockup .brand-logo{width:43px!important;height:48px!important;max-width:43px;object-fit:contain;flex:0 0 auto}
+.brand-lockup .brand-logo{width:43px!important;height:48px!important;max-width:43px;object-fit:contain;flex:0 0 auto;background:#041009;border:1px solid #214a30;border-radius:10px;padding:2px;box-shadow:0 0 18px #20e87912}
 .brand-lockup .logo{min-width:0}
 .brand-lockup .logo h1{font:850 clamp(16px,1.6vw,22px)/1.05 Inter,system-ui,sans-serif!important;letter-spacing:.045em!important;color:#f3fff5!important;white-space:normal;overflow-wrap:anywhere;margin:0!important}
 .brand-lockup .logo p{font:600 10px/1.4 Inter,system-ui,sans-serif!important;letter-spacing:.11em;text-transform:uppercase;color:#6deba0!important;margin:4px 0 0!important;max-width:34ch}
