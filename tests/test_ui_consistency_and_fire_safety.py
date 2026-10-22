@@ -21,7 +21,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_backend_exposes_safe_hotspot_location_and_source_time(self):
         source = (ROOT / "backend" / "app" / "api" / "risk_routes.py").read_text(encoding="utf-8")
-        self.assertIn('"nearby_hotspots_24h"', source)
+        self.assertIn('"hotspot_details_24h"', source)
         self.assertIn('"latitude": alert["latitude"]', source)
         self.assertIn('"longitude": alert["longitude"]', source)
         self.assertIn('"observed_at_utc"', source)
