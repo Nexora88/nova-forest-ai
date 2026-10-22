@@ -84,7 +84,7 @@ async function checkLiveIncidents(){
     const title=b?.querySelector('[data-incident-title]');
     window.NovaProviderStatus?.update("firms","error","NASA FIRMS kontrolü başarısız; sıfır olay olarak yorumlanmamalıdır.");
     if(title)title.textContent='NASA FIRMS · DURUM DOĞRULANAMADI';
-    if(t)t.textContent='Veri alınamadı; bu sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.';
+    if(t)t.textContent='Veri alınamadı; Bu, sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.';
   }
 }
 
