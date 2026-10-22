@@ -12,6 +12,20 @@ Status: **pilot metering is implemented for queued satellite/GIS jobs; payments 
 
 The server currently maps the stored plan value in profiles.plan to these monthly job limits: free = 5, pro = 100, enterprise = 1,000. The profiles.plan and profiles.tokens fields are protected against client-side insert/update attempts by a database trigger. Plan changes must be made by trusted server-side administration until billing webhooks and a subscription ledger are built.
 
+## Nova Bee & agriculture — proposed feature tiers
+
+| Feature | Free pilot | Future Pro / Premium proposal |
+| --- | --- | --- |
+| Saved apiary / field area and local preferences | Included | Included |
+| Seven-day weather forecast and basic frost threshold | Included | Included |
+| Basic bee-flight weather signal | Included | Included |
+| ET₀/Kc irrigation-check indicator | Included | Included |
+| Custom Sentinel-2 NDVI/NDMI time-series report | Limited pilot request subject to existing account quota and worker availability | Proposed premium feature with report history/export |
+| Multiple area comparison and advanced alert rules | Not in initial pilot | Proposed premium feature |
+| Background push/email delivery | Not guaranteed by the dashboard | Only after delivery service and consent flow are verified |
+
+This is a product proposal, not a purchasable offer. A UI label does not enforce a plan. Until a server-authoritative subscription entitlement and verified billing lifecycle exist, the app must not claim that a user has purchased Premium or that paid-only access is enforced.
+
 ## What consumes an analysis credit
 
 One credit is reserved for each accepted request to:
