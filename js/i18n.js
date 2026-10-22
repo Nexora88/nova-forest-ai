@@ -871,7 +871,7 @@
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
     // Preserve user-generated values such as saved area names; translate only UI copy.
-    if (node.parentElement?.closest(".area-card h3,[data-user-content],footer,[data-nexora-credit]")) return;
+    if (node.parentElement?.closest(".area-card h3,[data-user-content],footer,[data-nexora-credit],[data-language-fixed]")) return;
     if (!originals.has(node)) originals.set(node, node.nodeValue);
     const source = originals.get(node);
     const translated = replace(source, lang);
