@@ -310,6 +310,22 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.set_offline(False)
             context.close()
 
+    def test_risk_map_opens_local_boundaries_before_weather_network_finishes(self):
+        context, page = self.new_page(width=390, height=844)
+        try:
+            page.route("https://api.open-meteo.com/**", lambda route: route.abort())
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector("#map", timeout=5000)
+            page.wait_for_function("document.querySelectorAll('#map .leaflet-overlay-pane path').length > 0", timeout=8000)
+            self.assertGreater(page.locator("#map .leaflet-overlay-pane path").count(), 0, "local province boundaries should render without live weather")
+            self.assertTrue(page.locator(".map-filters").is_visible(), "map controls should be immediately available")
+            self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), 391, "premium map UI must not overflow mobile width")
+            # A missing live feed must be reported as unavailable, not silently represented as zero risk.
+            page.wait_for_function("document.querySelector('[data-map-status]')?.textContent.includes('CANLI VERİ ALINAMADI') || document.querySelector('[data-map-status]')?.textContent.includes('LIVE DATA UNAVAILABLE')", timeout=5000)
+        finally:
+            context.close()
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

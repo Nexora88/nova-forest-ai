@@ -37,6 +37,7 @@ function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x)
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
 function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
 function popup(r,level="province"){
+ if(r.dataAvailable===false)return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+escapeHtml(level.toUpperCase())+'</div><h3>'+escapeHtml(r.name)+'</h3><div class="popup-warning">'+(mapLang()==="en"?"Live weather data is not available yet. This is not a zero-risk result; the province boundary is shown while data loads.":"Canlı hava verisi henüz alınmadı. Bu, riskin sıfır olduğu anlamına gelmez; veri yüklenirken il sınırı gösteriliyor.")+'</div></div>';
  const s=scoreFor(r);
  const action=(level==="province"||level==="il")
   ? '<button type="button" class="map-drill-button" data-open-province>İlçeleri aç →</button>'
@@ -48,7 +49,7 @@ function popup(r,level="province"){
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
-function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
+function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));if(r.dataAvailable===false)return{color:supported?"#50745c":"#667085",weight:supported?1.5:.9,fillColor:supported?"#355640":"#667085",fillOpacity:supported ? 0.26 : 0.18,dashArray:"4 5"};return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
@@ -60,7 +61,7 @@ function controls(){
  let old=el(".map-filters");if(old)old.remove();
  const box=document.createElement("div");box.className="map-filters";
  box.innerHTML='<strong>VERİ KATMANI</strong><div class="filter-buttons"><button data-action="radar" aria-pressed="false">🌧 Radar</button><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small>';
- el(".map-section").appendChild(box);
+ const section=el(".map-section"),mapNode=el("#map");if(mapNode&&mapNode.parentNode===section)section.insertBefore(box,mapNode);else section.appendChild(box);
  box.onclick=e=>{const m=e.target.dataset.m,a=e.target.dataset.action;if(a==="radar"){toggleRainRadar(box);return}if(m){mode=m;box.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x.dataset.m===mode));refreshView();return}if(a==="back")goBack();if(a==="add")toggleDraw()};
 }
 
@@ -102,19 +103,51 @@ function weatherRow(name,area,w,pollen=0,lat=null,lon=null){const risk=riskScore
 async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(rows.map(async r=>{if(r.lat!=null&&r.lon!=null)r.pollen=await pollenAt(r.lat,r.lon);r.bee=beeScore(r.w,r.pollen)}))}
 async function loadProvinceData(){
  try{
-  const gj=await fetch(provincePath).then(x=>x.json());
-  provinceFeatures=(gj.features||[]);
-  const activeNames=provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>norm((f.properties||{}).il_adi));const ws=await weatherFor(provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi))).map(f=>coords(f.geometry)));
-  provinceRows=provinceFeatures.map((f,i)=>{const p=f.properties||{},c=ws[i]?.current||{},d=ws[i]?.daily||{};const w={t:Number(c.temperature_2m||0),h:Number(c.relative_humidity_2m||0),wind:Number(c.wind_speed_10m||0),soil:Number(c.soil_moisture_0_to_7cm||0),et0:Number(d.et0_fao_evapotranspiration?.[0]||0),vpd:Number(c.vapour_pressure_deficit||0),precip:Number(c.precipitation||0)};const cc=coords(f.geometry);return weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1])});
-  await applyPollen(provinceRows);drawProvinces();saveHistory(provinceRows);
+  // Draw the local administrative geometry before any remote weather request.
+  const gj=await fetch(provincePath,{cache:"force-cache"}).then(response=>{if(!response.ok)throw new Error("Yerel il sınırı dosyası okunamadı");return response.json()});
+  provinceFeatures=Array.isArray(gj.features)?gj.features:[];
+  const cached=(()=>{try{return JSON.parse(localStorage.getItem("nexorawildfire-map-cache-v1")||"null")}catch{return null}})();
+  if(cached?.rows?.length){
+    const byName=new Map(cached.rows.map(row=>[norm(row.name),row]));
+    provinceRows=provinceFeatures.map(f=>byName.get(norm(f.properties?.il_adi))||{...weatherRow(f.properties?.il_adi,area(f.geometry),{t:0,h:0,wind:0,soil:0,et0:0,vpd:0,precip:0},0,...coords(f.geometry)),dataAvailable:false});
+  }else{
+    provinceRows=provinceFeatures.map(f=>({...weatherRow(f.properties?.il_adi,area(f.geometry),{t:0,h:0,wind:0,soil:0,et0:0,vpd:0,precip:0},0,...coords(f.geometry)),dataAvailable:false}));
+  }
+  drawProvinces();
+  controls();
+  renderSavedAreas();
+  setStatus(mapLang()==="en"?"BOUNDARIES READY · LOADING LIVE DATA":"SINIRLAR HAZIR · CANLI VERİ BEKLENİYOR");
+  const pilotFeatures=provinceFeatures.filter(f=>ACTIVE_PROVINCES.has(norm((f.properties||{}).il_adi)));
+  const ws=await weatherFor(pilotFeatures.map(f=>coords(f.geometry)));
+  const weatherByProvince=new Map();
+  pilotFeatures.forEach((f,i)=>{
+    const c=ws[i]?.current||{},d=ws[i]?.daily||{};
+    // Missing required weather fields are unavailable data, never zero-risk readings.
+    if(c.temperature_2m==null||c.relative_humidity_2m==null||c.wind_speed_10m==null)return;
+    weatherByProvince.set(norm(f.properties?.il_adi),{t:Number(c.temperature_2m),h:Number(c.relative_humidity_2m),wind:Number(c.wind_speed_10m),soil:Number(c.soil_moisture_0_to_7cm??0),et0:Number(d.et0_fao_evapotranspiration?.[0]??0),vpd:Number(c.vapour_pressure_deficit??0),precip:Number(c.precipitation??0)});
+  });
+  provinceRows=provinceFeatures.map(f=>{
+    const p=f.properties||{},cc=coords(f.geometry),w=weatherByProvince.get(norm(p.il_adi));
+    if(!w)return {...weatherRow(p.il_adi,area(f.geometry),{t:0,h:0,wind:0,soil:0,et0:0,vpd:0,precip:0},0,cc[0],cc[1]),dataAvailable:false};
+    return {...weatherRow(p.il_adi,area(f.geometry),w,0,cc[0],cc[1]),dataAvailable:true};
+  });
+  await applyPollen(provinceRows);
+  drawProvinces();saveHistory(provinceRows);
   localStorage.setItem("nexorawildfire-map-cache-v1",JSON.stringify({savedAt:Date.now(),rows:provinceRows}));
-  setStatus("CANLI • "+provinceRows.length+" İL • "+mode.toUpperCase());
+  setStatus(mapLang()==="en"?"LIVE · 5 PILOT PROVINCES · "+mode.toUpperCase():"CANLI · 5 PİLOT İL · "+mode.toUpperCase());
  }catch(e){
+  console.warn("Risk map data refresh",e);
   try{
    const cached=JSON.parse(localStorage.getItem("nexorawildfire-map-cache-v1")||"null");
-   if(cached?.rows?.length){provinceRows=cached.rows;drawProvinces();setStatus("ÇEVRİMDIŞI • SON GEÇERLİ VERİ • "+new Date(cached.savedAt).toLocaleString("tr-TR"))}
-   else setStatus("ÇEVRİMDIŞI • HENÜZ YEREL VERİ YOK");
-  }catch{setStatus("ÇEVRİMDIŞI • YEREL VERİ OKUNAMADI")}
+   if(cached?.rows?.length){
+    provinceRows=provinceFeatures.map(f=>cached.rows.find(row=>norm(row.name)===norm(f.properties?.il_adi))).filter(Boolean);
+    drawProvinces();
+    setStatus((mapLang()==="en"?"OFFLINE · LAST SAVED OBSERVATIONS · ":"ÇEVRİMDIŞI · SON KAYITLI GÖZLEMLER · ")+new Date(cached.savedAt).toLocaleString(mapLang()==="en"?"en-GB":"tr-TR"));
+   }else{
+    drawProvinces();
+    setStatus(mapLang()==="en"?"BOUNDARIES READY · LIVE DATA UNAVAILABLE":"SINIRLAR HAZIR · CANLI VERİ ALINAMADI");
+   }
+  }catch{setStatus(mapLang()==="en"?"LOCAL DATA COULD NOT BE READ":"YEREL VERİ OKUNAMADI")}
  }
 }
 async function openProvince(name){
@@ -261,5 +294,5 @@ async function finishDraw(){
 }
 function renderSavedAreas(){fieldLayer.clearLayers();let areas=[];try{const raw=JSON.parse(localStorage.getItem(areaKey)||"[]");if(Array.isArray(raw))areas=raw.filter(validSavedArea)}catch{}const polygons=new Map();areas.forEach(a=>{try{const polygon=L.polygon(a.coordinates,{className:"nova-saved-field",color:"#8a6cff",weight:3,fillColor:"#8a6cff",fillOpacity:.16}).bindTooltip("ALANIM · "+escapeHtml(a.name)+" · "+escapeHtml(a.type),{className:"saved-field-label"}).addTo(fieldLayer);polygons.set(String(a.id),polygon)}catch(error){console.warn("Invalid saved area skipped",a?.id,error)}});const focusId=new URLSearchParams(location.search).get("area");if(focusId&&polygons.has(String(focusId))){const target=polygons.get(String(focusId));map.fitBounds(target.getBounds(),{padding:[30,30],maxZoom:15});target.openTooltip();setStatus("SEÇİLİ ALAN HARİTADA GÖSTERİLİYOR");}}
 map.on("dblclick",finishDraw);
-async function load(){try{await loadProvinceData();controls();renderSavedAreas()}catch(e){console.error(e);setStatus("VERİ AKIŞI BEKLENİYOR")}}
+async function load(){controls();renderSavedAreas();setStatus(mapLang()==="en"?"OPENING LOCAL MAP…":"YEREL HARİTA AÇILIYOR…");try{await loadProvinceData()}catch(e){console.error(e);setStatus(mapLang()==="en"?"MAP READY · LIVE DATA PENDING":"HARİTA HAZIR · CANLI VERİ BEKLENİYOR")}}
 load();enableMobileMapGesture();setInterval(()=>{if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()},300000);
