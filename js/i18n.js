@@ -692,7 +692,6 @@
     ["Pilot Bölge","Pilot Region"],
     ["CUMHURİYET VİZYONU","REPUBLIC VISION"],
     ["BİLİM","SCIENCE"],
-  ];
     ["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."],
     ["NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin yardımcı olacağını bize anlat.","NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field."],
     ["Hata bildir veya özellik öner →","Report a bug or suggest a feature →"],
@@ -734,6 +733,7 @@
     ["Veri alınamadı; bu sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.","Data could not be retrieved; this does not mean zero events. Check connectivity and provider status."],
     ["pilot ilde termal anomali sinyali. Ayrıntı ve kaynak zamanını görmek için haritada incele.","pilot province(s) have thermal anomaly signals. Inspect the map for details and source times."],
     ["Güncel rüzgâr verisi alınıyor…","Loading current wind data…"],["Rüzgâr verisi alınamadı. Manuel değerlerle devam edebilirsin.","Wind data unavailable. You can continue with manual values."],
+  ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
   for (const [tr,en] of pairs) if (!enToTr.has(en)) enToTr.set(en,tr);
