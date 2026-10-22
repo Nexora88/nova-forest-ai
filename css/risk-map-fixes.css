@@ -6,7 +6,8 @@ body>header .brand-lockup .logo h1{color:#eaffef!important}
 body>header .brand-lockup .logo p{color:#6deba0!important}
 .map-filters{transition:opacity .18s ease,transform .18s ease}
 .map-filters .map-filters-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.map-filters .map-filters-head>strong{margin:0!important}
+.map-filters .map-filters-head>strong{display:flex;align-items:center;gap:9px;margin:0!important;color:#9df6b8!important;font-size:10px!important;letter-spacing:.17em!important}
+.map-filters .map-filters-head>strong:before{content:"";width:24px;height:2px;background:#24ed7d;box-shadow:0 0 10px #24ed7d}
 .map-filters .map-filters-close,.map-tools-reopen{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:7px 10px;border:1px solid #315c3d;border-radius:9px;background:#061009;color:#d9ffe3;font:700 11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}
 .map-filters .map-filters-close:hover,.map-tools-reopen:hover{border-color:#28e77e;color:#fff}
 .map-tools-reopen{position:absolute;z-index:1001;top:78px;left:26px;box-shadow:0 12px 34px #0009;background:#041008f5}
