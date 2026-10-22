@@ -23,7 +23,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_feedback_translation_and_footer_cannot_be_retranslated_by_observer(self):
         source = (ROOT / "js" / "i18n.js").read_text(encoding="utf-8")
-        self.assertIn('["Help make environmental data more useful.","Çevresel verileri daha kullanışlı hâle getirmemize yardım et."]', source)
+        self.assertIn('["Çevresel verileri daha kullanışlı hâle getirmemize yardım et.","Help make environmental data more useful."]', source)
         self.assertIn('footer,[data-nexora-credit]', source)
         self.assertIn('if(!footer){footer=document.createElement("footer")', source)
         page = (ROOT / "pages" / "feedback.html").read_text(encoding="utf-8")
