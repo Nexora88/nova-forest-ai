@@ -33,7 +33,7 @@ class PushSubscribeRequest(BaseModel):
     threshold: int = Field(default=70, ge=25, le=100)
 
 class ChannelSubscribeRequest(BaseModel):
-    phone: str = Field(min_length=9, max_length=16, pattern=r"^\\+[1-9][0-9]{7,14}$")
+    phone: str = Field(min_length=9, max_length=16)
     channel: str = Field(pattern="^(sms|whatsapp)$")
     lat: float = Field(ge=-90, le=90)
     lon: float = Field(ge=-180, le=180)
