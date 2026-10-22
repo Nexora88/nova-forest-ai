@@ -56,6 +56,14 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn("official", source.lower())
         self.assertIn("Resmî uyarı ve acil durum ekiplerinin talimatları önceliklidir", page)
 
+    def test_evacuation_readiness_checklist_is_interactive_and_honest(self):
+        page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
+        source = (ROOT / "js" / "fire-safety-sim.js").read_text(encoding="utf-8")
+        self.assertIn('data-evac-check', page)
+        self.assertIn('data-evac-progress-bar', page)
+        self.assertIn('updateEvacuationReadiness', source)
+        self.assertIn('does not replace official evacuation instructions', source)
+
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('nexorawildfire-shell-v27', source)
