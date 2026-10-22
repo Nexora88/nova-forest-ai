@@ -310,10 +310,6 @@ class MobileUiSmokeTests(unittest.TestCase):
             context.set_offline(False)
             context.close()
 
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
     def test_risk_map_opens_local_boundaries_before_weather_network_finishes(self):
         context, page = self.new_page(width=390, height=844)
         try:
@@ -329,3 +325,7 @@ if __name__ == "__main__":
         finally:
             context.close()
 
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
