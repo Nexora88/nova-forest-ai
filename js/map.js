@@ -49,7 +49,7 @@ function popup(r,level="province"){
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
-function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));if(r.dataAvailable===false)return{color:supported?"#50745c":"#667085",weight:supported?1.5:.9,fillColor:supported?"#355640":"#667085",fillOpacity:supported?.26:.18,dashArray:"4 5"};return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
+function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));if(r.dataAvailable===false)return{color:supported?"#50745c":"#667085",weight:supported?1.5:.9,fillColor:supported?"#355640":"#667085",fillOpacity:supported ? 0.26 : 0.18,dashArray:"4 5"};return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
@@ -122,7 +122,9 @@ async function loadProvinceData(){
   const weatherByProvince=new Map();
   pilotFeatures.forEach((f,i)=>{
     const c=ws[i]?.current||{},d=ws[i]?.daily||{};
-    weatherByProvince.set(norm(f.properties?.il_adi),{t:Number(c.temperature_2m??0),h:Number(c.relative_humidity_2m??0),wind:Number(c.wind_speed_10m??0),soil:Number(c.soil_moisture_0_to_7cm??0),et0:Number(d.et0_fao_evapotranspiration?.[0]??0),vpd:Number(c.vapour_pressure_deficit??0),precip:Number(c.precipitation??0)});
+    // Missing required weather fields are unavailable data, never zero-risk readings.
+    if(c.temperature_2m==null||c.relative_humidity_2m==null||c.wind_speed_10m==null)return;
+    weatherByProvince.set(norm(f.properties?.il_adi),{t:Number(c.temperature_2m),h:Number(c.relative_humidity_2m),wind:Number(c.wind_speed_10m),soil:Number(c.soil_moisture_0_to_7cm??0),et0:Number(d.et0_fao_evapotranspiration?.[0]??0),vpd:Number(c.vapour_pressure_deficit??0),precip:Number(c.precipitation??0)});
   });
   provinceRows=provinceFeatures.map(f=>{
     const p=f.properties||{},cc=coords(f.geometry),w=weatherByProvince.get(norm(p.il_adi));
