@@ -879,6 +879,9 @@
     ["Üç model tanımlı · sağlayıcı erişimi çağrı sırasında doğrulanır.","Three models configured · provider access is checked during inference."],
     ["Kişisel model raporu için hesabına giriş yap.","Sign in to run your personal model report."],
     ["Üç bağımsız model çağrısı tamamlandı. Kaynak ve sınırlamalar rapor yanıtında yer alır.","Three independent model calls completed. Sources and limitations are included in the report."],
+    ["TARİHÎ GÖRSEL · 1925","HISTORICAL PHOTOGRAPH · 1925"],
+    ["Atatürk'ün üretim anlayışı ve doğa","Atatürk's vision of production and nature"],
+    ["Bu tarihî görsel ve alıntı ilham kaynağıdır; ürünün bilimsel geçerliliğinin kanıtı değildir.","This historical image and quotation are a source of inspiration, not proof of the product's scientific validity."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
