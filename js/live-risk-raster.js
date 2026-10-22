@@ -13,7 +13,7 @@ function incidentBanner(){
  document.body.prepend(b);b.querySelector("[data-incident-close]").onclick=()=>b.classList.remove("show");
  b.querySelector("[data-incident-details]").onclick=()=>{
   const dialog=document.createElement("dialog");dialog.className="nova-incident-dialog";
-  dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
+  dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" data-dialog-close aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
   const list=dialog.querySelector("[data-incident-list]");
   incidentPointLayer.clearLayers();
   if(incidentDetails.length){
@@ -35,7 +35,7 @@ function incidentBanner(){
       }
     });
   }else{const li=document.createElement("li");li.textContent="Beş pilot ilde bölgesel sinyal bulunmuyor.";list.append(li);}
-  document.body.appendChild(dialog);dialog.querySelectorAll("button").forEach(x=>x.onclick=()=>dialog.close());dialog.addEventListener("close",()=>dialog.remove());
+  document.body.appendChild(dialog);dialog.querySelectorAll("[data-dialog-close],.incident-dialog-done").forEach(x=>x.onclick=()=>dialog.close());dialog.addEventListener("close",()=>dialog.remove());
   const centers=incidentDetails.map(x=>FIRMS_PROVINCE_CENTERS[x.name]).filter(Boolean);
   if(typeof map!=="undefined"&&centers.length===1)map.setView(centers[0],8);else if(typeof map!=="undefined"&&centers.length>1)map.fitBounds(L.latLngBounds(centers),{padding:[30,30],maxZoom:7});
   if(dialog.showModal)dialog.showModal();else dialog.setAttribute("open","");
