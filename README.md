@@ -26,7 +26,7 @@ flowchart TD
 
 **Research status:** RGB statistics and Sobel filters are local image-analysis tools, not a trained fire/smoke detector. EXIF coordinates show the photo's recorded location, not where a fire started. Source images remain in the browser lab; the optional [Google Cloud report-export demo](docs/CLOUD_INTEGRATION_DEMO.md) only uploads a sanitized JSON report after an explicit manual confirmation.
 
-For a presentation-ready narrative, model/licensing gates, offline limitations, and a responsible drone/tower-camera roadmap, see the [Competition & Research Brief](docs/COMPETITION_PITCH.md).
+For a presentation-ready narrative, model/licensing gates, offline limitations, and a responsible drone/tower-camera roadmap, see the [Competition & Research Brief](docs/COMPETITION_PITCH.md).\n\n## Nova field copilot\n\nThe field dashboard now exposes an optional independent model-agent pipeline. Agro-Agent, Eco-Agent, and Writer Agent use separate Ollama-compatible inference requests; production use requires a secured, reachable model gateway and three configured model names. See [agent and alert activation instructions](docs/NOVA_COPILOT_AGENTS_SETUP.md). The API reports missing configuration or failed inference rather than inventing a completed report. SMS/WhatsApp delivery, Premium checkout, and scheduled background alerts are not enabled merely by adding this code; they require provider credentials, consent, durable entitlement checks, and an active scheduler.
 
 ## Vision
 
