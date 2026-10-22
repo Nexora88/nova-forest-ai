@@ -72,5 +72,6 @@
   });
   evacChecks.forEach(input=>input.addEventListener("change",updateEvacuationReadiness));
   updateEvacuationReadiness();
+  new MutationObserver(updateEvacuationReadiness).observe(document.documentElement,{attributes:true,attributeFilter:["data-language"]});
   document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))setTimeout(()=>{if(lastWeather)status(t("Open-Meteo gözlemi: ","Open-Meteo observation: ")+lastWeather.time);updateEvacuationReadiness();},0);});
 })();
