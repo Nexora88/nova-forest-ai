@@ -90,8 +90,11 @@ def _run_agent(role: str, system_prompt: str, payload: dict[str, Any]) -> dict[s
     config = agent_config()[role]
     if not config["base_url"] or not config["model"]:
         raise RuntimeError(f"{role}_agent_not_configured")
+    api_key = os.getenv("OLLAMA_API_KEY", "").strip()
+    headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
     response = requests.post(
         f"{config['base_url']}/api/chat",
+        headers=headers,
         json={
             "model": config["model"],
             "stream": False,
