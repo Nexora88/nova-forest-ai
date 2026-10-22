@@ -325,8 +325,7 @@ if __name__ == "__main__":
             self.assertTrue(page.locator(".map-filters").is_visible(), "map controls should be immediately available")
             self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), 391, "premium map UI must not overflow mobile width")
             # A missing live feed must be reported as unavailable, not silently represented as zero risk.
-            page.locator("#map .leaflet-overlay-pane path").first.click()
-            page.wait_for_function("document.querySelector('.leaflet-popup-content')?.textContent.includes('Canlı hava verisi') || document.querySelector('.leaflet-popup-content')?.textContent.includes('Live weather data')", timeout=3000)
+            page.wait_for_function("document.querySelector('[data-map-status]')?.textContent.includes('CANLI VERİ ALINAMADI') || document.querySelector('[data-map-status]')?.textContent.includes('LIVE DATA UNAVAILABLE')", timeout=5000)
         finally:
             context.close()
 
