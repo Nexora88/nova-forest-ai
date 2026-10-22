@@ -42,7 +42,7 @@ function incidentBanner(){
  };
 }
 function normalizeProvinceName(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("tr-TR").replace(/ı/g,"i").trim();}
-function pilotProvinceName(region){const raw=region?.province||region?.province_name||region?.name||region?.region||region?.il||"";return FIRMS_PILOT_PROVINCES.find(name=>normalizeProvinceName(name)===normalizeProvinceName(raw))||null;}
+function pilotProvinceName(region){const raw=region?.province||region?.province_name||region?.name||region?.region||region?.il||"";const normalized=normalizeProvinceName(raw);if(normalized.startsWith("istanbul"))return "İstanbul";return FIRMS_PILOT_PROVINCES.find(name=>normalizeProvinceName(name)===normalized)||null;}
 function incidentSourceTime(region,payload){const value=region?.satellite?.nasa_firms?.observed_at||region?.satellite?.nasa_firms?.acquired_at||region?.satellite?.nasa_firms?.last_observation||payload?.nasa_firms_observed_at||null;if(!value)return "Kaynak gözlem zamanı bildirilmedi";const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"});}
 async function checkLiveIncidents(){
   incidentBanner();
