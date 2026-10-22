@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 from app.services.weather_service import get_current_weather
+from app.services.channel_service import configured as channels_configured, upsert_channel, send_message, list_channels, update_channel_alert
 from app.services.push_service import (
     configured, delete_subscription, list_subscriptions, send_push,
     update_alert_state, upsert_subscription, verify_supabase_user, VAPID_PUBLIC_KEY,
@@ -30,6 +31,15 @@ class PushSubscribeRequest(BaseModel):
     lon: float = Field(ge=-180, le=180)
     area_name: str = Field(min_length=1, max_length=120)
     threshold: int = Field(default=70, ge=25, le=100)
+
+class ChannelSubscribeRequest(BaseModel):
+    phone: str = Field(min_length=9, max_length=16, pattern=r"^\\+[1-9][0-9]{7,14}$")
+    channel: str = Field(pattern="^(sms|whatsapp)$")
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    area_name: str = Field(min_length=1, max_length=120)
+    threshold: int = Field(default=70, ge=25, le=100)
+    consent: bool
 
 class PushUnsubscribeRequest(BaseModel):
     endpoint: str = Field(min_length=20, max_length=2048)
@@ -94,7 +104,38 @@ def push_test(payload:PushSubscribeRequest, authorization: str | None = Header(d
     if not ok: raise HTTPException(status_code=502,detail="Push servisine teslim edilemedi.")
     return {"status":"sent"}
 
-@router.post("/evaluate")
+
+@router.post("/channels/subscribe")
+def subscribe_channel(payload: ChannelSubscribeRequest, authorization: str | None = Header(default=None)):
+    user_id=require_user_id(authorization)
+    if not payload.consent:
+        raise HTTPException(status_code=422, detail="SMS/WhatsApp uyarıları için açık rıza gerekli.")
+    if not channels_configured():
+        raise HTTPException(status_code=503, detail="Supabase ve Twilio kanal ayarları yapılandırılmadı.")
+    try:
+        upsert_channel(user_id,payload.phone,payload.channel,payload.lat,payload.lon,payload.area_name,payload.threshold)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="Telefon numarası E.164 biçiminde olmalı; ülke kodunu + ile yaz.") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Bildirim tercihi kaydedilemedi.") from exc
+    return {"status":"subscribed","channel":payload.channel,"consent":True,"background_delivery":True}
+
+@router.post("/channels/test")
+def test_channel(payload: ChannelSubscribeRequest, authorization: str | None = Header(default=None)):
+    user_id=require_user_id(authorization)
+    if not payload.consent:
+        raise HTTPException(status_code=422, detail="Test mesajı için açık rıza gerekli.")
+    if not channels_configured():
+        raise HTTPException(status_code=503, detail="Supabase ve Twilio kanal ayarları yapılandırılmadı.")
+    try:
+        upsert_channel(user_id,payload.phone,payload.channel,payload.lat,payload.lon,payload.area_name,payload.threshold)
+        rows=[r for r in list_channels() if r.get("user_id")==user_id and r.get("channel")==payload.channel and r.get("area_name")==payload.area_name]
+        if not rows or not send_message(rows[0],"NexoraWildfire AI · Kanal testi","Bildirim kanalın çalışıyor. Bu test mesajıdır; otomatik uyarılar kayıtlı alanının risk eşiğine göre gönderilir."):
+            raise HTTPException(status_code=502,detail="Twilio mesajı teslim edilemedi; gönderen numara ve sağlayıcı durumunu kontrol et.")
+    except HTTPException: raise
+    except Exception as exc: raise HTTPException(status_code=502,detail="Bildirim kanalı kaydedilemedi veya test edilemedi.") from exc
+    return {"status":"sent","channel":payload.channel}
+\n@router.post("/evaluate")
 def evaluate_notification(payload:EvaluateRequest):
     weather=get_current_weather(payload.lat,payload.lon); risk=calculate_risk(weather); threshold=max(25,min(100,int(payload.threshold)))
     level="critical" if risk>=80 else "high" if risk>=60 else "medium" if risk>=40 else "low"
