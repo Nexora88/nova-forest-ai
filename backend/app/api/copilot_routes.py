@@ -21,7 +21,8 @@ def agents_status():
 
 
 @router.post("/analyze")
-def analyze_area(payload: AnalyzeRequest):
+def analyze_area(payload: AnalyzeRequest, authorization: str | None = Header(default=None)):
+    require_user_id(authorization)
     current = status()
     if current["status"] != "configured":
         raise HTTPException(
