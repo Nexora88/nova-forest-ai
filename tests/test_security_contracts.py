@@ -65,5 +65,5 @@ def test_map_provider_status_is_separate_and_does_not_fake_observations():
     assert 'providerState("satellite","error"' in layers
     assert 'update("firms","error"' in firms
     assert "bu sıfır olay anlamına gelmez" in firms
-    assert 'src="../js/provider-status.js?v=20261020a"' in page
+    assert 'src="../js/provider-status.js?v=20261022b"' in page
     assert 'p.name+" · Open-Meteo"' not in layers
