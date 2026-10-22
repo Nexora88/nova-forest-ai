@@ -2,15 +2,28 @@ let sentinelRiskLayer=L.layerGroup().addTo(map);
 let sentinelRasterTimer=null;
 let sentinelRasterLoading=false;
 
+const FIRMS_PILOT_PROVINCES=["Edirne","Tekirdağ","Kırklareli","Çanakkale","İstanbul"];
+const FIRMS_PROVINCE_CENTERS={"Edirne":[41.6771,26.5557],"Tekirdağ":[40.9781,27.5117],"Kırklareli":[41.7351,27.2252],"Çanakkale":[40.1553,26.4142],"İstanbul":[41.0082,28.9784]};
+let incidentDetails=[];
 function incidentBanner(){
-  if(document.querySelector('.nova-incident-banner'))return;
-  const b=document.createElement('div');
-  b.className='nova-incident-banner';
-  b.innerHTML='<span class="incident-pulse"></span><div><strong>CANLI OLAY UYARISI</strong><span data-incident-text>NASA FIRMS kontrol ediliyor…</span></div><button data-incident-close>×</button>';
-  document.body.prepend(b);
-  b.querySelector('[data-incident-close]').onclick=()=>b.classList.remove('show');
+ if(document.querySelector(".nova-incident-banner"))return;
+ const b=document.createElement("section");b.className="nova-incident-banner";b.setAttribute("role","status");b.setAttribute("aria-live","polite");
+ b.innerHTML=`<span class="incident-pulse" aria-hidden="true"></span><div class="incident-copy"><strong data-incident-title>ORMAN RİSK SİNYALİ</strong><span data-incident-text>NASA FIRMS kontrol ediliyor…</span><div class="incident-actions"><button type="button" data-incident-details>Haritada incele</button><button type="button" data-incident-close aria-label="Uyarıyı kapat">Kapat ×</button></div></div>`;
+ document.body.prepend(b);b.querySelector("[data-incident-close]").onclick=()=>b.classList.remove("show");
+ b.querySelector("[data-incident-details]").onclick=()=>{
+  const dialog=document.createElement("dialog");dialog.className="nova-incident-dialog";
+  dialog.innerHTML=`<div class="incident-dialog-head"><div><small>NASA FIRMS · PİLOT BÖLGE</small><h2>Termal anomali sinyalleri</h2></div><button type="button" aria-label="Kapat">×</button></div><p>Termal anomali kesin yangın doğrulaması değildir. Konum il düzeyindedir; bu veri uç noktası kesin sıcak nokta koordinatlarını sağlamaz. Kaynak gözlem zamanı yoksa son kontrol saati gözlem zamanı olarak sunulmaz.</p><ul data-incident-list></ul><button type="button" class="incident-dialog-done">Kapat</button>`;
+  const list=dialog.querySelector("[data-incident-list]");
+  if(incidentDetails.length){incidentDetails.forEach(x=>{const li=document.createElement("li"),name=document.createElement("strong"),time=document.createElement("span");name.textContent=x.name;time.textContent=x.time;li.append(name,time);list.append(li);});}else{const li=document.createElement("li");li.textContent="Beş pilot ilde bölgesel sinyal bulunmuyor.";list.append(li);}
+  document.body.appendChild(dialog);dialog.querySelectorAll("button").forEach(x=>x.onclick=()=>dialog.close());dialog.addEventListener("close",()=>dialog.remove());
+  const centers=incidentDetails.map(x=>FIRMS_PROVINCE_CENTERS[x.name]).filter(Boolean);
+  if(typeof map!=="undefined"&&centers.length===1)map.setView(centers[0],8);else if(typeof map!=="undefined"&&centers.length>1)map.fitBounds(L.latLngBounds(centers),{padding:[30,30],maxZoom:7});
+  if(dialog.showModal)dialog.showModal();else dialog.setAttribute("open","");
+ };
 }
-
+function normalizeProvinceName(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("tr-TR").replace(/ı/g,"i").trim();}
+function pilotProvinceName(region){const raw=region?.province||region?.province_name||region?.name||region?.region||region?.il||"";return FIRMS_PILOT_PROVINCES.find(name=>normalizeProvinceName(name)===normalizeProvinceName(raw))||null;}
+function incidentSourceTime(region,payload){const value=region?.satellite?.nasa_firms?.observed_at||region?.satellite?.nasa_firms?.acquired_at||region?.satellite?.nasa_firms?.last_observation||payload?.nasa_firms_observed_at||null;if(!value)return "Kaynak gözlem zamanı bildirilmedi";const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"});}
 async function checkLiveIncidents(){
   incidentBanner();
   if(!API_BASE){window.NovaProviderStatus?.update("firms","error","Backend API yapılandırılmamış; NASA FIRMS durumu doğrulanamıyor.");return;}
@@ -20,23 +33,29 @@ async function checkLiveIncidents(){
     if(!r||!Array.isArray(r.regions)||!r.regions.length)throw new Error("Risk yanıtında doğrulanabilir bölge kaydı yok");
     if(r.regions.some(x=>!x.satellite||!x.satellite.nasa_firms||typeof x.satellite.nasa_firms.nearby_hotspot!=="boolean"))throw new Error("NASA FIRMS alanı eksik; bu durum sıfır olay anlamına gelmez");
     const hits=r.regions.filter(x=>x.satellite.nasa_firms.nearby_hotspot);
-    const sourceTime=r.nasa_firms_observed_at||r.generated_at||r.updated_at||null;
-    window.NovaProviderStatus?.update("firms",hits.length?"ok":"empty",hits.length+" bölgesel FIRMS sinyali; bu kesin yangın doğrulaması değildir.",sourceTime);
+    const scopedHits=hits.map(region=>({region,name:pilotProvinceName(region)})).filter(x=>x.name);
+    incidentDetails=scopedHits.map(({region,name})=>({name,time:incidentSourceTime(region,r)}));
+    window.NovaProviderStatus?.update("firms",scopedHits.length?"ok":"empty",scopedHits.length+" pilot ilde bölgesel FIRMS sinyali; kesin yangın doğrulaması değildir.",r.nasa_firms_observed_at||null);
     const b=document.querySelector('.nova-incident-banner');
     const t=b?.querySelector('[data-incident-text]');
-    if(hits.length){
+    const title=b?.querySelector('[data-incident-title]');
+    if(scopedHits.length){
       b?.classList.add('show');
-      if(t)t.textContent=hits.length+' bölgede NASA FIRMS termal anomali tespit edildi. Son kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'. Bu kesin yangın doğrulaması değildir; sahada teyit gerekir.';
+      if(title)title.textContent='ORMAN RİSK SİNYALİ · '+scopedHits.length+' PİLOT İL';
+      if(t)t.textContent=scopedHits.length+' pilot ilde termal anomali sinyali. Ayrıntı ve kaynak zamanını görmek için haritada incele.';
     }else{
       b?.classList.remove('show');
-      if(t)t.textContent='Son başarılı kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'. Son 24 saatte bölgesel NASA FIRMS termal anomali bulunmadı.';
+      if(title)title.textContent='NASA FIRMS · SON KONTROL';
+      if(t)t.textContent='Beş pilot ilde son başarılı kontrolde bölgesel termal anomali sinyali bulunmadı. Son kontrol: '+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'.';
     }
   }catch(error){
     const b=document.querySelector('.nova-incident-banner');
     b?.classList.add('show');
-    const t=b?.querySelector('[data-incident-text]');
+        const t=b?.querySelector('[data-incident-text]');
+    const title=b?.querySelector('[data-incident-title]');
     window.NovaProviderStatus?.update("firms","error","NASA FIRMS kontrolü başarısız; sıfır olay olarak yorumlanmamalıdır.");
-    if(t)t.textContent='NASA FIRMS durumu doğrulanamadı ('+new Date().toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+'). Bu, sıfır olay anlamına gelmez. Yeniden deneyin.';
+    if(title)title.textContent='NASA FIRMS · DURUM DOĞRULANAMADI';
+    if(t)t.textContent='Veri alınamadı; bu sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.';
   }
 }
 
