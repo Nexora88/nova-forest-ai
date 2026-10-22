@@ -11,6 +11,20 @@
   let corridor=null,marker=null,lastWeather=null;
   const language=()=>document.documentElement.dataset.language||"tr";
   const t=(tr,en)=>language()==="en"?en:tr;
+  const evacChecks=[...document.querySelectorAll("[data-evac-check]")];
+  function updateEvacuationReadiness(){
+    const done=evacChecks.filter(input=>input.checked).length,total=evacChecks.length;
+    const label=document.querySelector("[data-evac-progress]");
+    const bar=document.querySelector("[data-evac-progress-bar]");
+    const progress=bar?.parentElement;
+    if(label)label.textContent=t("Tamamlanan hazırlık adımı: ","Readiness steps completed: ")+done+"/"+total;
+    if(bar)bar.style.width=(total?done/total*100:0)+"%";
+    progress?.setAttribute("aria-valuenow",String(done));
+    const note=document.querySelector("[data-evac-note]");
+    if(note)note.textContent=done===total
+      ?t("Kontrol listesi tamamlandı; bu, resmî tahliye izni veya güvenli rota onayı değildir.","Checklist complete; this is not official evacuation clearance or confirmation of a safe route.")
+      :t("Bu liste hazırlık kontrolüdür; resmî tahliye talimatının yerine geçmez.","This is a preparedness checklist; it does not replace official evacuation instructions.");
+  }
   const province=()=>provinces[$("[data-sim-province]").value]||provinces.Edirne;
   const status=text=>{$("[data-sim-status]").textContent=text;};
   const pointAt=(lat,lon,bearing,distanceKm)=>{
@@ -56,5 +70,7 @@
       status(t("Open-Meteo gözlemi: ","Open-Meteo observation: ")+current.time);
     }catch(e){lastWeather=null;status(t("Rüzgâr verisi alınamadı. Manuel değerlerle devam edebilirsin.","Wind data unavailable. You can continue with manual values."));}
   });
-  document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))setTimeout(()=>{if(lastWeather)status(t("Open-Meteo gözlemi: ","Open-Meteo observation: ")+lastWeather.time);},0);});
+  evacChecks.forEach(input=>input.addEventListener("change",updateEvacuationReadiness));
+  updateEvacuationReadiness();
+  document.addEventListener("click",e=>{if(e.target.closest("#nexora-language-toggle"))setTimeout(()=>{if(lastWeather)status(t("Open-Meteo gözlemi: ","Open-Meteo observation: ")+lastWeather.time);updateEvacuationReadiness();},0);});
 })();
