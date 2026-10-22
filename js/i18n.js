@@ -850,6 +850,9 @@
     ["Ayrı test kümesinde hassasiyet, yanlış alarm ve kaçırma oranlarının raporlanması.","Report precision, false-alarm rate, and missed detections on a separate test set."],
     ["Şu anda bu sayfada gerçek duman/ateş sınıflandırma modeli çalışmıyor. RGB göstergeleri yalnızca açıklayıcı, kural tabanlı renk ölçümleridir; resmî uyarı olarak kullanılmamalıdır.","No real smoke/fire classification model currently runs on this page. RGB indicators are explanatory, rule-based colour measurements only and must not be used as official warnings."],
     ["olarak gösterir.","is displayed as."],["Çevresel Zekâ","Environmental Intelligence"],[" (Türkiye saati)"," (Türkiye time)"],
+    ["Tamamlanan hazırlık adımı: ","Readiness steps completed: "],
+    ["Kontrol listesi tamamlandı; bu, resmî tahliye izni veya güvenli rota onayı değildir.","Checklist complete; this is not official evacuation clearance or confirmation of a safe route."],
+    ["Bu liste hazırlık kontrolüdür; resmî tahliye talimatının yerine geçmez.","This is a preparedness checklist; it does not replace official evacuation instructions."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
