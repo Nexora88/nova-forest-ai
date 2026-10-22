@@ -733,6 +733,33 @@
     ["Veri alınamadı; bu sıfır olay anlamına gelmez. Bağlantıyı ve sağlayıcı durumunu kontrol edin.","Data could not be retrieved; this does not mean zero events. Check connectivity and provider status."],
     ["pilot ilde termal anomali sinyali. Ayrıntı ve kaynak zamanını görmek için haritada incele.","pilot province(s) have thermal anomaly signals. Inspect the map for details and source times."],
     ["Güncel rüzgâr verisi alınıyor…","Loading current wind data…"],["Rüzgâr verisi alınamadı. Manuel değerlerle devam edebilirsin.","Wind data unavailable. You can continue with manual values."],
+    ["Environmental intelligence for real-world needs","Gerçek dünya ihtiyaçları için çevresel istihbarat"],
+    ["PRODUCT FEEDBACK","ÜRÜN GERİ BİLDİRİMİ"],
+    ["NEXORA / BUILT WITH FEEDBACK","NEXORA / GERİ BİLDİRİMLE GELİŞİYOR"],
+    ["Help make environmental data more useful.","Çevresel verileri daha kullanışlı hâle getirmemize yardım et."],
+    ["NexoraWildfire AI is being developed around practical needs: understanding local environmental conditions, keeping track of selected areas, and making available observations easier to explore. Tell us what works, what breaks, and what would genuinely help in the field.","NexoraWildfire AI; yerel çevre koşullarını anlamak, seçili alanları izlemek ve mevcut gözlemleri daha anlaşılır kılmak için geliştiriliyor. Nelerin işe yaradığını, nelerin bozulduğunu ve sahada neyin gerçekten yardımcı olacağını bize anlat."],
+    ["Report a bug or suggest a feature →","Hata bildir veya özellik öner →"],
+    ["Explore the product","Ürünü keşfet"],
+    ["What feedback is most useful?","Hangi geri bildirimler daha yararlı?"],
+    ["A reproducible bug: what page you opened, what you expected, and what happened.","Tekrarlanabilir hata: hangi sayfayı açtığın, ne beklediğin ve ne olduğu."],
+    ["A data issue: the selected area, the layer, the time, and whether the source showed an error or no observations.","Veri sorunu: seçili alan, katman, zaman ve kaynağın hata mı yoksa gözlem yokluğu mu gösterdiği."],
+    ["A practical feature request: who it helps and what task it would make easier.","Pratik özellik önerisi: kime yardımcı olacağı ve hangi işi kolaylaştıracağı."],
+    ["Mobile usability: device/browser type and the control that was difficult to use.","Mobil kullanılabilirlik: cihaz/tarayıcı türü ve kullanımı zor olan kontrol."],
+    ["Please do not include passwords, API keys, private contact details, or sensitive exact locations in a public issue. Public reports are visible to other visitors.","Herkese açık bir bildirime parola, API anahtarı, özel iletişim bilgisi veya hassas kesin konum ekleme. Herkese açık bildirimler başkaları tarafından görülebilir."],
+    ["SCIENCE · SERVICE · RESPONSIBILITY","BİLİM · HİZMET · SORUMLULUK"],
+    ["Science should help people solve real problems.","Bilim, insanların gerçek sorunları çözmesine yardımcı olmalıdır."],
+    ["That principle guides the product direction: build carefully, be honest about evidence, and make technology useful to the people and ecosystems it serves.","Bu ilke ürünün yönünü belirler: dikkatle geliştirmek, kanıtlar konusunda dürüst olmak ve teknolojiyi hizmet ettiği insanlara ve ekosistemlere faydalı kılmak."],
+    ["Environmental Map","Çevresel Harita"],["Home","Ana Panel"],["About","Sistem"],["My Areas","Alanlarım"],["Satellite Hub","Uydu Merkezi"],
+    ["NexoraWildfire AI | Feedback","NexoraWildfire AI | Geri Bildirim"],
+    ["NexoraWildfire AI · Independent project by Ahmet Eymen Bakraç · Nexora","NexoraWildfire AI · Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026"],
+    ["Independent project by Ahmet Eymen Bakraç · Nexora","Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026"],
+    ["Verin seninle gelsin.","Let your data travel with you."],
+    ["Saha kimliği · tarım · arıcılık · orman","Field identity · agriculture · beekeeping · forests"],
+    ["GÜVENLİ HESAP","SECURE ACCOUNT"],["Giriş yöntemi","Sign-in method"],["Giriş yap","Sign in"],["Hesap oluştur","Create account"],
+    ["Parola","Password"],["Parolanı unuttun mu?","Forgot your password?"],["E-posta adresi","Email address"],
+    ["Parola en az 8 karakter olmalı.","Password must be at least 8 characters."],["Parolalar eşleşmiyor.","Passwords do not match."],
+    ["Oturum kapatılıyor…","Signing out…"],["Oturum kapatılamadı:","Could not sign out:"],
+    ["İHA Görüntü Laboratuvarı","UAV Image Lab"],["Görüntü bekleniyor","Waiting for image"],["Filtre önizlemesi","Filter preview"],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
@@ -751,7 +778,7 @@
   function translateNode(node) {
     if (node.nodeType !== Node.TEXT_NODE || !node.nodeValue || !node.nodeValue.trim()) return;
     // Preserve user-generated values such as saved area names; translate only UI copy.
-    if (node.parentElement?.closest(".area-card h3,[data-user-content]")) return;
+    if (node.parentElement?.closest(".area-card h3,[data-user-content],footer,[data-nexora-credit]")) return;
     if (!originals.has(node)) originals.set(node, node.nodeValue);
     const source = originals.get(node);
     const translated = replace(source, lang);
@@ -784,14 +811,14 @@
     if (btn) { btn.textContent = lang === "en" ? "EN · TR" : "TR · EN"; btn.setAttribute("aria-label",lang === "en" ? "Switch to Turkish" : "Switch to English"); }
     document.documentElement.dataset.language = lang;
     try { localStorage.setItem(stateKey,lang); } catch {}
-    const footer=document.querySelector("footer");
-    if(footer){
-      let credit=footer.querySelector("p");
-      if(!credit){credit=document.createElement("p");footer.appendChild(credit);}
-      credit.textContent=lang==="en"
-        ?"NexoraWildfire AI · Independent project · Developed by Ahmet Eymen Bakraç · Nexora88 © 2026"
-        :"NexoraWildfire AI · Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026";
-    }
+    let footer=document.querySelector("footer");
+    if(!footer){footer=document.createElement("footer");document.body.appendChild(footer);}
+    let credit=footer.querySelector("[data-nexora-credit]");
+    if(!credit){credit=footer.querySelector("p")||document.createElement("p");credit.dataset.nexoraCredit="";if(!credit.parentNode)footer.appendChild(credit);}
+    credit.dataset.nexoraCredit="";
+    credit.textContent=lang==="en"
+      ?"NexoraWildfire AI · Independent project · Developed by Ahmet Eymen Bakraç · Nexora88 © 2026"
+      :"NexoraWildfire AI · Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88 © 2026";
   }
   function init() {
     const button = document.createElement("button");
