@@ -46,7 +46,7 @@
   const center=selectedCenter();if(!center){status.textContent="Seçili alanın koordinatları okunamadı; Alanlarım ekranında alan geometrisini kontrol et.";return}
   const phone=$("alert-phone").value.trim(),channel=$("alert-channel").value,threshold=Number($("channel-risk-threshold").value||70);
   if(!$("channel-consent").checked){status.textContent="Etkinleştirmek için açık onay kutusunu işaretle.";return}
-  if(!/^\\+[1-9][0-9]{7,14}$/.test(phone)){status.textContent="Telefonu +905xxxxxxxxx biçiminde gir.";return}
+  if(!/^\+[1-9][0-9]{7,14}$/.test(phone){status.textContent="Telefonu +905xxxxxxxxx biçiminde gir.";return}
   button.disabled=true;status.textContent="Onaylı kanal tercihi güvenli biçimde kaydediliyor…";
   try{
    const r=await fetch(api+"/notifications/channels/subscribe",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({channel,phone_e164:phone,lat:center.lat,lon:center.lon,area_name:selected.name||"Seçili saha",threshold,consent:true})});
