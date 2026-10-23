@@ -31,6 +31,41 @@
  }
  function evaluateNotifications(b){if(!("Notification"in window)||Notification.permission!=="granted")return;const p=prefs(),th=num(p.frost)?Number(p.frost):2,mins=b.daily?.temperature_2m_min||[],min=mins.filter(num).map(Number).reduce((a,x)=>Math.min(a,x),Infinity),day=b.daily?.time?.[mins.findIndex(v=>num(v)&&Number(v)===min)]||"";if(Number.isFinite(min)&&min<=th){const key="frost|"+String(selected?.id)+"|"+day+"|"+th;if(localStorage.getItem("nova-bee-last-notice")!==key){try{new Notification("Nova Bee · Don riski",{body:(selected?.name||"Alanınız")+" için "+day+" günü minimum "+min.toFixed(1)+"°C tahmini. Saha koşullarını kontrol et."});localStorage.setItem("nova-bee-last-notice",key)}catch{}}}}
  async function enableNotifications(){if(!("Notification"in window)){$("notification-status").textContent="Bu tarayıcı bildirim API'sini desteklemiyor.";return}try{const p=await Notification.requestPermission();$("notification-status").textContent=p==="granted"?"İzin verildi. Bildirimler yalnızca sayfa açıkken tahmin kontrol edildiğinde değerlendirilir.":"Bildirim izni verilmedi.";if(p==="granted"&&latest)evaluateNotifications(latest)}catch{$("notification-status").textContent="Bildirim izni alınamadı."}}
+ const channelStorageKey="nova-alert-channel-contact-v1";
+ function selectedCenter(){
+  const points=selected?.coordinates||selected?.vertices||selected?.polygon||[];
+  if(!Array.isArray(points)||!points.length)return null;
+  const valid=points.filter(p=>Array.isArray(p)&&Number.isFinite(Number(p[0]))&&Number.isFinite(Number(p[1])));
+  if(!valid.length)return null;
+  return {lat:valid.reduce((sum,p)=>sum+Number(p[0]),0)/valid.length,lon:valid.reduce((sum,p)=>sum+Number(p[1]),0)/valid.length};
+ }
+ async function subscribeAlertChannel(){
+  const status=$("channel-status"),button=$("channel-subscribe"),session=window.NovaAuth?.session?.();
+  if(!selected){status.textContent="Önce bir saha seç.";return}
+  if(!session?.access_token){status.textContent="Bildirim tercihi için önce hesabına giriş yap.";window.NovaAuth?.requireAccount?.("../pages/bee.html");return}
+  const center=selectedCenter();if(!center){status.textContent="Seçili alanın koordinatları okunamadı; Alanlarım ekranında alan geometrisini kontrol et.";return}
+  const phone=$("alert-phone").value.trim(),channel=$("alert-channel").value,threshold=Number($("channel-risk-threshold").value||70);
+  if(!$("channel-consent").checked){status.textContent="Etkinleştirmek için açık onay kutusunu işaretle.";return}
+  if(!/^\\+[1-9][0-9]{7,14}$/.test(phone)){status.textContent="Telefonu +905xxxxxxxxx biçiminde gir.";return}
+  button.disabled=true;status.textContent="Onaylı kanal tercihi güvenli biçimde kaydediliyor…";
+  try{
+   const r=await fetch(api+"/notifications/channels/subscribe",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({channel,phone_e164:phone,lat:center.lat,lon:center.lon,area_name:selected.name||"Seçili saha",threshold,consent:true})});
+   const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(typeof d.detail==="string"?d.detail:(d.detail?.message||"HTTP "+r.status));
+   const contact=d.contact||{};if(contact.id){localStorage.setItem(channelStorageKey,JSON.stringify({id:contact.id,channel,area_name:selected.name||"Seçili saha"}));$("channel-unsubscribe").hidden=false}
+   status.textContent=channel.toUpperCase()+" tercihi kaydedildi. Bildirimler yapılandırılmış zamanlayıcı çalıştığında ve eşik aşıldığında gönderilir.";
+  }catch(e){status.textContent="Bildirim açılamadı: "+(e?.message||"servis hatası")+". Supabase migration, Twilio ve zamanlayıcı yapılandırmasını kontrol et."}
+  finally{button.disabled=false}
+ }
+ async function unsubscribeAlertChannel(){
+  const status=$("channel-status"),session=window.NovaAuth?.session?.();let saved=null;
+  try{saved=JSON.parse(localStorage.getItem(channelStorageKey)||"null")}catch{}
+  if(!saved?.id){status.textContent="Bu cihazda iptal edilecek kanal kaydı bulunamadı.";return}
+  if(!session?.access_token){status.textContent="İptal için hesabına giriş yap.";return}
+  const button=$("channel-unsubscribe");button.disabled=true;
+  try{const r=await fetch(api+"/notifications/channels/unsubscribe",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({contact_id:saved.id})});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(typeof d.detail==="string"?d.detail:"HTTP "+r.status);localStorage.removeItem(channelStorageKey);button.hidden=true;status.textContent="Bu cihazdaki kanal aboneliği iptal edildi."}
+  catch(e){status.textContent="İptal tamamlanamadı: "+(e?.message||"servis hatası")}
+  finally{button.disabled=false}
+ }
  async function requestAgentReport(){
   const statusBox=$("agent-report-status"),reportBox=$("agent-report-text"),button=$("generate-agent-report");
   if(!selected){statusBox.textContent="Önce Alanlarım bölümünden bir saha seç.";return}
@@ -104,5 +139,5 @@
   }catch(e){box.textContent="Uydu raporu şu an tamamlanamadı: "+(e?.message||"servis hatası")+". Worker, CDSE sağlayıcısı veya hesap kotası hazır olmayabilir."}
   finally{btn.disabled=false;btn.textContent="Özel rapor iste"}
  }
- $("area-select").addEventListener("change",e=>chooseArea(areas.find(a=>String(a.id)===e.target.value)||null));$("refresh").addEventListener("click",refresh);$("save-settings").addEventListener("click",()=>{savePrefs();if(latest)render(latest);status("Don eşiği ve Kc kaydedildi. Sulama sinyali bitki türü ve saha ölçümüyle doğrulanmalıdır.","good")});$("enable-notifications").addEventListener("click",enableNotifications);$("ndvi-request").addEventListener("click",requestNDVI);$("billing-checkout")?.addEventListener("click",requestCheckout);$("generate-agent-report")?.addEventListener("click",requestAgentReport);window.addEventListener("nova:areas-synced",loadAreas);window.addEventListener("nova:auth-ready",()=>{if(!areas.length)loadAreas()});const p=prefs();if(num(p.frost))$("frost-threshold").value=p.frost;if(num(p.kc))$("crop-coefficient").value=p.kc;loadAreas();loadBillingStatus();
+ $("area-select").addEventListener("change",e=>chooseArea(areas.find(a=>String(a.id)===e.target.value)||null));$("refresh").addEventListener("click",refresh);$("save-settings").addEventListener("click",()=>{savePrefs();if(latest)render(latest);status("Don eşiği ve Kc kaydedildi. Sulama sinyali bitki türü ve saha ölçümüyle doğrulanmalıdır.","good")});$("enable-notifications").addEventListener("click",enableNotifications);$("ndvi-request").addEventListener("click",requestNDVI);$("billing-checkout")?.addEventListener("click",requestCheckout);$("generate-agent-report")?.addEventListener("click",requestAgentReport);$("channel-subscribe")?.addEventListener("click",subscribeAlertChannel);$("channel-unsubscribe")?.addEventListener("click",unsubscribeAlertChannel);window.addEventListener("nova:areas-synced",loadAreas);window.addEventListener("nova:auth-ready",()=>{if(!areas.length)loadAreas()});const p=prefs();if(num(p.frost))$("frost-threshold").value=p.frost;if(num(p.kc))$("crop-coefficient").value=p.kc;loadAreas();loadBillingStatus();
 })();
