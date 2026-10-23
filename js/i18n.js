@@ -853,6 +853,22 @@
     ["Tamamlanan hazırlık adımı: ","Readiness steps completed: "],
     ["Kontrol listesi tamamlandı; bu, resmî tahliye izni veya güvenli rota onayı değildir.","Checklist complete; this is not official evacuation clearance or confirmation of a safe route."],
     ["Bu liste hazırlık kontrolüdür; resmî tahliye talimatının yerine geçmez.","This is a preparedness checklist; it does not replace official evacuation instructions."],
+    ["İlçeleri aç →","Open districts →"],
+    ["İlçeyi aç · köy/mahalleleri göster →","Open district · show villages/neighbourhoods →"],
+    ["Ayrıntıları kapat ×","Close details ×"],
+    ["İL SEVİYESİ","PROVINCE LEVEL"],
+    ["İLÇELER","DISTRICTS"],
+    ["KÖY / MAHALLELER YÜKLENİYOR…","LOADING VILLAGES / NEIGHBOURHOODS…"],
+    ["ALAN EKLE","ADD AREA"],
+    ["Alan adı (en fazla 80 karakter)","Area name (up to 80 characters)"],
+    ["Alan türü: çiftçi / arıcı / orman / genel","Area type: farmer / beekeeper / forest / general"],
+    ["VERİ KATMANI","DATA LAYER"],
+    ["Çevresel analiz alanı","Environmental analysis area"],
+    ["Sıcaklık","Temperature"],
+    ["Toprak nemi","Soil moisture"],
+    ["Geçmiş","History"],
+    ["Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.","Source: Open-Meteo + NexoraWildfire decision engine. Satellite data is linked separately as a time series for the selected area."],
+    ["Canlı hava verisi henüz alınmadı. Bu, riskin sıfır olduğu anlamına gelmez; veri yüklenirken il sınırı gösteriliyor.","Live weather data is not available yet. This is not a zero-risk result; the province boundary is shown while data loads."],
   ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
