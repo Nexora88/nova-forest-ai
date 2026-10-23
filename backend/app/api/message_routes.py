@@ -99,6 +99,17 @@ def subscribe_message_alert(payload:SubscribeRequest,authorization:str|None=Head
     except requests.RequestException: raise HTTPException(status_code=503,detail="Mesaj aboneliği kaydedilemedi.")
     return {"status":"subscribed","channel":payload.channel,"area_name":payload.area_name}
 
+@router.post("/unsubscribe")
+def unsubscribe_message_alert(area_name:str,channel:str,authorization:str|None=Header(default=None)):
+    user_id=_authenticated_user(authorization)
+    if channel not in {"sms","whatsapp"}: raise HTTPException(status_code=422,detail="Kanal sms veya whatsapp olmalı.")
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY: raise HTTPException(status_code=503,detail="Abonelik veritabanı yapılandırılmamış.")
+    try:
+        response=requests.patch(f"{SUPABASE_URL}/rest/v1/nexorawildfire_message_subscriptions",params={"user_id":f"eq.{user_id}","area_name":f"eq.{area_name}","channel":f"eq.{channel}"},headers={"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {SUPABASE_ADMIN_KEY}","Content-Type":"application/json","Prefer":"return=minimal"},json={"enabled":False},timeout=10)
+        response.raise_for_status()
+    except requests.RequestException: raise HTTPException(status_code=503,detail="Abonelik kapatılamadı.")
+    return {"status":"unsubscribed","area_name":area_name,"channel":channel}
+
 @router.post("/send")
 def send_message(payload:MessageRequest,authorization:str|None=Header(default=None)):
     _authenticated_user(authorization)
