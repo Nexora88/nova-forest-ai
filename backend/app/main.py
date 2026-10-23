@@ -15,6 +15,7 @@ from app.api.jobs_routes import router as jobs_router
 from app.api.enterprise_reports import router as enterprise_reports_router
 from app.api.account_routes import router as account_router
 from app.api.copilot_routes import router as copilot_router
+from app.api.billing_routes import router as billing_router
 from app.engine.ml_fire_model import model_status as fire_model_status
 
 app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.4.0")
@@ -64,6 +65,7 @@ app.include_router(jobs_router)
 app.include_router(enterprise_reports_router)
 app.include_router(account_router)
 app.include_router(copilot_router)
+app.include_router(billing_router)
 
 
 @app.middleware("http")
