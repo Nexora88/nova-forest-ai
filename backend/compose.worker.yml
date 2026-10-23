@@ -28,6 +28,22 @@ services:
         condition: service_healthy
     networks: [worker-private]
 
+  notification-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    command: ["python", "-m", "app.notification_scheduler"]
+    env_file:
+      - .env.worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      NEXORA_SCHEDULER_ENABLED: "true"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [worker-private]
+
   queue-worker:
     build:
       context: .

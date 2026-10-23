@@ -14,6 +14,9 @@ from app.api.yolo_routes import router as yolo_router
 from app.api.jobs_routes import router as jobs_router
 from app.api.enterprise_reports import router as enterprise_reports_router
 from app.api.account_routes import router as account_router
+from app.api.copilot_routes import router as copilot_router
+from app.api.billing_routes import router as billing_router
+from app.api.message_routes import router as message_router
 from app.engine.ml_fire_model import model_status as fire_model_status
 
 app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.4.0")
@@ -62,6 +65,9 @@ app.include_router(yolo_router)
 app.include_router(jobs_router)
 app.include_router(enterprise_reports_router)
 app.include_router(account_router)
+app.include_router(copilot_router)
+app.include_router(billing_router)
+app.include_router(message_router)
 
 
 @app.middleware("http")
@@ -89,6 +95,9 @@ def root():
             "satellite_routes": "registered",
             "forecast_routes": "registered",
             "notifications": "route_registered",
+            "copilot_agents": "configurable_role_models",
+            "billing": "stripe_webhook_gated",
+            "messaging": "twilio_config_gated",
             "predictive_ml": model.get("status", "unknown"),
         },
         "note": "API readiness does not mean every external provider is reachable. Check /satellite/live-check and /satellite/providers/status for provider diagnostics. Scores are decision-support indicators, not official fire warnings.",

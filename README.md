@@ -115,3 +115,11 @@ The priority is a dependable core product: clear map layers, understandable indi
 - [AI-assisted development disclosure (English + Türkçe)](AI_ASSISTED_DEVELOPMENT.md)
 
 The MIT license applies to Nexora-authored code only; it does not relicense third-party weights, data, map tiles, or dependencies. AI coding assistants are used for technical debugging, code explanation, tests, translation, and documentation—not as the originator of the project concept. See the disclosure for the complete statement.
+
+
+## Configurable Copilot and delivery integrations
+
+- `POST /copilot/daily-report` orchestrates separately configured Agro-Agent, Eco-Agent, and Writer Agent model calls. Set `AI_API_BASE_URL`, `AI_API_KEY`, and the three `NEXORA_*_MODEL` values on the server.
+- Twilio Verify phone ownership and explicit area opt-in are required for scheduled SMS/WhatsApp alerts. Apply `supabase/migrations/20261023090000_provider_integrations.sql` and run the persistent `notification-scheduler` service.
+- Stripe Checkout changes the plan only after a signature-verified webhook. Configure the Stripe secrets and register `/billing/webhook` before offering paid plans.
+- Missing credentials are reported as unconfigured; no provider is claimed active solely because its code or route exists.

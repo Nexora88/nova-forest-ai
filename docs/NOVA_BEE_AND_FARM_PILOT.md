@@ -30,3 +30,16 @@ Durum: **pilot arayüzü ve tarayıcı tabanlı göstergeler**. Ödeme, otomatik
 3. Supabase giriş ve worker hazır değilken NDVI isteğinin kullanıcıya açık hata verdiğini doğrula.
 4. Ücretli planı açmadan önce sunucu tarafı plan yetkisi, abonelik kaydı, webhook, iptal/iade, gizlilik metni ve kullanım limitlerini tamamla.
 5. Trakya'daki arıcı ve üreticilerden saha geri bildirimi topla; eşikleri doğrulanmış agronomik tavsiye olarak pazarlama.
+
+
+## Configurable AI Copilot (2026-10-23)
+
+The backend now exposes `POST /copilot/daily-report`. Agro-Agent and Eco-Agent run as separate model calls before Writer Agent creates a Turkish briefing. Configure `AI_API_BASE_URL`, `AI_API_KEY`, `NEXORA_AGRO_MODEL`, `NEXORA_ECO_MODEL`, and `NEXORA_WRITER_MODEL` in the server environment. Missing model configuration returns `agents_not_ready`; it is not disguised as AI output. Optional GeoJSON Polygon input requests a real Sentinel-2 NDVI/NDMI series when CDSE credentials are available.
+
+## Delivery and billing deployment gates
+
+- Apply `supabase/migrations/20261023090000_provider_integrations.sql`.
+- The persistent `notification-scheduler` service supports background Web Push and opt-in SMS/WhatsApp checks. It requires the Supabase tables, VAPID keys, Twilio credentials and a verified phone number. A serverless request alone cannot guarantee background delivery.
+- SMS/WhatsApp uses Twilio Verify for phone ownership and sends only for a verified, explicitly opted-in area subscription.
+- Stripe Checkout is server-side; a plan changes only after a signature-verified webhook. Configure Stripe secrets and register `/billing/webhook` before enabling paid checkout.
+- Missing credentials are reported as unconfigured. Provider setup and live delivery/payment must be tested in the deployed environment before claiming activation.

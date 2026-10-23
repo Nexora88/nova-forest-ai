@@ -29,8 +29,36 @@
   const card=(label,title,copy,note)=>'<article class="bee-card"><div class="bee-card-top"><span>'+label+'</span></div><h3>'+safe(title)+'</h3><p>'+safe(copy)+'</p>'+(note?'<small class="bee-note">'+safe(note)+'</small>':'')+'</article>';
   host.innerHTML=card("ECO / ÇEVRE AJANI",min!==null&&min<=threshold?"Don eşiğini izle":"Hava ve don kontrolü",eco,"Kaynak: Open-Meteo; tahmin mikroiklim ölçümü değildir.")+card("AGRO / TARIM AJANI",net!==null&&net>=3?"Sulama kontrolü":"Su talebi özeti",agro,"Uydu NDVI/NDMI verisi otomatik varsayılmaz.")+card("NOVA BEE / ARICILIK","Uçuş koşulu sinyali",bee,"Koloni sağlığı veya polen ölçümü değildir.");
  }
+ async function runRealAgents(){
+  const box=$("copilot-summary"),button=$("run-ai-agents");
+  if(!selected){box.textContent="Önce bir saha seç.";return}
+  const s=window.NovaAuth?.session?.();
+  if(!s?.access_token){box.textContent="Gerçek ajanları çalıştırmak için hesabına giriş yap.";window.NovaAuth?.requireAccount?.("../pages/bee.html");return}
+  const c=center(selected);
+  if(!c){box.textContent="Saha koordinatları eksik; ajan çağrısı yapılmadı.";return}
+  button.disabled=true;button.textContent="Ajanlar çalışıyor…";box.textContent="Agro-Agent ve Eco-Agent için veri hazırlanıyor…";
+  try{
+   const payload={area_name:selected.name||"Kayıtlı saha",lat:c[0],lon:c[1],crop:selected.crop||selected.type||"general"};
+   try{payload.geometry=geometry(selected)}catch{}
+   const response=await fetch(api+"/copilot/daily-report",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token},body:JSON.stringify(payload)});
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(data.detail?.message||data.detail||("HTTP "+response.status));
+   const agents=data.agents||{};
+   if(data.status==="agents_not_ready"){box.textContent="Gerçek ajanlar henüz sunucu ortamında yapılandırılmamış. AI_API_KEY, AI_API_BASE_URL ve üç rol modelinin ayarlanması gerekiyor.";hostAgentStatus(agents);return}
+   const writer=agents.writer?.output;
+   box.textContent=writer||"Writer Agent rapor üretmedi. Sağlayıcı durumunu kontrol et.";
+   hostAgentStatus(agents);
+   if(data.evidence?.satellite?.status&&data.evidence.satellite.status!=="available"){$("ndvi-status").textContent="Uydu verisi: "+data.evidence.satellite.status+"; bu raporda NDVI sonucu kullanılmadı."}
+  }catch(e){box.textContent="Gerçek ajan raporu alınamadı: "+(e?.message||"servis hatası")+". Kural tabanlı göstergeler ayrı olarak kullanılabilir."}
+  finally{button.disabled=false;button.textContent="Gerçek ajanlarla analiz et"}
+ }
+ function hostAgentStatus(agents){
+  const host=$("copilot-agents");if(!host)return;
+  const labels={eco:"ECO / ÇEVRE AJANI",agro:"AGRO / TARIM AJANI",writer:"WRITER / RAPORLAYICI"};
+  host.innerHTML=["eco","agro","writer"].map(role=>{const a=agents[role]||{},name=a.model||"Model yapılandırılmadı",state=a.status||"unknown",output=a.output||a.message||("Durum: "+state);return '<article class="bee-card"><div class="bee-card-top"><span>'+labels[role]+'</span></div><h3>'+safe(name)+'</h3><p>'+safe(output)+'</p><small class="bee-note">Servis durumu: '+safe(state)+'</small></article>'}).join("");
+ }
  function evaluateNotifications(b){if(!("Notification"in window)||Notification.permission!=="granted")return;const p=prefs(),th=num(p.frost)?Number(p.frost):2,mins=b.daily?.temperature_2m_min||[],min=mins.filter(num).map(Number).reduce((a,x)=>Math.min(a,x),Infinity),day=b.daily?.time?.[mins.findIndex(v=>num(v)&&Number(v)===min)]||"";if(Number.isFinite(min)&&min<=th){const key="frost|"+String(selected?.id)+"|"+day+"|"+th;if(localStorage.getItem("nova-bee-last-notice")!==key){try{new Notification("Nova Bee · Don riski",{body:(selected?.name||"Alanınız")+" için "+day+" günü minimum "+min.toFixed(1)+"°C tahmini. Saha koşullarını kontrol et."});localStorage.setItem("nova-bee-last-notice",key)}catch{}}}}
  async function enableNotifications(){if(!("Notification"in window)){$("notification-status").textContent="Bu tarayıcı bildirim API'sini desteklemiyor.";return}try{const p=await Notification.requestPermission();$("notification-status").textContent=p==="granted"?"İzin verildi. Bildirimler yalnızca sayfa açıkken tahmin kontrol edildiğinde değerlendirilir.":"Bildirim izni verilmedi.";if(p==="granted"&&latest)evaluateNotifications(latest)}catch{$("notification-status").textContent="Bildirim izni alınamadı."}}
  async function requestNDVI(){const box=$("ndvi-status");if(!selected){box.textContent="Önce bir alan seç.";return}const s=window.NovaAuth?.session?.();if(!s?.access_token){box.textContent="Özel rapor isteği için önce hesabına giriş yap.";window.NovaAuth?.requireAccount?.("../pages/bee.html");return}const btn=$("ndvi-request");btn.disabled=true;btn.textContent="İstek gönderiliyor…";box.textContent="Alan sınırı ve oturum doğrulanıyor…";try{const r=await fetch(api+"/jobs/ndvi-timeseries",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token},body:JSON.stringify({geometry:geometry(selected),days:180,interval:"P30D"})}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.detail?.message||d.detail||d.message||("HTTP "+r.status));const id=d.job_id||d.id||d.job?.id;if(id){localStorage.setItem("nova-bee-last-ndvi-job",String(id));box.textContent="İstek kuyruğa iletildi. Görev: "+id+". Sonuç, worker ve kota durumuna bağlıdır."}else box.textContent="İstek kabul edildi; servis yanıtı: "+JSON.stringify(d).slice(0,350)}catch(e){box.textContent="Rapor şu an oluşturulamadı: "+(e?.message||"servis hatası")+". Worker veya hesap kotası hazır olmayabilir; ücretli abonelik aktif değildir."}finally{btn.disabled=false;btn.textContent="Özel rapor iste"}}
- $("area-select").addEventListener("change",e=>chooseArea(areas.find(a=>String(a.id)===e.target.value)||null));$("refresh").addEventListener("click",refresh);$("save-settings").addEventListener("click",()=>{savePrefs();if(latest)render(latest);status("Don eşiği ve Kc kaydedildi. Sulama sinyali bitki türü ve saha ölçümüyle doğrulanmalıdır.","good")});$("enable-notifications").addEventListener("click",enableNotifications);$("ndvi-request").addEventListener("click",requestNDVI);window.addEventListener("nova:areas-synced",loadAreas);window.addEventListener("nova:auth-ready",()=>{if(!areas.length)loadAreas()});const p=prefs();if(num(p.frost))$("frost-threshold").value=p.frost;if(num(p.kc))$("crop-coefficient").value=p.kc;loadAreas();
+ $("area-select").addEventListener("change",e=>chooseArea(areas.find(a=>String(a.id)===e.target.value)||null));$("refresh").addEventListener("click",refresh);$("save-settings").addEventListener("click",()=>{savePrefs();if(latest)render(latest);status("Don eşiği ve Kc kaydedildi. Sulama sinyali bitki türü ve saha ölçümüyle doğrulanmalıdır.","good")});$("enable-notifications").addEventListener("click",enableNotifications);$("ndvi-request").addEventListener("click",requestNDVI);$("run-ai-agents")?.addEventListener("click",runRealAgents);window.addEventListener("nova:areas-synced",loadAreas);window.addEventListener("nova:auth-ready",()=>{if(!areas.length)loadAreas()});const p=prefs();if(num(p.frost))$("frost-threshold").value=p.frost;if(num(p.kc))$("crop-coefficient").value=p.kc;loadAreas();
 })();
