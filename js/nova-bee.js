@@ -65,6 +65,44 @@
    window.location.assign(d.url);
   }catch(e){status.textContent="Ödeme başlatılamadı: "+(e?.message||"servis hatası");button.disabled=false}
  }
- async function requestNDVI(){const box=$("ndvi-status");if(!selected){box.textContent="Önce bir alan seç.";return}const s=window.NovaAuth?.session?.();if(!s?.access_token){box.textContent="Özel rapor isteği için önce hesabına giriş yap.";window.NovaAuth?.requireAccount?.("../pages/bee.html");return}const btn=$("ndvi-request");btn.disabled=true;btn.textContent="İstek gönderiliyor…";box.textContent="Alan sınırı ve oturum doğrulanıyor…";try{const r=await fetch(api+"/jobs/ndvi-timeseries",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token},body:JSON.stringify({geometry:geometry(selected),days:180,interval:"P30D"})}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.detail?.message||d.detail||d.message||("HTTP "+r.status));const id=d.job_id||d.id||d.job?.id;if(id){localStorage.setItem("nova-bee-last-ndvi-job",String(id));box.textContent="İstek kuyruğa iletildi. Görev: "+id+". Sonuç, worker ve kota durumuna bağlıdır."}else box.textContent="İstek kabul edildi; servis yanıtı: "+JSON.stringify(d).slice(0,350)}catch(e){box.textContent="Rapor şu an oluşturulamadı: "+(e?.message||"servis hatası")+". Worker veya hesap kotası hazır olmayabilir; ücretli abonelik aktif değildir."}finally{btn.disabled=false;btn.textContent="Özel rapor iste"}}
+ async function requestNDVI(){
+  const box=$("ndvi-status");
+  if(!selected){box.textContent="Önce bir alan seç.";return}
+  const session=window.NovaAuth?.session?.();
+  if(!session?.access_token){box.textContent="Özel rapor isteği için önce hesabına giriş yap.";window.NovaAuth?.requireAccount?.("../pages/bee.html");return}
+  const btn=$("ndvi-request");btn.disabled=true;btn.textContent="İstek gönderiliyor…";box.textContent="Alan sınırı ve oturum doğrulanıyor…";
+  try{
+   const response=await fetch(api+"/jobs/ndvi-timeseries",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({geometry:geometry(selected),days:180,interval:"P30D"})});
+   const payload=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(payload.detail?.message||payload.detail||payload.message||("HTTP "+response.status));
+   const id=payload.job_id||payload.id||payload.job?.id;
+   if(!id){box.textContent="İstek kabul edildi ancak görev kimliği dönmedi: "+JSON.stringify(payload).slice(0,350);return}
+   localStorage.setItem("nova-bee-last-ndvi-job",String(id));
+   box.textContent="Görev kuyruğa alındı ("+id+"). Sentinel-2 istatistikleri bekleniyor…";
+   for(let attempt=0;attempt<18;attempt++){
+    await new Promise(resolve=>setTimeout(resolve,5000));
+    const poll=await fetch(api+"/jobs/"+encodeURIComponent(String(id)),{headers:{"Authorization":"Bearer "+session.access_token,"Accept":"application/json"}});
+    const job=await poll.json().catch(()=>({}));
+    if(!poll.ok)throw Error(job.detail?.message||job.detail||("Görev durumu HTTP "+poll.status));
+    const state=String(job.status||job.state||job.job?.status||"").toLowerCase();
+    if(["completed","complete","succeeded","success","finished"].includes(state)){
+      const result=job.result||job.output||job.job?.result||job.job?.output||job;
+      const series=result.series||result.data?.series||result.report?.series||[];
+      const latest=result.latest||result.data?.latest||series[series.length-1];
+      const delta=result.delta||result.data?.delta||{};
+      let report="Sentinel-2 raporu tamamlandı. Görev: "+id+".";
+      if(latest)report+=" Son ölçüm: "+(latest.from||latest.to||latest.date||"tarih belirtilmedi")+", NDVI "+(latest.ndvi??"—")+", NDMI "+(latest.ndmi??"—")+", sınıf "+(latest.classification||"belirtilmedi")+".";
+      if(delta.ndvi!==undefined&&delta.ndvi!==null)report+=" Önceki ölçüme göre NDVI değişimi: "+delta.ndvi+".";
+      if(!latest)report+=" Sağlayıcı sonucu: "+JSON.stringify(result).slice(0,700);
+      box.textContent=report+" Kaynak ve örnek sayısı görev yanıtında doğrulanmalıdır.";
+      return;
+    }
+    if(["failed","error","cancelled","canceled"].includes(state))throw Error(job.error||job.message||"Uydu görevi başarısız oldu.");
+    box.textContent="Sentinel-2 görevi çalışıyor… ("+(attempt+1)+"/18) · "+id;
+   }
+   box.textContent="Görev hâlâ çalışıyor. Kimlik: "+id+". Bu ekran açık kaldığında yeniden istek oluşturma; görev durumu sunucuda tutuluyor.";
+  }catch(e){box.textContent="Uydu raporu şu an tamamlanamadı: "+(e?.message||"servis hatası")+". Worker, CDSE sağlayıcısı veya hesap kotası hazır olmayabilir."}
+  finally{btn.disabled=false;btn.textContent="Özel rapor iste"}
+ }
  $("area-select").addEventListener("change",e=>chooseArea(areas.find(a=>String(a.id)===e.target.value)||null));$("refresh").addEventListener("click",refresh);$("save-settings").addEventListener("click",()=>{savePrefs();if(latest)render(latest);status("Don eşiği ve Kc kaydedildi. Sulama sinyali bitki türü ve saha ölçümüyle doğrulanmalıdır.","good")});$("enable-notifications").addEventListener("click",enableNotifications);$("ndvi-request").addEventListener("click",requestNDVI);$("billing-checkout")?.addEventListener("click",requestCheckout);$("generate-agent-report")?.addEventListener("click",requestAgentReport);window.addEventListener("nova:areas-synced",loadAreas);window.addEventListener("nova:auth-ready",()=>{if(!areas.length)loadAreas()});const p=prefs();if(num(p.frost))$("frost-threshold").value=p.frost;if(num(p.kc))$("crop-coefficient").value=p.kc;loadAreas();loadBillingStatus();
 })();
