@@ -126,3 +126,12 @@
 .provider-status-detail{margin:8px 0 5px;color:#b2c9b9;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
 .provider-status-times{display:block;color:#728a7a;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:700px){.provider-status-heading{flex-direction:column;gap:6px}.provider-status-list{grid-template-columns:1fr}.provider-status-row{padding:11px}.provider-status-top{flex-wrap:wrap}.provider-state{white-space:normal}}
+
+/* Popup/detail controls: compact on phones and dismissible at every drill-down level. */
+#map .leaflet-popup-content-wrapper{max-width:min(420px,calc(100vw - 38px));}
+#map .leaflet-popup-content{max-height:min(62dvh,520px);overflow:auto;overscroll-behavior:contain;min-width:0!important;width:min(300px,calc(100vw - 88px))!important;margin:12px!important}
+#map .leaflet-popup-close-button{z-index:2}
+.risk-popup .map-popup-close{display:block;width:100%;min-height:40px;margin:10px 0 0;padding:9px 12px;border:1px solid #486b54;border-radius:10px;background:#050a07;color:#d6e7da;font-weight:800;cursor:pointer}
+.risk-popup .map-popup-close:hover{border-color:#27e981;color:#8bffb3}
+.map-filters{max-height:calc(100% - 94px);overflow:auto;overscroll-behavior:contain}
+@media(max-width:700px){.map-section{border-radius:15px!important}.map-toolbar{align-items:flex-start;flex-direction:column;letter-spacing:.04em}.map-filters{left:10px!important;top:68px!important;width:min(255px,calc(100% - 20px))!important;padding:12px!important;max-height:calc(100% - 78px)}.filter-buttons{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))}.map-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))}.map-breadcrumb{font-size:9px!important}.risk-popup .popup-score{font-size:34px!important}.risk-popup .popup-grid{gap:6px 8px;font-size:10px!important}#map .leaflet-popup-content{width:min(270px,calc(100vw - 76px))!important;max-height:56dvh}}
