@@ -64,7 +64,7 @@ def calculate_risk(weather):
 
 @router.get("/status")
 def notification_status():
-    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":["in_app","browser","web_push"] if configured() else ["in_app","browser"],"background_delivery":configured()}
+    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":["in_app","browser","web_push"] if configured() else ["in_app","browser"],"background_delivery":bool(configured() and __import__("os").getenv("NEXORA_SCHEDULER_ENABLED","").lower()=="true"),"scheduler_configured":__import__("os").getenv("NEXORA_SCHEDULER_ENABLED","").lower()=="true","note":"Background delivery requires the separate persistent notification-scheduler service to be deployed and enabled."}
 
 @router.get("/push/config")
 def push_config():
@@ -108,7 +108,9 @@ async def background_push_cycle():
     if not push_ready and not messages_ready: return
     now=datetime.now(timezone.utc)
     if push_ready:
-        for row in list_subscriptions():
+        try: push_rows=list_subscriptions()
+        except Exception: push_rows=[]
+        for row in push_rows:
             if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"): continue
             try:
                 weather=get_current_weather(float(row["lat"]),float(row["lon"]))
