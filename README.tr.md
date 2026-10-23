@@ -119,3 +119,11 @@ NexoraWildfire AI geliştirilmekte olan bir araştırma ve karar destek projesid
 - [Yapay zekâ destekli geliştirme beyanı (Türkçe + English)](AI_ASSISTED_DEVELOPMENT.md)
 
 MIT lisansı yalnızca Nexora tarafından yazılan kod için geçerlidir; üçüncü taraf model ağırlıklarını, verileri, harita döşemelerini veya bağımlılıkları yeniden lisanslamaz. Yapay zekâ kodlama asistanları teknik hata ayıklama, kod açıklama, test, çeviri ve belge hazırlama için kullanılır; proje fikrinin kaynağı olarak gösterilmez. Ayrıntı için geliştirme beyanını okuyun.
+
+
+## Copilot ve üretim servisleri
+
+- `POST /copilot/daily-report`: Agro-Agent, Eco-Agent ve Writer Agent için ayrı model çağrıları; kaynaklı hava/polen ve isteğe bağlı işlenmiş Sentinel-2 zaman serisi.
+- `/messages/verify/start`, `/messages/verify/check` ve `/messages/subscribe`: Twilio Verify ile telefon doğrulaması ve açık rızalı SMS/WhatsApp alarm aboneliği.
+- `/billing/checkout` ve `/billing/webhook`: Stripe Checkout ve imza doğrulamalı plan etkinleştirme.
+- Kalıcı `notification-scheduler` servisi Web Push ve mesaj aboneliklerini zamanlanmış olarak kontrol eder. AI, Twilio, Stripe, Supabase ve VAPID anahtarları hedef ortamda yapılandırılmadan bu servisler canlı kabul edilmez.
