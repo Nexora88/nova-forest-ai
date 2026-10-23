@@ -1,0 +1,26 @@
+name: Nova scheduled environmental alerts
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Validate scheduler configuration
+        env:
+          NOVA_CRON_URL: ${{ secrets.NOVA_CRON_URL }}
+          NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          test -n "$NOVA_CRON_URL" || { echo "NOVA_CRON_URL secret is missing"; exit 1; }
+          test -n "$NOVA_CRON_SECRET" || { echo "NOVA_CRON_SECRET secret is missing"; exit 1; }
+      - name: Run opted-in alert cycle
+        env:
+          NOVA_CRON_URL: ${{ secrets.NOVA_CRON_URL }}
+          NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 90 \
+            -X POST "$NOVA_CRON_URL" \
+            -H "X-Nova-Cron-Secret: $NOVA_CRON_SECRET" \
+            -H "Accept: application/json"

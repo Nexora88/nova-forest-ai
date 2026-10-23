@@ -98,3 +98,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ops-metric strong{color:#dfffea!important}
 .ops-chip{font-family:Inter,system-ui,sans-serif!important}
 @media(max-width:760px){.ops-hero{grid-template-columns:minmax(0,1fr)!important}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ops-user{align-items:flex-start}.ops-user>div{min-width:0}}
+
+/* Keep the logo mark on the application's dark command surface on every page. */
+.brand-lockup .brand-logo{display:block!important;padding:4px!important;border:1px solid #244a31!important;border-radius:10px!important;background:#020503!important;box-shadow:0 0 22px #19e87810!important;object-fit:contain!important}

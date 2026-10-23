@@ -130,3 +130,75 @@ async def background_push_loop():
 @router.post("/send")
 def send_notification():
     raise HTTPException(status_code=501,detail="Genel gönderim henüz sunucu tarafından uygulanmıyor. Kullanıcı aboneliğiyle Web Push akışını kullan.")
+
+
+# Explicit opt-in contact management. Phone numbers are E.164 and never exposed in public diagnostics.
+class ChannelSubscribeRequest(BaseModel):
+    channel: str = Field(pattern="^(sms|whatsapp)$")
+    phone_e164: str = Field(pattern=r"^\+[1-9][0-9]{7,14}$")
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    area_name: str = Field(min_length=1, max_length=120)
+    threshold: int = Field(default=70, ge=25, le=100)
+    consent: bool
+
+class ChannelUnsubscribeRequest(BaseModel):
+    contact_id: str = Field(min_length=36, max_length=36)
+
+@router.post("/channels/subscribe")
+def subscribe_alert_channel(payload: ChannelSubscribeRequest, authorization: str | None = Header(default=None)):
+    if not payload.consent:
+        raise HTTPException(status_code=400, detail="SMS/WhatsApp bildirimi için açık onay gerekli.")
+    user_id=require_user_id(authorization)
+    from app.services.channel_service import save_contact
+    try:
+        contact=save_contact(user_id,payload.channel,payload.phone_e164,payload.lat,payload.lon,payload.area_name,payload.threshold)
+    except Exception as exc:
+        raise HTTPException(status_code=503,detail="Bildirim tercihi kaydedilemedi; veritabanı yapılandırmasını kontrol et.") from exc
+    return {"status":"subscribed","channel":payload.channel,"contact":contact,"consent_recorded":True}
+
+@router.post("/channels/unsubscribe")
+def unsubscribe_alert_channel(payload: ChannelUnsubscribeRequest, authorization: str | None = Header(default=None)):
+    user_id=require_user_id(authorization)
+    from app.services.channel_service import delete_contact
+    try: delete_contact(user_id,payload.contact_id)
+    except Exception as exc: raise HTTPException(status_code=503,detail="Bildirim tercihi kaldırılamadı.") from exc
+    return {"status":"unsubscribed"}
+
+@router.post("/cron")
+async def scheduled_alert_cycle(x_nova_cron_secret: str | None = Header(default=None)):
+    import os, hmac
+    expected=os.getenv("NOVA_CRON_SECRET","").strip()
+    if not expected or not x_nova_cron_secret or not hmac.compare_digest(expected,x_nova_cron_secret):
+        raise HTTPException(status_code=401,detail="Geçersiz zamanlayıcı kimliği.")
+    await background_push_cycle()
+    from app.services.channel_service import list_contacts, send_channel, update_contact_alert
+    results={"push":"processed","sms_whatsapp_checked":0,"sent":0,"skipped":0}
+    try: contacts=list_contacts()
+    except Exception as exc: raise HTTPException(status_code=503,detail="İletişim tercihleri okunamadı.") from exc
+    now=datetime.now(timezone.utc)
+    for contact in contacts:
+        results["sms_whatsapp_checked"]+=1
+        try:
+            if not contact.get("lat") or not contact.get("lon"): 
+                # 0° is valid; only None is invalid.
+                if contact.get("lat") is None or contact.get("lon") is None: continue
+            weather=get_current_weather(float(contact["lat"]),float(contact["lon"]))
+            risk=calculate_risk(weather)
+            threshold=max(25,min(100,int(contact.get("threshold") or 70)))
+            last=contact.get("last_alert_at")
+            recent=False
+            if last:
+                try: recent=(now-datetime.fromisoformat(str(last).replace("Z","+00:00"))).total_seconds()<21600
+                except ValueError: pass
+            if risk>=threshold and not recent:
+                body=f"{contact['area_name']}: çevresel risk göstergesi {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgâr {weather.get('wind')} km/sa. Bu bir karar destek uyarısıdır; resmî yangın teyidi değildir."
+                send_channel(contact["channel"],contact["phone_e164"],body)
+                update_contact_alert(contact["id"],risk,True)
+                results["sent"]+=1
+            else:
+                update_contact_alert(contact["id"],risk,False)
+                results["skipped"]+=1
+        except Exception:
+            results["skipped"]+=1
+    return results

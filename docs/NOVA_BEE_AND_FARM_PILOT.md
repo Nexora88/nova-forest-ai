@@ -30,3 +30,10 @@ Durum: **pilot arayüzü ve tarayıcı tabanlı göstergeler**. Ödeme, otomatik
 3. Supabase giriş ve worker hazır değilken NDVI isteğinin kullanıcıya açık hata verdiğini doğrula.
 4. Ücretli planı açmadan önce sunucu tarafı plan yetkisi, abonelik kaydı, webhook, iptal/iade, gizlilik metni ve kullanım limitlerini tamamla.
 5. Trakya'daki arıcı ve üreticilerden saha geri bildirimi topla; eşikleri doğrulanmış agronomik tavsiye olarak pazarlama.
+
+
+## Real three-agent report endpoint
+
+The dashboard's local daily summary remains a transparent weather-rule fallback. The **Üç ajanla rapor oluştur** action calls the authenticated `POST /copilot/report` endpoint. Agro-Agent, Eco-Agent and Writer Agent each make a separate server-side OpenAI-compatible chat-completions request; per-agent provider URLs, model names and API keys can be configured independently in the backend environment. No key belongs in browser code. Missing provider configuration returns an explicit service error instead of pretending a model ran.
+
+The satellite job request and the completed satellite report are separate states: NDVI/NDMI results are only reportable when the asynchronous worker returns actual statistics. SMS/WhatsApp alerts require the opt-in migration, Twilio credentials and a configured scheduled runner. Scheduled execution can be delayed by the hosting scheduler and is not a life-safety guarantee. Premium checkout is not enabled by this change.
