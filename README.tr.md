@@ -111,6 +111,10 @@ Depodaki `LICENSE`, yalnızca Nexora tarafından yazılan kodu kapsar. Üçünc�
 NexoraWildfire AI geliştirilmekte olan bir araştırma ve karar destek projesidir. Resmî uyarı sistemi değildir; yangını kesin tahmin etmeyi garanti etmez ve yerel kurumların, uzman değerlendirmesinin veya acil durum prosedürlerinin yerini almamalıdır.
 
 
+## Bağımsız AI Copilot ajanları
+
+Nova Bee panelindeki model raporu, yapılandırıldığında ayrı model kimlikleriyle çalışan Agro-Agent, Eco-Agent ve Writer Agent çağrılarını kullanır. Kurulum ve ortam değişkenleri için [AI Copilot ajan rehberine](docs/AI_COPILOT_AGENTS.md) bakın. Model anahtarı ve üç model kimliği üretim ortamına eklenmedikçe gerçek model raporu çalışmaz; kural tabanlı günlük özet ayrı tutulur. SMS/WhatsApp ve ücretli abonelik ödemeleri henüz etkin bir üretim entegrasyonu olarak kabul edilmemelidir.
+
 ## Bilimsel durum, lisans ve şeffaflık
 
 - [Bilimsel durum ve doğrulama planı](docs/SCIENTIFIC_STATUS.md)
