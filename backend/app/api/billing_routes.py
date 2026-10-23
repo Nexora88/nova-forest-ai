@@ -54,7 +54,14 @@ async def stripe_webhook(request:Request,stripe_signature:str|None=Header(defaul
     kind=event.get("type"); obj=event.get("data",{}).get("object",{})
     if kind=="checkout.session.completed" and obj.get("mode")=="subscription":
         user_id=(obj.get("metadata") or {}).get("user_id") or obj.get("client_reference_id")
-        if user_id: _set_plan(str(user_id),"pro",obj.get("customer"),obj.get("subscription"))
+        subscription_id=obj.get("subscription")
+        if user_id and subscription_id and obj.get("payment_status") in {"paid","no_payment_required"}:
+            try:
+                subscription=stripe.Subscription.retrieve(subscription_id)
+                if subscription.get("status") in {"active","trialing"}:
+                    _set_plan(str(user_id),"pro",obj.get("customer"),subscription_id)
+            except Exception:
+                raise HTTPException(status_code=503,detail="Abonelik durumu doğrulanamadı; Stripe olayı yeniden denenmeli.")
     elif kind in ("customer.subscription.deleted","customer.subscription.paused"):
         user_id=(obj.get("metadata") or {}).get("user_id")
         if user_id: _set_plan(str(user_id),"free",obj.get("customer"),obj.get("id"))
