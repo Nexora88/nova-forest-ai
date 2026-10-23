@@ -20,7 +20,7 @@ def _stripe_ready():
 
 @router.get("/status")
 def billing_status():
-    return {"checkout_configured":bool(os.getenv("STRIPE_SECRET_KEY","").strip() and os.getenv("STRIPE_PRICE_PRO","").strip()),"webhook_configured":bool(os.getenv("STRIPE_WEBHOOK_SECRET","").strip()),"secret_exposed":False,"plans":["free","pro"]}
+    return {"checkout_configured":bool(os.getenv("STRIPE_SECRET_KEY","").strip() and os.getenv("STRIPE_PRICE_PRO","").strip() and os.getenv("STRIPE_WEBHOOK_SECRET","").strip() and os.getenv("SUPABASE_URL","").strip() and os.getenv("SUPABASE_ADMIN_KEY","").strip()),"webhook_configured":bool(os.getenv("STRIPE_WEBHOOK_SECRET","").strip() and os.getenv("SUPABASE_URL","").strip() and os.getenv("SUPABASE_ADMIN_KEY","").strip()),"secret_exposed":False,"plans":["free","pro"]}
 
 @router.post("/checkout")
 def create_checkout(payload:CheckoutRequest,authorization:str|None=Header(default=None)):
@@ -29,7 +29,7 @@ def create_checkout(payload:CheckoutRequest,authorization:str|None=Header(defaul
     secret=os.getenv("STRIPE_SECRET_KEY","").strip()
     price=os.getenv("STRIPE_PRICE_PRO","").strip()
     base=os.getenv("NOVA_PUBLIC_APP_URL","https://nova-forest-ai.vercel.app").rstrip("/")
-    if not secret or not price: raise HTTPException(status_code=503,detail="Stripe checkout henüz yapılandırılmadı.")
+    if not secret or not price or not os.getenv("STRIPE_WEBHOOK_SECRET","").strip() or not os.getenv("SUPABASE_URL","").strip() or not os.getenv("SUPABASE_ADMIN_KEY","").strip(): raise HTTPException(status_code=503,detail="Stripe checkout, imzalı webhook ve Supabase plan güncellemesi tamamen yapılandırılmalı.")
     form={
         "mode":"subscription",
         "success_url":base+"/pages/bee.html?billing=success",
