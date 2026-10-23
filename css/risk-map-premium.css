@@ -126,3 +126,6 @@
 .provider-status-detail{margin:8px 0 5px;color:#b2c9b9;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
 .provider-status-times{display:block;color:#728a7a;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:700px){.provider-status-heading{flex-direction:column;gap:6px}.provider-status-list{grid-template-columns:1fr}.provider-status-row{padding:11px}.provider-status-top{flex-wrap:wrap}.provider-state{white-space:normal}}
+
+/* Compact district breadcrumb and an explicit close control for oversized map popups. */
+.map-breadcrumb-row{display:flex;align-items:stretch;gap:8px;min-width:0;margin:12px 0 9px}.map-breadcrumb-row .map-breadcrumb{flex:1;min-width:0;margin:0!important}.map-close-details{flex:0 0 auto;min-height:38px;padding:8px 11px;border:1px solid #385641;border-radius:10px;background:#09140d;color:#b7d4c0;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}.map-close-details:hover,.map-close-details:focus-visible{border-color:#3bed85;color:#effff3;background:#0b2816}.map-actions [data-action=close-details]{display:none}@media(max-width:420px){.map-breadcrumb-row{flex-direction:column}.map-close-details{width:100%;min-height:40px}.map-actions{grid-template-columns:repeat(3,minmax(0,1fr))}}
