@@ -107,6 +107,10 @@ The priority is a dependable core product: clear map layers, understandable indi
 İHA / Yapay Zekâ sayfası ve model servisinin kurulumu, model kaynağı/lisansı, API sözleşmesi ve doğrulama sınırları için [YOLO çıkarım rehberini](docs/YOLO_INFERENCE.md) inceleyin. Çalışan çıkarım için `backend/requirements-ml.txt` ile ayrı ML container gerekir; Vercel statik/standart API dağıtımı tek başına PyTorch modelinin çalıştığı anlamına gelmez.
 
 
+## Independent AI Copilot agents
+
+The Nova Bee model report can call separate Agro-Agent, Eco-Agent, and Writer Agent model IDs when the backend provider is configured. See [AI Copilot agent setup](docs/AI_COPILOT_AGENTS.md). Without production credentials and three model IDs, model-based reporting is unavailable; the existing rule-based summary remains separate. SMS/WhatsApp and paid subscription payments are not yet active production integrations.
+
 ## Scientific status, licensing, and transparency
 
 - [Scientific status and validation plan](docs/SCIENTIFIC_STATUS.md)
