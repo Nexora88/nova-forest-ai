@@ -104,3 +104,25 @@ def send_message(payload:MessageRequest,authorization:str|None=Header(default=No
     _authenticated_user(authorization)
     if payload.channel not in {"sms","whatsapp"}: raise HTTPException(status_code=422,detail="Kanal sms veya whatsapp olmalı.")
     return _send(payload.channel,payload.to,payload.message)
+
+
+def messaging_configured()->bool:
+    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN"))
+
+def list_message_subscriptions()->list[dict]:
+    if not messaging_configured(): return []
+    response=requests.get(f"{SUPABASE_URL}/rest/v1/nexorawildfire_message_subscriptions",params={"select":"*","enabled":"eq.true","limit":"500"},headers={"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {SUPABASE_ADMIN_KEY}"},timeout=10)
+    response.raise_for_status()
+    return response.json()
+
+def deliver_scheduled_alert(row:dict,risk:int,weather:dict)->bool:
+    if risk<int(row.get("threshold") or 70): return False
+    message=f"{row.get('area_name','Alan')}: çevresel tarama göstergesi {risk}/100. Sıcaklık {weather.get('temperature')}°C, bağıl nem %{weather.get('humidity')}, rüzgâr {weather.get('wind')} km/sa. Bu otomatik karar destek mesajıdır; resmî yangın teyidi değildir."
+    try:
+        result=_send(str(row.get("channel")),str(row.get("phone")),message)
+        if result.get("status")!="accepted": return False
+        headers={"apikey":SUPABASE_ADMIN_KEY,"Authorization":f"Bearer {SUPABASE_ADMIN_KEY}","Content-Type":"application/json","Prefer":"return=minimal"}
+        requests.patch(f"{SUPABASE_URL}/rest/v1/nexorawildfire_message_subscriptions",params={"id":f"eq.{row['id']}"},headers=headers,json={"last_risk":risk,"last_alert_at":__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()},timeout=8).raise_for_status()
+        return True
+    except Exception:
+        return False
