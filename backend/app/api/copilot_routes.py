@@ -37,6 +37,8 @@ async def create_copilot_report(
     if len(str(payload.model_dump())) > 30000:
         raise HTTPException(status_code=413, detail="Copilot bağlamı 30 KB sınırını aşıyor.")
     context = payload.model_dump()
+    # The specialist models do not need exact coordinates after the weather lookup; minimize data sent upstream.
+    context["location"] = {"area_name": payload.area_name, "area_type": payload.area_type}
     try:
         # The model client is synchronous; keep network waits off the API event loop.
         return await asyncio.to_thread(generate_copilot_report, context)
