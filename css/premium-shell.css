@@ -98,3 +98,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ops-metric strong{color:#dfffea!important}
 .ops-chip{font-family:Inter,system-ui,sans-serif!important}
 @media(max-width:760px){.ops-hero{grid-template-columns:minmax(0,1fr)!important}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ops-user{align-items:flex-start}.ops-user>div{min-width:0}}
+
+/* Brand lockup remains on the dark command surface on desktop and mobile. */
+body>header .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;max-width:100%;padding:5px 12px 5px 5px;border:1px solid #173a27;border-radius:14px;background:#020604;text-decoration:none}
+body>header .brand-lockup .brand-logo{display:block;width:48px!important;height:48px!important;max-width:48px;object-fit:contain;flex:0 0 48px;padding:2px;border:1px solid #245237;border-radius:10px;background:#020604}
+body>header .brand-lockup .logo{min-width:0}
+body>header .brand-lockup .logo h1{color:#f3fff5!important}
+@media(max-width:640px){body>header .brand-lockup{gap:8px;padding-right:8px}body>header .brand-lockup .brand-logo{width:40px!important;height:40px!important;max-width:40px;flex-basis:40px}body>header{align-items:center}}
