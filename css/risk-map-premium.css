@@ -126,3 +126,25 @@
 .provider-status-detail{margin:8px 0 5px;color:#b2c9b9;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
 .provider-status-times{display:block;color:#728a7a;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:700px){.provider-status-heading{flex-direction:column;gap:6px}.provider-status-list{grid-template-columns:1fr}.provider-status-row{padding:11px}.provider-status-top{flex-wrap:wrap}.provider-state{white-space:normal}}
+
+/* 2026-10-23 map polish: keep the command interface compact, dark, and dismissible. */
+.map-section{min-width:0;overflow:hidden}
+.map-section .map-toolbar{flex-wrap:wrap;row-gap:8px}
+.map-section .map-toolbar>span{min-width:0;overflow-wrap:anywhere}
+.brand-lockup{display:flex;align-items:center;gap:13px;min-width:0;color:inherit;text-decoration:none}
+.brand-logo{display:block;width:58px;height:58px;flex:0 0 58px;object-fit:contain;padding:5px;border:1px solid #234a32;border-radius:12px;background:#020503;box-shadow:0 0 22px #19e87810}
+header .brand-lockup .logo h1{font-size:clamp(18px,2.4vw,30px);letter-spacing:clamp(1px,.2vw,3px);overflow-wrap:anywhere}
+header .brand-lockup .logo p{font-size:12px;line-height:1.5}
+.map-intelligence-strip{display:none!important}
+.map-filter-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:38px;margin:0 0 10px;padding:8px 10px;border:1px solid #28583a;border-radius:9px;background:#07130b;color:#bfffd0;font:700 11px/1.4 inherit;cursor:pointer}
+.map-filter-toggle:hover{border-color:#27e981;color:#fff}
+.map-filters.is-collapsed .filter-buttons,.map-filters.is-collapsed .map-actions,.map-filters.is-collapsed .map-breadcrumb,.map-filters.is-collapsed .legend,.map-filters.is-collapsed>small{display:none!important}
+.map-filters.is-collapsed{width:min(245px,calc(100% - 24px))!important;padding:10px!important}
+.risk-popup{position:relative;max-width:min(330px,calc(100vw - 64px));overflow-wrap:anywhere}
+.risk-popup-close{position:absolute;right:-8px;top:-9px;display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid #315b40;border-radius:9px;background:#07160d;color:#d9ffe5;font-size:21px;line-height:1;cursor:pointer}
+.risk-popup-close:hover{background:#173d24;border-color:#36e981;color:#fff}
+#map .leaflet-popup-content{max-width:calc(100vw - 72px);min-width:0!important}
+#map .leaflet-popup-content-wrapper{max-width:calc(100vw - 36px)}
+.selected-field-panel{max-width:min(380px,calc(100% - 24px));max-height:min(70vh,680px);overflow:auto;overscroll-behavior:contain}
+@media(max-width:700px){header{padding:14px 12px!important;gap:8px}header .brand-logo{width:44px;height:44px;flex-basis:44px;padding:3px}header .brand-lockup{gap:8px}header .brand-lockup .logo h1{font-size:16px;letter-spacing:.5px}header .brand-lockup .logo p{font-size:10px;margin:4px 0 0}header>.status{padding:7px 9px!important;font-size:9px!important;white-space:normal;text-align:center;max-width:112px}main{padding:14px!important}.map-filters{left:12px!important;top:62px!important;width:min(280px,calc(100% - 24px))!important;max-height:calc(100% - 76px);overflow:auto}.map-filter-toggle{position:sticky;top:0;z-index:2}#map{min-height:62vh!important;height:62vh!important}.risk-popup{max-width:calc(100vw - 70px)}.risk-popup-close{right:-5px;top:-5px}}
+@media(min-width:701px){.map-filters{max-height:calc(100% - 96px);overflow:auto}}
