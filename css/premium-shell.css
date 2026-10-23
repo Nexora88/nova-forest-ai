@@ -105,3 +105,6 @@ body>header .brand-lockup .brand-logo{display:block;width:48px!important;height:
 body>header .brand-lockup .logo{min-width:0}
 body>header .brand-lockup .logo h1{color:#f3fff5!important}
 @media(max-width:640px){body>header .brand-lockup{gap:8px;padding-right:8px}body>header .brand-lockup .brand-logo{width:40px!important;height:40px!important;max-width:40px;flex-basis:40px}body>header{align-items:center}}
+
+/* Restore the historical Atatürk portrait on the Republic vision entry, with dark framing. */
+.nx-vision-link{display:grid;grid-template-columns:86px minmax(0,1fr) auto;align-items:center;gap:18px;padding:18px;border:1px solid #234c32;border-radius:18px;background:linear-gradient(110deg,#06100a,#020604)}.nx-vision-portrait{width:86px;height:108px;object-fit:cover;object-position:center 22%;border:1px solid #315a3d;border-radius:10px;background:#020604;box-shadow:0 8px 24px #0008}.nx-vision-link h2{margin:5px 0}.nx-vision-link p{margin:0;color:#a8b9ae;line-height:1.6}@media(max-width:640px){.nx-vision-link{grid-template-columns:64px minmax(0,1fr);gap:12px;padding:13px}.nx-vision-portrait{width:64px;height:86px}.nx-vision-link>.secondary-action{grid-column:1/-1;justify-self:start}}
