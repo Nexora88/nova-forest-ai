@@ -107,7 +107,7 @@ def send_message(payload:MessageRequest,authorization:str|None=Header(default=No
 
 
 def messaging_configured()->bool:
-    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN"))
+    return bool(SUPABASE_URL and SUPABASE_ADMIN_KEY and os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN") and (os.getenv("TWILIO_SMS_FROM") or os.getenv("TWILIO_WHATSAPP_FROM")))
 
 def list_message_subscriptions()->list[dict]:
     if not messaging_configured(): return []
