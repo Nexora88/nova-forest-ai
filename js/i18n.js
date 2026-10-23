@@ -1,6 +1,7 @@
 /* Lightweight bilingual UI layer. Keep original content in the HTML; translations are reversible. */
 (() => {
   const pairs = [
+    ["HARİTA KONTROLLERİ","MAP CONTROLS"],["Katmanları daralt","Collapse layers"],["Katmanları aç","Expand layers"],["VERİ KATMANI","DATA LAYERS"],["İlçeleri aç →","Open districts →"],["İlçeyi aç · köy/mahalleleri göster →","Open district · show villages/neighbourhoods →"],["Alanlarım →","My areas →"],["＋ Alan Ekle","＋ Add area"],["← Geri","← Back"],["Kaynak: Open-Meteo + NexoraWildfire karar motoru. Uydu verisi seçili alanın zaman serisine ayrıca bağlanır.","Source: Open-Meteo + NexoraWildfire decision engine. Satellite data is connected separately to the selected area's time series."],["Canlı hava verisi henüz alınmadı. Bu, riskin sıfır olduğu anlamına gelmez; veri yüklenirken il sınırı gösteriliyor.","Live weather data is not available yet. This is not a zero-risk result; the province boundary is shown while data loads."],["Toprak nemi","Soil moisture"],["Kapat","Close"],["Rüzgar","Wind"],["Düşük / iyi","Low / good"],["Yüksek","High"],["Kritik","Critical"],
     ["Bilim, üretim ve toplumsal fayda için ilham.","Inspired by science, production, and public benefit."],
     ["Atatürk’ün bilim ve üretim vizyonuna ayrılan tarihî arşivi ve sözleri ayrı sayfada keşfet.","Explore the historical archive and quotations about Atatürk’s vision for science and production on a dedicated page."],
     ["Bilim ve üretim vizyonundan ilham alan bir çevresel gelecek.","An environmental future inspired by science and production."],
