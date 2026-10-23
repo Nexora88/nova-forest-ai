@@ -5,6 +5,7 @@ is returned when credentials/models are missing or an upstream model fails.
 """
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
@@ -44,7 +45,7 @@ def _call_model(base_url: str, api_key: str, model: str, timeout: int, system: s
             "temperature": 0.2,
             "messages": [
                 {"role": "system", "content": system},
-                {"role": "user", "content": __import__("json").dumps(payload, ensure_ascii=False, allow_nan=False)},
+                {"role": "user", "content": json.dumps(payload, ensure_ascii=False, allow_nan=False)},
             ],
         },
         timeout=timeout,
