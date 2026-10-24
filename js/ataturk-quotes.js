@@ -7,8 +7,9 @@
     { quote: "“Bütün ümidim gençliktedir.”", enQuote: "“All my hope is in the youth.”", context: "Yeni fikirler, öğrenme ve sorumluluk geleceği şekillendirir.", enContext: "New ideas, learning, and responsibility shape the future." },
     { quote: "“Milletin efendisi hakiki müstahsil olan köylüdür.”", enQuote: "“The true producer, the peasant, is the master of the nation.”", context: "Üretim ve tarım, ülkenin ekonomik bağımsızlığının temel unsurlarındandır.", enContext: "Production and agriculture are fundamental to a country's economic independence." }
   ];
+  const localAtaturkPhoto = location.pathname.includes("/pages/") ? "../assets/ataturk-1925.jpg" : "assets/ataturk-1925.jpg";
   const photos = [
-    { src: "https://commons.wikimedia.org/wiki/Special:FilePath/Orman%20%C3%87iftli%C4%9Fi%2C%20Ankara%2C%2014%20Temmuz%201929%20%287%29.png", alt: "Atatürk Orman Çiftliği, 1929 tarihli fotoğraf", caption: "Orman Çiftliği · 1929", source: "https://commons.wikimedia.org/wiki/File:Orman_%C3%87iftli%C4%9Fi,_Ankara,_14_Temmuz_1929_(7).png" },
+    { src: localAtaturkPhoto, alt: "Mustafa Kemal Atatürk, 1925 tarihli arşiv fotoğrafı", caption: "Atatürk · 1925", source: "https://commons.wikimedia.org/" },
     { src: "https://commons.wikimedia.org/wiki/Special:FilePath/Atat%C3%BCrk%20ve%20%C3%A7ift%C3%A7i.jpg", alt: "Atatürk bir çiftçiyle birlikte", caption: "Atatürk ve çiftçi", source: "https://commons.wikimedia.org/wiki/File:Atat%C3%BCrk_ve_%C3%A7ift%C3%A7i.jpg" },
     { src: "https://commons.wikimedia.org/wiki/Special:FilePath/Atat%C3%BCrk%20in%20a%20rowboat%2C%201934.jpg", alt: "Atatürk Florya'da sandalda, 1934", caption: "Florya · 1934", source: "https://commons.wikimedia.org/wiki/File:Atat%C3%BCrk_in_a_rowboat,_1934.jpg" }
   ];
