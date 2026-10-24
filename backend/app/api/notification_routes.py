@@ -133,7 +133,7 @@ def request_channel_verification(payload: ChannelOptInRequest, authorization: st
     secret = os.getenv("NEXORA_OTP_SECRET", "").strip()
     if not secret:
         raise HTTPException(status_code=503, detail="Telefon doğrulama OTP anahtarı yapılandırılmadı.")
-    if not re.fullmatch(r"\\+[1-9][0-9]{7,14}", payload.phone_e164):
+    if not re.fullmatch(r"\+[1-9][0-9]{7,14}", payload.phone_e164):
         raise HTTPException(status_code=422, detail="Telefon numarası E.164 biçiminde olmalı.")
     base, key = _admin_config()
     code = f"{secrets.randbelow(1_000_000):06d}"
