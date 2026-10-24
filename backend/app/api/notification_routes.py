@@ -1,4 +1,6 @@
 import asyncio
+import hmac
+import os
 from datetime import datetime, timezone
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -102,12 +104,15 @@ def evaluate_notification(payload:EvaluateRequest):
     return {"status":"alert" if alert else "normal","system":"Nova-Alert","area":payload.area_name,"risk":risk,"threshold":threshold,"level":level,"weather":{"temperature":weather.get("temperature"),"humidity":weather.get("humidity"),"wind":weather.get("wind")},"alert":alert,"title":f"{payload.area_name} • Çevresel risk yükseldi" if alert else f"{payload.area_name} • Risk normal","message":f"Çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgar {weather.get('wind')} km/s."}
 
 async def background_push_cycle():
-    if not configured(): return
+    if not configured():
+        return {"status":"not_configured","checked":0,"sent":0,"failed":0}
     rows=list_subscriptions(); now=datetime.now(timezone.utc)
+    checked=sent=failed=0
     for row in rows:
         if row.get("lat") is None or row.get("lon") is None or not row.get("area_name"): continue
         try:
             weather=get_current_weather(float(row["lat"]),float(row["lon"])); risk=calculate_risk(weather); threshold=max(25,min(100,int(row.get("threshold") or 70)))
+            checked+=1
             last=row.get("last_alert_at"); recent=False
             if last:
                 try: recent=(now-datetime.fromisoformat(str(last).replace("Z","+00:00"))).total_seconds()<21600
@@ -116,16 +121,29 @@ async def background_push_cycle():
                 msg=f"{row['area_name']}: çevresel risk {risk}/100. Sıcaklık {weather.get('temperature')}°C, nem %{weather.get('humidity')}, rüzgar {weather.get('wind')} km/s."
                 ok=send_push(row,"NexoraWildfire AI • Nova-Alert",msg,"./")
                 update_alert_state(row["id"],risk,ok)
+                sent += int(bool(ok)); failed += int(not ok)
             else:
                 update_alert_state(row["id"],risk,False)
         except Exception:
+            failed+=1
             continue
+    return {"status":"completed","checked":checked,"sent":sent,"failed":failed,"checked_at_utc":datetime.now(timezone.utc).isoformat()}
 
 async def background_push_loop():
     while True:
         try: await background_push_cycle()
         except Exception: pass
         await asyncio.sleep(300)
+
+@router.post("/scheduler/run")
+async def run_scheduled_push_cycle(x_nexora_scheduler_secret: str | None = Header(default=None)):
+    """Call from a trusted external scheduler; never expose the scheduler secret to the browser."""
+    expected=os.getenv("NEXORA_SCHEDULER_SECRET","")
+    if not expected:
+        raise HTTPException(status_code=503,detail="NEXORA_SCHEDULER_SECRET sunucu ortamında yapılandırılmamış.")
+    if not x_nexora_scheduler_secret or not hmac.compare_digest(x_nexora_scheduler_secret,expected):
+        raise HTTPException(status_code=401,detail="Zamanlayıcı kimliği doğrulanamadı.")
+    return await background_push_cycle()
 
 @router.post("/send")
 def send_notification():
