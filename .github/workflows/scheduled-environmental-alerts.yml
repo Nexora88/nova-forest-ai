@@ -1,0 +1,22 @@
+name: Scheduled environmental alerts
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deliver opted-in alerts
+        env:
+          API_BASE: https://nova-forest-ai.vercel.app/api
+          CRON_TOKEN: ${{ secrets.NEXORA_NOTIFICATION_CRON_TOKEN }}
+        run: |
+          if [ -z "$CRON_TOKEN" ]; then
+            echo "NEXORA_NOTIFICATION_CRON_TOKEN is not configured; scheduled delivery skipped."
+            exit 0
+          fi
+          curl --fail --show-error --silent \
+            -X POST "$API_BASE/notifications/internal/run-cycle" \
+            -H "X-Nexora-Cron-Token: $CRON_TOKEN" \
+            -H "Accept: application/json"
