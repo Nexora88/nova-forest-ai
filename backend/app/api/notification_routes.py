@@ -4,6 +4,7 @@ import hmac
 import os
 import re
 import secrets
+import requests
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
