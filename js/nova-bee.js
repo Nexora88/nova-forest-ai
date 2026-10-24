@@ -41,7 +41,7 @@
   btn.disabled=true;btn.textContent="Üç ajan çalışıyor…";box.textContent="Gerçek hava ve varsa Sentinel-2 verisi alınıyor; Eco-Agent, Agro-Agent ve Writer Agent ayrı model çağrıları yapacak.";
   try{
    const payload={area_name:selected.name||"Seçili alan",lat:c[0],lon:c[1],crop_coefficient:Number($("crop-coefficient").value||.8),frost_threshold_c:Number($("frost-threshold").value||2),satellite_days:180};
-   try{payload.geometry=geometry(selected)}catch{}const satelliteJobId=localStorage.getItem("nova-bee-last-ndvi-job");if(satelliteJobId)payload.satellite_job_id=satelliteJobId;
+   try{payload.geometry=geometry(selected)}catch{}let savedSatellite=null;try{savedSatellite=JSON.parse(localStorage.getItem("nova-bee-last-ndvi-report")||"null")}catch{}const satelliteJobId=localStorage.getItem("nova-bee-last-ndvi-job");if(satelliteJobId&&savedSatellite?.status==="available"&&Array.isArray(savedSatellite.series)&&savedSatellite.series.length)payload.satellite_job_id=satelliteJobId;
    const r=await fetch(api+"/copilot/analyze",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(payload),cache:"no-store"});
    const d=await r.json().catch(()=>({}));
    if(!r.ok)throw Error(d.detail?.message||d.detail?.code||d.detail||("HTTP "+r.status));
