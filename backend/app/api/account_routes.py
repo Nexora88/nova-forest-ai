@@ -103,20 +103,40 @@ def account_usage(authorization: str | None = Header(default=None)):
         area_count = int(content_range.rsplit("/", 1)[1])
     except (ValueError, IndexError):
         area_count = len(areas_r.json())
+    billing_enabled = all(os.getenv(k, "").strip() for k in (
+        "STRIPE_SECRET_KEY", "STRIPE_PRO_PRICE_ID", "STRIPE_WEBHOOK_SECRET",
+        "SUPABASE_URL", "SUPABASE_ADMIN_KEY", "NEXORA_BILLING_SUCCESS_URL", "NEXORA_BILLING_CANCEL_URL",
+    ))
+    pro_price = None
+    pro_price_label = "Ödeme entegrasyonu yapılandırılmadı"
+    if billing_enabled:
+        try:
+            price_response = requests.get(
+                f"https://api.stripe.com/v1/prices/{os.getenv('STRIPE_PRO_PRICE_ID', '').strip()}",
+                auth=(os.getenv("STRIPE_SECRET_KEY", "").strip(), ""), timeout=5,
+            )
+            price_response.raise_for_status()
+            price_data = price_response.json()
+            if price_data.get("unit_amount") is not None:
+                pro_price = int(price_data["unit_amount"])
+                currency = str(price_data.get("currency", "")).upper()
+                interval = (price_data.get("recurring") or {}).get("interval", "month")
+                pro_price_label = f"{pro_price / 100:.2f} {currency} / {interval}"
+            else:
+                pro_price_label = "Stripe üzerinden fiyat gösterilir"
+        except (requests.RequestException, ValueError, TypeError):
+            pro_price_label = "Fiyat Stripe Checkout'ta gösterilir"
     return {
         "plan": plan,
         "usage": {"used": used, "limit": limit, "remaining": max(0, limit - used), "period_start": start},
         "assets": {"saved_areas": area_count},
         "tiers": [
             {"id": "free", "name": "Pilot", "price": None, "price_label": "Ücretsiz pilot", "monthly_analyses": 5, "api_access": False},
-            {"id": "pro", "name": "Pro", "price": None, "price_label": "Fiyatlandırma sonra açıklanacak", "monthly_analyses": 100, "api_access": "planned"},
+            {"id": "pro", "name": "Pro", "price": pro_price, "price_label": pro_price_label, "monthly_analyses": 100, "api_access": "planned"},
             {"id": "enterprise", "name": "Enterprise", "price": None, "price_label": "Kurumsal teklif", "monthly_analyses": 1000, "api_access": "approval_required"},
         ],
         "billing": {
-            "enabled": all(os.getenv(k, "").strip() for k in (
-                "STRIPE_SECRET_KEY", "STRIPE_PRO_PRICE_ID", "STRIPE_WEBHOOK_SECRET",
-                "SUPABASE_URL", "SUPABASE_ADMIN_KEY", "NEXORA_BILLING_SUCCESS_URL", "NEXORA_BILLING_CANCEL_URL",
-            )),
+            "enabled": billing_enabled,
             "provider": "Stripe Checkout",
             "message": "Stripe aboneliği yapılandırıldı." if all(os.getenv(k, "").strip() for k in (
                 "STRIPE_SECRET_KEY", "STRIPE_PRO_PRICE_ID", "STRIPE_WEBHOOK_SECRET",
