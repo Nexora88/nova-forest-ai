@@ -59,10 +59,14 @@ function enableMobileMapGesture(){
 }
 function controls(){
  let old=el(".map-filters");if(old)old.remove();
+ let opener=el(".map-controls-open");if(opener)opener.remove();
  const box=document.createElement("div");box.className="map-filters";
- box.innerHTML='<strong>VERİ KATMANI</strong><div class="filter-buttons"><button data-action="radar" aria-pressed="false">🌧 Radar</button><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small>';
+ box.innerHTML='<div class="map-control-head"><strong>VERİ KATMANI</strong><button type="button" data-action="panel-toggle" aria-expanded="true" aria-label="Harita kontrol panelini kapat">Paneli kapat ×</button></div><div class="filter-buttons"><button data-action="radar" aria-pressed="false">🌧 Radar</button><button data-m="risk" class="on">🔥 Risk</button><button data-m="forest">🌲 Orman</button><button data-m="water">💧 Su / Nem</button><button data-m="crop">🌾 Tarım</button><button data-m="pollen">🌼 Polen</button></div><div class="map-actions"><button data-action="back">← Geri / İlçeleri kapat</button><button data-action="add">＋ Alan Ekle</button><a href="'+(document.location.pathname.includes("/pages/")?"areas.html":"pages/areas.html")+'">Alanlarım →</a></div><div class="map-breadcrumb" data-breadcrumb>İL SEVİYESİ</div><div class="legend"><span style="background:#19a974"></span>Düşük / iyi <span style="background:#e4c441"></span>Orta <span style="background:#ef8b24"></span>Yüksek <span style="background:#d9363e"></span>Kritik</div><small>Yeşil her katmanda aynı şeyi ifade etmez. Seçili katmanın anlamı yukarıdaki açıklamaya göre okunur.</small>';
  const section=el(".map-section"),mapNode=el("#map");if(mapNode&&mapNode.parentNode===section)section.insertBefore(box,mapNode);else section.appendChild(box);
- box.onclick=e=>{const m=e.target.dataset.m,a=e.target.dataset.action;if(a==="radar"){toggleRainRadar(box);return}if(m){mode=m;box.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x.dataset.m===mode));refreshView();return}if(a==="back")goBack();if(a==="add")toggleDraw()};
+ opener=document.createElement("button");opener.type="button";opener.className="map-controls-open";opener.textContent="☷ Harita kontrolleri";opener.setAttribute("aria-expanded","false");opener.hidden=true;section.appendChild(opener);
+ function setCollapsed(collapsed){box.classList.toggle("is-collapsed",collapsed);opener.hidden=!collapsed;opener.setAttribute("aria-expanded",String(!collapsed));const toggle=box.querySelector('[data-action="panel-toggle"]');if(toggle){toggle.textContent=collapsed?"Paneli aç ↓":"Paneli kapat ×";toggle.setAttribute("aria-expanded",String(!collapsed));toggle.setAttribute("aria-label",collapsed?"Harita kontrol panelini aç":"Harita kontrol panelini kapat")}setTimeout(()=>map.invalidateSize({pan:false}),80)}
+ box.onclick=e=>{const m=e.target.dataset.m,a=e.target.dataset.action;if(a==="panel-toggle"){setCollapsed(!box.classList.contains("is-collapsed"));return}if(a==="radar"){toggleRainRadar(box);return}if(m){mode=m;box.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x.dataset.m===mode));refreshView();return}if(a==="back")goBack();if(a==="add")toggleDraw()};
+ opener.onclick=()=>setCollapsed(false);
 }
 
 async function toggleRainRadar(box){
@@ -160,10 +164,12 @@ async function openProvince(name){
 }
 async function focusDistrict(r){
  const idx=districtRows.findIndex(x=>x.name===r.name);if(idx<0)return;
- const f=districtFeatures[idx],b=L.geoJSON(f).getBounds();if(b.isValid())map.fitBounds(b.pad(.08));
- const [lat,lon]=[r.lat||Number(f.properties.center_lat),r.lon||Number(f.properties.center_lon)];r.pollen=await pollenAt(lat,lon);r.bee=beeScore(r.w,r.pollen);await loadSettlements(r.name,lat,lon);
- const title=el("[data-map-status]");if(title)title.textContent=r.name+" • "+label(scoreFor(r),mode)+" • ALAN EKLE ile kendi parselini kaydedebilirsin";
- L.geoJSON(f,{style:{color:"#00ff66",weight:3,fillOpacity:.12}}).bindPopup(popup(r,"ilçe")).addTo(districtLayer).openPopup();
+ selectedDistrict=r.name;
+ const idxFeature=districtFeatures[idx],bounds=L.geoJSON(idxFeature).getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.08));
+ const [lat,lon]=[r.lat||Number(idxFeature.properties.center_lat),r.lon||Number(idxFeature.properties.center_lon)];r.pollen=await pollenAt(lat,lon);r.bee=beeScore(r.w,r.pollen);await loadSettlements(r.name,lat,lon);
+ const title=el("[data-map-status]");if(title)title.textContent=r.name+" • "+label(scoreFor(r),mode)+" • Alan Ekle ile kendi sahanı kaydedebilirsin";
+ breadcrumb((selectedProvince||"İL")+" → "+r.name+" → KÖY / MAHALLE");
+ L.geoJSON(idxFeature,{style:{color:"#00ff66",weight:3,fillOpacity:.12}}).bindPopup(popup(r,"ilçe")).addTo(districtLayer).openPopup();
 }
 async function pollenFor(coordsList){if(!coordsList.length)return[];try{const u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",coordsList.map(x=>x[0]).join(","));u.searchParams.set("longitude",coordsList.map(x=>x[1]).join(","));u.searchParams.set("current","alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());const arr=Array.isArray(j)?j:[j];return arr.map(q=>{const p=q.current||{};return Math.max(...["alder_pollen","birch_pollen","grass_pollen","mugwort_pollen","olive_pollen","ragweed_pollen"].map(k=>Number(p[k]||0)))})}catch{return coordsList.map(()=>0)}}
 async function loadSettlements(district,lat,lon){
