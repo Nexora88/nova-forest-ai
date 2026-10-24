@@ -41,7 +41,7 @@
   btn.disabled=true;btn.textContent="Üç ajan çalışıyor…";box.textContent="Gerçek hava ve varsa Sentinel-2 verisi alınıyor; Eco-Agent, Agro-Agent ve Writer Agent ayrı model çağrıları yapacak.";
   try{
    const payload={area_name:selected.name||"Seçili alan",lat:c[0],lon:c[1],crop_coefficient:Number($("crop-coefficient").value||.8),frost_threshold_c:Number($("frost-threshold").value||2),satellite_days:180};
-   try{payload.geometry=geometry(selected)}catch{}
+   try{payload.geometry=geometry(selected)}catch{}const satelliteJobId=localStorage.getItem("nova-bee-last-ndvi-job");if(satelliteJobId)payload.satellite_job_id=satelliteJobId;
    const r=await fetch(api+"/copilot/analyze",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(payload),cache:"no-store"});
    const d=await r.json().catch(()=>({}));
    if(!r.ok)throw Error(d.detail?.message||d.detail?.code||d.detail||("HTTP "+r.status));
@@ -63,7 +63,7 @@
    if(data.status==="finished"){
     const result=data.result||{},series=Array.isArray(result.series)?result.series:[];
     if(result.status!=="available"||!series.length){box.textContent="Uydu görevi tamamlandı ancak geçerli NDVI/NDMI zaman serisi yok. Durum: "+(result.status||"veri yok")+". Kaynak kimlik bilgileri, bulut maskesi ve sahne kapsamını kontrol et.";return}
-    const latestPoint=series[series.length-1],delta=result.delta||{};
+    localStorage.setItem("nova-bee-last-ndvi-report",JSON.stringify(result));const latestPoint=series[series.length-1],delta=result.delta||{};
     box.textContent="TAMAMLANMIŞ SENTINEL-2 RAPORU · "+series.length+" dönem · Son ölçüm "+(latestPoint.to||latestPoint.from||"tarih yok")+" · NDVI "+latestPoint.ndvi+" ("+(latestPoint.classification||"sınıflandırma yok")+") · NDMI "+(latestPoint.ndmi??"veri yok")+" · NDVI değişimi "+(delta.ndvi??"hesaplanamadı")+". Kaynak: "+(result.source||"Copernicus Sentinel-2 L2A")+". Bu gösterge tek başına hastalık veya verim teşhisi değildir.";
     const summary=$("copilot-summary");if(summary)summary.textContent=box.textContent;
     const host=$("copilot-agents");if(host)host.innerHTML='<article class="bee-card"><div class="bee-card-top"><span>SENTINEL-2 / NDVI</span></div><h3>'+safe(String(latestPoint.classification||"Son ölçüm"))+'</h3><strong>'+safe(String(latestPoint.ndvi))+'</strong><p>Son dönem: '+safe(String(latestPoint.to||latestPoint.from||"tarih yok"))+'</p></article><article class="bee-card"><div class="bee-card-top"><span>SENTINEL-2 / NDMI</span></div><h3>Bitki nem sinyali</h3><strong>'+safe(String(latestPoint.ndmi??"Veri yok"))+'</strong><p>NDMI tek başına toprak nem sensörü değildir.</p></article><article class="bee-card"><div class="bee-card-top"><span>ZAMAN SERİSİ</span></div><h3>'+series.length+' ölçüm dönemi</h3><strong>'+safe(String(delta.ndvi??"—"))+'</strong><p>Önceki ölçüme göre NDVI farkı. Bulut ve sahne kapsamına bağlıdır.</p></article>';
