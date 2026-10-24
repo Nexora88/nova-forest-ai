@@ -328,3 +328,25 @@ def run_scheduled_notification_cycle(x_nexora_cron_token: str | None = Header(de
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Scheduled notification cycle failed.") from exc
     return {"status": "completed", "web_push": push_result, "channels": channels}
+
+
+class ChannelDisableRequest(BaseModel):
+    channel: str = Field(pattern="^(sms|whatsapp)$")
+    phone_e164: str = Field(pattern=r"^\+[1-9][0-9]{7,14}$")
+
+
+@router.post("/channels/disable")
+def disable_notification_channel(payload: ChannelDisableRequest, authorization: str | None = Header(default=None)):
+    user_id = require_user_id(authorization)
+    base, key = _admin_config()
+    response = requests.patch(
+        _channel_url(base),
+        headers=_admin_headers(key, "return=minimal"),
+        params={"user_id": f"eq.{user_id}", "channel": f"eq.{payload.channel}",
+                "phone_e164": f"eq.{payload.phone_e164}"},
+        json={"enabled": False, "updated_at": datetime.now(timezone.utc).isoformat()},
+        timeout=12,
+    )
+    if response.status_code >= 400:
+        raise HTTPException(status_code=503, detail="Bildirim aboneliği kapatılamadı.")
+    return {"status": "disabled", "enabled": False, "channel": payload.channel}
