@@ -233,7 +233,19 @@ def background_channel_cycle():
 
 @router.get("/status")
 def notification_status():
-    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":["in_app","browser","web_push","sms","whatsapp"],"background_delivery":"scheduled_cycle_required","note":"Background delivery depends on the scheduled worker and provider configuration; no delivery is guaranteed."}
+    twilio = all(os.getenv(k, "").strip() for k in ("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_SMS_FROM"))
+    whatsapp = all(os.getenv(k, "").strip() for k in ("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_WHATSAPP_FROM"))
+    channels = ["in_app", "browser"]
+    if configured():
+        channels.append("web_push")
+    if twilio:
+        channels.append("sms")
+    if whatsapp:
+        channels.append("whatsapp")
+    return {"status":"available","system":"Nova-Alert","push":configured(),"channels":channels,
+            "sms_configured":twilio,"whatsapp_configured":whatsapp,
+            "background_delivery":"scheduled_cycle_required",
+            "note":"Background delivery depends on scheduled workflow, provider configuration, consent and carrier/browser acceptance; no delivery is guaranteed."}
 
 @router.get("/push/config")
 def push_config():
@@ -308,8 +320,11 @@ def run_scheduled_notification_cycle(x_nexora_cron_token: str | None = Header(de
         raise HTTPException(status_code=401, detail="Scheduled notification authorization failed.")
     import asyncio as _asyncio
     try:
-        _asyncio.run(background_push_cycle())
+        push_result = "not_configured"
+        if configured():
+            _asyncio.run(background_push_cycle())
+            push_result = "cycle_ran"
         channels = background_channel_cycle()
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Scheduled notification cycle failed.") from exc
-    return {"status": "completed", "web_push": "cycle_ran", "channels": channels}
+    return {"status": "completed", "web_push": push_result, "channels": channels}
