@@ -71,7 +71,7 @@ def calculate_risk(weather):
 
 class ChannelOptInRequest(BaseModel):
     channel: str = Field(pattern="^(sms|whatsapp)$")
-    phone_e164: str = Field(pattern=r"^\\+[1-9][0-9]{7,14}$")
+    phone_e164: str = Field(pattern=r"^\+[1-9][0-9]{7,14}$")
     area_name: str = Field(min_length=1, max_length=120)
     lat: float = Field(ge=-90, le=90)
     lon: float = Field(ge=-180, le=180)
@@ -81,7 +81,7 @@ class ChannelOptInRequest(BaseModel):
 
 class ChannelVerifyRequest(BaseModel):
     channel: str = Field(pattern="^(sms|whatsapp)$")
-    phone_e164: str = Field(pattern=r"^\\+[1-9][0-9]{7,14}$")
+    phone_e164: str = Field(pattern=r"^\+[1-9][0-9]{7,14}$")
     code: str = Field(pattern=r"^[0-9]{6}$")
 
 
