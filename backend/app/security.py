@@ -52,6 +52,9 @@ def _limit_for_path(path: str) -> int:
         "/ndvi/risk-raster",
         "/satellite/live-check",
         "/satellite/providers/status",
+        "/notifications/channels/",
+        "/billing/checkout",
+        "/copilot/analyze",
     )
     return EXPENSIVE_LIMIT if any(path.startswith(p) for p in expensive_prefixes) else DEFAULT_LIMIT
 
