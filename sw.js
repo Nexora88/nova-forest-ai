@@ -1,12 +1,13 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v27";
-const DATA_CACHE = "nexorawildfire-data-v27";
+const CACHE_NAME = "nexorawildfire-shell-v28";
+const DATA_CACHE = "nexorawildfire-data-v28";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./pages/map.html",
+  "./pages/bee.html",
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
@@ -20,6 +21,8 @@ const APP_SHELL = [
   "./css/style.css",
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
+  "./css/style.css?v=20261024a",
+  "./css/risk-map-premium.css?v=20261024a",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
   "./js/provider-status.js?v=20261020a",
@@ -28,6 +31,9 @@ const APP_SHELL = [
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
+  "./js/map.js?v=20261024a",
+  "./js/nova-bee.js?v=20261024a",
+  "./js/i18n.js?v=20261024a",
   "./js/live-risk-raster.js?v=20261022a",
   "./js/mobile-nav.js",
   "./js/mobile-nav.js?v=20261012c",
