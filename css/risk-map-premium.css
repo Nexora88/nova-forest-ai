@@ -126,3 +126,29 @@
 .provider-status-detail{margin:8px 0 5px;color:#b2c9b9;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
 .provider-status-times{display:block;color:#728a7a;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 @media(max-width:700px){.provider-status-heading{flex-direction:column;gap:6px}.provider-status-list{grid-template-columns:1fr}.provider-status-row{padding:11px}.provider-status-top{flex-wrap:wrap}.provider-state{white-space:normal}}
+
+
+/* 2026-10-24: compact map controls, black-side logo lockup, no forced data-status panel */
+.brand-lockup{display:flex;align-items:center;gap:14px;min-width:0;color:inherit;text-decoration:none;background:#020604;border-radius:14px;padding:6px 12px 6px 6px;border:1px solid #173b25;box-shadow:inset 0 0 0 1px #ffffff04}
+.brand-logo{display:block;width:56px;height:56px;flex:0 0 56px;object-fit:contain;padding:5px;border-radius:10px;background:#020604!important;border:1px solid #1b4b2c;filter:none!important}
+.brand-lockup .logo h1{font-size:clamp(17px,2vw,27px);letter-spacing:clamp(.5px,.15vw,2px);line-height:1.15}
+.brand-lockup .logo p{margin:5px 0 0;font-size:11px;line-height:1.4}
+.map-control-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.map-control-head>strong{margin:0!important;min-width:0}
+.map-control-head>button{flex:0 0 auto;min-height:34px!important;padding:7px 10px!important;border:1px solid #2c6540!important;border-radius:9px!important;background:#07170d!important;color:#aaf6be!important;font-size:10px!important;font-weight:800!important;cursor:pointer}
+.map-filters.is-collapsed{width:max-content!important;max-width:calc(100% - 24px)!important;padding:10px 12px!important}
+.map-filters.is-collapsed .filter-buttons,.map-filters.is-collapsed .map-actions,.map-filters.is-collapsed .map-breadcrumb,.map-filters.is-collapsed .legend,.map-filters.is-collapsed>small{display:none!important}
+.map-filters.is-collapsed .map-control-head{margin:0!important}
+.map-filters.is-collapsed .map-control-head>strong{font-size:9px!important}
+.map-controls-open{position:absolute;z-index:1001;top:18px;left:18px;min-height:42px;padding:10px 14px;border:1px solid #2d7145;border-radius:11px;background:#041008f2;color:#b8ffce;font:800 11px ui-monospace,monospace;box-shadow:0 10px 30px #0008;backdrop-filter:blur(12px);cursor:pointer}
+.map-controls-open[hidden]{display:none!important}
+.map-filters [data-action="back"]{font-size:10px!important}
+.provider-status-panel{display:none!important}
+@media(max-width:700px){
+ header{align-items:stretch!important;padding:12px!important;gap:10px!important}
+ header .brand-lockup{width:100%;justify-content:flex-start;text-align:left!important}
+ header .brand-logo{width:48px;height:48px;flex-basis:48px}
+ header .status{align-self:flex-start;padding:8px 11px!important;font-size:10px!important}
+ .map-filters.is-collapsed{width:100%!important;max-width:100%!important}
+ .map-controls-open{top:12px;left:12px}
+}
