@@ -112,6 +112,16 @@ def account_usage(authorization: str | None = Header(default=None)):
             {"id": "pro", "name": "Pro", "price": None, "price_label": "Fiyatlandırma sonra açıklanacak", "monthly_analyses": 100, "api_access": "planned"},
             {"id": "enterprise", "name": "Enterprise", "price": None, "price_label": "Kurumsal teklif", "monthly_analyses": 1000, "api_access": "approval_required"},
         ],
-        "billing": {"enabled": False, "message": "Ödeme altyapısı bağlanmadı; hiçbir ücret tahsil edilmiyor."},
+        "billing": {
+            "enabled": all(os.getenv(k, "").strip() for k in (
+                "STRIPE_SECRET_KEY", "STRIPE_PRO_PRICE_ID", "STRIPE_WEBHOOK_SECRET",
+                "SUPABASE_URL", "SUPABASE_ADMIN_KEY", "NEXORA_BILLING_SUCCESS_URL", "NEXORA_BILLING_CANCEL_URL",
+            )),
+            "provider": "Stripe Checkout",
+            "message": "Stripe aboneliği yapılandırıldı." if all(os.getenv(k, "").strip() for k in (
+                "STRIPE_SECRET_KEY", "STRIPE_PRO_PRICE_ID", "STRIPE_WEBHOOK_SECRET",
+                "SUPABASE_URL", "SUPABASE_ADMIN_KEY", "NEXORA_BILLING_SUCCESS_URL", "NEXORA_BILLING_CANCEL_URL",
+            )) else "Ödeme sağlayıcısı ve fiyat kimliği yapılandırılmadı; hiçbir ücret tahsil edilmiyor.",
+        },
         "source": "supabase",
     }
