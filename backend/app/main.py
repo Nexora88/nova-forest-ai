@@ -14,9 +14,11 @@ from app.api.yolo_routes import router as yolo_router
 from app.api.jobs_routes import router as jobs_router
 from app.api.enterprise_reports import router as enterprise_reports_router
 from app.api.account_routes import router as account_router
+from app.api.copilot_routes import router as copilot_router
+from app.services.agent_service import agent_status
 from app.engine.ml_fire_model import model_status as fire_model_status
 
-app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.4.0")
+app = FastAPI(title="NexoraWildfire AI", description="Uydu tabanlı çevresel risk analiz ve karar destek platformu.", version="1.5.0")
 
 import os
 from app.security import security_middleware
@@ -62,6 +64,7 @@ app.include_router(yolo_router)
 app.include_router(jobs_router)
 app.include_router(enterprise_reports_router)
 app.include_router(account_router)
+app.include_router(copilot_router)
 
 
 @app.middleware("http")
@@ -81,7 +84,7 @@ def root():
     return {
         "system": "NexoraWildfire AI",
         "status": "api_ready",
-        "version": "1.4.0",
+        "version": "1.5.0",
         "upstream_data_verified": False,
         "capabilities": {
             "risk_routes": "registered",
@@ -89,6 +92,7 @@ def root():
             "satellite_routes": "registered",
             "forecast_routes": "registered",
             "notifications": "route_registered",
+            "field_copilot": agent_status(),
             "predictive_ml": model.get("status", "unknown"),
         },
         "note": "API readiness does not mean every external provider is reachable. Check /satellite/live-check and /satellite/providers/status for provider diagnostics. Scores are decision-support indicators, not official fire warnings.",
@@ -97,4 +101,4 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.4.0"}
+    return {"status": "healthy", "system": "NexoraWildfire AI", "version": "1.5.0"}
