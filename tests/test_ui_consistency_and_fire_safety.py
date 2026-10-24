@@ -71,5 +71,35 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
+    def test_risk_map_controls_are_dismissible_and_provider_panel_is_not_injected(self):
+        page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
+        source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
+        self.assertNotIn('provider-status.js', page)
+        self.assertIn('data-panel-close', source)
+        self.assertIn('map-panel-reopen', source)
+        self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
+        self.assertIn('nexora-wildfire-logo-fallback.svg', page)
+
+    def test_real_agent_satellite_billing_and_verified_alert_integrations_exist(self):
+        root = ROOT / "backend" / "app" / "api"
+        agents = (root / "copilot_routes.py").read_text(encoding="utf-8")
+        billing = (root / "billing_routes.py").read_text(encoding="utf-8")
+        alerts = (root / "notification_routes.py").read_text(encoding="utf-8")
+        self.assertIn('ThreadPoolExecutor', agents)
+        self.assertIn('satellite_job_id', agents)
+        self.assertIn('Writer Agent', agents)
+        self.assertIn('_verify_signature', billing)
+        self.assertIn('/checkout', billing)
+        self.assertIn('request-verification', alerts)
+        self.assertIn('internal/run-cycle', alerts)
+        self.assertIn('NEXORA_NOTIFICATION_CRON_TOKEN', alerts)
+
+    def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
+        source = (ROOT / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('nexorawildfire-shell-v28', source)
+        self.assertIn('pages/bee.html', source)
+        self.assertIn('js/nova-bee.js?v=20261024a', source)
+        self.assertIn('js/i18n.js?v=20261024a', source)
+
 if __name__ == "__main__":
     unittest.main()
