@@ -66,8 +66,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v27', source)
-        self.assertIn('nexorawildfire-data-v27', source)
+        self.assertIn('nexorawildfire-shell-v28', source)
+        self.assertIn('nexorawildfire-data-v28', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
