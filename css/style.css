@@ -937,3 +937,5 @@ header:has(.brand-lockup)::before{display:none}
 
 /* Restore the existing Atatürk archive portrait without the washed-out grayscale treatment. */
 .ataturk-portrait img{filter:none!important;opacity:.96!important;object-position:center 24%!important}
+
+.nx-vision-portrait-grid figure img{filter:none!important;opacity:1!important;object-position:center 24%!important;max-height:560px}
