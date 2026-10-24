@@ -143,13 +143,15 @@ async def stripe_webhook(request: Request):
                     user_id = user_id or (sub.get("metadata") or {}).get("user_id")
                 except requests.RequestException as exc:
                     raise HTTPException(status_code=502, detail="Stripe abonelik doğrulaması yapılamadı.") from exc
+    elif event_type == "customer.subscription.deleted":
+        user_id = (obj.get("metadata") or {}).get("user_id")
+        status = "canceled"
+        items = (obj.get("items") or {}).get("data") or []
+        price_id = ((items[0].get("price") or {}).get("id") if items else None)
     elif event_type.startswith("customer.subscription."):
         user_id = (obj.get("metadata") or {}).get("user_id")
         items = (obj.get("items") or {}).get("data") or []
         price_id = ((items[0].get("price") or {}).get("id") if items else None)
-    elif event_type == "customer.subscription.deleted":
-        user_id = (obj.get("metadata") or {}).get("user_id")
-        status = "canceled"
 
     if user_id and subscription_id and event_type in {
         "checkout.session.completed", "customer.subscription.created",
