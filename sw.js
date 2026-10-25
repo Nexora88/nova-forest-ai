@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v28";
-const DATA_CACHE = "nexorawildfire-data-v28";
+const CACHE_NAME = "nexorawildfire-shell-v29";
+const DATA_CACHE = "nexorawildfire-data-v29";
 
 const APP_SHELL = [
   "./",
@@ -22,6 +22,7 @@ const APP_SHELL = [
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
+  "./css/premium-shell.css?v=20261025c",
   "./css/risk-map-premium.css?v=20261024a",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
@@ -72,6 +73,7 @@ const APP_SHELL = [
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
   "./assets/nexora-wildfire-logo.png",
   "./assets/nexora-wildfire-logo.png?v=20261017a",
+  "./assets/nexora-wildfire-logo.png?v=20261025c",
   "./assets/ataturk-1925.jpg",
   "./favicon.png",
   "./manifest.webmanifest",
