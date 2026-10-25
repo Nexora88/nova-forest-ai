@@ -18,7 +18,7 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/nexora-wildfire-logo.png",
+      "src": "assets/nexora-wildfire-logo.png?v=20261025c",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any"
