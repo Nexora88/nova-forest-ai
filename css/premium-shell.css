@@ -98,3 +98,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ops-metric strong{color:#dfffea!important}
 .ops-chip{font-family:Inter,system-ui,sans-serif!important}
 @media(max-width:760px){.ops-hero{grid-template-columns:minmax(0,1fr)!important}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ops-user{align-items:flex-start}.ops-user>div{min-width:0}}
+
+/* Brand consistency: official horizontal NexoraWildfire logo on a dark header. */
+body>header .brand-lockup{flex:0 1 auto;gap:14px;max-width:min(760px,100%)}
+body>header .brand-lockup .brand-logo{display:block;width:clamp(150px,18vw,230px)!important;height:clamp(76px,8vw,112px)!important;max-width:none!important;object-fit:contain;object-position:left center;flex:0 0 auto;background:#020303;border-radius:8px}
+body>header .brand-lockup .logo h1{color:#f3fff5!important}
+@media(max-width:700px){body>header{align-items:center!important;justify-content:flex-start!important;gap:10px!important;padding:10px 12px!important}body>header .brand-lockup{width:100%;gap:10px}body>header .brand-lockup .brand-logo{width:clamp(112px,34vw,160px)!important;height:74px!important}body>header .brand-lockup .logo h1{font-size:clamp(14px,4vw,18px)!important}body>header .brand-lockup .logo p{font-size:8px!important;letter-spacing:.06em!important}body>header>.status{margin-left:auto;font-size:9px!important;padding:7px 9px!important}}
