@@ -99,3 +99,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ops-chip{font-family:Inter,system-ui,sans-serif!important}
 @media(max-width:760px){.ops-hero{grid-template-columns:minmax(0,1fr)!important}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ops-user{align-items:flex-start}.ops-user>div{min-width:0}}
 
+
+
+/* Unified official logo: fixed geometry prevents header reflow and cross-page drift. */
+body>header .brand-lockup{display:flex!important;align-items:center!important;gap:14px!important;flex:1 1 auto;min-width:0;max-width:min(100%,980px)}
+body>header .brand-lockup .brand-logo,
+body>header>img.brand-logo{display:block!important;width:clamp(52px,4.2vw,64px)!important;height:clamp(52px,4.2vw,64px)!important;min-width:clamp(52px,4.2vw,64px)!important;max-width:clamp(52px,4.2vw,64px)!important;aspect-ratio:1/1;object-fit:contain!important;object-position:center;flex:0 0 clamp(52px,4.2vw,64px)!important;margin:0!important;padding:0!important;border:0!important;filter:drop-shadow(0 0 10px #20e87924)}
+body>header .brand-lockup .logo{flex:1 1 auto;min-width:0;max-width:100%}
+body>header .brand-lockup .logo h1,
+body>header>.logo h1{margin:0!important;line-height:1.12!important;letter-spacing:.035em!important;overflow-wrap:anywhere}
+body>header .brand-lockup .logo p,
+body>header>.logo p{margin:5px 0 0!important;line-height:1.4!important;overflow-wrap:anywhere}
+/* Older pages place image and title as siblings instead of a linked lockup. */
+body>header:has(>img.brand-logo):not(:has(>.brand-lockup)){justify-content:flex-start!important;column-gap:14px!important}
+body>header:has(>img.brand-logo):not(:has(>.brand-lockup))>.logo{flex:1 1 auto;min-width:0;margin-right:auto}
+body>header:has(>img.brand-logo):not(:has(>.brand-lockup))>.status{margin-left:auto;flex:0 0 auto}
+@media(max-width:700px){
+ body>header{gap:12px!important;padding:12px 14px!important;min-height:76px;align-items:center!important}
+ body>header .brand-lockup{gap:11px!important;flex:1 1 100%;width:100%;max-width:100%}
+ body>header .brand-lockup .brand-logo,body>header>img.brand-logo{width:54px!important;height:54px!important;min-width:54px!important;max-width:54px!important;flex-basis:54px!important}
+ body>header .brand-lockup .logo h1,body>header>.logo h1{font-size:clamp(16px,4.5vw,21px)!important;white-space:normal!important}
+ body>header .brand-lockup .logo p,body>header>.logo p{font-size:9px!important;letter-spacing:.055em!important}
+ body>header>.status{margin-left:0!important;max-width:100%;white-space:normal!important;font-size:10px!important;padding:7px 10px!important}
+ body>header:has(>img.brand-logo):not(:has(>.brand-lockup)){display:grid!important;grid-template-columns:54px minmax(0,1fr);column-gap:11px!important;row-gap:10px!important}
+ body>header:has(>img.brand-logo):not(:has(>.brand-lockup))>img.brand-logo{grid-column:1;grid-row:1}
+ body>header:has(>img.brand-logo):not(:has(>.brand-lockup))>.logo{grid-column:2;grid-row:1;margin:0!important}
+ body>header:has(>img.brand-logo):not(:has(>.brand-lockup))>.status{grid-column:1/-1;grid-row:2;justify-self:start;margin:0!important}
+}
