@@ -22,6 +22,7 @@ const APP_SHELL = [
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
+  "./css/premium-shell.css?v=20261025c",
   "./css/risk-map-premium.css?v=20261024a",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
