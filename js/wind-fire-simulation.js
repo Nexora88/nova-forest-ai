@@ -23,7 +23,7 @@
   function seedParticles(){const r=mapEl.getBoundingClientRect();state.particles=Array.from({length:Math.max(45,Math.min(110,Math.round(r.width/5)))},()=>({x:Math.random()*r.width,y:Math.random()*r.height,age:Math.random()*100,tail:5+Math.random()*10}))}
   function flowVector(){const direction=((state.wind?.direction??state.windDir)+180)%360,rad=direction*Math.PI/180;return{x:Math.sin(rad),y:-Math.cos(rad)}}
   function drawWind(dt){
-    if(!state.windOn||!state.wind)return;const r=mapEl.getBoundingClientRect(),v=flowVector(),scale=.12+Math.min(state.wind.speed,80)*.018;
+    if(!state.windOn||!state.wind)return;const r=mapEl.getBoundingClientRect(),v=flowVector(),scale=.012+Math.min(state.wind.speed,80)*.0018;
     ctx.save();ctx.lineWidth=1.4;ctx.strokeStyle="rgba(105,245,166,.66)";ctx.fillStyle="rgba(160,255,195,.8)";
     for(const p of state.particles){p.x+=v.x*scale*dt;p.y+=v.y*scale*dt;p.age+=dt;if(p.x< -25||p.x>r.width+25||p.y< -25||p.y>r.height+25||p.age>180){p.x=Math.random()*r.width;p.y=Math.random()*r.height;p.age=0}
       const ex=p.x-v.x*p.tail,ey=p.y-v.y*p.tail;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,1.4,0,Math.PI*2);ctx.fill();
