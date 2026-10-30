@@ -939,3 +939,18 @@ header:has(.brand-lockup)::before{display:none}
 .ataturk-portrait img{filter:none!important;opacity:.96!important;object-position:center 24%!important}
 
 .nx-vision-portrait-grid figure img{filter:none!important;opacity:1!important;object-position:center 24%!important;max-height:560px}
+
+
+/* 2026-10 customer-first home dashboard and transparent brand treatment */
+.brand-lockup,.brand-lockup img,.brand-logo{background:transparent!important}
+.brand-lockup>img,.brand-logo{object-fit:contain!important;mix-blend-mode:normal;filter:drop-shadow(0 0 12px rgba(35,232,121,.16))}
+.nx-home-vision{display:grid;grid-template-columns:minmax(220px,.82fr) minmax(0,1.18fr);gap:clamp(18px,3vw,34px);align-items:center;margin:26px 0;padding:clamp(16px,2.8vw,28px);border:1px solid #28583a;border-radius:20px;background:linear-gradient(125deg,#07160d,#030705 72%);overflow:hidden}
+.nx-home-vision-image{min-height:260px;max-height:380px;overflow:hidden;border-radius:14px;border:1px solid #315a3d;background:#020503}
+.nx-home-vision-image img{display:block;width:100%;height:100%;min-height:260px;max-height:380px;object-fit:cover;object-position:center 28%}
+.nx-home-vision-copy h2{margin:10px 0;color:#2cf18a;font-size:clamp(23px,3vw,36px);line-height:1.14;letter-spacing:-.035em}
+.nx-home-vision-copy blockquote{margin:14px 0;padding-left:14px;border-left:2px solid #e4b84f;color:#f0d88d;font-size:clamp(15px,2vw,20px);font-weight:700}
+.nx-home-vision-copy p,.nx-home-map-cta p{color:#a9b9ad;line-height:1.7;font-size:13px}
+.nx-home-map-cta{display:flex;align-items:center;justify-content:space-between;gap:22px;margin:26px 0;padding:22px 24px;border:1px solid #28583a;border-radius:18px;background:radial-gradient(ellipse at 8% 0%,#0d321c,#040906 68%)}
+.nx-home-map-cta h2{margin:7px 0;color:#e9f6ec;font-size:clamp(21px,2.5vw,30px)}
+.nx-home-map-cta p{margin:0;max-width:58ch}
+@media(max-width:760px){.nx-home-vision{grid-template-columns:1fr}.nx-home-vision-image,.nx-home-vision-image img{min-height:220px;max-height:300px}.nx-home-map-cta{align-items:stretch;flex-direction:column}.nx-home-map-cta .primary-action{width:100%;text-align:center}main{padding:16px!important}}
