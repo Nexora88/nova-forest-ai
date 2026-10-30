@@ -8,7 +8,7 @@
  function updateAreas(){const areas=read("nexorawildfire-my-areas-v1");$("[data-personal-areas]").textContent=say((Array.isArray(areas)?areas.length:0)+" kayıtlı alan",""+(Array.isArray(areas)?areas.length:0)+" saved areas")}
  async function load(){
   const id=++requestId,home=read("nexorawildfire-home-v1"),profile=read("nexorawildfire-profile-v1");
-  const lat=Number(home?.lat??profile?.lat),lon=Number(home?.lon??profile?.lon),place=home?.name||profile?.place?.split(",")[0]||say("Kişisel alan seçilmedi","No personal area selected"),type=home?.type||profile?.type||"genel";
+  const lat=Number(home?.lat),lon=Number(home?.lon),place=home?.name||say("Kişisel alan seçilmedi","No personal area selected"),type=home?.type||"genel";
   $("[data-personal-place]").textContent=place;updateAreas();
   const weatherEl=$("[data-personal-weather]"),adviceEl=$("[data-personal-advice]");
   if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){
