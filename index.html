@@ -33,6 +33,10 @@
   <div class="hero-terminal"><span>AKTİF PİLOT ALANI</span><strong>TRAKYA</strong><small>Edirne · Kırklareli · Tekirdağ<br>Kaynak erişimi ve veri kapsamı katmana göre değişir<br>Gözlem ≠ doğrulanmış yangın</small></div>
 </section>
 
+<section class="nx-home-vision" aria-labelledby="nx-home-vision-title">
+  <div class="nx-home-vision-image"><img src="assets/ataturk-1925.jpg" alt="Mustafa Kemal Atatürk, 1925" loading="lazy"></div>
+  <div class="nx-home-vision-copy"><span class="eyebrow">CUMHURİYET VİZYONU · BİLİM · ÜRETİM</span><h2 id="nx-home-vision-title">Bilimle düşün. Doğayı koru. Geleceği birlikte kur.</h2><blockquote>“Hayatta en hakiki mürşit ilimdir.”</blockquote><p>Atatürk’ün bilime ve akla verdiği önem, bu bağımsız projenin ilham kaynaklarından biridir. NexoraWildfire AI, çevresel veriyi anlaşılır hâle getirerek üretime, doğaya ve topluma fayda sağlamayı amaçlar.</p><a class="secondary-action" href="pages/vision.html">Atatürk ve Cumhuriyet vizyonunu keşfet →</a></div>
+</section>
 <section class="nx-signal-strip" aria-label="Platform kapsamı">
   <a href="pages/map.html"><span class="nx-signal-icon">⌖</span><span><small>GÖZLEM</small><strong>Risk haritası</strong></span><b>↗</b></a>
   <a href="pages/areas.html"><span class="nx-signal-icon">◇</span><span><small>SAHA</small><strong>Alanlarım</strong></span><b>↗</b></a>
@@ -67,11 +71,7 @@
 
 <section id="agri-intelligence" class="agri-intelligence"></section>
 
-<section class="map-section">
-  <div class="section-heading"><div><div class="eyebrow">01 / OPERASYON MERKEZİ</div><h2>Trakya Çevresel Risk Alanı</h2><p>İl sınırları gerçek geometrileriyle; hava, tarım ve ekosistem göstergeleriyle birlikte.</p></div></div>
-  <div class="map-toolbar"><span>EDİRNE • KIRKLARELİ • TEKİRDAĞ</span><span data-map-status>VERİLER YÜKLENİYOR…</span></div>
-  <div id="map"></div>
-</section>
+<section class="nx-home-map-cta"><div><span class="eyebrow">OPERASYON MERKEZİ</span><h2>Trakya ve pilot bölgelerin risk haritası</h2><p>İlçe seçimi, çevresel katmanlar ve saha ayrıntıları için tam ekran haritaya geç.</p></div><a class="primary-action" href="pages/map.html">Risk haritasını aç →</a></section>
 
 <section class="insight-grid">
   <article class="insight-panel"><div class="eyebrow">TARIM / SULAMA</div><h3 data-farm-title>Hesaplanıyor…</h3><p data-farm-summary>Toprak nemi ve ET₀ verileri hazırlanıyor.</p><div class="metric-row"><span>Toprak nemi</span><b data-soil>—</b></div><div class="metric-row"><span>ET₀</span><b data-et0>—</b></div></article>
@@ -79,20 +79,7 @@
   <article class="insight-panel"><div class="eyebrow">ORMAN / EKOSİSTEM</div><h3 data-forest-title>Çevresel durum hesaplanıyor</h3><p data-forest-summary>Yangın, sıcaklık, nem ve bitki stresi sinyalleri birleştiriliyor.</p><div class="metric-row"><span>Risk</span><b data-forest-risk>—</b></div><div class="metric-row"><span>Uyarı</span><b data-forest-alert>—</b></div></article>
 </section>
 
-<section class="system-grid">
-  <div class="system-item"><div class="eyebrow">01 / ORMAN</div><strong>Orman Sağlığı</strong><p>Sentinel-2 sahne altyapısı, bitki stresi ve risk sinyalleri. Gerçek NDVI pixel hesabı ayrıca yapılandırılacak.</p></div>
-  <div class="system-item"><div class="eyebrow">02 / TARIM</div><strong>Toprak & Su</strong><p>Toprak nemi, yağış, ET₀ ve VPD ile sulama ve su stresi için karar destek göstergeleri.</p></div>
-  <div class="system-item"><div class="eyebrow">03 / ARICILIK</div><strong>Nova-Bee</strong><p>Arı uçuş koşulları, polen aktivitesi ve hava koşullarını tek ekranda yorumlayan yardımcı modül.</p></div>
-  <div class="system-item"><div class="eyebrow">04 / İNSAN</div><strong>Polen & Hava</strong><p>CAMS tabanlı polen ve hava kalitesi göstergeleriyle günlük çevre farkındalığı.</p></div>
-  <div class="system-item"><div class="eyebrow">05 / SICAK NOKTA</div><strong>NASA FIRMS</strong><p>Yapılandırıldığında VIIRS sıcak nokta gözlemlerini risk motoruna ekler.</p></div>
-  <div class="system-item"><div class="eyebrow">06 / GEÇMİŞ</div><strong>Zaman Serisi</strong><p>Yerel gözlem geçmişi şimdilik tarayıcıda tutulur; kalıcı sunucu geçmişi sonraki veri katmanıdır.</p></div>
-</section>
 
-
-<section class="notice-panel">
-  <div><div class="eyebrow">SİSTEM MANTIĞI</div><h2>Tek uygulama, farklı kullanıcılar.</h2></div>
-  <p>Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir. NexoraWildfire'ın amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.</p>
-</section>
 </main>
 <footer><p>NexoraWildfire AI · Geliştirici: <strong>Ahmet Eymen Bakraç</strong> · Nexora88 © 2026</p></footer>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js"></script>
