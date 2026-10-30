@@ -48,7 +48,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn("Independent project · Developed by Ahmet Eymen Bakraç · Nexora88", source)
         self.assertIn("Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88", source)
 
-    def test_wind_scenario_is_not_misrepresented_as_official_fire_or_evacuation_model(self):
+    def test_new_wind_overlay_and_scenario_are_explicitly_educational(self):\n        source = (ROOT / "js" / "wind-fire-simulation.js").read_text(encoding="utf-8")\n        self.assertIn("EDUCATIONAL VISUAL SCENARIO", (ROOT / "js" / "i18n.js").read_text(encoding="utf-8"))\n        self.assertIn("wind_direction_10m", source)\n        self.assertIn("data-wind-toggle", (ROOT / "pages" / "map.html").read_text(encoding="utf-8"))\n        self.assertIn("data-sim-timeline", (ROOT / "pages" / "map.html").read_text(encoding="utf-8"))\n\n    def test_wind_scenario_is_not_misrepresented_as_official_fire_or_evacuation_model(self):
         page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
         source = (ROOT / "js" / "fire-safety-sim.js").read_text(encoding="utf-8")
         self.assertIn("data-fire-safety-sim", page)
@@ -66,8 +66,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v28', source)
-        self.assertIn('nexorawildfire-data-v28', source)
+        self.assertIn('nexorawildfire-shell-v29', source)
+        self.assertIn('nexorawildfire-data-v29', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
@@ -96,7 +96,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v28', source)
+        self.assertIn('nexorawildfire-shell-v29', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
