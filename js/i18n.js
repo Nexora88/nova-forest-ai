@@ -883,8 +883,9 @@
     ["Kaydedilmiş alanlar aranıyor…","Checking saved areas…"],
     ["Kişisel alan seçilmedi","No personal area selected"],
     ["Canlı hava verisi yok","Live weather unavailable"],
-    ["Hava tek başına sulama ihtiyacını göstermez. Toprak nemi ve ürün evresiyle birlikte değerlendir.","Weather alone does not determine irrigation need. Combine it with soil moisture and crop stage."]
-    ["Yön açısı rüzgârın geldiği yönü belirtir; haritadaki parçacıklar rüzgârın estiği yönü gösterir.","The direction angle indicates where the wind comes from; particles on the map show where it is blowing."],\n  ];
+    ["Hava tek başına sulama ihtiyacını göstermez. Toprak nemi ve ürün evresiyle birlikte değerlendir.","Weather alone does not determine irrigation need. Combine it with soil moisture and crop stage."],
+    ["Yön açısı rüzgârın geldiği yönü belirtir; haritadaki parçacıklar rüzgârın estiği yönü gösterir.","The direction angle indicates where the wind comes from; particles on the map show where it is blowing."]
+  ];
   const trToEn = new Map(pairs);
   const enToTr = new Map();
   for (const [tr,en] of pairs) if (!enToTr.has(en)) enToTr.set(en,tr);
