@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#020303">
 <title>NexoraWildfire AI | Environmental Intelligence</title>
-<link rel="stylesheet" href="css/style.css?v=20261022a"><link rel="stylesheet" href="css/brand-layout-fix.css?v=20261028a"><link rel="stylesheet" href="css/premium-shell.css?v=20261025b"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
+<link rel="stylesheet" href="css/style.css?v=20261030a"><link rel="stylesheet" href="css/brand-layout-fix.css?v=20261030a"><link rel="stylesheet" href="css/premium-shell.css?v=20261025b"><link rel="stylesheet" href="css/field-ui.css?v=20261006"><link rel="stylesheet" href="css/agri-intelligence.css?v=20261008a">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css">
 <link rel="stylesheet" href="css/product-ui.css?v=20261007e"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="favicon.png"><link rel="stylesheet" href="css/province-feedback.css?v=20261007a"><link rel="stylesheet" href="css/special-days.css?v=20261008a"><link rel="stylesheet" href="css/auth.css?v=20261008a"></head>
 <body>
@@ -33,6 +33,12 @@
   <div class="hero-terminal"><span>AKTİF PİLOT ALANI</span><strong>TRAKYA</strong><small>Edirne · Kırklareli · Tekirdağ<br>Kaynak erişimi ve veri kapsamı katmana göre değişir<br>Gözlem ≠ doğrulanmış yangın</small></div>
 </section>
 
+
+<section class="nx-ataturk-home" aria-labelledby="nx-ataturk-title">
+  <div class="nx-ataturk-image"><img src="assets/ataturk-1925.jpg" alt="Mustafa Kemal Atatürk, 1925" loading="lazy"></div>
+  <div class="nx-ataturk-copy"><div class="eyebrow">CUMHURİYET VİZYONU · BİLİM · ÜRETİM</div><h2 id="nx-ataturk-title">Bilimle düşün. Üreterek geleceği koru.</h2><blockquote>“Hayatta en hakiki mürşit ilimdir.”</blockquote><p>Atatürk’ün bilim, akıl ve üretim anlayışından ilham alıyoruz. Bu bağımsız teknoloji projesi, çevresel veriyi insanlara ve doğaya fayda sağlayan kararlara dönüştürmeyi amaçlıyor.</p><a class="secondary-action" href="pages/vision.html">Cumhuriyet Vizyonunu keşfet →</a></div>
+</section>
+
 <section class="nx-signal-strip" aria-label="Platform kapsamı">
   <a href="pages/map.html"><span class="nx-signal-icon">⌖</span><span><small>GÖZLEM</small><strong>Risk haritası</strong></span><b>↗</b></a>
   <a href="pages/areas.html"><span class="nx-signal-icon">◇</span><span><small>SAHA</small><strong>Alanlarım</strong></span><b>↗</b></a>
@@ -49,7 +55,7 @@
 
 
 <section class="nx-vision-link"><div><div class="eyebrow">CUMHURİYET VİZYONU / BİLİM • ÜRETİM • TOPLUM</div><h2>Bilim, üretim ve toplumsal fayda için ilham.</h2><p>Atatürk’ün bilim ve üretim vizyonuna ayrılan tarihî arşivi ve sözleri ayrı sayfada keşfet.</p></div><a class="secondary-action" href="pages/vision.html">Cumhuriyet Vizyonu →</a></section>
-<section class="command-strip">
+<section class="command-strip" aria-label="İzlenen alanlar">
   <div><span>ORMAN</span><strong>Sağlık + yangın</strong></div>
   <div><span>TARIM</span><strong>Nem + sulama</strong></div>
   <div><span>ARICILIK</span><strong>Nova-Bee</strong></div>
@@ -79,17 +85,16 @@
   <article class="insight-panel"><div class="eyebrow">ORMAN / EKOSİSTEM</div><h3 data-forest-title>Çevresel durum hesaplanıyor</h3><p data-forest-summary>Yangın, sıcaklık, nem ve bitki stresi sinyalleri birleştiriliyor.</p><div class="metric-row"><span>Risk</span><b data-forest-risk>—</b></div><div class="metric-row"><span>Uyarı</span><b data-forest-alert>—</b></div></article>
 </section>
 
-<section class="system-grid">
+<details class="nx-system-details"><summary>Sistem kapsamı ve veri kaynakları</summary><section class="system-grid">
   <div class="system-item"><div class="eyebrow">01 / ORMAN</div><strong>Orman Sağlığı</strong><p>Sentinel-2 sahne altyapısı, bitki stresi ve risk sinyalleri. Gerçek NDVI pixel hesabı ayrıca yapılandırılacak.</p></div>
   <div class="system-item"><div class="eyebrow">02 / TARIM</div><strong>Toprak & Su</strong><p>Toprak nemi, yağış, ET₀ ve VPD ile sulama ve su stresi için karar destek göstergeleri.</p></div>
   <div class="system-item"><div class="eyebrow">03 / ARICILIK</div><strong>Nova-Bee</strong><p>Arı uçuş koşulları, polen aktivitesi ve hava koşullarını tek ekranda yorumlayan yardımcı modül.</p></div>
   <div class="system-item"><div class="eyebrow">04 / İNSAN</div><strong>Polen & Hava</strong><p>CAMS tabanlı polen ve hava kalitesi göstergeleriyle günlük çevre farkındalığı.</p></div>
   <div class="system-item"><div class="eyebrow">05 / SICAK NOKTA</div><strong>NASA FIRMS</strong><p>Yapılandırıldığında VIIRS sıcak nokta gözlemlerini risk motoruna ekler.</p></div>
   <div class="system-item"><div class="eyebrow">06 / GEÇMİŞ</div><strong>Zaman Serisi</strong><p>Yerel gözlem geçmişi şimdilik tarayıcıda tutulur; kalıcı sunucu geçmişi sonraki veri katmanıdır.</p></div>
-</section>
+</section></details>
 
-
-<section class="notice-panel">
+<section class="notice-panel nx-customer-promise">
   <div><div class="eyebrow">SİSTEM MANTIĞI</div><h2>Tek uygulama, farklı kullanıcılar.</h2></div>
   <p>Çiftçi sulamaya, arıcı uçuş gününe, orman yöneticisi riskli alana, doğa gözlemcisi polene bakabilir. NexoraWildfire'ın amacı kullanıcıyı veriyle boğmak değil, veriyi anlaşılır kararlara çevirmektir.</p>
 </section>
