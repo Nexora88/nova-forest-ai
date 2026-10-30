@@ -29,7 +29,8 @@
       const ex=p.x-v.x*p.tail,ey=p.y-v.y*p.tail;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,1.4,0,Math.PI*2);ctx.fill();
     }ctx.restore();
   }
-  function scenarioVector(){const rad=((state.windDir+180)%360)*Math.PI/180;return{x:Math.sin(rad),y:-Math.cos(rad)}}\n  function latLngToPx(lat,lon){return map.latLngToContainerPoint([lat,lon])}
+  function scenarioVector(){const rad=((state.windDir+180)%360)*Math.PI/180;return{x:Math.sin(rad),y:-Math.cos(rad)}}
+  function latLngToPx(lat,lon){return map.latLngToContainerPoint([lat,lon])}
   function simOrigin(){return state.origin||map.getCenter()}
   function drawSimulation(){
     if(!sim||sim.hidden||!state.origin)return;const o=latLngToPx(state.origin.lat,state.origin.lng),zoom=map.getZoom(),metersPerPx=156543.03392*Math.cos(state.origin.lat*Math.PI/180)/Math.pow(2,zoom),hours=state.minutes/60;
@@ -51,7 +52,9 @@
   $("[data-sim-play]").addEventListener("click",()=>{if(sim.hidden)sim.hidden=false;if(state.minutes>=state.duration*60)state.minutes=0;state.playing=!state.playing;$("[data-sim-play]").textContent=state.playing?lang("Ⅱ Duraklat","Ⅱ Pause"):lang("▶ Oynat","▶ Play");ensureLoop()});
   $("[data-sim-reset]").addEventListener("click",()=>{pause();state.minutes=0;updateTimeline();draw()});
   $("[data-sim-timeline]").addEventListener("input",e=>{pause();state.minutes=Number(e.target.value);updateTimeline();draw()});
-  $("[data-sim-speed]").addEventListener("input",e=>{state.windSpeed=Number(e.target.value);setText("[data-sim-speed-value]",state.windSpeed+" km/sa");draw()});\n  $("[data-sim-dir]").addEventListener("input",e=>{state.windDir=Number(e.target.value);setText("[data-sim-dir-value]",state.windDir+"°");draw()});\n  $("[data-fuel]").addEventListener("input",e=>{state.fuel=Number(e.target.value);setText("[data-fuel-value]","%"+state.fuel);draw()});
+  $("[data-sim-speed]").addEventListener("input",e=>{state.windSpeed=Number(e.target.value);setText("[data-sim-speed-value]",state.windSpeed+" km/sa");draw()});
+  $("[data-sim-dir]").addEventListener("input",e=>{state.windDir=Number(e.target.value);setText("[data-sim-dir-value]",state.windDir+"°");draw()});
+  $("[data-fuel]").addEventListener("input",e=>{state.fuel=Number(e.target.value);setText("[data-fuel-value]","%"+state.fuel);draw()});
   $("[data-duration]").addEventListener("input",e=>{state.duration=Number(e.target.value);setText("[data-duration-value]",state.duration+" "+lang("saat","hours"));state.minutes=Math.min(state.minutes,state.duration*60);updateTimeline();draw()});
   map.on("move zoom resize",()=>{if(state.windOn||state.playing||(!sim.hidden&&state.origin))draw()});
   window.addEventListener("resize",()=>{if(state.windOn||state.playing)draw()});
