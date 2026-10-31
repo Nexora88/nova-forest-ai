@@ -28,7 +28,7 @@ flowchart TD
 
 **Araştırma durumu:** RGB istatistikleri ve Sobel filtreleri yerel görüntü işleme araçlarıdır; eğitilmiş yangın/duman tespit modeli değildir. EXIF koordinatı, fotoğrafın kaydedilmiş konumunu gösterir; yangının başladığı yeri kanıtlamaz. Kaynak fotoğraf tarayıcı laboratuvarında kalır. İsteğe bağlı [Google Cloud rapor aktarım demosu](docs/CLOUD_INTEGRATION_DEMO.md) yalnızca açık komut satırı onayından sonra arındırılmış JSON raporunu yükler.
 
-Sunum anlatımı, model/lisans koşulları, çevrimdışı kullanım sınırları ve sorumlu İHA/gözetleme kamerası yol haritası için [Yarışma ve Araştırma Dosyası](docs/COMPETITION_PITCH.md) belgesine bakın.
+Sunum anlatımı, model/lisans koşulları, çevrimdışı kullanım sınırları ve sorumlu İHA/gözetleme kamerası yol haritası için [Yarışma ve Araştırma Dosyası](docs/COMPETITION_PITCH.md) belgesine bakın. TÜBİTAK 2204-A için hazırlanan ve henüz sonuç iddiası içermeyen [Türkçe araştırma planı](docs/TUBITAK_2204A_RESEARCH_PLAN_TR.md) ayrıca incelenebilir.
 
 ## Vizyon
 
