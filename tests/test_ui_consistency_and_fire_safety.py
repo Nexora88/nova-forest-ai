@@ -73,8 +73,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v29', source)
-        self.assertIn('nexorawildfire-data-v29', source)
+        self.assertIn('nexorawildfire-shell-v30', source)
+        self.assertIn('nexorawildfire-data-v30', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
@@ -101,9 +101,18 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('internal/run-cycle', alerts)
         self.assertIn('NEXORA_NOTIFICATION_CRON_TOKEN', alerts)
 
+    def test_svg_brand_asset_and_layout_are_stable(self):
+        page = (ROOT / "index.html").read_text(encoding="utf-8")
+        manifest = (ROOT / "manifest.webmanifest").read_text(encoding="utf-8")
+        styles = (ROOT / "css" / "brand-layout-fix.css").read_text(encoding="utf-8")
+        self.assertIn('assets/nexora-wildfire-logo.svg', page)
+        self.assertIn('image/svg+xml', manifest)
+        self.assertIn('aspect-ratio:1/1', styles)
+        self.assertIn('flex:0 0 44px', styles)
+
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v29', source)
+        self.assertIn('nexorawildfire-shell-v30', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
