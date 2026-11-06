@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v33";
-const DATA_CACHE = "nexorawildfire-data-v33";
+const CACHE_NAME = "nexorawildfire-shell-v34";
+const DATA_CACHE = "nexorawildfire-data-v34";
 
 const APP_SHELL = [
   "./",
@@ -74,6 +74,7 @@ const APP_SHELL = [
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
   "./assets/nexora-wildfire-official.webp",
+  "./assets/nexora-wildfire-official.webp?v=20261106e",
   "./assets/nexora-wildfire-logo.png",
   "./assets/nexora-wildfire-logo.png?v=20261106d",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
