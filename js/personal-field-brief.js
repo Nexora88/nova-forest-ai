@@ -1,0 +1,33 @@
+/* Personal, opt-in field briefing. Coordinates come only from the user's saved onboarding/area choice. */
+(() => {
+ "use strict";
+ const root=document.querySelector("[data-personal-brief]");if(!root)return;
+ const $=s=>root.querySelector(s),tr=()=>((document.documentElement.dataset.language||localStorage.getItem("nexorawildfire-language-v1")||"tr")==="tr");
+ const say=(a,b)=>tr()?a:b,read=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch{return null}};
+ let requestId=0;
+ function updateAreas(){const areas=read("nexorawildfire-my-areas-v1");$("[data-personal-areas]").textContent=say((Array.isArray(areas)?areas.length:0)+" kayıtlı alan",""+(Array.isArray(areas)?areas.length:0)+" saved areas")}
+ async function load(){
+  const id=++requestId,home=read("nexorawildfire-home-v1"),profile=read("nexorawildfire-profile-v1");
+  const lat=Number(home?.lat),lon=Number(home?.lon),place=home?.name||say("Kişisel alan seçilmedi","No personal area selected"),type=home?.type||"genel";
+  $("[data-personal-place]").textContent=place;updateAreas();
+  const weatherEl=$("[data-personal-weather]"),adviceEl=$("[data-personal-advice]");
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){
+   weatherEl.textContent=say("Kişisel konum yok","No personal location");adviceEl.textContent=say("Kişisel saha özeti için başlangıç alanını seç. Alan eklediğinde harita ve öneriler seçtiğin bölgeye göre düzenlenir.","Choose a starting area for a personal field briefing. Your map and insights can then be tailored to the area you select.");$("[data-personal-updated]").textContent=say("Konum izni istenmez; başlangıç alanını kendin seçersin.","No location permission is requested; you choose your starting area.");return;
+  }
+  weatherEl.textContent=say("Veri alınıyor…","Loading data…");
+  const u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",String(lat));u.searchParams.set("longitude",String(lon));u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,precipitation");u.searchParams.set("timezone","Europe/Istanbul");
+  try{
+   const response=await fetch(u,{cache:"no-store"});if(!response.ok)throw Error("weather unavailable");const j=await response.json();if(id!==requestId)return;
+   const c=j.current||{};if(c.temperature_2m==null||c.relative_humidity_2m==null||c.wind_speed_10m==null)throw Error("incomplete weather");
+   const temp=Number(c.temperature_2m),humidity=Number(c.relative_humidity_2m),wind=Number(c.wind_speed_10m),rain=Number(c.precipitation||0),direction=Number(c.wind_direction_10m||0);
+   weatherEl.textContent=Math.round(temp)+"°C · "+say("Nem ","Humidity ")+Math.round(humidity)+"% · "+say("Rüzgâr ","Wind ")+Math.round(wind)+" km/sa · "+Math.round(direction)+"°";
+   const dry=humidity<35&&temp>=27,windy=wind>=25,wet=rain>=1;let advice;
+   if(type==="arıcı"||type==="bee")advice=windy||wet?say("Rüzgâr/yağış arı uçuşunu zorlaştırabilir. Kovan çevresindeki gerçek koşulları kontrol et; bu gösterge uçuş garantisi değildir.","Wind/rain may limit bee flight. Check conditions at the apiary; this indicator is not a flight guarantee."):say("Hava şu an daha sakin görünüyor. Kovan çevresindeki rüzgârı ve yağışı yerinde kontrol ederek karar ver.","Conditions look calmer at this location. Check wind and rain at the apiary before deciding.");
+   else if(type==="çiftçi"||type==="farmer")advice=dry?say("Sıcak ve kuru hava sinyali var. Sulama kararı vermeden önce tarladaki gerçek toprak nemini ve ürünün gelişim evresini kontrol et.","Warm, dry weather signal. Check actual field soil moisture and crop stage before making irrigation decisions."):wet?say("Yağış gözlemi var. Tarla çalışmasını planlarken yerel yağış ve drenaj koşullarını kontrol et.","Precipitation is observed. Check local rainfall and drainage before field work."):say("Hava tek başına sulama ihtiyacını göstermez. Toprak nemi ve ürün evresiyle birlikte değerlendir.","Weather alone does not determine irrigation need. Combine it with soil moisture and crop stage.");
+   else if(type==="orman"||type==="nature")advice=dry&&windy?say("Sıcak, kuru ve rüzgârlı koşullar çevresel dikkat gerektirir. Resmî uyarıları takip et; bu gösterge yangın tespiti değildir.","Warm, dry and windy conditions warrant environmental awareness. Follow official alerts; this is not fire detection."):say("Hava gözlemini uydu bitki sağlığı ve resmî duyurularla birlikte değerlendir. Bu özet doğrulanmış yangın bildirimi değildir.","Combine weather observations with satellite vegetation information and official notices. This is not a confirmed fire report.");
+   else advice=say("Bugünkü hava: "+(dry?"sıcak ve kuru":wet?"yağışlı":windy?"rüzgârlı":"nispeten sakin")+". İlgi alanına göre tarım, arıcılık veya çevre katmanını açarak ayrıntıya inebilirsin.","Today's conditions are "+(dry?"warm and dry":wet?"wet":windy?"windy":"relatively calm")+". Open the agriculture, beekeeping or environment layer for more context.");
+   adviceEl.textContent=advice;$("[data-personal-updated]").textContent=say("Gözlem zamanı: ","Observation time: ")+new Date(c.time||Date.now()).toLocaleString(tr()?"tr-TR":"en-GB");
+  }catch(e){if(id!==requestId)return;weatherEl.textContent=say("Canlı hava verisi yok","Live weather unavailable");adviceEl.textContent=say("Kaynak yanıt vermedi. Sonuç üretmek yerine veri yok olarak gösteriliyor; biraz sonra yeniden deneyebilirsin.","The source did not respond. Instead of inventing a result, the panel shows unavailable data; try again later.");$("[data-personal-updated]").textContent=say("Kaynak: Open-Meteo · bağlantı bekleniyor","Source: Open-Meteo · waiting for connection")}
+ }
+ window.addEventListener("nova:profile-updated",load);window.addEventListener("nova:areas-updated",updateAreas);load();
+})();

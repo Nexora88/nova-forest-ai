@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v28";
-const DATA_CACHE = "nexorawildfire-data-v28";
+const CACHE_NAME = "nexorawildfire-shell-v31";
+const DATA_CACHE = "nexorawildfire-data-v31";
 
 const APP_SHELL = [
   "./",
@@ -23,11 +23,15 @@ const APP_SHELL = [
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
   "./css/risk-map-premium.css?v=20261024a",
+  "./css/wind-simulation.css?v=20261030a",
+  "./css/personal-brief.css?v=20261030a",
   "./css/field-ui.css",
   "./css/field-ui.css?v=20261006",
   "./js/provider-status.js?v=20261020a",
   "./js/i18n.js?v=20261022a",
   "./js/fire-safety-sim.js?v=20261022a",
+  "./js/wind-fire-simulation.js?v=20261030a",
+  "./js/personal-field-brief.js?v=20261030a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
@@ -69,9 +73,11 @@ const APP_SHELL = [
   "./css/special-days.css?v=20261008a",
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
+  "./assets/nexora-wildfire-logo.svg",
+  "./assets/nexora-wildfire-app-icon.svg",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
-  "./assets/nexora-wildfire-logo.png",
-  "./assets/nexora-wildfire-logo.png?v=20261017a",
+  "./assets/nexora-wildfire-logo.svg",
+  "./assets/nexora-wildfire-logo.svg?v=20261017a",
   "./assets/ataturk-1925.jpg",
   "./favicon.png",
   "./manifest.webmanifest",
@@ -174,8 +180,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: data.icon || new URL("./assets/nexora-wildfire-logo.svg", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-logo.svg", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }

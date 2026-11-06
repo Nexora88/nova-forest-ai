@@ -48,6 +48,13 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn("Independent project · Developed by Ahmet Eymen Bakraç · Nexora88", source)
         self.assertIn("Bağımsız proje · Geliştirici: Ahmet Eymen Bakraç · Nexora88", source)
 
+    def test_new_wind_overlay_and_scenario_are_explicitly_educational(self):
+        source = (ROOT / "js" / "wind-fire-simulation.js").read_text(encoding="utf-8")
+        self.assertIn("EDUCATIONAL VISUAL SCENARIO", (ROOT / "js" / "i18n.js").read_text(encoding="utf-8"))
+        self.assertIn("wind_direction_10m", source)
+        self.assertIn("data-wind-toggle", (ROOT / "pages" / "map.html").read_text(encoding="utf-8"))
+        self.assertIn("data-sim-timeline", (ROOT / "pages" / "map.html").read_text(encoding="utf-8"))
+
     def test_wind_scenario_is_not_misrepresented_as_official_fire_or_evacuation_model(self):
         page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
         source = (ROOT / "js" / "fire-safety-sim.js").read_text(encoding="utf-8")
@@ -66,8 +73,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v28', source)
-        self.assertIn('nexorawildfire-data-v28', source)
+        self.assertIn('nexorawildfire-shell-v31', source)
+        self.assertIn('nexorawildfire-data-v30', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
@@ -94,9 +101,18 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('internal/run-cycle', alerts)
         self.assertIn('NEXORA_NOTIFICATION_CRON_TOKEN', alerts)
 
+    def test_svg_brand_asset_and_layout_are_stable(self):
+        page = (ROOT / "index.html").read_text(encoding="utf-8")
+        manifest = (ROOT / "manifest.webmanifest").read_text(encoding="utf-8")
+        styles = (ROOT / "css" / "brand-layout-fix.css").read_text(encoding="utf-8")
+        self.assertIn('assets/nexora-wildfire-logo.svg', page)
+        self.assertIn('assets/nexora-wildfire-app-icon.svg', manifest)
+        self.assertIn('aspect-ratio:1200/320', styles)
+        self.assertIn('background:transparent!important', styles)
+
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v28', source)
+        self.assertIn('nexorawildfire-shell-v30', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)

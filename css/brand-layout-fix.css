@@ -1,13 +1,10 @@
-/* Brand and mobile layout repair — preserve the existing NexoraWildfire logo asset. */
-body>header{background:#020403!important;isolation:isolate;min-width:0}
-body>header .brand-lockup{display:flex!important;align-items:center;gap:12px;min-width:0;max-width:min(100%,720px)}
-body>header .brand-lockup>.brand-logo{display:block!important;width:clamp(42px,5vw,64px)!important;height:clamp(42px,5vw,64px)!important;max-width:64px!important;object-fit:contain;flex:0 0 auto;background:transparent!important}
-body>header .brand-lockup .logo{min-width:0;flex:1 1 auto;background:transparent!important}
-body>header .brand-lockup .logo h1{color:#21e879!important;letter-spacing:.01em!important;overflow-wrap:anywhere;word-break:normal}
-body>header .brand-lockup .logo p{max-width:42ch;overflow-wrap:anywhere}
+/* Transparent, original NexoraWildfire wordmark lockup. */
+body>header{background:#020403!important;isolation:isolate;min-width:0;min-height:84px;align-items:center;flex-wrap:nowrap}
+body>header .brand-lockup{display:flex!important;align-items:center;min-width:0;max-width:min(100%,760px);flex:1 1 auto}
+body>header .brand-lockup>.brand-logo{display:block!important;width:clamp(230px,34vw,390px)!important;height:auto!important;min-width:0;max-width:100%!important;aspect-ratio:1200/320;object-fit:contain;object-position:left center;flex:0 1 auto;background:transparent!important;contain:layout paint}
+body>header .brand-lockup .logo{display:none!important}
 body>header .status{flex:0 0 auto;max-width:100%;white-space:normal}
-body>main .brand-lockup{display:none!important}
-body>main .nx-header-logo{display:none!important}
+body>main .brand-lockup,body>main .nx-header-logo{display:none!important}
 body>nav.nx-nav{min-width:0}
 .nx-connectivity-bar{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .nx-science-notice{width:100%;max-width:100%!important;overflow-wrap:anywhere}
@@ -15,10 +12,8 @@ main,main>section,.map-section,#map{min-width:0;max-width:100%}
 .brand-lockup img{background:transparent!important}
 @media(max-width:760px){
  body>header{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;padding:12px 14px!important}
- body>header .brand-lockup{flex:1 1 auto;width:auto;gap:9px}
- body>header .brand-lockup>.brand-logo{width:46px!important;height:46px!important;max-width:46px!important}
- body>header .brand-lockup .logo h1{font-size:clamp(16px,4.5vw,21px)!important;line-height:1.15!important;white-space:normal!important}
- body>header .brand-lockup .logo p{font-size:9px!important;line-height:1.4!important;letter-spacing:.04em!important;max-width:29ch}
+ body>header .brand-lockup{flex:1 1 auto;width:auto;gap:0}
+ body>header .brand-lockup>.brand-logo{width:min(72vw,300px)!important;height:auto!important;min-width:0;max-width:100%!important;flex-basis:auto;aspect-ratio:1200/320}
  body>header .status{display:none!important}
  .nx-connectivity-bar{padding:6px 12px!important;line-height:1.45!important}
  .nx-device-status{max-width:100%;white-space:normal}
@@ -26,8 +21,4 @@ main,main>section,.map-section,#map{min-width:0;max-width:100%}
  .nexora-language-toggle{bottom:14px!important;left:12px!important;z-index:1200!important}
  .edge-dock{max-width:calc(100vw - 24px)!important}
 }
-@media(max-width:380px){
- body>header .brand-lockup>.brand-logo{width:40px!important;height:40px!important;max-width:40px!important}
- body>header .brand-lockup .logo h1{font-size:15px!important}
- body>header .brand-lockup .logo p{font-size:8px!important;max-width:25ch}
-}
+@media(max-width:380px){body>header .brand-lockup>.brand-logo{width:min(70vw,260px)!important}}
