@@ -18,10 +18,16 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/nexora-wildfire-app-icon.svg?v=20261106c",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
+      "sizes": "any",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

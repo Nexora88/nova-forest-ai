@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v32";
-const DATA_CACHE = "nexorawildfire-data-v32";
+const CACHE_NAME = "nexorawildfire-shell-v33";
+const DATA_CACHE = "nexorawildfire-data-v33";
 
 const APP_SHELL = [
   "./",
@@ -73,12 +73,12 @@ const APP_SHELL = [
   "./css/special-days.css?v=20261008a",
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
-  "./assets/nexora-wildfire-logo.svg",
   "./assets/nexora-wildfire-official.webp",
-  "./assets/nexora-wildfire-app-icon.svg",
+  "./assets/nexora-wildfire-logo.png",
+  "./assets/nexora-wildfire-logo.png?v=20261106d",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
-  "./assets/nexora-wildfire-logo.svg",
-  "./assets/nexora-wildfire-logo.svg?v=20261017a",
+  "./assets/nexora-wildfire-official.webp",
+  "./assets/nexora-wildfire-official.webp?v=20261017a",
   "./assets/ataturk-1925.jpg",
   "./favicon.png",
   "./manifest.webmanifest",
@@ -181,8 +181,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.svg", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.svg", self.registration.scope).href,
+    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
