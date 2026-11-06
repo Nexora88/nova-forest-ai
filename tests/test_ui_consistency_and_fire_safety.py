@@ -73,7 +73,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v30', source)
+        self.assertIn('nexorawildfire-shell-v31', source)
         self.assertIn('nexorawildfire-data-v30', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
@@ -106,9 +106,9 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         manifest = (ROOT / "manifest.webmanifest").read_text(encoding="utf-8")
         styles = (ROOT / "css" / "brand-layout-fix.css").read_text(encoding="utf-8")
         self.assertIn('assets/nexora-wildfire-logo.svg', page)
-        self.assertIn('image/svg+xml', manifest)
-        self.assertIn('aspect-ratio:1/1', styles)
-        self.assertIn('flex:0 0 44px', styles)
+        self.assertIn('assets/nexora-wildfire-app-icon.svg', manifest)
+        self.assertIn('aspect-ratio:1200/320', styles)
+        self.assertIn('background:transparent!important', styles)
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
