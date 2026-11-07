@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v34";
-const DATA_CACHE = "nexorawildfire-data-v34";
+const CACHE_NAME = "nexorawildfire-shell-v35";
+const DATA_CACHE = "nexorawildfire-data-v35";
 
 const APP_SHELL = [
   "./",
