@@ -34,6 +34,7 @@ const APP_SHELL = [
   "./js/fire-safety-sim.js?v=20261022a",
   "./js/wind-fire-simulation.js?v=20261030a",
   "./js/personal-field-brief.js?v=20261107a",
+  "./js/areas.js?v=20261107a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
