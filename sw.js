@@ -20,7 +20,7 @@ const APP_SHELL = [
   "./pages/about.html",
   "./css/style.css",
   "./css/brand-layout-fix.css?v=20261107a",
-  "./css/personal-brief.css?v=20261030a",
+  "./css/personal-brief.css?v=20261107a",
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
