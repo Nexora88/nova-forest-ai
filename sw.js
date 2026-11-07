@@ -77,8 +77,8 @@ const APP_SHELL = [
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
   "./assets/nexora-wildfire-official.webp",
-  "./assets/nexora-wildfire-logo.png",
-  "./assets/nexora-wildfire-logo.png?v=20261106d",
+  "./assets/nexora-wildfire-official.webp",
+  "./assets/nexora-wildfire-official.webp?v=20261107b",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
   "./assets/nexora-wildfire-official.webp",
   "./assets/nexora-wildfire-official.webp?v=20261017a",
@@ -184,8 +184,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: data.icon || new URL("./assets/nexora-wildfire-official.webp", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-official.webp", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
