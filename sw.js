@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v33";
-const DATA_CACHE = "nexorawildfire-data-v33";
+const CACHE_NAME = "nexorawildfire-shell-v34";
+const DATA_CACHE = "nexorawildfire-data-v34";
 
 const APP_SHELL = [
   "./",
@@ -19,6 +19,8 @@ const APP_SHELL = [
   "./pages/feedback.html",
   "./pages/about.html",
   "./css/style.css",
+  "./css/brand-layout-fix.css?v=20261107a",
+  "./css/personal-brief.css?v=20261030a",
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
@@ -31,7 +33,7 @@ const APP_SHELL = [
   "./js/i18n.js?v=20261022a",
   "./js/fire-safety-sim.js?v=20261022a",
   "./js/wind-fire-simulation.js?v=20261030a",
-  "./js/personal-field-brief.js?v=20261030a",
+  "./js/personal-field-brief.js?v=20261107a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
