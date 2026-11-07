@@ -1,4 +1,4 @@
-/* Personal field intelligence: uses only an explicitly selected home area or saved user areas. */
+/* Personal field intelligence: selected user areas, real sources and optional authenticated NOVA analysis. */
 (() => {
   "use strict";
   const root=document.querySelector("[data-personal-brief]");
@@ -7,7 +7,8 @@
   const isTr=()=>((document.documentElement.dataset.language||localStorage.getItem("nexorawildfire-language-v1")||"tr")==="tr");
   const say=(tr,en)=>isTr()?tr:en;
   const read=(key,fallback=null)=>{try{const value=JSON.parse(localStorage.getItem(key)||"null");return value??fallback}catch{return fallback}};
-  let requestId=0;
+  const API_BASE=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api")).replace(/\/$/,"");
+  let requestId=0,satelliteRequestId=0;
   const finite=value=>value!==null&&value!==undefined&&value!==""&&Number.isFinite(Number(value));
   function validPoint(point){return Array.isArray(point)&&point.length>=2&&finite(point[0])&&finite(point[1])&&Math.abs(Number(point[0]))<=90&&Math.abs(Number(point[1]))<=180}
   function areaCenter(area){
@@ -19,14 +20,15 @@
     const home=read("nexorawildfire-home-v1");
     const areas=read("nexorawildfire-my-areas-v1",[]);
     const list=Array.isArray(areas)?areas:[];
-    if(finite(home?.lat)&&finite(home?.lon)&&Math.abs(Number(home.lat))<=90&&Math.abs(Number(home.lon))<=180){
-      return {lat:Number(home.lat),lon:Number(home.lon),name:home.name||home.displayName?.split(",")?.[0]||say("Başlangıç alanım","My starting area"),type:home.type||"genel",areas:list};
-    }
     const preferredId=localStorage.getItem("nexorawildfire-primary-area-v1");
-    const area=list.find(a=>String(a.id)===String(preferredId))||list[0];
-    const center=areaCenter(area);
-    if(center)return {lat:center[0],lon:center[1],name:area.name||say("Kayıtlı alanım","My saved area"),type:area.type||"genel",areas:list};
-    return {lat:null,lon:null,name:say("Kişisel alan seçilmedi","No personal area selected"),type:"genel",areas:list};
+    const primary=list.find(a=>String(a.id)===String(preferredId));
+    if(finite(home?.lat)&&finite(home?.lon)&&Math.abs(Number(home.lat))<=90&&Math.abs(Number(home.lon))<=180){
+      const matched=primary||list.find(a=>String(a.name||"").trim()===String(home.name||"").trim())||null;
+      return {lat:Number(home.lat),lon:Number(home.lon),name:home.name||home.displayName?.split(",")?.[0]||say("Başlangıç alanım","My starting area"),type:home.type||matched?.type||"genel",areas:list,area:matched};
+    }
+    const area=primary||list[0],center=areaCenter(area);
+    if(center)return {lat:center[0],lon:center[1],name:area.name||say("Kayıtlı alanım","My saved area"),type:area.type||"genel",areas:list,area};
+    return {lat:null,lon:null,name:say("Kişisel alan seçilmedi","No personal area selected"),type:"genel",areas:list,area:null};
   }
   function profileData(){
     let profile=null;
@@ -35,17 +37,14 @@
   }
   function updateAreas(context){
     const areas=context?.areas||read("nexorawildfire-my-areas-v1",[]);
-    const count=Array.isArray(areas)?areas.length:0;
-    const el=$("[data-personal-areas]");
+    const count=Array.isArray(areas)?areas.length:0,el=$("[data-personal-areas]");
     if(el)el.textContent=say(count+" kayıtlı alan · "+(context?.name||"alan seçilmedi"),count+" saved areas · "+(context?.name||"no area selected"));
   }
   function adviceFor(type,w,soil,et0,rain){
     const t=String(type||"genel").toLocaleLowerCase("tr");
     const dry=finite(w.humidity)&&finite(w.temp)&&Number(w.humidity)<35&&Number(w.temp)>=27;
-    const windy=finite(w.wind)&&Number(w.wind)>=25;
-    const wet=finite(rain)&&Number(rain)>=3;
-    const soilLow=finite(soil)&&Number(soil)<.2;
-    const highEt0=finite(et0)&&Number(et0)>4;
+    const windy=finite(w.wind)&&Number(w.wind)>=25,wet=finite(rain)&&Number(rain)>=3;
+    const soilLow=finite(soil)&&Number(soil)<.2,highEt0=finite(et0)&&Number(et0)>4;
     if(t.includes("arı")||t.includes("bee")||t.includes("apiary")){
       if(windy||wet)return say("Rüzgâr veya yağış arı uçuşunu zorlaştırabilir. Kovan çevresindeki yerel koşulları kontrol et; bu gösterge uçuş garantisi değildir.","Wind or rain may limit bee flight. Check conditions at the apiary; this indicator is not a flight guarantee.");
       return say("Mevcut hava daha sakin görünüyor. Uçuş kararı öncesinde kovan çevresindeki rüzgârı, yağışı ve arı davranışını yerinde kontrol et.","Current weather looks calmer. Check local wind, rain and bee activity before making flight decisions.");
@@ -61,13 +60,56 @@
     }
     return say("Bugünkü koşulları seçtiğin kullanım amacına göre yorumla. Tarım, arıcılık veya orman katmanını açarak alanına özel ayrıntıları inceleyebilirsin.","Review today's conditions in the context of your chosen activity. Open the agriculture, beekeeping or forest layer for more detail about your area.");
   }
+  async function loadSatellite(context){
+    const id=++satelliteRequestId,el=$("[data-personal-satellite]");
+    if(!el)return;
+    const area=context?.area,points=Array.isArray(area?.coordinates)?area.coordinates.filter(validPoint):[];
+    if(points.length<3){el.textContent=say("Alan sınırı seçilmedi","No saved area boundary");return}
+    const ring=points.map(p=>[Number(p[1]),Number(p[0])]);
+    if(ring[0][0]!==ring[ring.length-1][0]||ring[0][1]!==ring[ring.length-1][1])ring.push([...ring[0]]);
+    el.textContent=say("Sentinel-2 zaman serisi kontrol ediliyor…","Checking Sentinel-2 time series…");
+    try{
+      const response=await fetch(API_BASE+"/ndvi/area-timeseries",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({geometry:{type:"Polygon",coordinates:[ring]},days:180,interval:"P30D"})});
+      const data=await response.json();if(id!==satelliteRequestId)return;
+      if(data.status==="available"&&data.latest&&finite(data.latest.ndvi)){
+        const ndvi=Number(data.latest.ndvi).toFixed(2),ndmi=finite(data.latest.ndmi)?Number(data.latest.ndmi).toFixed(2):"—";
+        el.textContent=say("NDVI "+ndvi+" · NDMI "+ndmi,"NDVI "+ndvi+" · NDMI "+ndmi);
+      }else if(data.status==="not_configured")el.textContent=say("Copernicus bağlantısı sunucuda yapılandırılmamış","Copernicus provider is not configured on the server");
+      else if(data.status==="available")el.textContent=say("İşlenmiş uydu örneği bulunamadı","No processed satellite samples returned");
+      else el.textContent=say("Uydu verisi şu anda alınamıyor","Satellite data is currently unavailable");
+    }catch{if(id===satelliteRequestId)el.textContent=say("Uydu kaynağına ulaşılamadı","Satellite source could not be reached")}
+  }
+  async function runNOVA(){
+    const button=$("[data-nova-analyze]"),output=$("[data-nova-report]");
+    if(!button||!output)return;
+    const context=selectedContext();
+    output.hidden=false;
+    if(!finite(context.lat)||!finite(context.lon)){output.textContent=say("Önce Alanlarım bölümünden bir başlangıç alanı seç.","Choose a starting area in My Areas first.");return}
+    let session=null;try{session=window.NovaAuth?.session?.()||null}catch{}
+    if(!session?.access_token){output.textContent=say("NOVA AI raporu için hesabına giriş yapmalısın. Giriş yaptıktan sonra bu düğmeyle gerçek model analizini çağırabilirsin.","Sign in to request a NOVA AI report. After signing in, use this button to call the configured model analysis.");return}
+    button.disabled=true;button.textContent=say("NOVA AI kaynakları değerlendiriyor…","NOVA AI is evaluating sources…");
+    output.textContent=say("Open-Meteo ve varsa tamamlanmış Sentinel-2 kanıtları güvenli backend üzerinden ajanlara gönderiliyor…","Open-Meteo and any completed Sentinel-2 evidence are being sent to the agents through the secure backend…");
+    try{
+      const response=await fetch(API_BASE+"/copilot/analyze",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({area_name:context.name,lat:context.lat,lon:context.lon})});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok){
+        const detail=data.detail?.message||data.detail?.message_tr||data.detail||"NOVA AI isteği tamamlanamadı.";
+        output.textContent=response.status===503?say("NOVA AI model sağlayıcısı sunucuda henüz yapılandırılmamış. Gerçek model yanıtı alınmadı; mevcut kişisel özet kural tabanlıdır.",String(detail)):String(typeof detail==="string"?detail:JSON.stringify(detail));
+        return;
+      }
+      output.textContent=(data.report||data.agents?.writer?.content||say("Model raporu boş döndü.","The model returned an empty report."))+"\n\n"+say("Kaynak: Open-Meteo"+(data.satellite?.status==="available"?" · Copernicus Sentinel-2 L2A":""),"Sources: Open-Meteo"+(data.satellite?.status==="available"?" · Copernicus Sentinel-2 L2A":""))+" · "+new Date(data.checked_at_utc||Date.now()).toLocaleString(isTr()?"tr-TR":"en-GB")+"\n"+say("Karar desteğidir; resmî uyarı veya kesin tahmin değildir.","Decision support only; not an official alert or definitive forecast.");
+    }catch(error){output.textContent=say("NOVA AI servisine ulaşılamadı. Sağlayıcı yapılandırmasını ve bağlantıyı kontrol et; yerel özet kullanılabilir durumda kalır.","NOVA AI service could not be reached. Check provider configuration and connectivity; the local briefing remains available.");}
+    finally{button.disabled=false;button.textContent=say("✦ NOVA AI ile ayrıntılı yorumla","✦ Analyze with NOVA AI")}
+  }
   async function load(){
     const id=++requestId,context=selectedContext(),profile=profileData();
     const place=$("[data-personal-place]"),weatherEl=$("[data-personal-weather]"),adviceEl=$("[data-personal-advice]"),updated=$("[data-personal-updated]");
     if(place)place.textContent=context.name;
     updateAreas(context);
-    const title=$("#nx-personal-title");
-    const displayName=String(profile?.full_name||profile?.name||"").trim().split(/\s+/)[0];
+    const mapLink=$("[data-personal-map-link]");
+    if(mapLink)mapLink.href=context.area?.id?"pages/map.html?area="+encodeURIComponent(context.area.id):"pages/map.html";
+    loadSatellite(context);
+    const title=$("#nx-personal-title"),displayName=String(profile?.full_name||profile?.name||"").trim().split(/\s+/)[0];
     if(title&&displayName)title.textContent=say("Bugün "+displayName+", alanında neler oluyor?","What's happening in your area today, "+displayName+"?");
     if(!finite(context.lat)||!finite(context.lon)){
       if(weatherEl)weatherEl.textContent=say("Kişisel alan seçilmedi","No personal area selected");
@@ -106,6 +148,7 @@
       if(updated)updated.textContent=say("Kaynak: Open-Meteo · bağlantı bekleniyor","Source: Open-Meteo · waiting for connection");
     }
   }
+  $("[data-nova-analyze]")?.addEventListener("click",runNOVA);
   window.addEventListener("nova:profile-updated",load);
   window.addEventListener("nova:areas-updated",load);
   window.addEventListener("nova:areas-synced",load);
