@@ -11,9 +11,9 @@ body>header .brand-lockup{
 /* The official WEBP is a horizontal lockup. Crop its left emblem into a compact mark;
    keep the actual product name as live text so it remains sharp and accessible. */
 body>header .brand-lockup>.brand-logo{
-  display:block!important;width:58px!important;height:58px!important;min-width:58px!important;
-  max-width:58px!important;object-fit:cover!important;object-position:left center!important;
-  aspect-ratio:1/1;flex:0 0 58px;background:transparent!important;border-radius:10px
+  display:block!important;width:44px!important;height:44px!important;min-width:44px!important;
+  max-width:44px!important;object-fit:contain!important;object-position:center!important;
+  aspect-ratio:1/1;flex:0 0 44px;background:transparent!important;border-radius:0
 }
 body>header .brand-lockup .logo{display:block!important;min-width:0;overflow:hidden}
 body>header .brand-lockup .logo h1{
@@ -34,7 +34,7 @@ main,main>section,.map-section,#map{min-width:0;max-width:100%}
 @media(max-width:760px){
   body>header{gap:10px!important;padding:10px 14px!important;min-height:72px}
   body>header .brand-lockup{gap:10px!important;width:auto;flex:1 1 auto}
-  body>header .brand-lockup>.brand-logo{width:52px!important;height:52px!important;min-width:52px!important;max-width:52px!important;flex-basis:52px}
+  body>header .brand-lockup>.brand-logo{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important;flex-basis:36px}
   body>header .brand-lockup .logo h1{font-size:clamp(15px,4.3vw,19px)!important}
   body>header .brand-lockup .logo p{font-size:8px!important;letter-spacing:.045em}
   body>header .status{display:none!important}
@@ -46,7 +46,7 @@ main,main>section,.map-section,#map{min-width:0;max-width:100%}
 }
 @media(max-width:360px){
   body>header .brand-lockup{gap:8px!important}
-  body>header .brand-lockup>.brand-logo{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;flex-basis:46px}
+  body>header .brand-lockup>.brand-logo{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;flex-basis:34px}
   body>header .brand-lockup .logo h1{font-size:15px!important}
   body>header .brand-lockup .logo p{font-size:7px!important}
 }
