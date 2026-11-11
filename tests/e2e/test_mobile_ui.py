@@ -109,7 +109,13 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertTrue(menu.is_visible())
             self.assertEqual(page.locator("nav.nx-nav > a:visible").count(), 0)
             menu.click()
+            self.assertEqual(menu.get_attribute("aria-expanded"), "true")
+            self.assertTrue(page.locator("nav.nx-nav").evaluate("(el) => el.classList.contains('nx-nav-open')"))
             self.assertGreater(page.locator("nav.nx-nav > a:visible").count(), 0)
+            menu.click()
+            self.assertEqual(menu.get_attribute("aria-expanded"), "false")
+            self.assertFalse(page.locator("nav.nx-nav").evaluate("(el) => el.classList.contains('nx-nav-open')"))
+            menu.click()
             self.assertLessEqual(page.locator("nav.nx-nav").evaluate("(el) => el.scrollWidth"), 390)
             page.wait_for_selector("#nexora-language-toggle", timeout=10000)
             page.wait_for_function("document.documentElement.lang === 'en'", timeout=10000)
@@ -248,9 +254,9 @@ class MobileUiSmokeTests(unittest.TestCase):
                                     f"UAV link missing or duplicated on {path}")
                     self.assertEqual(page.locator('nav.nx-nav a[aria-current="page"]').count(), 1,
                                      f"active-page marker missing or duplicated on {path}")
-                    self.assertEqual(page.locator('header img[src*="nexora-wildfire-logo"]').count(), 1,
+                    self.assertEqual(page.locator('header img[src*="nexora-wildfire-mark.png"]').count(), 1,
                                      f"header logo missing or duplicated on {path}")
-                    self.assertTrue(page.locator('header img[src*="nexora-wildfire-logo"]').evaluate("(img) => img.complete && img.naturalWidth > 0"),
+                    self.assertTrue(page.locator('header img[src*="nexora-wildfire-mark.png"]').evaluate("(img) => img.complete && img.naturalWidth > 0"),
                                     f"header logo failed to load on {path}")
                     self.assertEqual(page.locator('nav.nx-nav a[href*="account.html"]').count(), 1,
                                      f"account link missing or duplicated on {path}")
@@ -300,7 +306,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
             keys = page.evaluate("caches.keys()")
-            self.assertIn("nexorawildfire-shell-v27", keys, "new app-shell cache version was not installed")
+            self.assertIn("nexorawildfire-shell-v40", keys, "new app-shell cache version was not installed")
             self.assertNotIn("nexorawildfire-shell-v20", keys, "stale app-shell cache was not removed")
             context.set_offline(True)
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)

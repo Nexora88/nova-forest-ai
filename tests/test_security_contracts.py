@@ -26,8 +26,8 @@ def test_owner_scoped_rls_and_role_guard_are_declared():
 def test_service_worker_never_caches_authenticated_responses_and_rotates_shell():
     worker = read("sw.js")
     assert 'request.headers.has("authorization")' in worker
-    assert "nexorawildfire-shell-v27" in worker
-    assert "nexorawildfire-data-v27" in worker
+    assert "nexorawildfire-shell-v40" in worker
+    assert "nexorawildfire-data-v40" in worker
     assert '"Cache-Control":"no-store"' in worker
 
 
@@ -65,5 +65,5 @@ def test_map_provider_status_is_separate_and_does_not_fake_observations():
     assert 'providerState("satellite","error"' in layers
     assert 'update("firms","error"' in firms
     assert "bu sıfır olay anlamına gelmez" in firms
-    assert 'src="../js/provider-status.js?v=20261022b"' in page
+    assert 'src="../js/provider-status.js?v=20261020a"' in page
     assert 'p.name+" · Open-Meteo"' not in layers
