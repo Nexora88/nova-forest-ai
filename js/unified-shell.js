@@ -3,17 +3,16 @@
   'use strict';
   const root=document.documentElement;
   const base=location.pathname.includes('/pages/')?'../':'./';
-  const logoUrl=base+'assets/nexora-wildfire-official.webp?v=20261107b';
   const appMarkUrl=base+'assets/nexora-wildfire-mark.png?v=20261111a';
   function brandHeader(){
     const header=document.querySelector('body>header');
     if(!header)return;
     header.innerHTML=
       '<a class="brand-lockup" href="'+base+'index.html" aria-label="NexoraWildfire AI ana sayfa">'+
-        '<img class="brand-logo" src="'+logoUrl+'" alt="" width="44" height="44">'+
+        '<img class="brand-logo" src="'+appMarkUrl+'" alt="" width="44" height="44">'+
         '<div class="logo">'+
           '<div class="brand-parent">NEXORA</div>'+
-          '<h1><span class="nx-brand-nexora">Nexora</span><span class="nx-brand-wildfire">Wildfire</span><span class="nx-brand-ai">AI</span></h1>'+
+          '<h1>NexoraWildfire AI</h1>'+
           '<p>Çevresel istihbarat · karar destek · EDGE</p>'+
         '</div>'+
       '</a>'+
@@ -35,7 +34,7 @@
   }
   function navigation(){
     const nav=document.querySelector('body>nav');
-    if(!nav)return;
+    if(!nav || nav.querySelector('.nx-nav-toggle'))return;
     nav.classList.add('nx-nav');
     if(!nav.hasAttribute('aria-label'))nav.setAttribute('aria-label','Ana gezinme');
     if(!nav.querySelector('.nav-brand')){
