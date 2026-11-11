@@ -73,8 +73,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v38', source)
-        self.assertIn('nexorawildfire-data-v38', source)
+        self.assertIn('nexorawildfire-shell-v39', source)
+        self.assertIn('nexorawildfire-data-v39', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
@@ -86,6 +86,13 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
         self.assertIn('unified-shell.js?v=20261111a', page)
+        styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
+        self.assertIn('#map .leaflet-top.leaflet-left{left:auto!important;right:10px!important}', styles)
+        self.assertIn('.nova-incident-banner .incident-actions [data-incident-close]{margin-left:auto!important}', styles)
+        self.assertIn('position:fixed!important', styles)
+        self.assertIn('body>header .nova-account-dock{gap:10px!important}', styles)
+        self.assertIn('color:#cbd5e1!important', styles)
+        self.assertIn('body>header>.status', styles)
 
     def test_real_agent_satellite_billing_and_verified_alert_integrations_exist(self):
         root = ROOT / "backend" / "app" / "api"
@@ -122,7 +129,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         pages = [ROOT / "index.html", *sorted((ROOT / "pages").glob("*.html"))]
         self.assertGreaterEqual(len(pages), 13)
         for page in pages:
-            self.assertIn("unified-shell.css?v=20261111a", page.read_text(encoding="utf-8"), str(page))
+            self.assertIn("unified-shell.css?v=20261111b", page.read_text(encoding="utf-8"), str(page))
             self.assertIn("unified-shell.js?v=20261111a", page.read_text(encoding="utf-8"), str(page))
 
     def test_map_timeline_handles_leaflet_center_without_saved_area(self):
@@ -146,7 +153,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v38', source)
+        self.assertIn('nexorawildfire-shell-v39', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
