@@ -18,15 +18,15 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
+      "src": "assets/nexora-wildfire-official.webp?v=20261107b",
       "sizes": "any",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "any"
     },
     {
-      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
+      "src": "assets/nexora-wildfire-official.webp?v=20261107b",
       "sizes": "any",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "maskable"
     }
   ]

@@ -1,7 +1,7 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v33";
-const DATA_CACHE = "nexorawildfire-data-v33";
+const CACHE_NAME = "nexorawildfire-shell-v35";
+const DATA_CACHE = "nexorawildfire-data-v35";
 
 const APP_SHELL = [
   "./",
@@ -19,6 +19,8 @@ const APP_SHELL = [
   "./pages/feedback.html",
   "./pages/about.html",
   "./css/style.css",
+  "./css/brand-layout-fix.css?v=20261107a",
+  "./css/personal-brief.css?v=20261107a",
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
@@ -31,7 +33,8 @@ const APP_SHELL = [
   "./js/i18n.js?v=20261022a",
   "./js/fire-safety-sim.js?v=20261022a",
   "./js/wind-fire-simulation.js?v=20261030a",
-  "./js/personal-field-brief.js?v=20261030a",
+  "./js/personal-field-brief.js?v=20261107a",
+  "./js/areas.js?v=20261107a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
@@ -74,8 +77,8 @@ const APP_SHELL = [
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
   "./assets/nexora-wildfire-official.webp",
-  "./assets/nexora-wildfire-logo.png",
-  "./assets/nexora-wildfire-logo.png?v=20261106d",
+  "./assets/nexora-wildfire-official.webp",
+  "./assets/nexora-wildfire-official.webp?v=20261107b",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
   "./assets/nexora-wildfire-official.webp",
   "./assets/nexora-wildfire-official.webp?v=20261017a",
@@ -181,8 +184,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: data.icon || new URL("./assets/nexora-wildfire-official.webp", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-official.webp", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }
