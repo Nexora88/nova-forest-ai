@@ -34,8 +34,8 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v39";', source)
-        self.assertIn('const DATA_CACHE = "nexorawildfire-data-v39";', source)
+        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v40";', source)
+        self.assertIn('const DATA_CACHE = "nexorawildfire-data-v40";', source)
 
     def test_service_worker_does_not_force_activate_updated_worker(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
