@@ -1,7 +1,6 @@
 /* Shared NexoraWildfire shell — loaded last on every route. */
 :root{
   --nx-brand-green:#10B981;
-  --nx-brand-orange:#F97316;
   --nx-shell-bg:#020604;
   --nx-shell-panel:rgba(10,25,18,.78);
   --nx-shell-line:rgba(16,185,129,.28);
@@ -11,7 +10,7 @@
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 body{
   font-family:Inter,"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
-  background:radial-gradient(ellipse at 50% -18%,rgba(16,185,129,.13),transparent 44%),var(--nx-shell-bg)!important;
+  background:var(--nx-shell-bg)!important;
   color:var(--nx-shell-text);
   line-height:1.6;
 }
@@ -28,9 +27,9 @@ body>header .brand-lockup{
 body>header .brand-lockup>.brand-logo{
   display:block!important;width:44px!important;height:44px!important;min-width:44px!important;
   max-width:44px!important;flex:0 0 44px;aspect-ratio:1/1;
-  object-fit:cover!important;object-position:left center!important;
-  border-radius:12px;background:transparent!important;
-  filter:drop-shadow(0 0 10px rgba(16,185,129,.18));
+  object-fit:contain!important;object-position:center!important;
+  border-radius:0;background:transparent!important;
+  filter:none!important;
 }
 body>header .brand-lockup .logo{display:block!important;min-width:0;overflow:hidden}
 body>header .brand-lockup .brand-parent{
@@ -42,13 +41,6 @@ body>header .brand-lockup .logo h1{
   margin:0!important;color:var(--nx-shell-text)!important;
   font:850 clamp(17px,2vw,24px)/1.08 Inter,system-ui,sans-serif!important;
   letter-spacing:-.045em!important;white-space:nowrap!important;overflow:visible;
-}
-body>header .brand-lockup .logo h1 .nx-brand-nexora{color:var(--nx-brand-green)!important}
-body>header .brand-lockup .logo h1 .nx-brand-wildfire{color:var(--nx-brand-orange)!important}
-body>header .brand-lockup .logo h1 .nx-brand-ai{
-  display:inline-flex;align-items:center;justify-content:center;margin-left:.12em;padding:.16em .34em;
-  border:1px solid rgba(148,163,184,.25);border-radius:5px;background:#17212a;
-  color:#dbe6ed!important;font-size:.62em;letter-spacing:.02em;line-height:1.2;
 }
 body>header .brand-lockup .logo p{
   margin:4px 0 0!important;color:#91A89A!important;
@@ -96,7 +88,7 @@ body>nav.nx-nav .nx-nav-toggle{
 }
 html[data-network="offline"] .nova-offline-bar{background:#21180b;border-color:#745323;color:#FFE0A3}
 html[data-network="online"] .nova-offline-bar{background:#061009;color:#A8EBC0}
-main,main.ops-main,main.lab-shell{min-width:0;max-width:100%;padding-bottom:calc(116px + env(safe-area-inset-bottom))!important}
+main,main.ops-main,main.lab-shell{min-width:0;max-width:100%;padding-bottom:24px!important}
 main>section{min-width:0;max-width:100%}
 h1,h2,h3,h4,.hero h2,.section-heading h2{font-family:Inter,"Plus Jakarta Sans",system-ui,sans-serif!important;color:var(--nx-shell-text)}
 .hero:not(.hero-command),.notice-panel,.sources,.insight-panel,.system-item,.card,.notify-panel,
@@ -117,7 +109,7 @@ h1,h2,h3,h4,.hero h2,.section-heading h2{font-family:Inter,"Plus Jakarta Sans",s
 .edge-dock{max-width:calc(100vw - 28px);z-index:11000}
 .nexora-language-toggle{z-index:1200!important}
 #nexora-install{position:fixed;right:14px;bottom:78px;z-index:11001;display:inline-flex;align-items:center;gap:8px;max-width:calc(100vw - 28px);padding:10px 13px;border:1px solid rgba(16,185,129,.38);border-radius:999px;background:#07150C;color:#E7FFF0;font:700 11px Inter,system-ui,sans-serif;box-shadow:0 8px 28px #0009}
-#nexora-install img{width:20px;height:20px;object-fit:cover;object-position:left center;border-radius:5px}
+#nexora-install img{width:20px;height:20px;object-fit:contain;object-position:center;border-radius:0}
 .nx-utility-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding:12px 18px 16px;min-width:0}
 .nx-utility-row .nexora-language-toggle,.nx-utility-row #nexora-install{position:static!important;inset:auto!important;transform:none!important;margin:0!important;max-width:100%}
 .nx-utility-row .edge-dock{position:static!important;inset:auto!important;transform:none!important;flex:1 1 100%;width:100%!important;max-width:none!important;margin:0!important}
@@ -126,7 +118,7 @@ body>header .nova-account-dock{position:static!important;inset:auto!important;tr
 @media(max-width:760px){
   body>header{gap:9px!important;padding:10px 12px!important;min-height:68px}
   body>header .brand-lockup{gap:9px!important}
-  body>header .brand-lockup>.brand-logo{width:32px!important;height:32px!important;min-width:32px!important;max-width:32px!important;flex-basis:32px}
+  body>header .brand-lockup>.brand-logo{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important;flex-basis:36px}
   body>header .brand-lockup .brand-parent{font-size:7px!important}
   body>header .brand-lockup .logo h1{font-size:clamp(15px,4.2vw,19px)!important;gap:.13em}
   body>header .brand-lockup .logo p{font-size:7px!important;letter-spacing:.035em!important;max-width:34ch}
@@ -138,7 +130,7 @@ body>header .nova-account-dock{position:static!important;inset:auto!important;tr
   body>nav.nx-nav.nx-nav-open .nx-nav-toggle{position:sticky;top:0;z-index:2;margin-bottom:7px}
   body>nav.nx-nav.nx-nav-open>a{display:flex;width:100%;max-width:none;flex:0 0 auto;justify-content:flex-start;padding:13px 14px!important;min-height:48px;font-size:14px!important;white-space:normal;text-align:left}
   .nova-offline-bar,.nx-connectivity-bar{font-size:9px;line-height:1.4;padding:6px 9px}
-  main,main.ops-main,main.lab-shell{padding:12px!important;padding-bottom:calc(132px + env(safe-area-inset-bottom))!important}
+  main,main.ops-main,main.lab-shell{padding:12px!important;padding-bottom:20px!important}
   .hero:not(.hero-command){padding:18px!important}
   .hero h2{font-size:clamp(23px,6vw,32px)!important;line-height:1.16}
   .hero p{font-size:13px;line-height:1.65}
@@ -152,7 +144,7 @@ body>header .nova-account-dock{position:static!important;inset:auto!important;tr
 }
 @media(max-width:360px){
   body>header .brand-lockup{gap:7px!important}
-  body>header .brand-lockup>.brand-logo{width:30px!important;height:30px!important;min-width:30px!important;max-width:30px!important;flex-basis:30px}
+  body>header .brand-lockup>.brand-logo{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;flex-basis:34px}
   body>header .brand-lockup .logo h1{font-size:14px!important}
   body>header .brand-lockup .logo p{font-size:6px!important}
 }
