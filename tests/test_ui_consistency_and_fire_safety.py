@@ -28,7 +28,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('if(!footer){footer=document.createElement("footer")', source)
         page = (ROOT / "pages" / "feedback.html").read_text(encoding="utf-8")
         self.assertIn('<html lang="tr">', page)
-        self.assertIn('i18n.js?v=20261022a', page)
+        self.assertIn('i18n.js?v=20261024a', page)
 
     def test_firms_alert_scope_is_limited_to_five_pilot_provinces(self):
         source = (ROOT / "js" / "live-risk-raster.js").read_text(encoding="utf-8")
@@ -73,8 +73,8 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v31', source)
-        self.assertIn('nexorawildfire-data-v30', source)
+        self.assertIn('nexorawildfire-shell-v37', source)
+        self.assertIn('nexorawildfire-data-v37', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
@@ -85,7 +85,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('data-panel-close', source)
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
-        self.assertIn('nexora-wildfire-logo-fallback.svg', page)
+        self.assertIn('unified-shell.js?v=20261111a', page)
 
     def test_real_agent_satellite_billing_and_verified_alert_integrations_exist(self):
         root = ROOT / "backend" / "app" / "api"
@@ -101,18 +101,52 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('internal/run-cycle', alerts)
         self.assertIn('NEXORA_NOTIFICATION_CRON_TOKEN', alerts)
 
-    def test_svg_brand_asset_and_layout_are_stable(self):
+    def test_official_brand_assets_and_responsive_layout_are_stable(self):
         page = (ROOT / "index.html").read_text(encoding="utf-8")
         manifest = (ROOT / "manifest.webmanifest").read_text(encoding="utf-8")
-        styles = (ROOT / "css" / "brand-layout-fix.css").read_text(encoding="utf-8")
-        self.assertIn('assets/nexora-wildfire-logo.svg', page)
-        self.assertIn('assets/nexora-wildfire-app-icon.svg', manifest)
-        self.assertIn('aspect-ratio:1200/320', styles)
-        self.assertIn('background:transparent!important', styles)
+        styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
+        shell = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
+        worker = (ROOT / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('nexora-wildfire-official.webp', shell)
+        self.assertIn('nx-brand-nexora', shell)
+        self.assertIn('nx-brand-wildfire', shell)
+        self.assertIn('nx-brand-ai', shell)
+        self.assertIn('nexora-wildfire-mark.png', manifest)
+        self.assertIn('"sizes": "512x512"', manifest)
+        self.assertIn('width:44px!important', styles)
+        self.assertIn('width:32px!important', styles)
+        self.assertIn('unified-shell.js?v=20261111a', page)
+        self.assertIn('nexora-wildfire-mark.png', worker)
+
+    def test_shared_shell_is_loaded_on_every_html_page(self):
+        pages = [ROOT / "index.html", *sorted((ROOT / "pages").glob("*.html"))]
+        self.assertGreaterEqual(len(pages), 13)
+        for page in pages:
+            self.assertIn("unified-shell.css?v=20261111a", page.read_text(encoding="utf-8"), str(page))
+            self.assertIn("unified-shell.js?v=20261111a", page.read_text(encoding="utf-8"), str(page))
+
+    def test_map_timeline_handles_leaflet_center_without_saved_area(self):
+        source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
+        self.assertIn('const center=map.getCenter();setForecastTarget("Harita merkezi",center.lat,center.lng)', source)
+        self.assertNotIn('const [lat,lon]=map.getCenter()', source)
+
+    def test_personal_shell_keeps_floating_controls_clear_of_page_content(self):
+        styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
+        shell = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
+        self.assertIn('main,main.ops-main,main.lab-shell{min-width:0;max-width:100%;padding-bottom:', styles)
+        self.assertIn('main,main.ops-main,main.lab-shell{padding:12px!important;padding-bottom:', styles)
+        self.assertIn('function utilityRow()', shell)
+        self.assertIn('main.insertAdjacentElement(\'afterend\',row)', shell)
+        self.assertIn("'.nexora-support-panel'", shell)
+        self.assertIn("'.nova-account-dock'", shell)
+        self.assertIn('.nx-utility-row .edge-dock{position:static!important', styles)
+        self.assertIn('.nx-utility-row #nexora-install{position:static!important', styles)
+        self.assertIn('.nx-utility-row .nexora-support-panel{position:relative!important', styles)
+        self.assertIn('body>header .nova-account-dock{position:static!important', styles)
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v30', source)
+        self.assertIn('nexorawildfire-shell-v37', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
