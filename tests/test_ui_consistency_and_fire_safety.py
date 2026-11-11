@@ -73,15 +73,15 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v37', source)
-        self.assertIn('nexorawildfire-data-v37', source)
+        self.assertIn('nexorawildfire-shell-v38', source)
+        self.assertIn('nexorawildfire-data-v38', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
 
-    def test_risk_map_controls_are_dismissible_and_provider_panel_is_not_injected(self):
+    def test_risk_map_controls_are_dismissible_and_provider_panel_is_loaded(self):
         page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
         source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
-        self.assertNotIn('provider-status.js', page)
+        self.assertIn('provider-status.js?v=20261020a', page)
         self.assertIn('data-panel-close', source)
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
@@ -146,7 +146,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v37', source)
+        self.assertIn('nexorawildfire-shell-v38', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261024a', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
