@@ -363,5 +363,28 @@ class MobileUiSmokeTests(unittest.TestCase):
 
 
 
+    def test_map_controls_do_not_overlap_map_on_mobile_or_desktop(self):
+        for width, height in ((360, 800), (390, 844), (768, 1024), (1440, 900)):
+            with self.subTest(width=width):
+                context, page = self.new_page(width=width, height=height)
+                try:
+                    page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector(".map-filters", timeout=15000)
+                    page.wait_for_selector("#map.leaflet-container", timeout=15000)
+                    relation = page.evaluate("""() => {
+                      const controls = document.querySelector('.map-section > .map-filters');
+                      const map = document.querySelector('.map-section > #map');
+                      const a = controls.getBoundingClientRect(), b = map.getBoundingClientRect();
+                      return {position:getComputedStyle(controls).position, controlsBottom:a.bottom, mapTop:b.top,
+                              overlap:Math.max(0, Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top))};
+                    }""")
+                    self.assertEqual(relation["position"], "relative")
+                    self.assertEqual(relation["overlap"], 0, f"map toolbar overlaps map canvas: {relation}")
+                    self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), width + 1)
+                finally:
+                    context.close()
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
