@@ -49,6 +49,18 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn('status:503', source)
         self.assertIn('response.status === 429 || response.status >= 500', source)
 
+    def test_offline_banner_explains_stale_provider_data_age(self):
+        source = (ROOT / "js" / "offline.js").read_text(encoding="utf-8")
+        self.assertIn('X-Nexora-Stale', source)
+        self.assertIn('X-Nexora-Stale-Age-Ms', source)
+        self.assertIn('son geçerli sağlayıcı verisi', source.lower())
+
+    def test_offline_landing_supports_both_languages(self):
+        source = (ROOT / "offline.html").read_text(encoding="utf-8")
+        self.assertIn('const en=', source)
+        self.assertIn('const tr=', source)
+        self.assertIn('id="language"', source)
+
     def test_nova_bee_is_reachable_from_shared_mobile_navigation(self):
         source = (ROOT / "js" / "mobile-nav.js").read_text(encoding="utf-8")
         self.assertIn('["pages/bee.html", "Nova Bee & Tarım", "Nova Bee & Agriculture"]', source)
