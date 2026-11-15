@@ -10,7 +10,7 @@
     if(!header)return;
     header.innerHTML=
       '<a class="brand-lockup" href="'+base+'index.html" aria-label="NexoraWildfire AI ana sayfa">'+
-        '<img class="brand-logo" src="'+appMarkUrl+'" alt="" width="48" height="48">'+
+        '<img class="brand-logo" src="'+wordmarkUrl+'" alt="" width="48" height="48">'+
         '<span class="brand-copy"><strong>NexoraWildfire AI</strong><small>Çevresel istihbarat platformu</small></span>'+
       '</a>'+
       '<div class="status" title="Trakya pilot alanı. Canlı veri kapsamı, ilgili sağlayıcının durumuna bağlıdır."><span></span> TRAKYA · PİLOT</div>';
