@@ -101,7 +101,7 @@ self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
       // Third-party CDNs are optional: weak connectivity must not block shell installation.
-      const localAssets = APP_SHELL.filter(asset => !/^https?:\\/\\//i.test(asset));
+      const localAssets = APP_SHELL.filter(asset => !asset.startsWith("http://") && !asset.startsWith("https://"));
       await Promise.allSettled(localAssets.map(asset => cache.add(asset)));
     })
   );
