@@ -34,7 +34,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v41";', source)
+        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v42";', source)
         self.assertIn('const DATA_CACHE = "nexorawildfire-data-v40";', source)
 
     def test_service_worker_has_offline_landing_and_exact_page_fallback(self):
@@ -48,6 +48,31 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn('X-Nexora-Stale', source)
         self.assertIn('status:503', source)
         self.assertIn('response.status === 429 || response.status >= 500', source)
+
+    def test_nova_farm_is_separate_and_precached(self):
+        source = (ROOT / "pages" / "farm.html").read_text(encoding="utf-8")
+        self.assertIn("Nova Farm", source)
+        self.assertIn("nova-farm.js", source)
+        self.assertIn("nova-farm.css", source)
+        worker = (ROOT / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('"./pages/farm.html"', worker)
+        self.assertIn('"./js/nova-farm.js?v=20261115b"', worker)
+
+    def test_atmosphere_uses_keyless_open_meteo_and_truthful_pollen_fallback(self):
+        source = (ROOT / "js" / "weather.js").read_text(encoding="utf-8")
+        self.assertIn("air-quality-api.open-meteo.com", source)
+        self.assertIn("Mevsim dışı veya kapsam dışı; sıfır değildir", source)
+        self.assertNotIn("api_key", source.lower())
+
+    def test_map_pollen_missing_data_is_not_zero(self):
+        source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
+        self.assertIn("values.length?Math.max(...values):null", source)
+        self.assertIn('mode==="pollen"&&r.pollen==null', source)
+
+    def test_map_controls_do_not_overlay_the_map(self):
+        source = (ROOT / "css" / "risk-map-premium.css").read_text(encoding="utf-8")
+        self.assertIn(".map-section .map-filters{position:relative!important", source)
+        self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", source)
 
     def test_offline_banner_explains_stale_provider_data_age(self):
         source = (ROOT / "js" / "offline.js").read_text(encoding="utf-8")
@@ -63,7 +88,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_nova_bee_is_reachable_from_shared_mobile_navigation(self):
         source = (ROOT / "js" / "mobile-nav.js").read_text(encoding="utf-8")
-        self.assertIn('["pages/bee.html", "Nova Bee & Tarım", "Nova Bee & Agriculture"]', source)
+        self.assertIn('["pages/bee.html", "Nova Bee", "Nova Bee"]', source)
 
     def test_shared_shell_uses_official_horizontal_wordmark(self):
         source = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
