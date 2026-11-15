@@ -15,8 +15,8 @@
  function providerState(key,state,detail,observedAt){window.NovaProviderStatus?.update(key,state,detail,observedAt)}
  function cMissing(obj,keys){return keys.some(k=>obj[k]==null)}
  function popup(place,kind,values,source,time){return '<div class="risk-popup"><div class="popup-kicker">'+safe(source)+'</div><h3>'+safe(place.name)+'</h3>'+values.map(v=>'<div class="metric-row"><span>'+safe(v[0])+'</span><b>'+safe(v[1])+'</b></div>').join("")+'<small>Güncelleme: '+safe(time||"kaynak zaman bilgisi yok")+'</small></div>'}
- overlays["Open-Meteo · Hava durumu"]=weatherLayer;
- overlays["Open-Meteo / CAMS · Hava kalitesi + polen"]=airLayer;
+ overlays["Open-Meteo · Hava + rüzgâr"]=weatherLayer;
+ overlays["CAMS · Hava kalitesi + polen"]=airLayer;
  overlays["USGS · Son 7 gün depremler"]=quakeLayer;
  const satelliteLayer=L.tileLayer.wms("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi",{
   layers:"MODIS_Terra_CorrectedReflectance_TrueColor",format:"image/jpeg",transparent:false,version:"1.1.1",time:new Date(Date.now()-86400000).toISOString().slice(0,10),attribution:"NASA Global Imagery Browse Services (GIBS)",tileSize:256
