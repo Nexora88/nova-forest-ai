@@ -33,7 +33,7 @@
     verifySatelliteCredentials();
   }
   async function verifySatelliteCredentials(){
-    const base=(window.NOVA_API_BASE||"/api").replace(/\/$/,"");
+    const base=(window.NOVA_API_BASE||(location.hostname.endsWith("github.io")?"https://nova-forest-ai.vercel.app/api":"/api")).replace(/\/$/,"");
     window.NovaProviderStatus.update("firmsKey","loading","NASA FIRMS anahtarı sunucu tarafında doğrulanıyor…");
     window.NovaProviderStatus.update("sentinelKey","loading","Copernicus CDSE kimlik bilgileri sunucu tarafında doğrulanıyor…");
     try{
