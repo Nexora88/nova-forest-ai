@@ -258,7 +258,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                                      f"active-page marker missing or duplicated on {path}")
                     self.assertEqual(page.locator('header img[src*="nexora-wildfire-official.webp"]').count(), 1,
                                      f"header logo missing or duplicated on {path}")
-                    self.assertTrue(page.locator('header img[src*="nexora-wildfire-mark.png"]').evaluate("(img) => img.complete && img.naturalWidth > 0"),
+                    self.assertTrue(page.locator('header img[src*="nexora-wildfire-official.webp"]').evaluate("(img) => img.complete && img.naturalWidth > 0"),
                                     f"header logo failed to load on {path}")
                     self.assertEqual(page.locator('nav.nx-nav a[href*="account.html"]').count(), 1,
                                      f"account link missing or duplicated on {path}")
@@ -308,7 +308,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
             keys = page.evaluate("caches.keys()")
-            self.assertIn("nexorawildfire-shell-v42", keys, "new app-shell cache version was not installed")
+            self.assertIn("nexorawildfire-shell-v44", keys, "new app-shell cache version was not installed")
             self.assertNotIn("nexorawildfire-shell-v20", keys, "stale app-shell cache was not removed")
             context.set_offline(True)
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)
