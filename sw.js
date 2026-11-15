@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v43";
+const CACHE_NAME = "nexorawildfire-shell-v44";
 const DATA_CACHE = "nexorawildfire-data-v40";
 
 const APP_SHELL = [
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "./js/install-update.js?v=20261115b",
   "./js/edge-ui.js?v=20261115b",
   "./js/free-data-layers.js?v=20261115b",
-  "./js/provider-status.js?v=20261115c",
+  "./js/provider-status.js?v=20261115d",
   "./js/personal-field-brief.js?v=20261115c",
   "./js/weather.js?v=20261115b",
   "./js/map.js?v=20261115b",
