@@ -4,6 +4,7 @@
     ["index.html", "Ana Panel", "Dashboard"],
     ["pages/map.html", "Risk Haritası", "Risk Map"],
     ["pages/areas.html", "Alanlarım", "My Areas"],
+    ["pages/bee.html", "Nova Bee & Tarım", "Nova Bee & Agriculture"],
     ["pages/weather.html", "Atmosfer", "Atmosphere"],
     ["pages/satellite.html", "Uydu Merkezi", "Satellite Hub"],
     ["pages/uav-demo.html", "İHA / Yapay Zekâ", "UAV / AI"],
