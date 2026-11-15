@@ -85,7 +85,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('data-panel-close', source)
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
-        self.assertIn('unified-shell.js?v=20261111b', page)
+        self.assertIn('unified-shell.js?v=20261115a', page)
         styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
         self.assertIn('#map .leaflet-top.leaflet-left{left:auto!important;right:10px!important}', styles)
         self.assertIn('.nova-incident-banner .incident-actions [data-incident-close]{margin-left:auto!important}', styles)
@@ -115,21 +115,23 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         shell = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
         worker = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('nexora-wildfire-mark.png', shell)
-        self.assertIn('<h1>NexoraWildfire AI</h1>', shell)
+        self.assertIn('brand-wordmark', shell)
+        self.assertIn('nexora-wildfire-official.webp', shell)
+        self.assertNotIn('<h1>NexoraWildfire AI</h1>', shell)
         self.assertNotIn('nx-brand-wildfire', shell)
         self.assertIn('nexora-wildfire-mark.png', manifest)
         self.assertIn('"sizes": "512x512"', manifest)
         self.assertIn('width:44px!important', styles)
         self.assertIn('width:36px!important', styles)
-        self.assertIn('unified-shell.js?v=20261111b', page)
+        self.assertIn('unified-shell.js?v=20261115a', page)
         self.assertIn('nexora-wildfire-mark.png', worker)
 
     def test_shared_shell_is_loaded_on_every_html_page(self):
         pages = [ROOT / "index.html", *sorted((ROOT / "pages").glob("*.html"))]
         self.assertGreaterEqual(len(pages), 13)
         for page in pages:
-            self.assertIn("unified-shell.css?v=20261111c", page.read_text(encoding="utf-8"), str(page))
-            self.assertIn("unified-shell.js?v=20261111b", page.read_text(encoding="utf-8"), str(page))
+            self.assertIn("unified-shell.css?v=20261115a", page.read_text(encoding="utf-8"), str(page))
+            self.assertIn("unified-shell.js?v=20261115a", page.read_text(encoding="utf-8"), str(page))
 
     def test_map_timeline_handles_leaflet_center_without_saved_area(self):
         source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
