@@ -26,7 +26,7 @@ def test_owner_scoped_rls_and_role_guard_are_declared():
 def test_service_worker_never_caches_authenticated_responses_and_rotates_shell():
     worker = read("sw.js")
     assert 'request.headers.has("authorization")' in worker
-    assert "nexorawildfire-shell-v41" in worker
+    assert "nexorawildfire-shell-v42" in worker
     assert "nexorawildfire-data-v40" in worker
     assert '"Cache-Control":"no-store"' in worker
 
@@ -49,7 +49,8 @@ def test_map_drilldown_is_explicit_and_controls_do_not_cover_map():
     assert 'data-open-district' in script
     assert 'l.on("click",()=>openProvince(r.name))' not in script
     assert 'if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()' in script
-    assert ".map-filters{\n  position:relative!important" in styles
+    styles = read("css/risk-map-premium.css")
+    assert ".map-section .map-filters{position:relative!important" in styles
 
 
 def test_map_provider_status_is_separate_and_does_not_fake_observations():
