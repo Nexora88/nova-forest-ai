@@ -350,6 +350,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     self.assertEqual(page.locator("header .brand-copy strong").inner_text(), "NexoraWildfire AI")
                     self.assertTrue(page.locator("link[data-nx-ux-polish]").count())
                     page.wait_for_selector(".area-card", timeout=20000)
+                    page.wait_for_function("Array.from(document.styleSheets).some(s => s.href && s.href.includes('ux-polish.css'))", timeout=10000)
                     self.assertFalse(page.locator(".area-details").evaluate("(el) => el.open"),
                                      "secondary metrics and event feed should be collapsed by default")
                     self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), width + 1,
@@ -371,6 +372,7 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
                     page.wait_for_selector(".map-filters", timeout=15000)
                     page.wait_for_selector("#map.leaflet-container", timeout=15000)
+                    page.wait_for_function("Array.from(document.styleSheets).some(s => s.href && s.href.includes('ux-polish.css'))", timeout=10000)
                     relation = page.evaluate("""() => {
                       const controls = document.querySelector('.map-section > .map-filters');
                       const map = document.querySelector('.map-section > #map');
