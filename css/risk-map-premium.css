@@ -160,3 +160,34 @@
 .map-panel-reopen{position:absolute!important;z-index:1001!important;top:78px!important;left:18px!important;min-height:44px;padding:10px 14px;border:1px solid #2a6540;border-radius:12px;background:#06110bf2;color:#baf8ca;font:750 12px/1.2 Inter,system-ui,sans-serif;box-shadow:0 10px 28px #0008;cursor:pointer}
 .map-panel-reopen:hover{border-color:#22e879;background:#0b2414}
 @media(max-width:700px){.map-filters{left:12px!important;top:12px!important;width:min(330px,calc(100% - 24px))!important;max-height:calc(100% - 24px);padding:13px!important}.map-panel-reopen{left:12px!important;top:12px!important;min-height:44px}.map-filters .map-panel-close{flex-basis:42px;width:42px;height:42px}}
+
+/* Map controls are a real toolbar, not a floating panel covering the map. */
+.map-section .map-filters{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;width:100%!important;max-width:100%!important;max-height:none!important;overflow:visible!important;margin:0 0 12px!important;padding:14px!important;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;animation:none!important;box-sizing:border-box}
+.map-section .map-filters[hidden]{display:none!important}
+.map-section .map-filters .filter-buttons{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px!important}
+.map-section .map-filters .filter-buttons button{min-width:0;min-height:46px!important;white-space:normal;line-height:1.25}
+.map-section .map-filters .map-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important;margin:0!important;padding:0!important;border:0!important}
+.map-section .map-filters .map-actions>*{min-width:0;min-height:44px!important;justify-content:center;text-align:center}
+.map-section .map-filters .map-breadcrumb{margin:0!important}
+.map-section .map-filters .legend{display:flex;flex-wrap:wrap;align-items:center}
+.map-section .map-filters .map-panel-close{display:none!important}
+.map-section .map-panel-reopen{position:relative!important;inset:auto!important;margin:0 0 12px!important}
+@media(max-width:900px){.map-section .map-filters .filter-buttons{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){
+ .map-section{padding:12px!important;border-radius:16px!important}
+ .map-toolbar{display:grid!important;grid-template-columns:1fr;gap:8px!important;font-size:9px!important}
+ .map-toolbar [data-map-status]{justify-self:start}
+ .map-section .map-filters{padding:11px!important;border-radius:13px!important}
+ .map-section .map-filters .filter-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .map-section .map-filters .filter-buttons button{min-height:48px!important;font-size:12px!important}
+ .map-section .map-filters .map-actions{grid-template-columns:1fr 1fr}
+ .map-section .map-filters .map-actions a{grid-column:1/-1}
+ #map{min-height:62dvh!important;height:62dvh!important;max-height:680px!important}
+ #map .leaflet-control-layers{max-width:calc(100vw - 38px)}
+ #map .leaflet-control-layers-list{max-height:42dvh;overflow:auto}
+}
+@media(min-width:601px){
+ .map-section .map-filters{grid-template-columns:minmax(0,1fr) auto;align-items:start}
+ .map-section .map-filters .map-filters-head,.map-section .map-filters .filter-buttons{grid-column:1/-1}
+ .map-section .map-filters .map-actions{grid-column:1/-1;grid-template-columns:repeat(3,minmax(130px,1fr));max-width:560px}
+}
