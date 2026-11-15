@@ -49,6 +49,10 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn('status:503', source)
         self.assertIn('response.status === 429 || response.status >= 500', source)
 
+    def test_nova_bee_is_reachable_from_shared_mobile_navigation(self):
+        source = (ROOT / "js" / "mobile-nav.js").read_text(encoding="utf-8")
+        self.assertIn('["pages/bee.html", "Nova Bee & Tarım", "Nova Bee & Agriculture"]', source)
+
     def test_shared_shell_uses_official_horizontal_wordmark(self):
         source = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
         styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
