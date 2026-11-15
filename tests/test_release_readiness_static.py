@@ -34,8 +34,27 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v40";', source)
-        self.assertIn('const DATA_CACHE = "nexorawildfire-data-v40";', source)
+        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v41";', source)
+        self.assertIn('const DATA_CACHE = "nexorawildfire-data-v41";', source)
+
+    def test_service_worker_has_offline_landing_and_exact_page_fallback(self):
+        source = (ROOT / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('"./offline.html"', source)
+        self.assertIn('caches.match("./offline.html")', source)
+        self.assertIn('caches.match(request)', source)
+
+    def test_provider_cache_marks_stale_data_and_does_not_fake_success(self):
+        source = (ROOT / "sw.js").read_text(encoding="utf-8")
+        self.assertIn('X-Nexora-Stale', source)
+        self.assertIn('status:503', source)
+        self.assertIn('response.status === 429 || response.status >= 500', source)
+
+    def test_shared_shell_uses_official_horizontal_wordmark(self):
+        source = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
+        styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
+        self.assertIn('nexora-wildfire-official.webp', source)
+        self.assertIn('brand-wordmark', source)
+        self.assertIn('.nova-account-dock{display:none!important}', styles)
 
     def test_service_worker_does_not_force_activate_updated_worker(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
