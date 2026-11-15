@@ -39,6 +39,7 @@ const APP_SHELL = [
   "./js/personal-field-brief.js?v=20261107a",
   "./js/areas.js?v=20261107a",
   "./js/unified-shell.js?v=20261115a",
+  "./js/offline.js?v=20261115a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
