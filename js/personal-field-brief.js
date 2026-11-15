@@ -75,6 +75,7 @@
         const ndvi=Number(data.latest.ndvi).toFixed(2),ndmi=finite(data.latest.ndmi)?Number(data.latest.ndmi).toFixed(2):"—";
         el.textContent=say("NDVI "+ndvi+" · NDMI "+ndmi,"NDVI "+ndvi+" · NDMI "+ndmi);
       }else if(data.status==="not_configured")el.textContent=say("Copernicus bağlantısı sunucuda yapılandırılmamış","Copernicus provider is not configured on the server");
+      else if(data.status==="no_observations")el.textContent=say("Bu alan ve tarih aralığı için geçerli Sentinel-2 piksel istatistiği yok; bu sıfır NDVI değildir.","No valid Sentinel-2 pixel statistics for this area and date range; this does not mean NDVI is zero.");
       else if(data.status==="available")el.textContent=say("İşlenmiş uydu örneği bulunamadı","No processed satellite samples returned");
       else el.textContent=say("Uydu verisi şu anda alınamıyor","Satellite data is currently unavailable");
     }catch{if(id===satelliteRequestId)el.textContent=say("Uydu kaynağına ulaşılamadı","Satellite source could not be reached")}
