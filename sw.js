@@ -1,11 +1,12 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v40";
-const DATA_CACHE = "nexorawildfire-data-v40";
+const CACHE_NAME = "nexorawildfire-shell-v41";
+const DATA_CACHE = "nexorawildfire-data-v41";
 
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./offline.html",
   "./pages/map.html",
   "./pages/bee.html",
   "./pages/areas.html",
@@ -98,12 +99,11 @@ const APP_SHELL = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async cache => {
-        // A single optional CDN/legacy asset must not prevent the local app shell from caching.
-        await Promise.allSettled(APP_SHELL.map(asset => cache.add(asset)));
-      })
-      // Updated workers wait until the app explicitly approves activation.
+    caches.open(CACHE_NAME).then(async cache => {
+      // Third-party CDNs are optional: weak connectivity must not block shell installation.
+      const localAssets = APP_SHELL.filter(asset => !/^https?:\\/\\//i.test(asset));
+      await Promise.allSettled(localAssets.map(asset => cache.add(asset)));
+    })
   );
 });
 
@@ -141,45 +141,79 @@ self.addEventListener("fetch", event => {
   }
 
   if (isDataRequest(url)) {
-    event.respondWith(
-      fetch(request).then(response => {
+    event.respondWith((async () => {
+      const cache = await caches.open(DATA_CACHE);
+      const cached = await cache.match(request);
+      const stale = async () => {
+        if (!cached) return null;
+        const headers = new Headers(cached.headers);
+        headers.set("X-Nexora-Cache", "stale");
+        headers.set("X-Nexora-Stale", "true");
+        return new Response(await cached.clone().arrayBuffer(), {
+          status: cached.status, statusText: cached.statusText, headers
+        });
+      };
+      try {
+        const response = await fetch(request);
         if (response.ok) {
-          const copy = response.clone();
-          caches.open(DATA_CACHE).then(cache => cache.put(request, copy));
+          await cache.put(request, response.clone());
+          return response;
+        }
+        if (response.status === 429 || response.status >= 500) {
+          const fallback = await stale();
+          if (fallback) return fallback;
         }
         return response;
-      }).catch(() =>
-        caches.match(request).then(cached => cached || new Response(
-          JSON.stringify({status:"offline",offline:true,message:"Bağlantı yok. Son geçerli veri mevcutsa yerel önbellekten gösterilir."}),
-          {headers:{"Content-Type":"application/json"},status:200}
-        ))
-      )
-    );
+      } catch {
+        const fallback = await stale();
+        return fallback || new Response(
+          JSON.stringify({status:"offline",offline:true,stale:false,message:"Bağlantı yok ve bu istek için önceden kaydedilmiş veri bulunamadı."}),
+          {headers:{"Content-Type":"application/json","Cache-Control":"no-store"},status:503}
+        );
+      }
+    })());
     return;
   }
 
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        return response;
-      }).catch(() => caches.match(request).then(c => c || caches.match("./index.html")))
-    );
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+          return response;
+        }
+        return await caches.match(request) || response;
+      } catch {
+        return await caches.match(request) ||
+          await caches.match("./offline.html") ||
+          await caches.match("./index.html") ||
+          new Response("NexoraWildfire AI çevrimdışı. Daha önce açılmış sayfayı tekrar deneyin.", {
+            status: 503, headers: {"Content-Type":"text/plain; charset=utf-8"}
+          });
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then(cached =>
-      cached || fetch(request).then(response => {
-        if (response.ok && (url.origin === self.location.origin)) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        }
-        return response;
-      }).catch(() => cached)
-    )
-  );
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    try {
+      const response = await fetch(request);
+      if (response.ok && url.origin === self.location.origin) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    } catch {
+      return new Response("Bu kaynak çevrimdışıyken önbellekte bulunamadı.", {
+        status: 503, headers: {"Content-Type":"text/plain; charset=utf-8"}
+      });
+    }
+  })());
 });
 
 self.addEventListener("push", event => {
