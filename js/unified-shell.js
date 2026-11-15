@@ -4,17 +4,13 @@
   const root=document.documentElement;
   const base=location.pathname.includes('/pages/')?'../':'./';
   const appMarkUrl=base+'assets/nexora-wildfire-mark.png?v=20261111a';
+  const wordmarkUrl=base+'assets/nexora-wildfire-official.webp?v=20261115a';
   function brandHeader(){
     const header=document.querySelector('body>header');
     if(!header)return;
     header.innerHTML=
       '<a class="brand-lockup" href="'+base+'index.html" aria-label="NexoraWildfire AI ana sayfa">'+
-        '<img class="brand-logo" src="'+appMarkUrl+'" alt="" width="44" height="44">'+
-        '<div class="logo">'+
-          '<div class="brand-parent">NEXORA</div>'+
-          '<h1>NexoraWildfire AI</h1>'+
-          '<p>Çevresel istihbarat · karar destek · EDGE</p>'+
-        '</div>'+
+        '<img class="brand-logo brand-wordmark" src="'+wordmarkUrl+'" alt="NexoraWildfire AI" width="230" height="76">'+
       '</a>'+
       '<div class="status" title="Trakya pilot alanı. Canlı veri kapsamı, ilgili sağlayıcının durumuna bağlıdır."><span></span> TRAKYA · PİLOT</div>';
   }
@@ -81,8 +77,8 @@
         const item=document.querySelector(selector);
         if(item&&item.parentElement!==row)row.appendChild(item);
       });
-      const account=document.querySelector('.nova-account-dock'),header=document.querySelector('body>header');
-      if(account&&header&&account.parentElement!==header)header.appendChild(account);
+      const account=document.querySelector('.nova-account-dock');
+      if(account)account.remove();
     };
     move();
     const observer=new MutationObserver(move);
