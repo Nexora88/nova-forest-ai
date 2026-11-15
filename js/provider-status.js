@@ -34,22 +34,22 @@
   }
   async function verifySatelliteCredentials(){
     const base=(window.NOVA_API_BASE||"/api").replace(/\/$/,"");
-    update("firmsKey","loading","NASA FIRMS anahtarı sunucu tarafında doğrulanıyor…");
-    update("sentinelKey","loading","Copernicus CDSE kimlik bilgileri sunucu tarafında doğrulanıyor…");
+    window.NovaProviderStatus.update("firmsKey","loading","NASA FIRMS anahtarı sunucu tarafında doğrulanıyor…");
+    window.NovaProviderStatus.update("sentinelKey","loading","Copernicus CDSE kimlik bilgileri sunucu tarafında doğrulanıyor…");
     try{
       const response=await fetch(base+"/satellite/providers/status?probe=true",{cache:"no-store"});
       if(!response.ok)throw new Error("HTTP "+response.status);
       const payload=await response.json(),providers=payload.providers||{};
       const firms=providers.nasa_firms||{},sentinel=providers.copernicus_sentinel_hub||{};
-      update("firmsKey",firms.status==="authorized"?"ok":"error",
+      window.NovaProviderStatus.update("firmsKey",firms.status==="authorized"?"ok":"error",
         firms.status==="authorized"?"NASA FIRMS anahtarı kabul edildi; gizli değer gösterilmedi.":
         firms.status==="not_configured"?"FIRMS_MAP_KEY sunucuda bulunamadı.":"NASA FIRMS anahtarı doğrulanamadı ("+firms.status+").");
-      update("sentinelKey",sentinel.status==="authorized"?"ok":"error",
+      window.NovaProviderStatus.update("sentinelKey",sentinel.status==="authorized"?"ok":"error",
         sentinel.status==="authorized"?"Copernicus erişim belirteci alındı; kimlik bilgileri gizli tutuldu.":
         sentinel.status==="not_configured"?"CDSE_CLIENT_ID / CDSE_CLIENT_SECRET sunucuda bulunamadı.":"Copernicus kimlik doğrulaması tamamlanamadı ("+sentinel.status+").");
     }catch(error){
-      update("firmsKey","error","Sunucu sağlayıcı kontrolüne ulaşılamadı; anahtar durumu doğrulanamadı.");
-      update("sentinelKey","error","Sunucu sağlayıcı kontrolüne ulaşılamadı; kimlik bilgileri doğrulanamadı.");
+      window.NovaProviderStatus.update("firmsKey","error","Sunucu sağlayıcı kontrolüne ulaşılamadı; anahtar durumu doğrulanamadı.");
+      window.NovaProviderStatus.update("sentinelKey","error","Sunucu sağlayıcı kontrolüne ulaşılamadı; kimlik bilgileri doğrulanamadı.");
     }
   }
   window.NovaProviderStatus={
