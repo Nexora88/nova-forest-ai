@@ -34,7 +34,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v42";', source)
+        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v43";', source)
         self.assertIn('const DATA_CACHE = "nexorawildfire-data-v40";', source)
 
     def test_service_worker_has_offline_landing_and_exact_page_fallback(self):
@@ -73,6 +73,32 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         source = (ROOT / "css" / "risk-map-premium.css").read_text(encoding="utf-8")
         self.assertIn(".map-section .map-filters{position:relative!important", source)
         self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", source)
+
+    def test_primary_area_is_shared_by_farm_bee_and_personal_brief(self):
+        farm = (ROOT / "js" / "nova-farm.js").read_text(encoding="utf-8")
+        bee = (ROOT / "js" / "nova-bee.js").read_text(encoding="utf-8")
+        brief = (ROOT / "js" / "personal-field-brief.js").read_text(encoding="utf-8")
+        shared_key = "nexorawildfire-primary-area-v1"
+        for source in (farm, bee, brief):
+            self.assertIn(shared_key, source)
+        self.assertIn("nexorawildfire-home-v1", farm)
+        self.assertIn("nexorawildfire-home-v1", bee)
+
+    def test_sentinel_empty_timeseries_is_not_reported_as_available(self):
+        source = (ROOT / "backend" / "app" / "services" / "ndvi_service.py").read_text(encoding="utf-8")
+        self.assertIn('"status": "no_observations"', source)
+        self.assertIn("Bu durum sıfır NDVI anlamına gelmez", source)
+        self.assertIn('"status":"available"', source)
+
+    def test_map_provider_panel_probes_credentials_without_exposing_them(self):
+        source = (ROOT / "js" / "provider-status.js").read_text(encoding="utf-8")
+        route = (ROOT / "backend" / "app" / "api" / "satellite_routes.py").read_text(encoding="utf-8")
+        self.assertIn("/satellite/providers/status?probe=true", source)
+        self.assertIn("FIRMS_MAP_KEY", route)
+        self.assertIn("CDSE_CLIENT_SECRET", route)
+        self.assertIn('"secret_exposed": False', route)
+        self.assertIn("NASA FIRMS anahtarı kabul edildi", source)
+        self.assertIn("Copernicus erişim belirteci alındı", source)
 
     def test_offline_banner_explains_stale_provider_data_age(self):
         source = (ROOT / "js" / "offline.js").read_text(encoding="utf-8")
