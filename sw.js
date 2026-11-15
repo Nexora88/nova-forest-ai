@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v41";
+const CACHE_NAME = "nexorawildfire-shell-v42";
 const DATA_CACHE = "nexorawildfire-data-v40";
 
 const APP_SHELL = [
@@ -9,6 +9,7 @@ const APP_SHELL = [
   "./offline.html",
   "./pages/map.html",
   "./pages/bee.html",
+  "./pages/farm.html",
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
@@ -21,6 +22,8 @@ const APP_SHELL = [
   "./pages/about.html",
   "./css/style.css",
   "./css/unified-shell.css?v=20261115a",
+  "./css/nova-farm.css?v=20261115b",
+  "./css/risk-map-premium.css?v=20261115b",
   "./css/brand-layout-fix.css?v=20261111c",
   "./css/brand-layout-fix.css?v=20261107a",
   "./css/personal-brief.css?v=20261107a",
@@ -44,7 +47,11 @@ const APP_SHELL = [
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
   "./js/map.js?v=20261024a",
-  "./js/nova-bee.js?v=20261024a",
+  "./js/nova-bee.js?v=20261115b",
+  "./js/nova-farm.js?v=20261115b",
+  "./js/weather.js?v=20261115b",
+  "./js/map.js?v=20261115b",
+  "./js/free-data-layers.js?v=20261115b",
   "./js/i18n.js?v=20261024a",
   "./js/live-risk-raster.js?v=20261022a",
   "./js/mobile-nav.js",
