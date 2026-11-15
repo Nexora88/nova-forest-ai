@@ -1,6 +1,6 @@
 /* UX pass: calmer hierarchy, readable brand, predictable responsive layout. */
 body>header .brand-lockup{gap:12px!important;max-width:min(100%,720px)!important}
-body>header .brand-lockup>.brand-logo{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;flex:0 0 46px!important;aspect-ratio:1!important;object-fit:contain!important}
+body>header .brand-lockup>.brand-logo{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;flex:0 0 46px!important;aspect-ratio:1!important;object-fit:cover!important;object-position:left center!important;overflow:hidden!important}
 body>header .brand-copy{display:grid;gap:3px;min-width:0}
 body>header .brand-copy strong{display:block;color:#f2fff6;font:800 clamp(16px,1.7vw,22px)/1.15 Inter,system-ui,sans-serif;letter-spacing:-.035em;white-space:nowrap}
 body>header .brand-copy small{display:block;color:#8ba596;font:600 9px/1.35 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
