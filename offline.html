@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#020604">
+<meta name="description" content="NexoraWildfire AI offline mode. Cached pages may remain available; live provider data may be unavailable.">
 <title>Çevrimdışı · NexoraWildfire AI</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#020604;color:#eff8f1}
@@ -14,19 +15,22 @@ img{display:block;width:min(100%,230px);height:auto;margin-bottom:24px}
 h1{font-size:clamp(26px,6vw,42px);line-height:1.08;margin:12px 0}
 p{color:#a9b9ae;line-height:1.7}
 .notice{margin:20px 0;padding:14px;border:1px solid #6d542b;border-radius:12px;background:#1b160b;color:#ffe1a6;font-size:13px;line-height:1.6}
-a{display:inline-flex;align-items:center;min-height:46px;padding:0 17px;border-radius:10px;background:#0b8b4c;color:white;text-decoration:none;font-weight:750}
+a,button{display:inline-flex;align-items:center;min-height:46px;padding:0 17px;border-radius:10px;background:#0b8b4c;color:white;text-decoration:none;font-weight:750;border:0;cursor:pointer}button{margin-left:8px;background:#12251a;border:1px solid #24583a}
 small{display:block;margin-top:18px;color:#74877a;line-height:1.6}
 </style>
 </head>
 <body>
 <main>
 <img src="./assets/nexora-wildfire-official.webp" alt="NexoraWildfire AI">
-<div class="eyebrow">NEXORA EDGE · OFFLINE MODE</div>
-<h1>Bağlantı şu anda kullanılamıyor.</h1>
-<p>Daha önce ziyaret ettiğin ve cihazına kaydedilmiş sayfalar çevrimdışı açılabilir. Kişisel alan kayıtların cihazında saklanır.</p>
-<div class="notice"><strong>Önemli:</strong> Çevrimdışı durumda hava tahmini, NASA FIRMS, uydu görüntüleri ve sunucu analizleri güncel olmayabilir veya kullanılamayabilir. Son kayıtların zamanı kontrol edilmeden karar verme.</div>
-<a href="./index.html">Ana panele dön</a>
-<small>İnternet bağlantısı geri geldiğinde sayfayı yenileyebilirsin. Bu ekran resmî yangın bildirimi veya acil durum hizmeti değildir.</small>
+<div class="eyebrow" id="eyebrow">NEXORA EDGE · OFFLINE MODE</div>
+<h1 id="title">Bağlantı şu anda kullanılamıyor.</h1>
+<p id="description">Daha önce ziyaret ettiğin ve cihazına kaydedilmiş sayfalar çevrimdışı açılabilir. Kişisel alan kayıtların cihazında saklanır.</p>
+<div class="notice" id="notice"><strong>Önemli:</strong> Çevrimdışı durumda hava tahmini, NASA FIRMS, uydu görüntüleri ve sunucu analizleri güncel olmayabilir veya kullanılamayabilir. Son kayıtların zamanı kontrol edilmeden karar verme.</div>
+<a id="home" href="./index.html">Ana panele dön</a><button id="language" type="button" aria-label="Switch language">EN</button>
+<small id="footnote">İnternet bağlantısı geri geldiğinde sayfayı yenileyebilirsin. Bu ekran resmî yangın bildirimi veya acil durum hizmeti değildir.</small>
 </main>
+<script>
+(function(){const en={eyebrow:"NEXORA EDGE · OFFLINE MODE",title:"The connection is currently unavailable.",description:"Pages you previously visited and cached on this device may still open offline. Your personal area records are stored on this device.",notice:"Important: Weather forecasts, NASA FIRMS, satellite imagery and server analyses may be unavailable or out of date while offline. Check the timestamp of the last observation before relying on it.",home:"Return to dashboard",footnote:"Refresh when your connection returns. This page is not an official wildfire alert or emergency service."};const tr={eyebrow:"NEXORA EDGE · OFFLINE MODE",title:"Bağlantı şu anda kullanılamıyor.",description:"Daha önce ziyaret ettiğin ve cihazına kaydedilmiş sayfalar çevrimdışı açılabilir. Kişisel alan kayıtların cihazında saklanır.",notice:"Önemli: Çevrimdışı durumda hava tahmini, NASA FIRMS, uydu görüntüleri ve sunucu analizleri güncel olmayabilir veya kullanılamayabilir. Son kayıtların zamanı kontrol edilmeden karar verme.",home:"Ana panele dön",footnote:"İnternet bağlantısı geri geldiğinde sayfayı yenileyebilirsin. Bu ekran resmî yangın bildirimi veya acil durum hizmeti değildir."};let lang=(navigator.language||"tr").toLowerCase().startsWith("en")?"en":"tr";function paint(){const d=lang==="en"?en:tr;document.documentElement.lang=lang;Object.keys(d).forEach(k=>document.getElementById(k).textContent=d[k]);document.getElementById("language").textContent=lang==="en"?"TR":"EN"}document.getElementById("language").addEventListener("click",()=>{lang=lang==="en"?"tr":"en";paint()});paint()})();
+</script>
 </body>
 </html>
