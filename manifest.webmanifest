@@ -10,22 +10,18 @@
   "background_color": "#020303",
   "theme_color": "#020303",
   "lang": "tr",
-  "categories": [
-    "utilities",
-    "productivity",
-    "weather"
-  ],
+  "categories": ["utilities", "productivity", "weather"],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
-      "sizes": "any",
+      "src": "assets/nexora-wildfire-mark.png?v=20261111a",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/nexora-wildfire-logo.png?v=20261106d",
-      "sizes": "any",
+      "src": "assets/nexora-wildfire-mark.png?v=20261111a",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }

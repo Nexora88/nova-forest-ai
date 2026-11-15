@@ -1,6 +1,12 @@
 /* Honest network state: connectivity is not proof that any provider is healthy or fresh. */
 (function(){
   const root=document.documentElement;
+  let staleAt=0;
+  function ageLabel(){
+    if(!staleAt)return "";
+    const hours=Math.max(0,Math.floor((Date.now()-staleAt)/3600000));
+    return hours<1?"1 saatten kısa süre önce":hours+" saat önce";
+  }
   function setNetwork(){
     const online=navigator.onLine;
     root.dataset.network=online?"online":"offline";
@@ -17,12 +23,26 @@
     const message=document.createElement("span");
     if(online){
       strong.textContent="● BAĞLANTI VAR";
-      message.textContent=" • İnternet erişilebilir; FIRMS, hava durumu ve uydu sağlayıcılarının durumu ayrıca doğrulanmalıdır.";
+      message.textContent=staleAt?" • Son geçerli sağlayıcı verisi "+ageLabel()+" kaydedilmiş; yeni veri ayrıca doğrulanmalıdır.":" • İnternet erişilebilir; FIRMS, hava durumu ve uydu sağlayıcılarının durumu ayrıca doğrulanmalıdır.";
     }else{
       strong.textContent="● ÇEVRİMDIŞI";
-      message.textContent=" • Önbellekteki arayüz kullanılabilir; canlı veriler güncel olmayabilir veya hiç bulunmayabilir.";
+      message.textContent=staleAt?" • Son geçerli sağlayıcı verisi "+ageLabel()+"; güncel olmayabilir.":" • Önbellekteki arayüz kullanılabilir; canlı veriler güncel olmayabilir veya hiç bulunmayabilir.";
     }
     bar.append(strong,message);
+  }
+  // Surface stale-but-usable provider responses without altering the response returned to app code.
+  if(typeof window.fetch==="function"){
+    const nativeFetch=window.fetch.bind(window);
+    window.fetch=async function(...args){
+      const response=await nativeFetch(...args);
+      if(response.headers?.get("X-Nexora-Stale")==="true"){
+        const age=Number(response.headers.get("X-Nexora-Stale-Age-Ms")||0);
+        staleAt=Date.now()-Math.max(0,age);
+        root.dataset.dataFreshness="stale";
+        setNetwork();
+      }
+      return response;
+    };
   }
   window.addEventListener("online",setNetwork);
   window.addEventListener("offline",setNetwork);

@@ -1,13 +1,15 @@
 
 
-const CACHE_NAME = "nexorawildfire-shell-v33";
-const DATA_CACHE = "nexorawildfire-data-v33";
+const CACHE_NAME = "nexorawildfire-shell-v44";
+const DATA_CACHE = "nexorawildfire-data-v40";
 
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./offline.html",
   "./pages/map.html",
   "./pages/bee.html",
+  "./pages/farm.html",
   "./pages/areas.html",
   "./pages/weather.html",
   "./pages/satellite.html",
@@ -19,6 +21,12 @@ const APP_SHELL = [
   "./pages/feedback.html",
   "./pages/about.html",
   "./css/style.css",
+  "./css/unified-shell.css?v=20261115a",
+  "./css/nova-farm.css?v=20261115b",
+  "./css/risk-map-premium.css?v=20261115b",
+  "./css/brand-layout-fix.css?v=20261111c",
+  "./css/brand-layout-fix.css?v=20261107a",
+  "./css/personal-brief.css?v=20261107a",
   "./css/style.css?v=20261010c",
   "./css/style.css?v=20261022a",
   "./css/style.css?v=20261024a",
@@ -31,12 +39,24 @@ const APP_SHELL = [
   "./js/i18n.js?v=20261022a",
   "./js/fire-safety-sim.js?v=20261022a",
   "./js/wind-fire-simulation.js?v=20261030a",
-  "./js/personal-field-brief.js?v=20261030a",
+  "./js/personal-field-brief.js?v=20261107a",
+  "./js/areas.js?v=20261107a",
+  "./js/unified-shell.js?v=20261115a",
+  "./js/offline.js?v=20261115a",
   "./js/map.js",
   "./js/map.js?v=20261012c",
   "./js/map.js?v=20261017c",
   "./js/map.js?v=20261024a",
-  "./js/nova-bee.js?v=20261024a",
+  "./js/nova-bee.js?v=20261115c",
+  "./js/nova-farm.js?v=20261115c",
+  "./js/mobile-nav.js?v=20261115b",
+  "./js/install-update.js?v=20261115b",
+  "./js/edge-ui.js?v=20261115b",
+  "./js/free-data-layers.js?v=20261115b",
+  "./js/provider-status.js?v=20261115d",
+  "./js/personal-field-brief.js?v=20261115c",
+  "./js/weather.js?v=20261115b",
+  "./js/map.js?v=20261115b",
   "./js/i18n.js?v=20261024a",
   "./js/live-risk-raster.js?v=20261022a",
   "./js/mobile-nav.js",
@@ -74,8 +94,9 @@ const APP_SHELL = [
   "./js/special-days.js",
   "./assets/nexora-wildfire-logo-fallback.svg",
   "./assets/nexora-wildfire-official.webp",
-  "./assets/nexora-wildfire-logo.png",
-  "./assets/nexora-wildfire-logo.png?v=20261106d",
+  "./assets/nexora-wildfire-official.webp",
+  "./assets/nexora-wildfire-official.webp?v=20261107b",
+  "./assets/nexora-wildfire-mark.png?v=20261111a",
   "./assets/nexora-wildfire-logo-fallback.svg?v=20261017c",
   "./assets/nexora-wildfire-official.webp",
   "./assets/nexora-wildfire-official.webp?v=20261017a",
@@ -91,12 +112,11 @@ const APP_SHELL = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async cache => {
-        // A single optional CDN/legacy asset must not prevent the local app shell from caching.
-        await Promise.allSettled(APP_SHELL.map(asset => cache.add(asset)));
-      })
-      // Updated workers wait until the app explicitly approves activation.
+    caches.open(CACHE_NAME).then(async cache => {
+      // Third-party CDNs are optional: weak connectivity must not block shell installation.
+      const localAssets = APP_SHELL.filter(asset => !asset.startsWith("http://") && !asset.startsWith("https://"));
+      await Promise.allSettled(localAssets.map(asset => cache.add(asset)));
+    })
   );
 });
 
@@ -134,45 +154,88 @@ self.addEventListener("fetch", event => {
   }
 
   if (isDataRequest(url)) {
-    event.respondWith(
-      fetch(request).then(response => {
+    event.respondWith((async () => {
+      const cache = await caches.open(DATA_CACHE);
+      const cached = await cache.match(request);
+      const stale = async () => {
+        if (!cached) return null;
+        const headers = new Headers(cached.headers);
+        const cachedAt = Number(headers.get("X-Nexora-Cached-At") || 0);
+        const age = cachedAt ? Date.now() - cachedAt : Number.POSITIVE_INFINITY;
+        if (age > 24 * 60 * 60 * 1000) return null;
+        headers.set("X-Nexora-Cache", "stale");
+        headers.set("X-Nexora-Stale", "true");
+        headers.set("X-Nexora-Stale-Age-Ms", String(age));
+        return new Response(await cached.clone().arrayBuffer(), {
+          status: cached.status, statusText: cached.statusText, headers
+        });
+      };
+      try {
+        const response = await fetch(request);
         if (response.ok) {
-          const copy = response.clone();
-          caches.open(DATA_CACHE).then(cache => cache.put(request, copy));
+          const headers = new Headers(response.headers);
+          headers.set("X-Nexora-Cached-At", String(Date.now()));
+          const stored = new Response(await response.clone().arrayBuffer(), {
+            status: response.status, statusText: response.statusText, headers
+          });
+          await cache.put(request, stored);
+          return response;
+        }
+        if (response.status === 429 || response.status >= 500) {
+          const fallback = await stale();
+          if (fallback) return fallback;
         }
         return response;
-      }).catch(() =>
-        caches.match(request).then(cached => cached || new Response(
-          JSON.stringify({status:"offline",offline:true,message:"Bağlantı yok. Son geçerli veri mevcutsa yerel önbellekten gösterilir."}),
-          {headers:{"Content-Type":"application/json"},status:200}
-        ))
-      )
-    );
+      } catch {
+        const fallback = await stale();
+        return fallback || new Response(
+          JSON.stringify({status:"offline",offline:true,stale:false,message:"Bağlantı yok ve bu istek için önceden kaydedilmiş veri bulunamadı."}),
+          {headers:{"Content-Type":"application/json","Cache-Control":"no-store"},status:503}
+        );
+      }
+    })());
     return;
   }
 
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        return response;
-      }).catch(() => caches.match(request).then(c => c || caches.match("./index.html")))
-    );
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+          return response;
+        }
+        return await caches.match(request) || response;
+      } catch {
+        return await caches.match(request) ||
+          await caches.match("./offline.html") ||
+          await caches.match("./index.html") ||
+          new Response("NexoraWildfire AI çevrimdışı. Daha önce açılmış sayfayı tekrar deneyin.", {
+            status: 503, headers: {"Content-Type":"text/plain; charset=utf-8"}
+          });
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then(cached =>
-      cached || fetch(request).then(response => {
-        if (response.ok && (url.origin === self.location.origin)) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        }
-        return response;
-      }).catch(() => cached)
-    )
-  );
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    try {
+      const response = await fetch(request);
+      if (response.ok && url.origin === self.location.origin) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    } catch {
+      return new Response("Bu kaynak çevrimdışıyken önbellekte bulunamadı.", {
+        status: 503, headers: {"Content-Type":"text/plain; charset=utf-8"}
+      });
+    }
+  })());
 });
 
 self.addEventListener("push", event => {
@@ -181,8 +244,8 @@ self.addEventListener("push", event => {
   const title = data.title || "NexoraWildfire AI";
   const options = {
     body: data.message || "Yeni çevresel uyarı var.",
-    icon: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
-    badge: data.icon || new URL("./assets/nexora-wildfire-logo.png", self.registration.scope).href,
+    icon: data.icon || new URL("./assets/nexora-wildfire-mark.png", self.registration.scope).href,
+    badge: data.icon || new URL("./assets/nexora-wildfire-mark.png", self.registration.scope).href,
     tag: data.tag || "nexorawildfire-alert",
     renotify: true,
     data: { url: data.url || "./" }

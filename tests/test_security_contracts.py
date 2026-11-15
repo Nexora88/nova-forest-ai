@@ -26,8 +26,8 @@ def test_owner_scoped_rls_and_role_guard_are_declared():
 def test_service_worker_never_caches_authenticated_responses_and_rotates_shell():
     worker = read("sw.js")
     assert 'request.headers.has("authorization")' in worker
-    assert "nexorawildfire-shell-v27" in worker
-    assert "nexorawildfire-data-v27" in worker
+    assert "nexorawildfire-shell-v44" in worker
+    assert "nexorawildfire-data-v40" in worker
     assert '"Cache-Control":"no-store"' in worker
 
 
@@ -49,7 +49,18 @@ def test_map_drilldown_is_explicit_and_controls_do_not_cover_map():
     assert 'data-open-district' in script
     assert 'l.on("click",()=>openProvince(r.name))' not in script
     assert 'if(!selectedProvince&&!selectedDistrict&&!drawMode)loadProvinceData()' in script
-    assert ".map-filters{\n  position:relative!important" in styles
+    styles = read("css/risk-map-premium.css")
+    assert ".map-section .map-filters{position:relative!important" in styles
+
+
+def test_map_provider_status_checks_firms_and_copernicus_credentials_safely():
+    panel = read("js/provider-status.js")
+    route = read("backend/app/api/satellite_routes.py")
+    assert "/satellite/providers/status?probe=true" in panel
+    assert "firmsKey" in panel and "sentinelKey" in panel
+    assert '"secret_exposed": False' in route
+    assert "FIRMS_MAP_KEY" in route
+    assert "CDSE_CLIENT_SECRET" in route
 
 
 def test_map_provider_status_is_separate_and_does_not_fake_observations():
@@ -65,5 +76,5 @@ def test_map_provider_status_is_separate_and_does_not_fake_observations():
     assert 'providerState("satellite","error"' in layers
     assert 'update("firms","error"' in firms
     assert "bu sıfır olay anlamına gelmez" in firms
-    assert 'src="../js/provider-status.js?v=20261022b"' in page
+    assert 'src="../js/provider-status.js?v=20261115d"' in page
     assert 'p.name+" · Open-Meteo"' not in layers

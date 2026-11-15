@@ -111,9 +111,27 @@ def get_area_ndvi_timeseries(geometry: Dict[str, Any], days=180, interval="P30D"
                 series.append({"from":item.get("interval",{}).get("from"),"to":item.get("interval",{}).get("to"),"ndvi":round(float(ndvi),4),"ndmi":round(float(ndmi),4) if ndmi is not None else None,"classification":classify_ndvi(float(ndvi)),"sample_count":ndvi_stats.get("sampleCount",0)})
         latest=series[-1] if series else None
         previous=series[-2] if len(series)>1 else None
+        if not series:
+            return {
+                "status": "no_observations",
+                "source": "Copernicus Sentinel-2 L2A / Statistical API",
+                "method": "NDVI B08-B04 + NDMI B08-B11; SCL cloud/shadow exclusion",
+                "series": [],
+                "latest": None,
+                "delta": {"ndvi": None, "ndmi": None},
+                "message": "İstenen tarih aralığı ve alan için geçerli piksel istatistiği dönmedi. Bu durum sıfır NDVI anlamına gelmez.",
+            }
         return {"status":"available","source":"Copernicus Sentinel-2 L2A / Statistical API","method":"NDVI B08-B04 + NDMI B08-B11; SCL cloud/shadow exclusion","series":series,"latest":latest,"delta":{"ndvi":round(latest["ndvi"]-previous["ndvi"],4) if latest and previous else None,"ndmi":round(latest["ndmi"]-previous["ndmi"],4) if latest and previous and latest.get("ndmi") is not None and previous.get("ndmi") is not None else None}}
     except requests.RequestException as exc:
-        return {"status":"error","source":"Copernicus Sentinel-2 L2A / Statistical API","error":str(exc),"series":[]}
+        response = getattr(exc, "response", None)
+        return {
+            "status": "error",
+            "source": "Copernicus Sentinel-2 L2A / Statistical API",
+            "error_type": type(exc).__name__,
+            "provider_status": getattr(response, "status_code", None),
+            "series": [],
+            "message": "Copernicus Statistical API isteği başarısız oldu; kimlik bilgileri veya istek ayrıntıları döndürülmedi.",
+        }
 
 
 

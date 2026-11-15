@@ -35,10 +35,11 @@ function forestScore(w){return Math.max(0,100-riskScore(w))}
 function beeScore(w,pollen=0){let s=100;if(w.t<14||w.t>34)s-=30;if(w.wind>25)s-=35;else if(w.wind>15)s-=15;if(w.precip>1)s-=35;if(pollen>120)s-=5;return Math.max(0,Math.min(100,s))}
 function coords(g){const a=[];const walk=x=>{if(typeof x[0]==="number")a.push(x);else x.forEach(walk)};walk(g.coordinates);return a.length?[a.reduce((s,p)=>s+p[1],0)/a.length,a.reduce((s,p)=>s+p[0],0)/a.length]:[41.2,27]}
 function hist(name){return JSON.parse(localStorage.getItem(historyKey)||"[]").filter(x=>x.name===name).slice(-5).reverse().map(x=>new Date(x.t).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" · "+x.r).join("<br>")||"Henüz geçmiş yok."}
-function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?r.pollen:r.forest}
+function scoreFor(r){return mode==="risk"?r.score:mode==="water"?r.w.soil:mode==="crop"?r.crop:mode==="pollen"?(r.pollen??null):r.forest}
 function popup(r,level="province"){
  if(r.dataAvailable===false)return '<div class="risk-popup"><div class="popup-kicker">NEXORAWILDFIRE / '+escapeHtml(level.toUpperCase())+'</div><h3>'+escapeHtml(r.name)+'</h3><div class="popup-warning">'+(mapLang()==="en"?"Live weather data is not available yet. This is not a zero-risk result; the province boundary is shown while data loads.":"Canlı hava verisi henüz alınmadı. Bu, riskin sıfır olduğu anlamına gelmez; veri yüklenirken il sınırı gösteriliyor.")+'</div></div>';
  const s=scoreFor(r);
+ if(mode==="pollen"&&s==null)return '<div class="risk-popup"><div class="popup-kicker">OPEN-METEO / CAMS</div><h3>'+escapeHtml(r.name)+'</h3><div class="popup-warning">Bu konum ve zaman için polen verisi sağlanmadı. Bu değer sıfır polen anlamına gelmez.</div><small>Kaynak: Open-Meteo Air Quality API</small></div>';
  const action=(level==="province"||level==="il")
   ? '<button type="button" class="map-drill-button" data-open-province>İlçeleri aç →</button>'
   : level==="ilçe"
@@ -49,7 +50,7 @@ function popup(r,level="province"){
 function modeDescription(m){return m==="risk"?"Çevresel/yangın riski yükseldiğinde kırmızıya gider.":m==="water"?"Yeşil/mavi tonlar yeterli toprak nemini, kırmızı kuraklık stresini gösterir.":m==="crop"?"Bitki yetiştirme koşulu; nem, ET₀ ve VPD birlikte yorumlanır.":m==="pollen"?"Atmosferik polen yüküdür; bitki çeşitliliği anlamına gelmez.":"Bitki sağlığı için şimdilik risk ters skoru; gerçek uydu NDVI/NDMI zaman serisi sonraki katmandır."}
 function num(v){const n=Number(String(v??0).replace(",","."));return Number.isFinite(n)?n:0}
 function area(g){return num(g?.properties?.area_sqkm)}
-function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));if(r.dataAvailable===false)return{color:supported?"#50745c":"#667085",weight:supported?1.5:.9,fillColor:supported?"#355640":"#667085",fillOpacity:supported ? 0.26 : 0.18,dashArray:"4 5"};return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
+function styleFor(r,forceSupported=false){const supported=forceSupported||ACTIVE_PROVINCES.has(norm(r.name));if(r.dataAvailable===false||(mode==="pollen"&&r.pollen==null))return{color:supported?"#50745c":"#667085",weight:supported?1.5:.9,fillColor:supported?"#355640":"#667085",fillOpacity:supported ? 0.26 : 0.18,dashArray:"4 5"};return supported?{color:"#102218",weight:1.3,fillColor:color(scoreFor(r)),fillOpacity:.68}:{color:"#667085",weight:.9,fillColor:"#667085",fillOpacity:.24,dashArray:"3 4"}}
 
 function enableMobileMapGesture(){
  if(!isMobile)return;
@@ -98,7 +99,7 @@ function chooseDistrict(r){selectedDistrict=r.name;focusDistrict(r)}
 async function weatherFor(coordsList){
  if(!coordsList.length)return[];
  const u=new URL("https://api.open-meteo.com/v1/forecast");u.searchParams.set("latitude",coordsList.map(x=>x[0]).join(","));u.searchParams.set("longitude",coordsList.map(x=>x[1]).join(","));u.searchParams.set("current","temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,soil_moisture_0_to_7cm,vapour_pressure_deficit");u.searchParams.set("daily","et0_fao_evapotranspiration,precipitation_sum");u.searchParams.set("forecast_days","3");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());return Array.isArray(j)?j:[j]}
-async function pollenAt(lat,lon){try{const u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",lat);u.searchParams.set("longitude",lon);u.searchParams.set("current","alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());const p=j.current||{};return Math.max(...["alder_pollen","birch_pollen","grass_pollen","mugwort_pollen","olive_pollen","ragweed_pollen"].map(k=>Number(p[k]||0)))}catch{return 0}}
+async function pollenAt(lat,lon){try{const u=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");u.searchParams.set("latitude",lat);u.searchParams.set("longitude",lon);u.searchParams.set("current","alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen");u.searchParams.set("timezone","Europe/Istanbul");const j=await fetch(u).then(x=>x.json());const p=j.current||{};const values=["alder_pollen","birch_pollen","grass_pollen","mugwort_pollen","olive_pollen","ragweed_pollen"].map(k=>p[k]).filter(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v))).map(Number);return values.length?Math.max(...values):null}catch{return 0}}
 function weatherRow(name,area,w,pollen=0,lat=null,lon=null){const risk=riskScore(w,0);return{name,area,w,score:risk,crop:cropScore(w),forest:forestScore(w),pollen,bee:beeScore(w,pollen),lat,lon}}
 async function applyPollen(rows){if(mode!=="pollen")return;await Promise.all(rows.map(async r=>{if(r.lat!=null&&r.lon!=null)r.pollen=await pollenAt(r.lat,r.lon);r.bee=beeScore(r.w,r.pollen)}))}
 async function loadProvinceData(){
