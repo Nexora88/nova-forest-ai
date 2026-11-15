@@ -20,6 +20,8 @@ PAGES = [
     "/pages/map.html",
     "/pages/areas.html",
     "/pages/weather.html",
+    "/pages/bee.html",
+    "/pages/farm.html",
     "/pages/satellite.html",
     "/pages/about.html",
     "/pages/enterprise.html",
