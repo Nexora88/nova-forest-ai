@@ -34,7 +34,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
 
     def test_service_worker_cache_version_is_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v43";', source)
+        self.assertIn('const CACHE_NAME = "nexorawildfire-shell-v44";', source)
         self.assertIn('const DATA_CACHE = "nexorawildfire-data-v40";', source)
 
     def test_service_worker_has_offline_landing_and_exact_page_fallback(self):
@@ -94,6 +94,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         source = (ROOT / "js" / "provider-status.js").read_text(encoding="utf-8")
         route = (ROOT / "backend" / "app" / "api" / "satellite_routes.py").read_text(encoding="utf-8")
         self.assertIn("/satellite/providers/status?probe=true", source)
+        self.assertIn("nova-forest-ai.vercel.app/api", source)
         self.assertIn("FIRMS_MAP_KEY", route)
         self.assertIn("CDSE_CLIENT_SECRET", route)
         self.assertIn('"secret_exposed": False', route)
