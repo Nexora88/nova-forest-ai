@@ -1,7 +1,7 @@
 
 
 const CACHE_NAME = "nexorawildfire-shell-v41";
-const DATA_CACHE = "nexorawildfire-data-v41";
+const DATA_CACHE = "nexorawildfire-data-v40";
 
 const APP_SHELL = [
   "./",
@@ -147,8 +147,12 @@ self.addEventListener("fetch", event => {
       const stale = async () => {
         if (!cached) return null;
         const headers = new Headers(cached.headers);
+        const cachedAt = Number(headers.get("X-Nexora-Cached-At") || 0);
+        const age = cachedAt ? Date.now() - cachedAt : Number.POSITIVE_INFINITY;
+        if (age > 24 * 60 * 60 * 1000) return null;
         headers.set("X-Nexora-Cache", "stale");
         headers.set("X-Nexora-Stale", "true");
+        headers.set("X-Nexora-Stale-Age-Ms", String(age));
         return new Response(await cached.clone().arrayBuffer(), {
           status: cached.status, statusText: cached.statusText, headers
         });
@@ -156,7 +160,12 @@ self.addEventListener("fetch", event => {
       try {
         const response = await fetch(request);
         if (response.ok) {
-          await cache.put(request, response.clone());
+          const headers = new Headers(response.headers);
+          headers.set("X-Nexora-Cached-At", String(Date.now()));
+          const stored = new Response(await response.clone().arrayBuffer(), {
+            status: response.status, statusText: response.statusText, headers
+          });
+          await cache.put(request, stored);
           return response;
         }
         if (response.status === 429 || response.status >= 500) {
