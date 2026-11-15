@@ -335,5 +335,33 @@ class MobileUiSmokeTests(unittest.TestCase):
 
 
 
+    def test_responsive_brand_and_saved_area_information_hierarchy(self):
+        for width, height in ((360, 800), (390, 844), (768, 1024), (1440, 900)):
+            with self.subTest(width=width):
+                context, page = self.new_page(width=width, height=height)
+                try:
+                    page.add_init_script("""localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+                      id:'ux-area-1', name:'Edirne Deneme Arazisi', type:'tarla', province:'Edirne',
+                      district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                      createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                    }]));""")
+                    page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector("header .brand-copy strong", timeout=10000)
+                    self.assertEqual(page.locator("header .brand-copy strong").inner_text(), "NexoraWildfire AI")
+                    self.assertTrue(page.locator("link[data-nx-ux-polish]").count())
+                    page.wait_for_selector(".area-card", timeout=20000)
+                    self.assertFalse(page.locator(".area-details").evaluate("(el) => el.open"),
+                                     "secondary metrics and event feed should be collapsed by default")
+                    self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), width + 1,
+                                         "saved areas must not create horizontal overflow")
+                    self.assertLessEqual(page.locator(".area-mini-map").evaluate("(el) => el.getBoundingClientRect().height"), 171,
+                                         "area preview map should remain compact")
+                    if width >= 761:
+                        self.assertGreaterEqual(page.locator(".area-grid").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length"), 1)
+                finally:
+                    context.close()
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
