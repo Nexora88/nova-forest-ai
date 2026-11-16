@@ -370,13 +370,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         try:
-            page.route("https://api.open-meteo.com/**", lambda route: route.fulfill(
-                status=200, content_type="application/json", body=json.dumps({"daily": {
-                    "time": ["2026-11-16"], "temperature_2m_max": [None], "temperature_2m_min": [None],
-                    "relative_humidity_2m_min": [None], "wind_speed_10m_max": [None],
-                    "precipitation_sum": [None], "et0_fao_evapotranspiration": [None]
-                }})
-            ))
+            page.route("https://api.open-meteo.com/**", lambda route: route.abort())
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
             search = page.locator(".nova-map-search")
             page.wait_for_selector(".nova-map-search input[name=q]", timeout=15000)
@@ -385,10 +379,19 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.wait_for_selector(".search-results button", timeout=10000)
             page.locator(".search-results button").first.click()
             page.wait_for_function("document.querySelector('#map .leaflet-marker-icon') !== null", timeout=10000)
-            self.assertIn("41.15", search.locator(".search-results").inner_text())
-            page.wait_for_function("![('0'),('null'),('')].includes(document.querySelector('.timeline-day b')?.textContent.trim())", timeout=10000)
+            page.wait_for_function("document.querySelector('.search-results')?.textContent.includes('41.15')", timeout=10000)
+
+            missing_risk = page.evaluate("""() => {
+              const result = forecastRisk(null, null, null, null);
+              forecastDays = [{date:'2026-11-16',t:null,tmin:null,h:null,wind:null,precip:null,et0:null,risk:result}];
+              renderTimeline();
+              return result;
+            }""")
+            self.assertIsNone(missing_risk)
+            page.wait_for_selector(".timeline-day[data-risk-state=missing]", timeout=5000)
             self.assertNotIn("0/100", page.locator(".timeline-day").first.inner_text())
             self.assertTrue(any(label in page.locator("[data-timeline-detail]").inner_text() for label in ("No data", "Veri yok")))
+
             search.locator("input[name=q]").fill("100, 200")
             search.locator("button[type=submit]").click()
             self.assertIn("Koordinatlar", search.locator(".search-results").inner_text())
