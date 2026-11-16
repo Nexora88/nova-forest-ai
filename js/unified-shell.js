@@ -10,7 +10,8 @@
     if(!header)return;
     header.innerHTML=
       '<a class="brand-lockup" href="'+base+'index.html" aria-label="NexoraWildfire AI ana sayfa">'+
-        '<img class="brand-logo brand-wordmark" src="'+wordmarkUrl+'" alt="NexoraWildfire AI" width="230" height="76">'+
+        '<img class="brand-logo" src="'+wordmarkUrl+'" alt="" width="48" height="48">'+
+        '<span class="brand-copy"><strong>NexoraWildfire AI</strong><small>Çevresel istihbarat platformu</small></span>'+
       '</a>'+
       '<div class="status" title="Trakya pilot alanı. Canlı veri kapsamı, ilgili sağlayıcının durumuna bağlıdır."><span></span> TRAKYA · PİLOT</div>';
   }
@@ -36,7 +37,7 @@
     if(!nav.querySelector('.nav-brand')){
       const label=document.createElement('span');
       label.className='nav-brand';
-      label.textContent='NEXORA / ENVIRONMENTAL INTELLIGENCE';
+      label.textContent='NexoraWildfire AI';
       nav.prepend(label);
     }
     let toggle=nav.querySelector('.nx-nav-toggle');
@@ -86,6 +87,7 @@
   }
   function boot(){
     document.body.classList.add('nx-unified-shell');
+    if(!document.querySelector('link[data-nx-ux-polish]')){const style=document.createElement('link');style.rel='stylesheet';style.href=base+'css/ux-polish.css?v=20261115a';style.dataset.nxUxPolish='true';document.head.appendChild(style);}
     icons();
     brandHeader();
     connectivity();

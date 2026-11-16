@@ -308,7 +308,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
             keys = page.evaluate("caches.keys()")
-            self.assertIn("nexorawildfire-shell-v44", keys, "new app-shell cache version was not installed")
+            self.assertIn("nexorawildfire-shell-v45", keys, "new app-shell cache version was not installed")
             self.assertNotIn("nexorawildfire-shell-v20", keys, "stale app-shell cache was not removed")
             context.set_offline(True)
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)
@@ -330,6 +330,102 @@ class MobileUiSmokeTests(unittest.TestCase):
             self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), 391, "premium map UI must not overflow mobile width")
             # A missing live feed must be reported as unavailable, not silently represented as zero risk.
             page.wait_for_function("document.querySelector('[data-map-status]')?.textContent.includes('CANLI VERİ ALINAMADI') || document.querySelector('[data-map-status]')?.textContent.includes('LIVE DATA UNAVAILABLE')", timeout=5000)
+        finally:
+            context.close()
+
+
+
+    def test_responsive_brand_and_saved_area_information_hierarchy(self):
+        for width, height in ((360, 800), (390, 844), (768, 1024), (1440, 900)):
+            with self.subTest(width=width):
+                context, page = self.new_page(width=width, height=height)
+                try:
+                    page.add_init_script("""localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+                      id:'ux-area-1', name:'Edirne Deneme Arazisi', type:'tarla', province:'Edirne',
+                      district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+                      createdAt:'2026-10-10T00:00:00.000Z', updatedAt:Date.now()
+                    }]));""")
+                    page.goto(BASE + "/pages/areas.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector("header .brand-copy strong", timeout=10000)
+                    self.assertEqual(page.locator("header .brand-copy strong").inner_text(), "NexoraWildfire AI")
+                    self.assertTrue(page.locator("link[data-nx-ux-polish]").count())
+                    page.wait_for_selector(".area-card", timeout=20000)
+                    page.wait_for_function("Array.from(document.styleSheets).some(s => s.href && s.href.includes('ux-polish.css'))", timeout=10000)
+                    self.assertFalse(page.locator(".area-details").evaluate("(el) => el.open"),
+                                     "secondary metrics and event feed should be collapsed by default")
+                    self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), width + 1,
+                                         "saved areas must not create horizontal overflow")
+                    self.assertLessEqual(page.locator(".area-mini-map").evaluate("(el) => el.getBoundingClientRect().height"), 171,
+                                         "area preview map should remain compact")
+                    if width >= 761:
+                        self.assertGreaterEqual(page.locator(".area-grid").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length"), 1)
+                finally:
+                    context.close()
+
+
+
+    def test_map_controls_do_not_overlap_map_on_mobile_or_desktop(self):
+        for width, height in ((360, 800), (390, 844), (768, 1024), (1440, 900)):
+            with self.subTest(width=width):
+                context, page = self.new_page(width=width, height=height)
+                try:
+                    page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector(".map-filters", timeout=15000)
+                    page.wait_for_selector("#map.leaflet-container", timeout=15000)
+                    page.wait_for_function("Array.from(document.styleSheets).some(s => s.href && s.href.includes('ux-polish.css'))", timeout=10000)
+                    relation = page.evaluate("""() => {
+                      const controls = document.querySelector('.map-section > .map-filters');
+                      const map = document.querySelector('.map-section > #map');
+                      const a = controls.getBoundingClientRect(), b = map.getBoundingClientRect();
+                      return {position:getComputedStyle(controls).position, controlsBottom:a.bottom, mapTop:b.top,
+                              overlap:Math.max(0, Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top))};
+                    }""")
+                    self.assertEqual(relation["position"], "relative")
+                    self.assertEqual(relation["overlap"], 0, f"map toolbar overlaps map canvas: {relation}")
+                    self.assertLessEqual(page.locator("body").evaluate("(el) => el.scrollWidth"), width + 1)
+                finally:
+                    context.close()
+
+
+    def test_nova_bee_uses_selected_saved_area_and_renders_real_data_fields(self):
+        context, page = self.new_page(width=390, height=844)
+        errors = []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        try:
+            page.add_init_script("""localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+              id:'bee-test', name:'Edirne Test Apiary', type:'arilik', province:'Edirne',
+              district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+              createdAt:'2026-11-16T00:00:00.000Z'
+            }]));""")
+            page.route("https://api.open-meteo.com/v1/forecast**", lambda route: route.fulfill(
+                status=200, content_type="application/json", body=json.dumps({
+                    "current": {"temperature_2m": 17.4, "wind_speed_10m": 8.2, "precipitation": 0},
+                    "daily": {
+                        "time": ["2026-11-16", "2026-11-17"],
+                        "temperature_2m_min": [3.1, 1.2], "temperature_2m_max": [14, 13],
+                        "precipitation_sum": [0, 1.2], "precipitation_probability_max": [10, 35],
+                        "wind_speed_10m_max": [9, 12], "et0_fao_evapotranspiration": [1.2, 1.1]
+                    }
+                })
+            ))
+            page.route("https://air-quality-api.open-meteo.com/**", lambda route: route.fulfill(
+                status=200, content_type="application/json", body=json.dumps({"current": {
+                    "time": "2026-11-16T10:00", "alder_pollen": 1.2, "birch_pollen": 0.5,
+                    "grass_pollen": 2.1, "mugwort_pollen": 0.2, "olive_pollen": 0.1, "ragweed_pollen": 0.1
+                }})
+            ))
+            page.goto(BASE + "/pages/bee.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.querySelector('#area-select option[value=bee-test]') !== null", timeout=15000)
+            page.select_option("#area-select", "bee-test")
+            page.click("#refresh")
+            page.wait_for_function("document.querySelector('#frost-value').textContent.includes('C')", timeout=15000)
+            self.assertEqual(page.locator("#active-area-name").inner_text(), "Edirne Test Apiary")
+            self.assertTrue(page.locator("#frost-value").inner_text().startswith("1.2"))
+            self.assertEqual(page.locator("#flight-value").inner_text(), "100/100")
+            self.assertTrue(page.locator("#pollen-value").inner_text().startswith("2.1 polen/"))
+            self.assertEqual(page.locator(".bee-day").count(), 2)
+            self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), 391)
+            self.assertEqual(errors, [], "Nova Bee must not emit browser runtime errors")
         finally:
             context.close()
 

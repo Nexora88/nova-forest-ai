@@ -73,7 +73,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v40', source)
+        self.assertIn('nexorawildfire-shell-v45', source)
         self.assertIn('nexorawildfire-data-v40', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
@@ -81,7 +81,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
     def test_risk_map_controls_are_dismissible_and_provider_panel_is_loaded(self):
         page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
         source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
-        self.assertIn('provider-status.js?v=20261020a', page)
+        self.assertIn('provider-status.js?v=20261115d', page)
         self.assertIn('data-panel-close', source)
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
@@ -115,7 +115,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         shell = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
         worker = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('nexora-wildfire-mark.png', shell)
-        self.assertIn('brand-wordmark', shell)
+        self.assertIn('brand-copy', shell)
         self.assertIn('nexora-wildfire-official.webp', shell)
         self.assertNotIn('<h1>NexoraWildfire AI</h1>', shell)
         self.assertNotIn('nx-brand-wildfire', shell)
@@ -154,9 +154,9 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v40', source)
+        self.assertIn('nexorawildfire-shell-v45', source)
         self.assertIn('pages/bee.html', source)
-        self.assertIn('js/nova-bee.js?v=20261024a', source)
+        self.assertIn('js/nova-bee.js?v=20261115c', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
 
 if __name__ == "__main__":
