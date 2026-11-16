@@ -385,6 +385,7 @@ class MobileUiSmokeTests(unittest.TestCase):
               const result = forecastRisk(null, null, null, null);
               forecastDays = [{date:'2026-11-16',t:null,tmin:null,h:null,wind:null,precip:null,et0:null,risk:result}];
               renderTimeline();
+              showForecastDetail(0);
               return result;
             }""")
             self.assertIsNone(missing_risk)
