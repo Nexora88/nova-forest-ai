@@ -14,7 +14,7 @@ const light=L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}
 const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors · © OpenTopoMap (CC-BY-SA)"});
 const humanitarian=L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors · Humanitarian style"});
 L.control.layers({"OSM · Standart":base,"Uydu · Esri":sat,"Karanlık · CARTO":dark,"Açık · CARTO":light,"Topoğrafya · OpenTopoMap":topo,"İnsani harita · HOT":humanitarian},null,{collapsed:true,position:"topright"}).addTo(map);
-const scan=document.createElement("div");scan.className="nova-satellite-scan";scan.innerHTML="<span>UYDU ANALİZİ • VECTOR OVERLAY • OFFLINE SINIRLAR</span><i></i>";document.querySelector(".map-section")?.appendChild(scan);
+const scan=document.createElement("div");scan.className="nova-satellite-scan";scan.innerHTML="<span>UYDU ANALİZİ • VECTOR OVERLAY • OFFLINE SINIRLAR</span><i></i>";(document.querySelector("#map")||document.querySelector(".map-section"))?.appendChild(scan);
 map.on("baselayerchange",e=>scan.classList.toggle("active",e.name.startsWith("Uydu")));
 
 const provinceLayer=L.layerGroup().addTo(map),districtLayer=L.layerGroup().addTo(map),settlementLayer=L.layerGroup().addTo(map),fieldLayer=L.layerGroup().addTo(map);

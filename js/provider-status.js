@@ -19,6 +19,12 @@
   }
   function mount(){
     if(document.querySelector("[data-provider-status]"))return;
+    const disclosure=document.createElement("details");disclosure.className="provider-status-disclosure";
+    const summary=document.createElement("summary");
+    const paintSummary=()=>{summary.textContent=(document.documentElement.dataset.language||document.documentElement.lang)==="en"?"DATA PROVIDER HEALTH / SOURCE VERIFICATION":"VER? SA?LAYICI DURUMU / KAYNAK DO?RULAMASI"};
+    paintSummary();
+    new MutationObserver(paintSummary).observe(document.documentElement,{attributes:true,attributeFilter:["data-language","lang"]});
+    disclosure.append(summary);
     const panel=document.createElement("section");panel.className="provider-status-panel";panel.dataset.providerStatus="";panel.setAttribute("aria-labelledby","provider-status-title");
     const head=document.createElement("div");head.className="provider-status-heading";
     const title=document.createElement("strong");title.id="provider-status-title";title.textContent="VERİ KAYNAĞI DURUMU";
@@ -26,9 +32,10 @@
     head.append(title,note);
     const list=document.createElement("div");list.className="provider-status-list";list.dataset.providerStatusList="";
     panel.append(head,list);
+    disclosure.append(panel);
     const mapSection=document.querySelector(".map-section");
-    const toolbar=mapSection?.querySelector(".map-toolbar");
-    if(mapSection?.parentNode)mapSection.parentNode.insertBefore(panel,mapSection);
+    if(mapSection?.parentNode)mapSection.insertAdjacentElement("afterend",disclosure);
+    else document.querySelector("main")?.append(disclosure);
     render();
     verifySatelliteCredentials();
   }

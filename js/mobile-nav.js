@@ -29,10 +29,13 @@
     chip.setAttribute("role", "status");
     chip.setAttribute("aria-live", "polite");
     chip.innerHTML = '<span class="nx-device-dot" aria-hidden="true"></span><span class="nx-device-label"></span>';
-    const statusBar = document.createElement("div");
-    statusBar.className = "nx-connectivity-bar";
-    statusBar.appendChild(chip);
-    nav.insertAdjacentElement("afterend", statusBar);
+    let statusBar = document.querySelector(".nx-connectivity-bar");
+    if (!statusBar) {
+      statusBar = document.createElement("div");
+      statusBar.className = "nx-connectivity-bar";
+      statusBar.appendChild(chip);
+      nav.insertAdjacentElement("afterend", statusBar);
+    }
     const paint = () => {
       chip.querySelector(".nx-device-label").textContent = navigator.onLine
         ? (english() ? "Device active · Internet connected" : "Cihaz aktif · İnternet bağlı")
@@ -52,6 +55,9 @@
     if (document.querySelector(".nx-science-notice")) return;
     const nav = document.querySelector("body > nav");
     if (!nav) return;
+    const path = location.pathname.replace(/\\/g, "/");
+    const isRiskWorkspace = /(?:^|\/)index\.html$/.test(path) || /(?:^|\/)map\.html$/.test(path) || path === "/";
+    if (!isRiskWorkspace) return;
     const note = document.createElement("aside");
     note.className = "nx-science-notice";
     note.setAttribute("role", "note");

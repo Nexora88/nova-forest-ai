@@ -73,7 +73,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_cache_shell_was_bumped_for_ui_assets(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v45', source)
+        self.assertIn('nexorawildfire-shell-v47', source)
         self.assertIn('nexorawildfire-data-v40', source)
         self.assertIn('fire-safety-sim.js?v=20261022a', source)
 
@@ -81,11 +81,11 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
     def test_risk_map_controls_are_dismissible_and_provider_panel_is_loaded(self):
         page = (ROOT / "pages" / "map.html").read_text(encoding="utf-8")
         source = (ROOT / "js" / "map.js").read_text(encoding="utf-8")
-        self.assertIn('provider-status.js?v=20261115d', page)
+        self.assertIn('provider-status.js?v=20261116a', page)
         self.assertIn('data-panel-close', source)
         self.assertIn('map-panel-reopen', source)
         self.assertIn('İLÇE SEÇİMİ / KATMANLAR', source)
-        self.assertIn('unified-shell.js?v=20261115a', page)
+        self.assertIn('unified-shell.js?v=20261116a', page)
         styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
         self.assertIn('#map .leaflet-top.leaflet-left{left:auto!important;right:10px!important}', styles)
         self.assertIn('.nova-incident-banner .incident-actions [data-incident-close]{margin-left:auto!important}', styles)
@@ -123,7 +123,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertIn('"sizes": "512x512"', manifest)
         self.assertIn('width:44px!important', styles)
         self.assertIn('width:36px!important', styles)
-        self.assertIn('unified-shell.js?v=20261115a', page)
+        self.assertIn('unified-shell.js?v=20261116a', page)
         self.assertIn('nexora-wildfire-mark.png', worker)
 
     def test_shared_shell_is_loaded_on_every_html_page(self):
@@ -131,7 +131,7 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
         self.assertGreaterEqual(len(pages), 13)
         for page in pages:
             self.assertIn("unified-shell.css?v=20261115a", page.read_text(encoding="utf-8"), str(page))
-            self.assertIn("unified-shell.js?v=20261115a", page.read_text(encoding="utf-8"), str(page))
+            self.assertIn("unified-shell.js?v=20261116a", page.read_text(encoding="utf-8"), str(page))
 
     def test_map_timeline_handles_leaflet_center_without_saved_area(self):
         source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
@@ -154,10 +154,56 @@ class UiConsistencyAndFireSafetyTests(unittest.TestCase):
 
     def test_pwa_shell_version_and_current_copilot_assets_are_bumped(self):
         source = (ROOT / "sw.js").read_text(encoding="utf-8")
-        self.assertIn('nexorawildfire-shell-v45', source)
+        self.assertIn('nexorawildfire-shell-v47', source)
         self.assertIn('pages/bee.html', source)
         self.assertIn('js/nova-bee.js?v=20261115c', source)
         self.assertIn('js/i18n.js?v=20261024a', source)
+
+    def test_enterprise_ui_shell_is_loaded_after_page_styles_on_every_route(self):
+        pages = [ROOT / "index.html", *sorted((ROOT / "pages").glob("*.html"))]
+        for page in pages:
+            source = page.read_text(encoding="utf-8")
+            self.assertIn("enterprise-ui.css?v=20261116b", source, str(page))
+            self.assertLess(source.index("enterprise-ui.css?v=20261116b"), source.index("</head>"))
+            self.assertIn("edge-ui.js?v=20261116a", source, str(page))
+            self.assertIn("install-update.js?v=20261116a", source, str(page))
+        shell = (ROOT / "css" / "enterprise-ui.css").read_text(encoding="utf-8")
+        self.assertIn(".nx-nav-more-links", shell)
+        self.assertIn("overflow:visible!important", shell)
+        self.assertIn(".map-section>.nova-map-search", shell)
+        self.assertIn(".map-section>.nova-layer-manager", shell)
+        self.assertIn(".map-section>#map", shell)
+
+    def test_shared_shell_reuses_single_connectivity_row(self):
+        shell = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
+        nav = (ROOT / "js" / "mobile-nav.js").read_text(encoding="utf-8")
+        self.assertIn("document.querySelectorAll('.nova-offline-bar').forEach(node=>node.remove())", shell)
+        self.assertIn("document.querySelector('.nx-connectivity-bar')", shell)
+        self.assertIn("const isRiskWorkspace", nav)
+        self.assertIn('document.querySelector(".nx-connectivity-bar")', nav)
+        self.assertIn('document.querySelectorAll(".nova-offline-bar").forEach(node=>node.remove())', (ROOT / "js" / "offline.js").read_text(encoding="utf-8"))
+
+    def test_map_intelligence_panels_are_inserted_before_map_canvas(self):
+        source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
+        layers = (ROOT / "js" / "free-data-layers.js").read_text(encoding="utf-8")
+        self.assertGreaterEqual(source.count("section.insertBefore(box,mapNode)"), 3)
+        self.assertIn("section.insertBefore(label,mapNode)", layers)
+
+
+    def test_map_forecast_does_not_turn_missing_provider_fields_into_zero_risk(self):
+        source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
+        self.assertIn("if(t===null||h===null||wind===null)return null", source)
+        self.assertIn("if(v===null||v===undefined)", source)
+        self.assertIn(r"VER\u0130 YOK", source)
+        self.assertIn('forecast_days","4"', source)
+
+    def test_map_search_validates_coordinates_and_uses_safe_text_nodes(self):
+        source = (ROOT / "js" / "map-intelligence.js").read_text(encoding="utf-8")
+        self.assertIn("query.match(/^(-?\\d+", source)
+        self.assertIn("lat < -90 || lat > 90 || lon < -180 || lon > 180", source)
+        self.assertIn("choice.textContent=String(row.display_name||query)", source)
+        self.assertNotIn("result.innerHTML=rows.map", source)
+
 
 if __name__ == "__main__":
     unittest.main()
