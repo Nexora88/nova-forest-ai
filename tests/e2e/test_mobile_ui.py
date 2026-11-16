@@ -387,6 +387,49 @@ class MobileUiSmokeTests(unittest.TestCase):
                     context.close()
 
 
+    def test_nova_bee_uses_selected_saved_area_and_renders_real_data_fields(self):
+        context, page = self.new_page(width=390, height=844)
+        errors = []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        try:
+            page.add_init_script("""localStorage.setItem('nexorawildfire-my-areas-v1', JSON.stringify([{
+              id:'bee-test', name:'Edirne Test Apiary', type:'arilik', province:'Edirne',
+              district:'Merkez', coordinates:[[41.67,26.55],[41.68,26.56],[41.66,26.57]],
+              createdAt:'2026-11-16T00:00:00.000Z'
+            }]));""")
+            page.route("https://api.open-meteo.com/v1/forecast**", lambda route: route.fulfill(
+                status=200, content_type="application/json", body=json.dumps({
+                    "current": {"temperature_2m": 17.4, "wind_speed_10m": 8.2, "precipitation": 0},
+                    "daily": {
+                        "time": ["2026-11-16", "2026-11-17"],
+                        "temperature_2m_min": [3.1, 1.2], "temperature_2m_max": [14, 13],
+                        "precipitation_sum": [0, 1.2], "precipitation_probability_max": [10, 35],
+                        "wind_speed_10m_max": [9, 12], "et0_fao_evapotranspiration": [1.2, 1.1]
+                    }
+                })
+            ))
+            page.route("https://air-quality-api.open-meteo.com/**", lambda route: route.fulfill(
+                status=200, content_type="application/json", body=json.dumps({"current": {
+                    "time": "2026-11-16T10:00", "alder_pollen": 1.2, "birch_pollen": 0.5,
+                    "grass_pollen": 2.1, "mugwort_pollen": 0.2, "olive_pollen": 0.1, "ragweed_pollen": 0.1
+                }})
+            ))
+            page.goto(BASE + "/pages/bee.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_function("document.querySelector('#area-select option[value=bee-test]') !== null", timeout=15000)
+            page.select_option("#area-select", "bee-test")
+            page.click("#refresh")
+            page.wait_for_function("document.querySelector('#frost-value').textContent.includes('C')", timeout=15000)
+            self.assertEqual(page.locator("#active-area-name").inner_text(), "Edirne Test Apiary")
+            self.assertTrue(page.locator("#frost-value").inner_text().startswith("1.2"))
+            self.assertEqual(page.locator("#flight-value").inner_text(), "100/100")
+            self.assertTrue(page.locator("#pollen-value").inner_text().startswith("2.1 polen/"))
+            self.assertEqual(page.locator(".bee-day").count(), 2)
+            self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), 391)
+            self.assertEqual(errors, [], "Nova Bee must not emit browser runtime errors")
+        finally:
+            context.close()
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

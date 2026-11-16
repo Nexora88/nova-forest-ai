@@ -56,7 +56,7 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         self.assertIn("nova-farm.css", source)
         worker = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn('"./pages/farm.html"', worker)
-        self.assertIn('"./js/nova-farm.js?v=20261115b"', worker)
+        self.assertIn('"./js/nova-farm.js?v=20261115c"', worker)
 
     def test_atmosphere_uses_keyless_open_meteo_and_truthful_pollen_fallback(self):
         source = (ROOT / "js" / "weather.js").read_text(encoding="utf-8")
@@ -121,7 +121,8 @@ class ReleaseReadinessStaticTests(unittest.TestCase):
         source = (ROOT / "js" / "unified-shell.js").read_text(encoding="utf-8")
         styles = (ROOT / "css" / "unified-shell.css").read_text(encoding="utf-8")
         self.assertIn('nexora-wildfire-official.webp', source)
-        self.assertIn('brand-wordmark', source)
+        self.assertIn('brand-copy', source)
+        self.assertIn('<strong>NexoraWildfire AI</strong>', source)
         self.assertIn('.nova-account-dock{display:none!important}', styles)
 
     def test_service_worker_does_not_force_activate_updated_worker(self):
