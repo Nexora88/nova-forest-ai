@@ -16,18 +16,22 @@
       '<div class="status" title="Trakya pilot alanı. Canlı veri kapsamı, ilgili sağlayıcının durumuna bağlıdır."><span></span> TRAKYA · PİLOT</div>';
   }
   function connectivity(){
-    let bar=document.querySelector('.nova-offline-bar');
-    if(!bar){bar=document.createElement('div');bar.className='nova-offline-bar';document.body.prepend(bar)}
-    function update(){
-      const online=navigator.onLine;
-      root.dataset.network=online?'online':'offline';
-      bar.innerHTML=online
-        ?'<strong>● BAĞLANTI VAR</strong><span>· Cihaz çevrimiçi; veri sağlayıcılarının durumu ayrıca doğrulanır</span>'
-        :'<strong>● ÇEVRİMDIŞI</strong><span>· Son kayıtlı veriler ve yerel özellikler kullanılabilir</span>';
+    document.querySelectorAll('.nova-offline-bar').forEach(node=>node.remove());
+    let bar=document.querySelector('.nx-connectivity-bar');
+    if(!bar){
+      bar=document.createElement('div');bar.className='nx-connectivity-bar';
+      const nav=document.querySelector('body>nav');
+      if(nav)nav.insertAdjacentElement('afterend',bar);else document.body.prepend(bar);
     }
-    window.addEventListener('online',update);
-    window.addEventListener('offline',update);
-    update();
+    const header=document.querySelector('body>header');
+    if(header&&header.previousElementSibling!==bar)header.insertAdjacentElement('beforebegin',bar);
+    const paint=()=>{
+      root.dataset.network=navigator.onLine?'online':'offline';
+      bar.dataset.network=navigator.onLine?'online':'offline';
+    };
+    window.addEventListener('online',paint);
+    window.addEventListener('offline',paint);
+    paint();
   }
   function navigation(){
     const nav=document.querySelector('body>nav');

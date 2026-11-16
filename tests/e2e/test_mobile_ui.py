@@ -76,6 +76,8 @@ class MobileUiSmokeTests(unittest.TestCase):
                     page.wait_for_selector("#nexora-language-toggle", timeout=10000)
                     page.wait_for_selector("#nexora-install", timeout=10000)
                     self.assertTrue(page.locator("#nexora-install").is_visible(), f"install control missing on {path}")
+                    self.assertEqual(page.locator(".nx-connectivity-bar, .nova-offline-bar").count(), 1, f"duplicate network banners on {path}")
+                    self.assertTrue(page.locator(".nx-connectivity-bar").evaluate("el => el === document.querySelector('body>header').previousElementSibling"), f"connectivity strip must sit above the brand header on {path}")
                     self.assertTrue(page.locator("#nexora-language-toggle").is_visible(), f"language toggle missing on {path}")
                     self.assertEqual(page.locator("html").get_attribute("lang"), "en", f"page language metadata was not switched to English on {path}")
                     if page.locator("nav").count():
@@ -160,8 +162,51 @@ class MobileUiSmokeTests(unittest.TestCase):
             more.click()
             self.assertTrue(page.locator("nav .nx-nav-more-links").is_visible())
             self.assertGreater(page.locator("nav .nx-nav-more-links a").count(), 0)
+            menu_box = page.locator("nav .nx-nav-more-links").bounding_box()
+            self.assertIsNotNone(menu_box)
+            self.assertGreaterEqual(menu_box["x"], 0)
+            self.assertLessEqual(menu_box["x"] + menu_box["width"], 1440)
         finally:
             context.close()
+
+
+    def test_map_workspace_controls_stay_in_flow_at_phone_tablet_and_desktop_widths(self):
+        for width, height in ((360, 780), (390, 844), (768, 1024), (1440, 900)):
+            with self.subTest(width=width):
+                context, page = self.new_page(width=width, height=height)
+                try:
+                    page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_selector(".map-section .map-filters", timeout=15000)
+                    page.wait_for_selector(".map-section .nova-layer-manager", timeout=15000)
+                    page.wait_for_selector(".map-section .nova-timeline", timeout=15000)
+                    page.wait_for_selector(".map-section #map.leaflet-container", timeout=20000)
+                    self.assertLessEqual(page.locator("body").evaluate("el => el.scrollWidth"), width + 1)
+                    positions = page.evaluate("""() => {
+                      const selectors = ['.map-toolbar','.free-layer-note','.nova-map-search','.nova-timeline','.map-filters','.nova-layer-manager','#map'];
+                      return selectors.map(selector => {
+                        const node = document.querySelector('.map-section '+selector);
+                        const rect = node.getBoundingClientRect();
+                        return {selector, y:rect.y, bottom:rect.bottom, position:getComputedStyle(node).position};
+                      });
+                    }""")
+                    self.assertEqual([item["selector"] for item in positions], [
+                        '.map-toolbar','.free-layer-note','.nova-map-search','.nova-timeline','.map-filters','.nova-layer-manager','#map'
+                    ])
+                    self.assertTrue(all(item["position"] != "absolute" for item in positions))
+                    self.assertTrue(all(positions[i]["bottom"] <= positions[i+1]["y"] + 2 for i in range(len(positions)-1)))
+                    scan = page.locator("#map .nova-satellite-scan")
+                    self.assertTrue(scan.count(), "satellite scan overlay must be inside the map canvas")
+                    map_box = page.locator("#map").bounding_box()
+                    scan_box = scan.bounding_box()
+                    self.assertAlmostEqual(map_box["x"] + 1, scan_box["x"], delta=1)
+                    self.assertAlmostEqual(map_box["y"] + 1, scan_box["y"], delta=1)
+                    self.assertAlmostEqual(map_box["width"] - 2, scan_box["width"], delta=1)
+                    self.assertAlmostEqual(map_box["height"] - 2, scan_box["height"], delta=1)
+                    provider = page.locator(".provider-status-disclosure")
+                    self.assertTrue(provider.count())
+                    self.assertFalse(provider.evaluate("el => el.open"))
+                finally:
+                    context.close()
 
 
 
@@ -270,6 +315,8 @@ class MobileUiSmokeTests(unittest.TestCase):
         context, page = self.new_page()
         try:
             page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_selector(".provider-status-disclosure", timeout=15000)
+            page.locator(".provider-status-disclosure > summary").click()
             page.wait_for_selector("[data-provider-status-list]", timeout=15000)
             panel = page.locator("[data-provider-status-list]")
             text = panel.inner_text()
@@ -308,7 +355,7 @@ class MobileUiSmokeTests(unittest.TestCase):
             page.reload(wait_until="domcontentloaded", timeout=30000)
             page.wait_for_function("Boolean(navigator.serviceWorker && navigator.serviceWorker.controller)", timeout=15000)
             keys = page.evaluate("caches.keys()")
-            self.assertIn("nexorawildfire-shell-v45", keys, "new app-shell cache version was not installed")
+            self.assertIn("nexorawildfire-shell-v47", keys, "new app-shell cache version was not installed")
             self.assertNotIn("nexorawildfire-shell-v20", keys, "stale app-shell cache was not removed")
             context.set_offline(True)
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=15000)
@@ -317,6 +364,38 @@ class MobileUiSmokeTests(unittest.TestCase):
         finally:
             context.set_offline(False)
             context.close()
+
+    def test_map_coordinate_search_and_missing_forecast_data_are_honest(self):
+        context, page = self.new_page(width=390, height=844)
+        errors = []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        try:
+            page.route("https://api.open-meteo.com/**", lambda route: route.fulfill(
+                status=200, content_type="application/json", body=json.dumps({"daily": {
+                    "time": ["2026-11-16"], "temperature_2m_max": [None], "temperature_2m_min": [None],
+                    "relative_humidity_2m_min": [None], "wind_speed_10m_max": [None],
+                    "precipitation_sum": [None], "et0_fao_evapotranspiration": [None]
+                }})
+            ))
+            page.goto(BASE + "/pages/map.html", wait_until="domcontentloaded", timeout=30000)
+            search = page.locator(".nova-map-search")
+            page.wait_for_selector(".nova-map-search input[name=q]", timeout=15000)
+            search.locator("input[name=q]").fill("41.15, 27.10")
+            search.locator("button[type=submit]").click()
+            page.wait_for_selector(".search-results button", timeout=10000)
+            page.locator(".search-results button").first.click()
+            page.wait_for_function("document.querySelector('#map .leaflet-marker-icon') !== null", timeout=10000)
+            self.assertIn("41.15", search.locator(".search-results").inner_text())
+            page.wait_for_function("![('0'),('null'),('')].includes(document.querySelector('.timeline-day b')?.textContent.trim())", timeout=10000)
+            self.assertNotIn("0/100", page.locator(".timeline-day").first.inner_text())
+            self.assertTrue(any(label in page.locator("[data-timeline-detail]").inner_text() for label in ("No data", "Veri yok")))
+            search.locator("input[name=q]").fill("100, 200")
+            search.locator("button[type=submit]").click()
+            self.assertIn("Koordinatlar", search.locator(".search-results").inner_text())
+            self.assertEqual(errors, [], "map search and missing forecast values must not raise browser errors")
+        finally:
+            context.close()
+
 
     def test_risk_map_opens_local_boundaries_before_weather_network_finishes(self):
         context, page = self.new_page(width=390, height=844)

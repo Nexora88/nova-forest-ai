@@ -10,13 +10,15 @@
   function setNetwork(){
     const online=navigator.onLine;
     root.dataset.network=online?"online":"offline";
-    let bar=document.querySelector(".nova-offline-bar");
+    document.querySelectorAll(".nova-offline-bar").forEach(node=>node.remove());
+    let bar=document.querySelector(".nx-connectivity-bar");
     if(!bar){
       bar=document.createElement("div");
-      bar.className="nova-offline-bar";
+      bar.className="nx-connectivity-bar";
       bar.setAttribute("role","status");
       bar.setAttribute("aria-live","polite");
-      document.body.prepend(bar);
+      const header=document.querySelector("body>header");
+      if(header)header.insertAdjacentElement("beforebegin",bar);else document.body.prepend(bar);
     }
     bar.replaceChildren();
     const strong=document.createElement("strong");
