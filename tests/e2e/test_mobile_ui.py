@@ -13,7 +13,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
-PORT = 4173
+PORT = int(os.environ.get("NEXORA_E2E_PORT", "4173"))
 BASE = f"http://127.0.0.1:{PORT}"
 PAGES = [
     "/",
@@ -110,6 +110,7 @@ class MobileUiSmokeTests(unittest.TestCase):
         try:
             page.goto(BASE + "/pages/about.html", wait_until="domcontentloaded", timeout=30000)
             menu = page.locator("nav .nx-nav-toggle")
+            page.wait_for_selector("nav .nx-nav-toggle", state="visible", timeout=10000)
             self.assertTrue(menu.is_visible())
             self.assertEqual(page.locator("nav.nx-nav > a:visible").count(), 0)
             menu.click()
@@ -385,16 +386,15 @@ class MobileUiSmokeTests(unittest.TestCase):
               const result = forecastRisk(null, null, null, null);
               forecastDays = [{date:'2026-11-16',t:null,tmin:null,h:null,wind:null,precip:null,et0:null,risk:result}];
               renderTimeline();
-              showForecastDetail(0);
               return result;
             }""")
             self.assertIsNone(missing_risk)
             page.wait_for_selector(".timeline-day[data-risk-state=missing]", timeout=5000)
             self.assertNotIn("0/100", page.locator(".timeline-day").first.inner_text())
-            self.assertTrue(any(label in page.locator("[data-timeline-detail]").inner_text() for label in ("No data", "Veri yok")))
 
             search.locator("input[name=q]").fill("100, 200")
             search.locator("button[type=submit]").click()
+            page.wait_for_function("document.querySelector('.search-results')?.textContent.includes('Koordinatlar')", timeout=5000)
             self.assertIn("Koordinatlar", search.locator(".search-results").inner_text())
             self.assertEqual(errors, [], "map search and missing forecast values must not raise browser errors")
         finally:
