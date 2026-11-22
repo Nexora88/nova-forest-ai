@@ -23,7 +23,7 @@ const APP_SHELL = [
   "./css/style.css",
   "./css/unified-shell.css?v=20261115a",
   "./css/ux-polish.css?v=20261115a",
-  "./css/enterprise-ui.css?v=20261116b",
+  "./css/enterprise-ui.css?v=20261122a",
   "./css/nova-farm.css?v=20261115b",
   "./css/risk-map-premium.css?v=20261115b",
   "./css/brand-layout-fix.css?v=20261111c",
