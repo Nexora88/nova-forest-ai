@@ -159,3 +159,153 @@ body:has(.map-section) main>.hero:not(.hero-command) p{max-width:82ch!important;
  body>nav.nx-nav.nx-nav-open .nx-nav-more-links{position:static!important;display:grid!important;grid-template-columns:1fr!important;gap:7px!important;width:100%!important;min-width:0!important;max-width:none!important;max-height:none!important;overflow:visible!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
  body>nav.nx-nav.nx-nav-open .nx-nav-more-links>a{display:flex!important;min-height:46px!important;padding:12px 14px!important;border:1px solid #1c422a!important;border-radius:10px!important;background:#07120b!important;color:#d4e5d9!important;font-size:13px!important}
 }
+
+
+/* ==========================================================
+   NEXORA WILDLIFE AI — PREMIUM UI FINISH
+   Shared visual layer. Presentation only; no product logic.
+   ========================================================== */
+:root{
+  --nx-bg:#050a07;
+  --nx-surface:#0a140e;
+  --nx-surface-raised:#0d1a12;
+  --nx-surface-soft:#101f16;
+  --nx-border:rgba(139,190,151,.16);
+  --nx-border-strong:rgba(64,207,123,.34);
+  --nx-accent:#39d982;
+  --nx-accent-strong:#20b96d;
+  --nx-ink:#f0f6f1;
+  --nx-copy:#b5c4b9;
+  --nx-dim:#829489;
+  --nx-shadow:0 18px 48px rgba(0,0,0,.24);
+}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{font-family:Inter,"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;letter-spacing:normal}
+body>header{border-bottom:1px solid var(--nx-border)!important;box-shadow:0 8px 30px rgba(0,0,0,.14)}
+body>header .brand-lockup{min-width:0}
+body>header .brand-lockup img{max-width:100%;height:auto}
+body>nav.nx-nav{border-bottom:1px solid var(--nx-border)!important}
+main{padding-block:clamp(16px,2.5vw,38px)!important}
+main>section{margin-block:clamp(14px,1.8vw,24px)!important}
+main h1,main h2,main h3,main h4{letter-spacing:-.025em}
+main p{line-height:1.7}
+.eyebrow{font-weight:800;letter-spacing:.16em;color:#83bd98}
+.hero:not(.hero-command),.hero-command,.nx-personal-brief,.nova-dashboard,
+.map-section,.nx-wind-lab,.risk-room,.model-evidence,.evacuation-panel,.rehab-panel,
+.notice-panel,.ataturk-vision,.nx-ataturk-home,.nx-vision-link,.sources{
+  border-color:var(--nx-border-strong)!important;
+  border-radius:20px!important;
+  box-shadow:var(--nx-shadow);
+}
+.hero:not(.hero-command){background:linear-gradient(135deg,rgba(19,48,29,.78),rgba(7,15,10,.96))!important}
+.hero-command{background:radial-gradient(ellipse at 85% 20%,rgba(57,217,130,.09),transparent 38%),linear-gradient(135deg,#0c1d12,#050a07)!important}
+.hero-command h2{max-width:20ch!important;font-size:clamp(28px,4vw,48px)!important;line-height:1.08!important}
+.hero-terminal{border-color:var(--nx-border-strong)!important;background:linear-gradient(155deg,rgba(26,95,54,.24),rgba(4,10,6,.8))!important}
+.primary-action,.secondary-action,.hero-actions a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:750;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.primary-action{background:linear-gradient(135deg,#48e391,#20bd70)!important;box-shadow:0 8px 22px rgba(32,189,112,.16)}
+.primary-action:hover,.secondary-action:hover{transform:translateY(-1px)}
+.secondary-action{border-color:var(--nx-border-strong)!important;background:rgba(10,26,15,.65)}
+.cards,.insight-grid,.system-grid{gap:16px!important}
+.card,.intelligence-card,.insight-panel,.system-item,.dashboard-grid article,
+.nx-signal-strip>a,.nx-personal-body>div,.nx-ataturk-home,.nx-editorial-grid>article,
+.nx-vision-principles>article{
+  border:1px solid var(--nx-border)!important;
+  border-radius:16px!important;
+  background:linear-gradient(155deg,rgba(14,31,20,.96),rgba(6,13,9,.98))!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+  transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.card:hover,.intelligence-card:hover,.insight-panel:hover,.system-item:hover{
+  border-color:rgba(57,217,130,.42)!important;
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(0,0,0,.22);
+}
+.card h3,.insight-panel h3,.dashboard-grid h3{color:#eaf5ed!important}
+.card p,.insight-panel p,.system-item p{color:var(--nx-copy)!important}
+.card-link{color:#6fe7a0!important;font-weight:750}
+.section-heading h2{font-size:clamp(23px,2.7vw,34px)!important}
+.map-section{gap:14px!important;background:linear-gradient(155deg,#0a160e,#040906)!important}
+.map-toolbar{border-color:var(--nx-border)!important;border-radius:12px}
+.map-toolbar [data-map-status]{font-weight:800}
+#map{border:1px solid rgba(90,170,112,.35)!important;border-radius:16px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 16px 36px rgba(0,0,0,.22)!important}
+#map .leaflet-control-zoom a{width:40px!important;height:40px!important;line-height:38px!important}
+#map .leaflet-control-layers{max-width:min(280px,calc(100vw - 32px));border-color:rgba(94,178,117,.38)!important}
+#map .leaflet-control-layers-list{max-height:min(46vh,420px);overflow:auto;overscroll-behavior:contain}
+#map .leaflet-control-layers label{display:flex;align-items:center;gap:8px;min-height:30px;line-height:1.35}
+.map-section .map-filters,.map-section .nova-layer-manager,.map-section .nova-timeline,
+.map-section .nova-map-search,.map-section .free-layer-note{
+  border-color:var(--nx-border-strong)!important;border-radius:14px!important;
+  background:linear-gradient(145deg,#0c1b11,#060d08)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.18)!important;
+}
+.map-section .map-filters button,.map-section .map-actions button,
+.map-section .nova-map-search button,.nx-wind-actions button,.nx-sim-buttons button,
+button.primary-action{
+  min-height:42px;border-radius:10px!important;font:inherit;font-weight:750;
+}
+button,input,select,textarea{font:inherit}
+button,a,input,select,textarea,summary{ -webkit-tap-highlight-color:transparent }
+:where(button,a,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:2px solid #6ee7a0!important;outline-offset:3px!important;
+}
+input,select,textarea{
+  max-width:100%;border-radius:10px;
+}
+input[type=range]{accent-color:var(--nx-accent);cursor:pointer}
+input[type=checkbox],input[type=radio]{accent-color:var(--nx-accent)}
+button:disabled{opacity:.55;cursor:not-allowed}
+.nx-wind-lab{padding:clamp(16px,2.2vw,24px)!important;background:linear-gradient(145deg,#0b1a10,#050b07)!important}
+.nx-wind-actions,.nx-sim-buttons{display:flex;gap:9px;flex-wrap:wrap}
+.nx-wind-actions button,.nx-sim-buttons button{
+  border:1px solid var(--nx-border-strong)!important;background:#0b2113!important;color:#dff6e6!important;
+  padding:10px 14px!important;cursor:pointer
+}
+.nx-wind-actions button:hover,.nx-sim-buttons button:hover{background:#12351f!important;border-color:#45d985!important}
+.nx-sim-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.nx-sim-controls label{display:grid;gap:8px;min-width:0;color:var(--nx-copy)}
+.nx-personal-head{align-items:center}
+.nx-personal-body{gap:12px}
+.nx-personal-body>div{padding:16px!important}
+.nx-signal-strip{gap:10px}
+.nx-signal-strip>a{min-width:0;padding:14px!important}
+.nx-integrity-line{border:1px solid var(--nx-border);border-radius:14px;background:rgba(9,21,13,.7);padding:12px 16px}
+footer{border-color:var(--nx-border)!important}
+@media(max-width:900px){
+  main{padding:16px!important}
+  .hero-command{grid-template-columns:minmax(0,1fr)!important;gap:18px!important}
+  .hero-terminal{min-height:0}
+  .insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+  main{padding:12px!important}
+  main>section{margin-block:13px!important}
+  .hero-command,.hero:not(.hero-command){padding:18px!important;border-radius:16px!important}
+  .hero-command h2{font-size:clamp(25px,7vw,34px)!important}
+  .hero-actions{gap:9px}
+  .hero-actions>a{flex:1 1 170px;text-align:center}
+  .cards,.insight-grid,.system-grid{grid-template-columns:minmax(0,1fr)!important}
+  .map-section{padding:12px!important}
+  .map-section>#map{height:clamp(390px,58dvh,620px)!important;min-height:390px!important;max-height:68dvh!important}
+  .nx-sim-controls{grid-template-columns:minmax(0,1fr)}
+  .nx-personal-head{align-items:flex-start;gap:12px}
+  .nx-personal-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .nx-personal-actions a{min-height:40px;display:inline-flex;align-items:center}
+  .nx-signal-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .nx-ataturk-home{grid-template-columns:minmax(0,1fr)!important}
+  .nx-ataturk-image{min-height:210px}
+  .nx-ataturk-image img{max-height:260px;object-fit:cover}
+  .nx-wind-actions button,.nx-sim-buttons button{flex:1 1 140px}
+  #map .leaflet-control-layers{max-width:calc(100vw - 42px)}
+  #map .leaflet-control-layers-list{max-height:36dvh}
+}
+@media(max-width:390px){
+  main{padding:10px!important}
+  .hero-actions>a{flex-basis:100%}
+  .nx-signal-strip{grid-template-columns:minmax(0,1fr)!important}
+  .map-section>#map{min-height:360px!important;height:54dvh!important}
+  .map-toolbar{letter-spacing:.04em!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
